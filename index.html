@@ -1,78 +1,456 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Play, Settings, Github, Star, TrendingUp, Zap, Grid, List } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Online Games - Play Unblocked Games</title>
+    <meta name="description" content="Play free online games - no downloads required!">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-const GamesManager = () => {
-  const [games, setGames] = useState([]);
-  const [categories, setCategories] = useState(['All', 'Action', 'Puzzle', 'Sports', 'Racing', 'Arcade', 'Multiplayer']);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState('grid');
-  const [showAdmin, setShowAdmin] = useState(false);
-  const [selectedGame, setSelectedGame] = useState(null);
-  
-  // Initial games data - this simulates loading from games.json
-  const initialGames = [
-    { id: 1, name: 'Slope Runner', folder: 'slope-runner', category: 'Racing', featured: true, plays: 15420 },
-    { id: 2, name: 'Pixel Warfare', folder: 'pixel-warfare', category: 'Action', featured: false, plays: 8932 },
-    { id: 3, name: 'Basketball Stars', folder: 'basketball-stars', category: 'Sports', featured: true, plays: 12456 },
-    { id: 4, name: '2048 Puzzle', folder: '2048', category: 'Puzzle', featured: false, plays: 23890 },
-    { id: 5, name: 'Drift Boss', folder: 'drift-boss', category: 'Racing', featured: true, plays: 9876 },
-    { id: 6, name: 'Tetris Classic', folder: 'tetris', category: 'Puzzle', featured: false, plays: 34567 },
-    { id: 7, name: 'Soccer Skills', folder: 'soccer-skills', category: 'Sports', featured: false, plays: 6543 },
-    { id: 8, name: 'Space Invaders', folder: 'space-invaders', category: 'Arcade', featured: true, plays: 28901 },
-    { id: 9, name: 'Tank Battle', folder: 'tank-battle', category: 'Multiplayer', featured: false, plays: 11234 },
-    { id: 10, name: 'Parkour Master', folder: 'parkour-master', category: 'Action', featured: true, plays: 7890 },
-    { id: 11, name: 'Chess Online', folder: 'chess', category: 'Puzzle', featured: false, plays: 15678 },
-    { id: 12, name: 'Racing Legends', folder: 'racing-legends', category: 'Racing', featured: false, plays: 10234 }
-  ];
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
 
-  useEffect(() => {
-    setGames(initialGames);
-  }, []);
+        .header {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-  const filteredGames = games.filter(game => {
-    const matchesCategory = selectedCategory === 'All' || game.category === selectedCategory;
-    const matchesSearch = game.name.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+        .nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-  const featuredGames = games.filter(game => game.featured).slice(0, 6);
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
 
-  const GameCard = ({ game }) => (
-    <div 
-      className="game-card"
-      onClick={() => setSelectedGame(game)}
-    >
-      <div className="game-thumb">
-        <div className="game-placeholder">
-          <Play size={48} strokeWidth={1.5} />
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #2563eb;
+        }
+
+        .admin-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .admin-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .search-bar {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .categories {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .category-btn {
+            padding: 0.5rem 1.25rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #475569;
+            transition: all 0.2s;
+        }
+
+        .category-btn:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+
+        .category-btn.active {
+            background: #2563eb;
+            border-color: #2563eb;
+            color: white;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .game-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .game-thumb {
+            position: relative;
+            padding-top: 75%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .game-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 3rem;
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .game-card:hover .play-overlay {
+            opacity: 1;
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: #fbbf24;
+            color: #78350f;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .game-info {
+            padding: 1rem;
+        }
+
+        .game-info h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+        }
+
+        .category {
+            color: #2563eb;
+            background: #eff6ff;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .plays {
+            color: #64748b;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 1200px;
+            width: 100%;
+            max-height: 90vh;
+            overflow: auto;
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: #1e293b;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #64748b;
+            padding: 0.5rem;
+            line-height: 1;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .game-frame {
+            background: #1e293b;
+            border-radius: 8px;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1rem;
+            color: white;
+        }
+
+        .admin-panel {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            display: none;
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        .admin-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .admin-section h3 {
+            margin-bottom: 1rem;
+            color: #475569;
+            font-size: 1.1rem;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .games-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .admin-game-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .folder-path {
+            display: block;
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            font-family: monospace;
+        }
+
+        .status-active {
+            color: #059669;
+            font-weight: 500;
+        }
+
+        .instructions {
+            padding-left: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .instructions code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .games-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 1rem;
+            }
+
+            .nav-links a:not(.admin-btn) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                ▶ Free Online Games
+            </div>
+            <div class="nav-links">
+                <a href="#featured">Featured</a>
+                <a href="#all">All Games</a>
+                <a href="#categories">Categories</a>
+                <button class="admin-btn" onclick="toggleAdmin()">⚙ Admin</button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <h1>Play Free Online Games</h1>
+        <p>No downloads, no registration - just pure gaming fun!</p>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search games..." onkeyup="searchGames()">
         </div>
-        <div className="play-overlay">
-          <Play size={32} fill="white" />
-        </div>
-        {game.featured && (
-          <div className="featured-badge">
-            <Star size={12} fill="currentColor" /> Featured
-          </div>
-        )}
-      </div>
-      <div className="game-info">
-        <h3>{game.name}</h3>
-        <div className="game-meta">
-          <span className="category">{game.category}</span>
-          <span className="plays">{(game.plays / 1000).toFixed(1)}K plays</span>
-        </div>
-      </div>
     </div>
-  );
 
-  const AdminPanel = () => (
-    <div className="admin-panel">
-      <h2>🎮 Games Management System</h2>
-      
-      <div className="admin-section">
-        <h3>📁 Folder Structure</h3>
-        <pre className="code-block">{`/games/
+    <div class="container">
+        <div id="adminPanel" class="admin-panel">
+            <h2>🎮 Games Management System</h2>
+            
+            <div class="admin-section">
+                <h3>📁 Folder Structure</h3>
+                <pre class="code-block">/games/
 ├── slope-runner/
 │   ├── index.html
 │   └── assets/
@@ -81,12 +459,12 @@ const GamesManager = () => {
 │   └── assets/
 └── basketball-stars/
     ├── index.html
-    └── assets/`}</pre>
-      </div>
+    └── assets/</pre>
+            </div>
 
-      <div className="admin-section">
-        <h3>📝 games.json Configuration</h3>
-        <pre className="code-block">{`[
+            <div class="admin-section">
+                <h3>📝 games.json Configuration</h3>
+                <pre class="code-block">[
   {
     "id": 1,
     "name": "Slope Runner",
@@ -96,606 +474,170 @@ const GamesManager = () => {
     "plays": 15420,
     "description": "Fast-paced endless runner"
   }
-]`}</pre>
-      </div>
-
-      <div className="admin-section">
-        <h3>📋 Current Games</h3>
-        <div className="games-list">
-          {games.map(game => (
-            <div key={game.id} className="admin-game-item">
-              <div>
-                <strong>{game.name}</strong>
-                <span className="folder-path">/games/{game.folder}/</span>
-              </div>
-              <div className="admin-actions">
-                <span className={game.featured ? 'status-active' : 'status-inactive'}>
-                  {game.featured ? '⭐ Featured' : '○ Regular'}
-                </span>
-              </div>
+]</pre>
             </div>
-          ))}
-        </div>
-      </div>
 
-      <div className="admin-section">
-        <h3>🚀 GitHub Deployment Instructions</h3>
-        <ol className="instructions">
-          <li>Create repository: <code>chromebook-unblocked</code></li>
-          <li>Add games to <code>/games/</code> folder</li>
-          <li>Update <code>games.json</code> with game details</li>
-          <li>Enable GitHub Pages in Settings</li>
-          <li>Your site will be live at: <code>username.github.io/chromebook-unblocked</code></li>
-        </ol>
-      </div>
+            <div class="admin-section">
+                <h3>🚀 GitHub Deployment Instructions</h3>
+                <ol class="instructions">
+                    <li>Create repository: <code>chromebook-unblocked</code></li>
+                    <li>Add games to <code>/games/</code> folder</li>
+                    <li>Update <code>games.json</code> with game details</li>
+                    <li>Enable GitHub Pages in Settings → Pages</li>
+                    <li>Your site will be live at: <code>username.github.io/chromebook-unblocked</code></li>
+                </ol>
+            </div>
+
+            <div class="admin-section">
+                <h3>📋 Current Games</h3>
+                <div class="games-list" id="adminGamesList"></div>
+            </div>
+        </div>
+
+        <div id="mainContent">
+            <h2 class="section-title">⭐ Featured Games</h2>
+            <div class="games-grid" id="featuredGames"></div>
+
+            <h2 class="section-title">📈 All Games</h2>
+            <div class="categories" id="categories"></div>
+            <div class="games-grid" id="allGames"></div>
+        </div>
     </div>
-  );
 
-  return (
-    <div className="app">
-      <style>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-
-        .app {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-          background: #f5f5f5;
-          min-height: 100vh;
-        }
-
-        .header {
-          background: white;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-          position: sticky;
-          top: 0;
-          z-index: 100;
-        }
-
-        .nav {
-          max-width: 1400px;
-          margin: 0 auto;
-          padding: 1rem 2rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .logo {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: #2563eb;
-        }
-
-        .nav-links {
-          display: flex;
-          gap: 2rem;
-          align-items: center;
-        }
-
-        .nav-links a {
-          color: #64748b;
-          text-decoration: none;
-          font-weight: 500;
-          transition: color 0.2s;
-        }
-
-        .nav-links a:hover {
-          color: #2563eb;
-        }
-
-        .admin-toggle {
-          background: #f1f5f9;
-          border: none;
-          padding: 0.5rem 1rem;
-          border-radius: 6px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-weight: 500;
-          color: #475569;
-        }
-
-        .admin-toggle:hover {
-          background: #e2e8f0;
-        }
-
-        .hero {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          padding: 3rem 2rem;
-          text-align: center;
-        }
-
-        .hero h1 {
-          font-size: 3rem;
-          margin-bottom: 0.5rem;
-          font-weight: 800;
-        }
-
-        .hero p {
-          font-size: 1.25rem;
-          opacity: 0.9;
-          margin-bottom: 2rem;
-        }
-
-        .search-bar {
-          max-width: 600px;
-          margin: 0 auto;
-          position: relative;
-        }
-
-        .search-bar input {
-          width: 100%;
-          padding: 1rem 3rem 1rem 1rem;
-          border: none;
-          border-radius: 50px;
-          font-size: 1rem;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .search-icon {
-          position: absolute;
-          right: 1rem;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #94a3b8;
-        }
-
-        .container {
-          max-width: 1400px;
-          margin: 0 auto;
-          padding: 2rem;
-        }
-
-        .section-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 1.5rem;
-        }
-
-        .section-title {
-          font-size: 1.75rem;
-          font-weight: 700;
-          color: #1e293b;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .categories {
-          display: flex;
-          gap: 0.5rem;
-          flex-wrap: wrap;
-          margin-bottom: 2rem;
-        }
-
-        .category-btn {
-          padding: 0.5rem 1.25rem;
-          border: 2px solid #e2e8f0;
-          background: white;
-          border-radius: 50px;
-          cursor: pointer;
-          font-weight: 500;
-          color: #475569;
-          transition: all 0.2s;
-        }
-
-        .category-btn:hover {
-          border-color: #2563eb;
-          color: #2563eb;
-        }
-
-        .category-btn.active {
-          background: #2563eb;
-          border-color: #2563eb;
-          color: white;
-        }
-
-        .games-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-          gap: 1.5rem;
-          margin-bottom: 3rem;
-        }
-
-        .game-card {
-          background: white;
-          border-radius: 12px;
-          overflow: hidden;
-          cursor: pointer;
-          transition: all 0.3s;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .game-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-        }
-
-        .game-thumb {
-          position: relative;
-          padding-top: 75%;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .game-placeholder {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: rgba(255,255,255,0.5);
-        }
-
-        .play-overlay {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0,0,0,0.4);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          opacity: 0;
-          transition: opacity 0.3s;
-          color: white;
-        }
-
-        .game-card:hover .play-overlay {
-          opacity: 1;
-        }
-
-        .featured-badge {
-          position: absolute;
-          top: 0.5rem;
-          right: 0.5rem;
-          background: #fbbf24;
-          color: #78350f;
-          padding: 0.25rem 0.75rem;
-          border-radius: 50px;
-          font-size: 0.75rem;
-          font-weight: 600;
-          display: flex;
-          align-items: center;
-          gap: 0.25rem;
-        }
-
-        .game-info {
-          padding: 1rem;
-        }
-
-        .game-info h3 {
-          font-size: 1rem;
-          font-weight: 600;
-          color: #1e293b;
-          margin-bottom: 0.5rem;
-        }
-
-        .game-meta {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-size: 0.875rem;
-        }
-
-        .category {
-          color: #2563eb;
-          background: #eff6ff;
-          padding: 0.25rem 0.5rem;
-          border-radius: 4px;
-          font-weight: 500;
-        }
-
-        .plays {
-          color: #64748b;
-        }
-
-        .modal {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0,0,0,0.8);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-          padding: 2rem;
-        }
-
-        .modal-content {
-          background: white;
-          border-radius: 12px;
-          max-width: 1200px;
-          width: 100%;
-          max-height: 90vh;
-          overflow: auto;
-        }
-
-        .modal-header {
-          padding: 1.5rem;
-          border-bottom: 1px solid #e2e8f0;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .modal-header h2 {
-          font-size: 1.5rem;
-          color: #1e293b;
-        }
-
-        .close-btn {
-          background: none;
-          border: none;
-          font-size: 1.5rem;
-          cursor: pointer;
-          color: #64748b;
-          padding: 0.5rem;
-        }
-
-        .modal-body {
-          padding: 2rem;
-        }
-
-        .game-frame-placeholder {
-          background: #1e293b;
-          border-radius: 8px;
-          height: 600px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-direction: column;
-          gap: 1rem;
-          color: white;
-        }
-
-        .admin-panel {
-          background: white;
-          padding: 2rem;
-          border-radius: 12px;
-          margin: 2rem 0;
-        }
-
-        .admin-panel h2 {
-          margin-bottom: 2rem;
-          color: #1e293b;
-        }
-
-        .admin-section {
-          margin-bottom: 2rem;
-          padding: 1.5rem;
-          background: #f8fafc;
-          border-radius: 8px;
-        }
-
-        .admin-section h3 {
-          margin-bottom: 1rem;
-          color: #475569;
-          font-size: 1.1rem;
-        }
-
-        .code-block {
-          background: #1e293b;
-          color: #e2e8f0;
-          padding: 1rem;
-          border-radius: 6px;
-          overflow-x: auto;
-          font-family: 'Courier New', monospace;
-          font-size: 0.875rem;
-          line-height: 1.6;
-        }
-
-        .games-list {
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-        }
-
-        .admin-game-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 1rem;
-          background: white;
-          border-radius: 6px;
-          border: 1px solid #e2e8f0;
-        }
-
-        .folder-path {
-          display: block;
-          color: #64748b;
-          font-size: 0.875rem;
-          margin-top: 0.25rem;
-          font-family: monospace;
-        }
-
-        .status-active {
-          color: #059669;
-          font-weight: 500;
-        }
-
-        .status-inactive {
-          color: #64748b;
-        }
-
-        .instructions {
-          padding-left: 1.5rem;
-          line-height: 1.8;
-        }
-
-        .instructions code {
-          background: #1e293b;
-          color: #e2e8f0;
-          padding: 0.25rem 0.5rem;
-          border-radius: 4px;
-          font-family: monospace;
-          font-size: 0.875rem;
-        }
-
-        .view-toggle {
-          display: flex;
-          gap: 0.5rem;
-        }
-
-        .view-btn {
-          padding: 0.5rem;
-          border: 1px solid #e2e8f0;
-          background: white;
-          border-radius: 6px;
-          cursor: pointer;
-          color: #64748b;
-        }
-
-        .view-btn:hover {
-          background: #f8fafc;
-        }
-
-        .view-btn.active {
-          background: #2563eb;
-          border-color: #2563eb;
-          color: white;
-        }
-
-        @media (max-width: 768px) {
-          .hero h1 {
-            font-size: 2rem;
-          }
-
-          .games-grid {
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
-          }
-
-          .nav-links {
-            display: none;
-          }
-        }
-      `}</style>
-
-      <header className="header">
-        <nav className="nav">
-          <div className="logo">
-            <Play size={28} />
-            <span>Free Online Games</span>
-          </div>
-          <div className="nav-links">
-            <a href="#new">New Games</a>
-            <a href="#popular">Popular</a>
-            <a href="#categories">Categories</a>
-            <button className="admin-toggle" onClick={() => setShowAdmin(!showAdmin)}>
-              <Settings size={18} />
-              Admin
-            </button>
-          </div>
-        </nav>
-      </header>
-
-      <div className="hero">
-        <h1>Play Free Online Games</h1>
-        <p>No downloads, no registration - just pure gaming fun!</p>
-        <div className="search-bar">
-          <input 
-            type="text" 
-            placeholder="Search games..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <Search className="search-icon" size={20} />
+    <div id="gameModal" class="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 id="modalTitle">Game Title</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="game-frame" id="gameFrame">
+                    <div style="font-size: 4rem;">▶</div>
+                    <p>Game would load here</p>
+                    <code id="gamePath" style="opacity: 0.7;"></code>
+                </div>
+            </div>
         </div>
-      </div>
-
-      <div className="container">
-        {showAdmin && <AdminPanel />}
-
-        {!showAdmin && (
-          <>
-            <div className="section-header">
-              <h2 className="section-title">
-                <Star size={24} />
-                Featured Games
-              </h2>
-            </div>
-            <div className="games-grid">
-              {featuredGames.map(game => (
-                <GameCard key={game.id} game={game} />
-              ))}
-            </div>
-
-            <div className="section-header">
-              <h2 className="section-title">
-                <TrendingUp size={24} />
-                All Games
-              </h2>
-              <div className="view-toggle">
-                <button 
-                  className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                  onClick={() => setViewMode('grid')}
-                >
-                  <Grid size={18} />
-                </button>
-                <button 
-                  className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-                  onClick={() => setViewMode('list')}
-                >
-                  <List size={18} />
-                </button>
-              </div>
-            </div>
-
-            <div className="categories">
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  className={`category-btn ${selectedCategory === cat ? 'active' : ''}`}
-                  onClick={() => setSelectedCategory(cat)}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-
-            <div className="games-grid">
-              {filteredGames.map(game => (
-                <GameCard key={game.id} game={game} />
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-
-      {selectedGame && (
-        <div className="modal" onClick={() => setSelectedGame(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{selectedGame.name}</h2>
-              <button className="close-btn" onClick={() => setSelectedGame(null)}>×</button>
-            </div>
-            <div className="modal-body">
-              <div className="game-frame-placeholder">
-                <Play size={64} />
-                <p>Game iframe would load here</p>
-                <code style={{opacity: 0.7}}>games/{selectedGame.folder}/index.html</code>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
-  );
-};
 
-export default GamesManager;
+    <script>
+        const games = [
+            { id: 1, name: 'Slope Runner', folder: 'slope-runner', category: 'Racing', featured: true, plays: 15420 },
+            { id: 2, name: 'Pixel Warfare', folder: 'pixel-warfare', category: 'Action', featured: false, plays: 8932 },
+            { id: 3, name: 'Basketball Stars', folder: 'basketball-stars', category: 'Sports', featured: true, plays: 12456 },
+            { id: 4, name: '2048 Puzzle', folder: '2048', category: 'Puzzle', featured: false, plays: 23890 },
+            { id: 5, name: 'Drift Boss', folder: 'drift-boss', category: 'Racing', featured: true, plays: 9876 },
+            { id: 6, name: 'Tetris Classic', folder: 'tetris', category: 'Puzzle', featured: false, plays: 34567 },
+            { id: 7, name: 'Soccer Skills', folder: 'soccer-skills', category: 'Sports', featured: false, plays: 6543 },
+            { id: 8, name: 'Space Invaders', folder: 'space-invaders', category: 'Arcade', featured: true, plays: 28901 },
+            { id: 9, name: 'Tank Battle', folder: 'tank-battle', category: 'Multiplayer', featured: false, plays: 11234 },
+            { id: 10, name: 'Parkour Master', folder: 'parkour-master', category: 'Action', featured: true, plays: 7890 },
+            { id: 11, name: 'Chess Online', folder: 'chess', category: 'Puzzle', featured: false, plays: 15678 },
+            { id: 12, name: 'Racing Legends', folder: 'racing-legends', category: 'Racing', featured: false, plays: 10234 }
+        ];
+
+        const categories = ['All', 'Action', 'Puzzle', 'Sports', 'Racing', 'Arcade', 'Multiplayer'];
+        let selectedCategory = 'All';
+
+        function createGameCard(game) {
+            return `
+                <div class="game-card" onclick="openGame('${game.name}', '${game.folder}')">
+                    <div class="game-thumb">
+                        <div class="game-placeholder">▶</div>
+                        <div class="play-overlay">▶</div>
+                        ${game.featured ? '<div class="featured-badge">⭐ Featured</div>' : ''}
+                    </div>
+                    <div class="game-info">
+                        <h3>${game.name}</h3>
+                        <div class="game-meta">
+                            <span class="category">${game.category}</span>
+                            <span class="plays">${(game.plays / 1000).toFixed(1)}K plays</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGames() {
+            const featured = games.filter(g => g.featured);
+            document.getElementById('featuredGames').innerHTML = featured.map(createGameCard).join('');
+            
+            renderFilteredGames();
+            renderCategories();
+            renderAdminGames();
+        }
+
+        function renderFilteredGames() {
+            const filtered = games.filter(g => 
+                selectedCategory === 'All' || g.category === selectedCategory
+            );
+            document.getElementById('allGames').innerHTML = filtered.map(createGameCard).join('');
+        }
+
+        function renderCategories() {
+            document.getElementById('categories').innerHTML = categories.map(cat => `
+                <button class="category-btn ${selectedCategory === cat ? 'active' : ''}" 
+                        onclick="selectCategory('${cat}')">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function renderAdminGames() {
+            document.getElementById('adminGamesList').innerHTML = games.map(game => `
+                <div class="admin-game-item">
+                    <div>
+                        <strong>${game.name}</strong>
+                        <span class="folder-path">/games/${game.folder}/</span>
+                    </div>
+                    <span class="${game.featured ? 'status-active' : ''}">
+                        ${game.featured ? '⭐ Featured' : '○ Regular'}
+                    </span>
+                </div>
+            `).join('');
+        }
+
+        function selectCategory(cat) {
+            selectedCategory = cat;
+            renderFilteredGames();
+            renderCategories();
+        }
+
+        function searchGames() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.game-card');
+            cards.forEach(card => {
+                const name = card.querySelector('h3').textContent.toLowerCase();
+                card.style.display = name.includes(term) ? 'block' : 'none';
+            });
+        }
+
+        function openGame(name, folder) {
+            document.getElementById('modalTitle').textContent = name;
+            document.getElementById('gamePath').textContent = `games/${folder}/index.html`;
+            document.getElementById('gameModal').classList.add('active');
+        }
+
+        function closeModal(event) {
+            if (!event || event.target.id === 'gameModal') {
+                document.getElementById('gameModal').classList.remove('active');
+            }
+        }
+
+        function toggleAdmin() {
+            const panel = document.getElementById('adminPanel');
+            const content = document.getElementById('mainContent');
+            
+            if (panel.classList.contains('active')) {
+                panel.classList.remove('active');
+                content.style.display = 'block';
+            } else {
+                panel.classList.add('active');
+                content.style.display = 'none';
+            }
+        }
+
+        renderGames();
+    </script>
+</body>
+</html>
