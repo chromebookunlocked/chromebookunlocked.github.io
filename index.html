@@ -99,42 +99,11 @@
 
   <main id="home">
     <!-- LEFT: POPULAR GAMES -->
-    <section class="games">
-      <h2>🔥 Popular Games</h2>
-
-      <div class="card game-card" onclick="launchGame('snake')">
-        <div class="thumb">🐍</div>
-        <div class="info">
-          <h4>Neon Snake</h4>
-          <p>Classic arcade, glow edition</p>
-        </div>
-      </div>
-
-      <div class="card game-card" onclick="launchGame('hexgl')">
-        <div class="thumb">🏎️</div>
-        <div class="info">
-          <h4>HexGL Racing</h4>
-          <p>High-speed futuristic racer</p>
-        </div>
-      </div>
-
-      <div class="card game-card" onclick="launchGame('2048')">
-        <div class="thumb">🔢</div>
-        <div class="info">
-          <h4>2048 Cyber</h4>
-          <p>Slide & merge to 2048</p>
-        </div>
-      </div>
-
-      <div class="card game-card" onclick="launchGame('tower')">
-        <div class="thumb">🗼</div>
-        <div class="info">
-          <h4>Tower Blocks</h4>
-          <p>Stack to the sky</p>
-        </div>
-      </div>
-    </section>
-
+<section class="games">
+  <h2>🔥 Popular Games</h2>
+  <div id="gameGrid" class="tile-container"></div>
+</section>
+<script src="js/gameLoader.js"></script>
     <!-- CENTER: AI CHAT -->
     <section>
       <h2>💬 AI Chat</h2>
@@ -206,4 +175,5 @@
   }
   </script>
 </body>
+
 </html>
