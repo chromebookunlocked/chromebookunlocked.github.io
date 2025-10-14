@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Chromebook Unlocked</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root{
+      --bg:#0d0f18;
+      --card:#1a1d2b88;
+      --accent:#00f0ff;
+      --text:#e4e6eb;
+      --sub:#a2a5b3;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
+    body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+    a{color:var(--accent);text-decoration:none}
+    header{
+      width:100%;
+      padding:1rem 2rem;
+      background:#12142099;
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid #ffffff11;
+      position:sticky;top:0;z-index:10
+    }
+    .top{
+      display:flex;align-items:center;justify-content:space-between
+    }
+    .logo{
+      font-size:1.6rem;font-weight:700;letter-spacing:1px;
+      background:linear-gradient(90deg,var(--accent),#00d9ff);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent
+    }
+    nav{display:flex;gap:1.5rem}
+    nav a{
+      color:var(--sub);font-weight:500;transition:.2s;
+      border-bottom:2px solid transparent;padding-bottom:4px
+    }
+    nav a:hover{color:var(--accent);border-color:var(--accent)}
+    main{
+      flex:1;
+      display:grid;
+      grid-template-columns:1fr 380px 200px;
+      gap:2rem;
+      padding:2rem;
+      max-width:1400px;margin:auto;width:100%
+    }
+    section h2{margin-bottom:.8rem;font-size:1.3rem}
+    .card{
+      background:var(--card);
+      border:1px solid #ffffff22;
+      border-radius:12px;
+      padding:1rem;
+      backdrop-filter:blur(8px);
+      transition:transform .2s,box-shadow .2s;
+      cursor:pointer
+    }
+    .card:hover{transform:translateY(-4px);box-shadow:0 8px 24px #00f0ff33}
+    .games{display:flex;flex-direction:column;gap:1rem}
+    .game-card{display:flex;align-items:center;gap:1rem}
+    .thumb{width:72px;height:72px;border-radius:8px;background:#2a2f45;display:flex;align-items:center;justify-content:center;font-size:2rem}
+    .info{flex:1}
+    .info h4{font-size:1rem;margin-bottom:.2rem}
+    .info p{font-size:.8rem;color:var(--sub)}
+    .chat-box{
+      display:flex;flex-direction:column;height:480px;
+      background:var(--card);border-radius:12px;border:1px solid #ffffff22;
+      backdrop-filter:blur(8px);padding:1rem
+    }
+    #chatLog{flex:1;overflow:auto;margin-bottom:.6rem;font-size:.9rem;line-height:1.3}
+    #chatIn{
+      background:#12142066;border:1px solid #ffffff33;border-radius:8px;
+      padding:.6rem;color:var(--text);outline:none
+    }
+    .categories{display:flex;flex-direction:column;gap:.6rem}
+    .chip{
+      background:#1f233588;border:1px solid #ffffff22;border-radius:20px;
+      padding:.4rem .9rem;text-align:center;font-size:.85rem;transition:.2s
+    }
+    .chip:hover{border-color:var(--accent);color:var(--accent)}
+    @media(max-width:900px){
+      main{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="top">
+      <div class="logo">Chromebook Unlocked</div>
+      <nav>
+        <a href="#home">Home</a>
+        <a href="#arcade">Arcade</a>
+        <a href="#puzzle">Puzzle</a>
+        <a href="#strategy">Strategy</a>
+        <a href="#about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="home">
+    <!-- LEFT: POPULAR GAMES -->
+    <section class="games">
+      <h2>🔥 Popular Games</h2>
+
+      <div class="card game-card" onclick="launchGame('snake')">
+        <div class="thumb">🐍</div>
+        <div class="info">
+          <h4>Neon Snake</h4>
+          <p>Classic arcade, glow edition</p>
+        </div>
+      </div>
+
+      <div class="card game-card" onclick="launchGame('hexgl')">
+        <div class="thumb">🏎️</div>
+        <div class="info">
+          <h4>HexGL Racing</h4>
+          <p>High-speed futuristic racer</p>
+        </div>
+      </div>
+
+      <div class="card game-card" onclick="launchGame('2048')">
+        <div class="thumb">🔢</div>
+        <div class="info">
+          <h4>2048 Cyber</h4>
+          <p>Slide & merge to 2048</p>
+        </div>
+      </div>
+
+      <div class="card game-card" onclick="launchGame('tower')">
+        <div class="thumb">🗼</div>
+        <div class="info">
+          <h4>Tower Blocks</h4>
+          <p>Stack to the sky</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER: AI CHAT -->
+    <section>
+      <h2>💬 AI Chat</h2>
+      <div class="chat-box">
+        <div id="chatLog"></div>
+        <input id="chatIn" placeholder="Ask anything…" autocomplete="off"/>
+      </div>
+    </section>
+
+    <!-- RIGHT: CATEGORIES -->
+    <section class="categories">
+      <h2>Categories</h2>
+      <a href="#arcade"  class="chip">Arcade</a>
+      <a href="#puzzle" class="chip">Puzzle</a>
+      <a href="#racing" class="chip">Racing</a>
+      <a href="#strategy" class="chip">Strategy</a>
+      <a href="#casual"  class="chip">Casual</a>
+    </section>
+  </main>
+
+  <script>
+  /* ---------- AD PLACEHOLDERS ---------- */
+  function launchGame(id){
+    // TODO: swap for real 5-s skippable ad SDK
+    console.warn('Ad #1 – 5 sec');
+    setTimeout(()=>{
+      console.warn('Ad #2 – 5 sec');
+      setTimeout(()=>{
+        location.href='games/'+id+'/index.html';
+      },5000);
+    },5000);
+  }
+
+  /* ---------- AI CHAT (OpenAI) ---------- */
+  const OPENAI_KEY = 'sk-XXXXXXXXXXXXXXXXXXXXXXXX'; // <= your key
+  const chatLog = document.getElementById('chatLog');
+  const chatIn  = document.getElementById('chatIn');
+
+  chatIn.addEventListener('keydown', e=>{
+    if(e.key!=='Enter') return;
+    const q = chatIn.value.trim();
+    if(!q) return;
+    append('user',q); chatIn.value='';
+    fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':`Bearer ${OPENAI_KEY}`
+      },
+      body:JSON.stringify({
+        model:'gpt-3.5-turbo',
+        messages:[
+          {role:'system', content:'You are a friendly tutor. Be concise. Refuse homework answers, profanity, or personal info.'},
+          {role:'user', content:q}
+        ],
+        max_tokens:150,
+        temperature:0.7
+      })
+    })
+    .then(r=>r.json())
+    .then(j=>append('bot', j.choices[0].message.content))
+    .catch(()=>append('bot','Sorry, try again later.'));
+  });
+
+  function append(who,txt){
+    const div=document.createElement('div');
+    div.className=who; div.textContent=txt;
+    chatLog.appendChild(div); chatLog.scrollTop=1e9;
+  }
+  </script>
+</body>
+</html>
