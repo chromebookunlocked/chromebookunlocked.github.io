@@ -81,6 +81,42 @@
     @media(max-width:900px){
       main{grid-template-columns:1fr}
     }
+.tile-container{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1.2rem;
+}
+.game-tile{
+  background: var(--card);
+  border: 1px solid #ffffff22;
+  border-radius: 16px;
+  padding: .8rem .6rem;
+  text-align: center;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
+}
+.game-tile:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px #00f0ff44;
+}
+.game-tile img{
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: .5rem;
+}
+.game-tile .title{
+  display: block;
+  font-weight: 600;
+  font-size: .95rem;
+}
+.game-tile .desc{
+  display: block;
+  font-size: .75rem;
+  color: var(--sub);
+  margin-top: .2rem;
+}
   </style>
 </head>
 <body>
@@ -177,3 +213,4 @@
 </body>
 
 </html>
+
