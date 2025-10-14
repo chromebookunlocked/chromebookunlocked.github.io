@@ -1,216 +1,701 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8"/>
-  <title>Chromebook Unlocked</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <style>
-    :root{
-      --bg:#0d0f18;
-      --card:#1a1d2b88;
-      --accent:#00f0ff;
-      --text:#e4e6eb;
-      --sub:#a2a5b3;
-    }
-    *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
-    body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
-    a{color:var(--accent);text-decoration:none}
-    header{
-      width:100%;
-      padding:1rem 2rem;
-      background:#12142099;
-      backdrop-filter:blur(10px);
-      border-bottom:1px solid #ffffff11;
-      position:sticky;top:0;z-index:10
-    }
-    .top{
-      display:flex;align-items:center;justify-content:space-between
-    }
-    .logo{
-      font-size:1.6rem;font-weight:700;letter-spacing:1px;
-      background:linear-gradient(90deg,var(--accent),#00d9ff);
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent
-    }
-    nav{display:flex;gap:1.5rem}
-    nav a{
-      color:var(--sub);font-weight:500;transition:.2s;
-      border-bottom:2px solid transparent;padding-bottom:4px
-    }
-    nav a:hover{color:var(--accent);border-color:var(--accent)}
-    main{
-      flex:1;
-      display:grid;
-      grid-template-columns:1fr 380px 200px;
-      gap:2rem;
-      padding:2rem;
-      max-width:1400px;margin:auto;width:100%
-    }
-    section h2{margin-bottom:.8rem;font-size:1.3rem}
-    .card{
-      background:var(--card);
-      border:1px solid #ffffff22;
-      border-radius:12px;
-      padding:1rem;
-      backdrop-filter:blur(8px);
-      transition:transform .2s,box-shadow .2s;
-      cursor:pointer
-    }
-    .card:hover{transform:translateY(-4px);box-shadow:0 8px 24px #00f0ff33}
-    .games{display:flex;flex-direction:column;gap:1rem}
-    .game-card{display:flex;align-items:center;gap:1rem}
-    .thumb{width:72px;height:72px;border-radius:8px;background:#2a2f45;display:flex;align-items:center;justify-content:center;font-size:2rem}
-    .info{flex:1}
-    .info h4{font-size:1rem;margin-bottom:.2rem}
-    .info p{font-size:.8rem;color:var(--sub)}
-    .chat-box{
-      display:flex;flex-direction:column;height:480px;
-      background:var(--card);border-radius:12px;border:1px solid #ffffff22;
-      backdrop-filter:blur(8px);padding:1rem
-    }
-    #chatLog{flex:1;overflow:auto;margin-bottom:.6rem;font-size:.9rem;line-height:1.3}
-    #chatIn{
-      background:#12142066;border:1px solid #ffffff33;border-radius:8px;
-      padding:.6rem;color:var(--text);outline:none
-    }
-    .categories{display:flex;flex-direction:column;gap:.6rem}
-    .chip{
-      background:#1f233588;border:1px solid #ffffff22;border-radius:20px;
-      padding:.4rem .9rem;text-align:center;font-size:.85rem;transition:.2s
-    }
-    .chip:hover{border-color:var(--accent);color:var(--accent)}
-    @media(max-width:900px){
-      main{grid-template-columns:1fr}
-    }
-.tile-container{
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 1.2rem;
-}
-.game-tile{
-  background: var(--card);
-  border: 1px solid #ffffff22;
-  border-radius: 16px;
-  padding: .8rem .6rem;
-  text-align: center;
-  cursor: pointer;
-  transition: transform .2s, box-shadow .2s;
-}
-.game-tile:hover{
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px #00f0ff44;
-}
-.game-tile img{
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: .5rem;
-}
-.game-tile .title{
-  display: block;
-  font-weight: 600;
-  font-size: .95rem;
-}
-.game-tile .desc{
-  display: block;
-  font-size: .75rem;
-  color: var(--sub);
-  margin-top: .2rem;
-}
-  </style>
-</head>
-<body>
-  <header>
-    <div class="top">
-      <div class="logo">Chromebook Unlocked</div>
-      <nav>
-        <a href="#home">Home</a>
-        <a href="#arcade">Arcade</a>
-        <a href="#puzzle">Puzzle</a>
-        <a href="#strategy">Strategy</a>
-        <a href="#about">About</a>
-      </nav>
-    </div>
-  </header>
+import React, { useState, useEffect } from 'react';
+import { Search, Play, Settings, Github, Star, TrendingUp, Zap, Grid, List } from 'lucide-react';
 
-  <main id="home">
-    <!-- LEFT: POPULAR GAMES -->
-<section class="games">
-  <h2>🔥 Popular Games</h2>
-  <div id="gameGrid" class="tile-container"></div>
-</section>
-<script src="js/gameLoader.js"></script>
-    <!-- CENTER: AI CHAT -->
-    <section>
-      <h2>💬 AI Chat</h2>
-      <div class="chat-box">
-        <div id="chatLog"></div>
-        <input id="chatIn" placeholder="Ask anything…" autocomplete="off"/>
-      </div>
-    </section>
+const GamesManager = () => {
+  const [games, setGames] = useState([]);
+  const [categories, setCategories] = useState(['All', 'Action', 'Puzzle', 'Sports', 'Racing', 'Arcade', 'Multiplayer']);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [viewMode, setViewMode] = useState('grid');
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [selectedGame, setSelectedGame] = useState(null);
+  
+  // Initial games data - this simulates loading from games.json
+  const initialGames = [
+    { id: 1, name: 'Slope Runner', folder: 'slope-runner', category: 'Racing', featured: true, plays: 15420 },
+    { id: 2, name: 'Pixel Warfare', folder: 'pixel-warfare', category: 'Action', featured: false, plays: 8932 },
+    { id: 3, name: 'Basketball Stars', folder: 'basketball-stars', category: 'Sports', featured: true, plays: 12456 },
+    { id: 4, name: '2048 Puzzle', folder: '2048', category: 'Puzzle', featured: false, plays: 23890 },
+    { id: 5, name: 'Drift Boss', folder: 'drift-boss', category: 'Racing', featured: true, plays: 9876 },
+    { id: 6, name: 'Tetris Classic', folder: 'tetris', category: 'Puzzle', featured: false, plays: 34567 },
+    { id: 7, name: 'Soccer Skills', folder: 'soccer-skills', category: 'Sports', featured: false, plays: 6543 },
+    { id: 8, name: 'Space Invaders', folder: 'space-invaders', category: 'Arcade', featured: true, plays: 28901 },
+    { id: 9, name: 'Tank Battle', folder: 'tank-battle', category: 'Multiplayer', featured: false, plays: 11234 },
+    { id: 10, name: 'Parkour Master', folder: 'parkour-master', category: 'Action', featured: true, plays: 7890 },
+    { id: 11, name: 'Chess Online', folder: 'chess', category: 'Puzzle', featured: false, plays: 15678 },
+    { id: 12, name: 'Racing Legends', folder: 'racing-legends', category: 'Racing', featured: false, plays: 10234 }
+  ];
 
-    <!-- RIGHT: CATEGORIES -->
-    <section class="categories">
-      <h2>Categories</h2>
-      <a href="#arcade"  class="chip">Arcade</a>
-      <a href="#puzzle" class="chip">Puzzle</a>
-      <a href="#racing" class="chip">Racing</a>
-      <a href="#strategy" class="chip">Strategy</a>
-      <a href="#casual"  class="chip">Casual</a>
-    </section>
-  </main>
+  useEffect(() => {
+    setGames(initialGames);
+  }, []);
 
-  <script>
-  /* ---------- AD PLACEHOLDERS ---------- */
-  function launchGame(id){
-    // TODO: swap for real 5-s skippable ad SDK
-    console.warn('Ad #1 – 5 sec');
-    setTimeout(()=>{
-      console.warn('Ad #2 – 5 sec');
-      setTimeout(()=>{
-        location.href='games/'+id+'/index.html';
-      },5000);
-    },5000);
-  }
-
-  /* ---------- AI CHAT (OpenAI) ---------- */
-  const OPENAI_KEY = 'sk-XXXXXXXXXXXXXXXXXXXXXXXX'; // <= your key
-  const chatLog = document.getElementById('chatLog');
-  const chatIn  = document.getElementById('chatIn');
-
-  chatIn.addEventListener('keydown', e=>{
-    if(e.key!=='Enter') return;
-    const q = chatIn.value.trim();
-    if(!q) return;
-    append('user',q); chatIn.value='';
-    fetch('https://api.openai.com/v1/chat/completions',{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':`Bearer ${OPENAI_KEY}`
-      },
-      body:JSON.stringify({
-        model:'gpt-3.5-turbo',
-        messages:[
-          {role:'system', content:'You are a friendly tutor. Be concise. Refuse homework answers, profanity, or personal info.'},
-          {role:'user', content:q}
-        ],
-        max_tokens:150,
-        temperature:0.7
-      })
-    })
-    .then(r=>r.json())
-    .then(j=>append('bot', j.choices[0].message.content))
-    .catch(()=>append('bot','Sorry, try again later.'));
+  const filteredGames = games.filter(game => {
+    const matchesCategory = selectedCategory === 'All' || game.category === selectedCategory;
+    const matchesSearch = game.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
   });
 
-  function append(who,txt){
-    const div=document.createElement('div');
-    div.className=who; div.textContent=txt;
-    chatLog.appendChild(div); chatLog.scrollTop=1e9;
+  const featuredGames = games.filter(game => game.featured).slice(0, 6);
+
+  const GameCard = ({ game }) => (
+    <div 
+      className="game-card"
+      onClick={() => setSelectedGame(game)}
+    >
+      <div className="game-thumb">
+        <div className="game-placeholder">
+          <Play size={48} strokeWidth={1.5} />
+        </div>
+        <div className="play-overlay">
+          <Play size={32} fill="white" />
+        </div>
+        {game.featured && (
+          <div className="featured-badge">
+            <Star size={12} fill="currentColor" /> Featured
+          </div>
+        )}
+      </div>
+      <div className="game-info">
+        <h3>{game.name}</h3>
+        <div className="game-meta">
+          <span className="category">{game.category}</span>
+          <span className="plays">{(game.plays / 1000).toFixed(1)}K plays</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  const AdminPanel = () => (
+    <div className="admin-panel">
+      <h2>🎮 Games Management System</h2>
+      
+      <div className="admin-section">
+        <h3>📁 Folder Structure</h3>
+        <pre className="code-block">{`/games/
+├── slope-runner/
+│   ├── index.html
+│   └── assets/
+├── pixel-warfare/
+│   ├── index.html
+│   └── assets/
+└── basketball-stars/
+    ├── index.html
+    └── assets/`}</pre>
+      </div>
+
+      <div className="admin-section">
+        <h3>📝 games.json Configuration</h3>
+        <pre className="code-block">{`[
+  {
+    "id": 1,
+    "name": "Slope Runner",
+    "folder": "slope-runner",
+    "category": "Racing",
+    "featured": true,
+    "plays": 15420,
+    "description": "Fast-paced endless runner"
   }
-  </script>
-</body>
+]`}</pre>
+      </div>
 
-</html>
+      <div className="admin-section">
+        <h3>📋 Current Games</h3>
+        <div className="games-list">
+          {games.map(game => (
+            <div key={game.id} className="admin-game-item">
+              <div>
+                <strong>{game.name}</strong>
+                <span className="folder-path">/games/{game.folder}/</span>
+              </div>
+              <div className="admin-actions">
+                <span className={game.featured ? 'status-active' : 'status-inactive'}>
+                  {game.featured ? '⭐ Featured' : '○ Regular'}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
+      <div className="admin-section">
+        <h3>🚀 GitHub Deployment Instructions</h3>
+        <ol className="instructions">
+          <li>Create repository: <code>chromebook-unblocked</code></li>
+          <li>Add games to <code>/games/</code> folder</li>
+          <li>Update <code>games.json</code> with game details</li>
+          <li>Enable GitHub Pages in Settings</li>
+          <li>Your site will be live at: <code>username.github.io/chromebook-unblocked</code></li>
+        </ol>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="app">
+      <style>{`
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        .app {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+          background: #f5f5f5;
+          min-height: 100vh;
+        }
+
+        .header {
+          background: white;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          position: sticky;
+          top: 0;
+          z-index: 100;
+        }
+
+        .nav {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 1rem 2rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .logo {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #2563eb;
+        }
+
+        .nav-links {
+          display: flex;
+          gap: 2rem;
+          align-items: center;
+        }
+
+        .nav-links a {
+          color: #64748b;
+          text-decoration: none;
+          font-weight: 500;
+          transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+          color: #2563eb;
+        }
+
+        .admin-toggle {
+          background: #f1f5f9;
+          border: none;
+          padding: 0.5rem 1rem;
+          border-radius: 6px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-weight: 500;
+          color: #475569;
+        }
+
+        .admin-toggle:hover {
+          background: #e2e8f0;
+        }
+
+        .hero {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 3rem 2rem;
+          text-align: center;
+        }
+
+        .hero h1 {
+          font-size: 3rem;
+          margin-bottom: 0.5rem;
+          font-weight: 800;
+        }
+
+        .hero p {
+          font-size: 1.25rem;
+          opacity: 0.9;
+          margin-bottom: 2rem;
+        }
+
+        .search-bar {
+          max-width: 600px;
+          margin: 0 auto;
+          position: relative;
+        }
+
+        .search-bar input {
+          width: 100%;
+          padding: 1rem 3rem 1rem 1rem;
+          border: none;
+          border-radius: 50px;
+          font-size: 1rem;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .search-icon {
+          position: absolute;
+          right: 1rem;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #94a3b8;
+        }
+
+        .container {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 2rem;
+        }
+
+        .section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+          font-size: 1.75rem;
+          font-weight: 700;
+          color: #1e293b;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .categories {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+          margin-bottom: 2rem;
+        }
+
+        .category-btn {
+          padding: 0.5rem 1.25rem;
+          border: 2px solid #e2e8f0;
+          background: white;
+          border-radius: 50px;
+          cursor: pointer;
+          font-weight: 500;
+          color: #475569;
+          transition: all 0.2s;
+        }
+
+        .category-btn:hover {
+          border-color: #2563eb;
+          color: #2563eb;
+        }
+
+        .category-btn.active {
+          background: #2563eb;
+          border-color: #2563eb;
+          color: white;
+        }
+
+        .games-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 1.5rem;
+          margin-bottom: 3rem;
+        }
+
+        .game-card {
+          background: white;
+          border-radius: 12px;
+          overflow: hidden;
+          cursor: pointer;
+          transition: all 0.3s;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .game-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+
+        .game-thumb {
+          position: relative;
+          padding-top: 75%;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .game-placeholder {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: rgba(255,255,255,0.5);
+        }
+
+        .play-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0,0,0,0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity 0.3s;
+          color: white;
+        }
+
+        .game-card:hover .play-overlay {
+          opacity: 1;
+        }
+
+        .featured-badge {
+          position: absolute;
+          top: 0.5rem;
+          right: 0.5rem;
+          background: #fbbf24;
+          color: #78350f;
+          padding: 0.25rem 0.75rem;
+          border-radius: 50px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+        }
+
+        .game-info {
+          padding: 1rem;
+        }
+
+        .game-info h3 {
+          font-size: 1rem;
+          font-weight: 600;
+          color: #1e293b;
+          margin-bottom: 0.5rem;
+        }
+
+        .game-meta {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-size: 0.875rem;
+        }
+
+        .category {
+          color: #2563eb;
+          background: #eff6ff;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-weight: 500;
+        }
+
+        .plays {
+          color: #64748b;
+        }
+
+        .modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0,0,0,0.8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          padding: 2rem;
+        }
+
+        .modal-content {
+          background: white;
+          border-radius: 12px;
+          max-width: 1200px;
+          width: 100%;
+          max-height: 90vh;
+          overflow: auto;
+        }
+
+        .modal-header {
+          padding: 1.5rem;
+          border-bottom: 1px solid #e2e8f0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .modal-header h2 {
+          font-size: 1.5rem;
+          color: #1e293b;
+        }
+
+        .close-btn {
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+          color: #64748b;
+          padding: 0.5rem;
+        }
+
+        .modal-body {
+          padding: 2rem;
+        }
+
+        .game-frame-placeholder {
+          background: #1e293b;
+          border-radius: 8px;
+          height: 600px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          gap: 1rem;
+          color: white;
+        }
+
+        .admin-panel {
+          background: white;
+          padding: 2rem;
+          border-radius: 12px;
+          margin: 2rem 0;
+        }
+
+        .admin-panel h2 {
+          margin-bottom: 2rem;
+          color: #1e293b;
+        }
+
+        .admin-section {
+          margin-bottom: 2rem;
+          padding: 1.5rem;
+          background: #f8fafc;
+          border-radius: 8px;
+        }
+
+        .admin-section h3 {
+          margin-bottom: 1rem;
+          color: #475569;
+          font-size: 1.1rem;
+        }
+
+        .code-block {
+          background: #1e293b;
+          color: #e2e8f0;
+          padding: 1rem;
+          border-radius: 6px;
+          overflow-x: auto;
+          font-family: 'Courier New', monospace;
+          font-size: 0.875rem;
+          line-height: 1.6;
+        }
+
+        .games-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+
+        .admin-game-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem;
+          background: white;
+          border-radius: 6px;
+          border: 1px solid #e2e8f0;
+        }
+
+        .folder-path {
+          display: block;
+          color: #64748b;
+          font-size: 0.875rem;
+          margin-top: 0.25rem;
+          font-family: monospace;
+        }
+
+        .status-active {
+          color: #059669;
+          font-weight: 500;
+        }
+
+        .status-inactive {
+          color: #64748b;
+        }
+
+        .instructions {
+          padding-left: 1.5rem;
+          line-height: 1.8;
+        }
+
+        .instructions code {
+          background: #1e293b;
+          color: #e2e8f0;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-family: monospace;
+          font-size: 0.875rem;
+        }
+
+        .view-toggle {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .view-btn {
+          padding: 0.5rem;
+          border: 1px solid #e2e8f0;
+          background: white;
+          border-radius: 6px;
+          cursor: pointer;
+          color: #64748b;
+        }
+
+        .view-btn:hover {
+          background: #f8fafc;
+        }
+
+        .view-btn.active {
+          background: #2563eb;
+          border-color: #2563eb;
+          color: white;
+        }
+
+        @media (max-width: 768px) {
+          .hero h1 {
+            font-size: 2rem;
+          }
+
+          .games-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+          }
+
+          .nav-links {
+            display: none;
+          }
+        }
+      `}</style>
+
+      <header className="header">
+        <nav className="nav">
+          <div className="logo">
+            <Play size={28} />
+            <span>Free Online Games</span>
+          </div>
+          <div className="nav-links">
+            <a href="#new">New Games</a>
+            <a href="#popular">Popular</a>
+            <a href="#categories">Categories</a>
+            <button className="admin-toggle" onClick={() => setShowAdmin(!showAdmin)}>
+              <Settings size={18} />
+              Admin
+            </button>
+          </div>
+        </nav>
+      </header>
+
+      <div className="hero">
+        <h1>Play Free Online Games</h1>
+        <p>No downloads, no registration - just pure gaming fun!</p>
+        <div className="search-bar">
+          <input 
+            type="text" 
+            placeholder="Search games..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Search className="search-icon" size={20} />
+        </div>
+      </div>
+
+      <div className="container">
+        {showAdmin && <AdminPanel />}
+
+        {!showAdmin && (
+          <>
+            <div className="section-header">
+              <h2 className="section-title">
+                <Star size={24} />
+                Featured Games
+              </h2>
+            </div>
+            <div className="games-grid">
+              {featuredGames.map(game => (
+                <GameCard key={game.id} game={game} />
+              ))}
+            </div>
+
+            <div className="section-header">
+              <h2 className="section-title">
+                <TrendingUp size={24} />
+                All Games
+              </h2>
+              <div className="view-toggle">
+                <button 
+                  className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                  onClick={() => setViewMode('grid')}
+                >
+                  <Grid size={18} />
+                </button>
+                <button 
+                  className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+                  onClick={() => setViewMode('list')}
+                >
+                  <List size={18} />
+                </button>
+              </div>
+            </div>
+
+            <div className="categories">
+              {categories.map(cat => (
+                <button
+                  key={cat}
+                  className={`category-btn ${selectedCategory === cat ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            <div className="games-grid">
+              {filteredGames.map(game => (
+                <GameCard key={game.id} game={game} />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {selectedGame && (
+        <div className="modal" onClick={() => setSelectedGame(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{selectedGame.name}</h2>
+              <button className="close-btn" onClick={() => setSelectedGame(null)}>×</button>
+            </div>
+            <div className="modal-body">
+              <div className="game-frame-placeholder">
+                <Play size={64} />
+                <p>Game iframe would load here</p>
+                <code style={{opacity: 0.7}}>games/{selectedGame.folder}/index.html</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default GamesManager;
