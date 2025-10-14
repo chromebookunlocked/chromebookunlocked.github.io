@@ -1,8 +1,7 @@
-{
-  "id": 1,
-  "name": "wbwwb",
-  "folder": "wbwwb",
-  "category": "Action",
-  "featured": true,
-  "plays": 15
-}
+    "id": 1,
+    "name": "wbwwb",
+    "folder": "wbwwb",
+    "category": "horror",
+    "featured": true,
+    "plays": 15420,
+    "description": "Navigate through a neon world at breakneck speeds! Avoid obstacles and see how far you can go in this endless runner."
