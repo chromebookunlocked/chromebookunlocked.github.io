@@ -33,20 +33,15 @@
   </div>
 
   <script>
-    // fetch directory listing of /games/
     fetch('games/')
       .then(r => r.text())
       .then(text => {
-        // grab folder names (href="foldername/")
-        const folders = [...new Set(text.match(/href="([^"/]+)\//g))]
-                       .map(s => s.slice(6, -2));
+        const folders = [...new Set(text.match(/href="([^"/]+)\//g))].map(s => s.slice(6, -2));
         const grid = document.getElementById('grid');
         folders.forEach(id => {
-          // choose thumb extension
-          const thumbSrc = `games/${id}/thumb.png`;
           const img = new Image();
-          img.src = thumbSrc;
-          img.onerror = () => img.src = `games/${id}/thumb.jpg`; // fallback
+          img.src = `games/${id}/thumb.png`;
+          img.onerror = () => img.src = `games/${id}/thumb.jpg`;
           img.loading = 'lazy';
           img.alt = id;
 
@@ -54,7 +49,7 @@
           card.className = 'card';
           card.appendChild(img);
           const h3 = document.createElement('h3');
-          h3.textContent = id.replace(/[-_]/g,' ').replace(/\b\w,c=>c.toUpperCase());
+          h3.textContent = id.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
           card.appendChild(h3);
           card.onclick = () => openGame(id);
           grid.appendChild(card);
@@ -62,7 +57,7 @@
       });
 
     function openGame(id) {
-      document.getElementById('title').textContent = id.replace(/[-_]/g,' ').replace(/\b\w,c=>c.toUpperCase());
+      document.getElementById('title').textContent = id.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
       document.getElementById('frame').src = `games/${id}/index.html`;
       document.getElementById('play').style.display = 'flex';
       history.pushState({id}, '', `#${id}`);
