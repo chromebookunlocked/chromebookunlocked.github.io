@@ -1,496 +1,78 @@
-<!DOCTYPE html>
+html
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="gameTitle">Play Game</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0f172a;
-            color: white;
-            overflow: hidden;
-        }
-
-        .game-header {
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            position: relative;
-            z-index: 100;
-        }
-
-        .game-info-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .back-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border: none;
-            padding: 0.6rem 1.5rem;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            color: white;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .back-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
-        }
-
-        .game-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: white;
-        }
-
-        .game-controls {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .control-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            padding: 0.6rem 1.2rem;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            color: white;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .control-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.4);
-        }
-
-        .fullscreen-btn {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            border: none;
-            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
-        }
-
-        .fullscreen-btn:hover {
-            box-shadow: 0 6px 16px rgba(251, 191, 36, 0.4);
-        }
-
-        .game-container {
-            width: 100%;
-            height: calc(100vh - 80px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #0f172a;
-            position: relative;
-        }
-
-        .game-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: #000;
-        }
-
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 10;
-        }
-
-        .loading.hidden {
-            display: none;
-        }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            display: none;
-            max-width: 500px;
-            padding: 2rem;
-            background: rgba(239, 68, 68, 0.1);
-            border: 2px solid rgba(239, 68, 68, 0.3);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .error-message.active {
-            display: block;
-        }
-
-        .error-message h2 {
-            color: #fca5a5;
-            margin-bottom: 1rem;
-        }
-
-        .error-message p {
-            color: #cbd5e1;
-            line-height: 1.6;
-        }
-
-        .game-sidebar {
-            position: fixed;
-            right: 0;
-            top: 80px;
-            width: 300px;
-            height: calc(100vh - 80px);
-            background: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1.5rem;
-            transform: translateX(100%);
-            transition: transform 0.3s;
-            overflow-y: auto;
-            z-index: 50;
-        }
-
-        .game-sidebar.active {
-            transform: translateX(0);
-        }
-
-        .sidebar-toggle {
-            position: fixed;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border: none;
-            padding: 1rem 0.6rem;
-            border-radius: 12px 0 0 12px;
-            cursor: pointer;
-            color: white;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-            z-index: 51;
-        }
-
-        .game-description {
-            margin-bottom: 1.5rem;
-        }
-
-        .game-description h3 {
-            margin-bottom: 0.5rem;
-            color: #667eea;
-        }
-
-        .game-description p {
-            color: #cbd5e1;
-            line-height: 1.6;
-            font-size: 0.9rem;
-        }
-
-        .related-games {
-            margin-top: 2rem;
-        }
-
-        .related-games h3 {
-            margin-bottom: 1rem;
-            color: #667eea;
-        }
-
-        .related-game-item {
-            display: flex;
-            gap: 1rem;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            margin-bottom: 0.75rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            color: white;
-        }
-
-        .related-game-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(-5px);
-        }
-
-        .related-thumb {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            overflow: hidden;
-        }
-
-        .related-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .related-info h4 {
-            font-size: 0.9rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .related-info p {
-            font-size: 0.75rem;
-            color: #94a3b8;
-        }
-
-        @media (max-width: 768px) {
-            .game-header {
-                padding: 0.75rem 1rem;
-                flex-wrap: wrap;
-            }
-
-            .game-name {
-                font-size: 1.2rem;
-            }
-
-            .game-controls {
-                gap: 0.5rem;
-            }
-
-            .control-btn {
-                padding: 0.5rem 0.8rem;
-                font-size: 0.85rem;
-            }
-
-            .game-sidebar {
-                width: 100%;
-            }
-        }
-    </style>
+  <meta charset="utf-8">
+  <title>Arcade</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    :root{--gap:1.2rem;--card:280px}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#111;color:#eee;margin:0;padding:2rem}
+    h1{text-align:center;margin-bottom:2rem}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card),1fr));gap:var(--gap)}
+    .card{background:#222;border-radius:8px;overflow:hidden;cursor:pointer;transition:transform .2s}
+    .card:hover{transform:scale(1.04)}
+    .card img{width:100%;height:auto;display:block}
+    .card h3{margin:.7rem .9rem 0;font-size:1.1rem}
+    .card p{margin:.3rem .9rem .9rem;font-size:.85rem;color:#aaa}
+    #play{position:fixed;inset:0;background:#000;display:none;flex-direction:column}
+    #play menu{background:#222;padding:.5rem}
+    #play button{border:none;padding:.4rem .8rem;background:#444;color:#fff;border-radius:4px;cursor:pointer}
+    #play iframe{flex:1;border:0;width:100%;height:100%}
+  </style>
 </head>
 <body>
-    <header class="game-header">
-        <div class="game-info-header">
-            <a href="index.html" class="back-btn">← Back</a>
-            <h1 class="game-name" id="gameName">Loading...</h1>
-        </div>
-        <div class="game-controls">
-            <button class="control-btn" onclick="reloadGame()">🔄 Reload</button>
-            <button class="control-btn fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-        </div>
-    </header>
+  <h1>Pick a game</h1>
+  <div class="grid" id="grid"></div>
 
-    <div class="game-container">
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Loading game...</p>
-        </div>
-        
-        <div class="error-message" id="errorMessage">
-            <h2>⚠️ Game Not Found</h2>
-            <p>The game you're looking for doesn't exist or hasn't been added yet.</p>
-            <p style="margin-top: 1rem;">Make sure the game folder exists in <code style="background: #1e293b; padding: 0.2rem 0.5rem; border-radius: 4px;">/games/</code> with an <code style="background: #1e293b; padding: 0.2rem 0.5rem; border-radius: 4px;">index.html</code> file.</p>
-            <a href="index.html" class="back-btn" style="margin-top: 1.5rem; display: inline-flex;">← Back to Home</a>
-        </div>
+  <div id="play">
+    <menu><button onclick="closeGame()">← Back</button> <span id="title"></span></menu>
+    <iframe id="frame"></iframe>
+  </div>
 
-        <iframe id="gameFrame" class="game-frame"></iframe>
-    </div>
-
-    <button class="sidebar-toggle" onclick="toggleSidebar()">ℹ️</button>
-
-    <div class="game-sidebar" id="gameSidebar">
-        <div class="game-description">
-            <h3>About This Game</h3>
-            <p id="gameDescription">Loading description...</p>
-        </div>
-
-        <div class="related-games">
-            <h3>More Games</h3>
-            <div id="relatedGames"></div>
-        </div>
-    </div>
-
-    <script>
-        let currentGame = null;
-        let allGames = [];
-
-        // Get game parameter from URL
-        function getGameFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('game');
-        }
-
-        // Load games from games.json
-        async function loadGamesData() {
-            try {
-                const response = await fetch('games.json');
-                allGames = await response.json();
-                return allGames;
-            } catch (error) {
-                console.error('Error loading games:', error);
-                return [];
-            }
-        }
-
-        // Load and display the game
-        async function loadGame() {
-            const gameFolder = getGameFromUrl();
-            
-            if (!gameFolder) {
-                showError();
-                return;
-            }
-
-            // Load games data
-            await loadGamesData();
-            currentGame = allGames.find(g => g.folder === gameFolder);
-
-            // Update page title and name
-            const gameName = currentGame ? currentGame.name : gameFolder.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-            document.getElementById('gameName').textContent = gameName;
-            document.getElementById('gameTitle').textContent = `${gameName} - Play Online`;
-
-            // Update description
-            if (currentGame && currentGame.description) {
-                document.getElementById('gameDescription').textContent = currentGame.description;
-            } else {
-                document.getElementById('gameDescription').textContent = 'Enjoy this amazing game!';
-            }
-
-            // Load related games
-            loadRelatedGames();
-
-            // Load the game iframe
-            const gameFrame = document.getElementById('gameFrame');
-            const gamePath = `games/${gameFolder}/index.html`;
-            
-            // Check if game exists by trying to load it
-            fetch(gamePath)
-                .then(response => {
-                    if (response.ok) {
-                        gameFrame.src = gamePath;
-                        gameFrame.onload = function() {
-                            document.getElementById('loading').classList.add('hidden');
-                        };
-                    } else {
-                        showError();
-                    }
-                })
-                .catch(() => {
-                    showError();
-                });
-        }
-
-        function showError() {
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('errorMessage').classList.add('active');
-            document.getElementById('gameFrame').style.display = 'none';
-        }
-
-        function reloadGame() {
-            const gameFrame = document.getElementById('gameFrame');
-            gameFrame.src = gameFrame.src;
-        }
-
-        function toggleFullscreen() {
-            const gameFrame = document.getElementById('gameFrame');
-            
-            if (!document.fullscreenElement) {
-                if (gameFrame.requestFullscreen) {
-                    gameFrame.requestFullscreen();
-                } else if (gameFrame.webkitRequestFullscreen) {
-                    gameFrame.webkitRequestFullscreen();
-                } else if (gameFrame.msRequestFullscreen) {
-                    gameFrame.msRequestFullscreen();
-                }
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
-            }
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('gameSidebar');
-            sidebar.classList.toggle('active');
-        }
-
-        function loadRelatedGames() {
-            if (!currentGame || allGames.length === 0) return;
-
-            // Get games from same category
-            let related = allGames.filter(g => 
-                g.category === currentGame.category && 
-                g.folder !== currentGame.folder
-            ).slice(0, 5);
-
-            // If not enough, add random games
-            if (related.length < 5) {
-                const remaining = allGames.filter(g => 
-                    g.folder !== currentGame.folder && 
-                    !related.includes(g)
-                ).slice(0, 5 - related.length);
-                related = [...related, ...remaining];
-            }
-
-            const relatedContainer = document.getElementById('relatedGames');
-            relatedContainer.innerHTML = related.map(game => `
-                <a href="play.html?game=${game.folder}" class="related-game-item">
-                    <div class="related-thumb">
-                        <img src="games/${game.folder}/thumbnail.jpg" alt="${game.name}"
-                             onerror="this.style.display='none'">
-                    </div>
-                    <div class="related-info">
-                        <h4>${game.name}</h4>
-                        <p>${game.category}</p>
-                    </div>
-                </a>
-            `).join('');
-        }
-
-        // Load game on page load
-        loadGame();
-
-        // Close sidebar when clicking outside
-        document.addEventListener('click', function(e) {
-            const sidebar = document.getElementById('gameSidebar');
-            const toggle = document.querySelector('.sidebar-toggle');
-            
-            if (sidebar.classList.contains('active') && 
-                !sidebar.contains(e.target) && 
-                !toggle.contains(e.target)) {
-                sidebar.classList.remove('active');
-            }
+  <script>
+    // build gallery once the page loads
+    fetch('games/')
+      .then(r => r.text())
+      .then(txt => {
+        // simple regex: grab all folder names that appear in href="folder/"
+        const folders = [...new Set(txt.match(/href="([^"/]+)\//g))]
+                       .map(s => s.slice(6, -2));
+        const grid = document.getElementById('grid');
+        folders.forEach(id => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src="games/${id}/thumbnail.jpg" loading="lazy" alt="${id}">
+            <h3>${id.replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</h3>`;
+          card.onclick = () => openGame(id);
+          grid.appendChild(card);
         });
-    </script>
+      });
+
+    function openGame(id) {
+      document.getElementById('title').textContent = id.replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+      document.getElementById('frame').src = `games/${id}/index.html`;
+      document.getElementById('play').style.display = 'flex';
+      history.pushState({id}, '', `#${id}`);
+    }
+    function closeGame() {
+      document.getElementById('play').style.display = 'none';
+      document.getElementById('frame').src = 'about:blank';
+      history.pushState({}, '', location.pathname);
+    }
+    // handle back/forward
+    window.addEventListener('popstate', () => {
+      if (location.hash) {
+        const id = location.hash.slice(1);
+        if (document.getElementById('play').style.display !== 'flex') openGame(id);
+      } else {
+        closeGame();
+      }
+    });
+    // deep-link on fresh load
+    if (location.hash) openGame(location.hash.slice(1));
+  </script>
 </body>
 </html>
