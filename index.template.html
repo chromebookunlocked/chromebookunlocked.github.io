@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Arcade</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    :root{--gap:1.2rem;--card:280px}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#111;color:#eee;margin:0;padding:2rem}
+    h1{text-align:center;margin-bottom:2rem}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card),1fr));gap:var(--gap)}
+    .card{background:#222;border-radius:8px;overflow:hidden;cursor:pointer;transition:transform .2s}
+    .card:hover{transform:scale(1.04)}
+    .card img{width:100%;height:auto;display:block}
+    .card h3{margin:.7rem .9rem 0;font-size:1.1rem}
+    #play{position:fixed;inset:0;background:#000;display:none;flex-direction:column}
+    #play menu{background:#222;padding:.5rem;display:flex;align-items:center;gap:.5rem}
+    #play button{border:none;padding:.4rem .8rem;background:#444;color:#fff;border-radius:4px;cursor:pointer}
+    #play iframe{flex:1;border:0;width:100%;height:100%}
+  </style>
+</head>
+<body>
+  <h1>Pick a game</h1>
+  <div class="grid" id="grid"></div>
+
+  <div id="play">
+    <menu>
+      <button onclick="closeGame()">← Back</button>
+      <span id="title"></span>
+    </menu>
+    <iframe id="frame"></iframe>
+  </div>
+
+  <script>
+    // 🕹️ This will be replaced automatically
+    const games = __GAMES__;
+    
+    const grid = document.getElementById('grid');
+    games.forEach(id => {
+      const img = new Image();
+      img.src = `games/${id}/thumb.png`;
+      img.onerror = () => img.src = `games/${id}/thumb.jpg`;
+      img.loading = 'lazy';
+      img.alt = id;
+
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.appendChild(img);
+
+      const h3 = document.createElement('h3');
+      h3.textContent = formatName(id);
+      card.appendChild(h3);
+
+      card.onclick = () => openGame(id);
+      grid.appendChild(card);
+    });
+
+    function openGame(id) {
+      document.getElementById('title').textContent = formatName(id);
+      document.getElementById('frame').src = `games/${id}/index.html`;
+      document.getElementById('play').style.display = 'flex';
+      history.pushState({id}, '', `#${id}`);
+    }
+
+    function closeGame() {
+      document.getElementById('play').style.display = 'none';
+      document.getElementById('frame').src = 'about:blank';
+      history.pushState({}, '', location.pathname);
+    }
+
+    function formatName(id) {
+      return id.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    window.addEventListener('popstate', () => {
+      if (location.hash) openGame(location.hash.slice(1));
+      else closeGame();
+    });
+
+    if (location.hash) openGame(location.hash.slice(1));
+  </script>
+</body>
+</html>
