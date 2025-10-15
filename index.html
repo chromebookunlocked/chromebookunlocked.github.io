@@ -33,31 +33,39 @@
   </div>
 
   <script>
-    // fetch games/ directory listing from GitHub Pages
+    // fetch directory listing of /games/
     fetch('games/')
       .then(r => r.text())
       .then(text => {
-        // grab every *.html href
-        const htmlFiles = [...text.matchAll(/href="([^"]+)\.html"/g)]
-                          .map(m => m[1])
-                          .filter(n => n !== 'index'); // safety
+        // grab folder names (href="foldername/")
+        const folders = [...new Set(text.match(/href="([^"/]+)\//g))]
+                       .map(s => s.slice(6, -2));
         const grid = document.getElementById('grid');
-        htmlFiles.forEach(name => {
+        folders.forEach(id => {
+          // choose thumb extension
+          const thumbSrc = `games/${id}/thumb.png`;
+          const img = new Image();
+          img.src = thumbSrc;
+          img.onerror = () => img.src = `games/${id}/thumb.jpg`; // fallback
+          img.loading = 'lazy';
+          img.alt = id;
+
           const card = document.createElement('div');
           card.className = 'card';
-          card.innerHTML = `
-            <img src="games/${name}.jpg" loading="lazy" alt="${name}">
-            <h3>${name.replace(/[-_]/g,' ').replace(/\b\w,g=>g.toUpperCase())}</h3>`;
-          card.onclick = () => openGame(name);
+          card.appendChild(img);
+          const h3 = document.createElement('h3');
+          h3.textContent = id.replace(/[-_]/g,' ').replace(/\b\w,c=>c.toUpperCase());
+          card.appendChild(h3);
+          card.onclick = () => openGame(id);
           grid.appendChild(card);
         });
       });
 
-    function openGame(name) {
-      document.getElementById('title').textContent = name.replace(/[-_]/g,' ').replace(/\b\w,g=>g.toUpperCase());
-      document.getElementById('frame').src = `games/${name}.html`;
+    function openGame(id) {
+      document.getElementById('title').textContent = id.replace(/[-_]/g,' ').replace(/\b\w,c=>c.toUpperCase());
+      document.getElementById('frame').src = `games/${id}/index.html`;
       document.getElementById('play').style.display = 'flex';
-      history.pushState({name}, '', `#${name}`);
+      history.pushState({id}, '', `#${id}`);
     }
     function closeGame() {
       document.getElementById('play').style.display = 'none';
