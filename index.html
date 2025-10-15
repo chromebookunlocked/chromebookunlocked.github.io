@@ -1,4 +1,3 @@
-html
 <!doctype html>
 <html lang="en">
 <head>
@@ -15,9 +14,8 @@ html
     .card:hover{transform:scale(1.04)}
     .card img{width:100%;height:auto;display:block}
     .card h3{margin:.7rem .9rem 0;font-size:1.1rem}
-    .card p{margin:.3rem .9rem .9rem;font-size:.85rem;color:#aaa}
     #play{position:fixed;inset:0;background:#000;display:none;flex-direction:column}
-    #play menu{background:#222;padding:.5rem}
+    #play menu{background:#222;padding:.5rem;display:flex;align-items:center;gap:.5rem}
     #play button{border:none;padding:.4rem .8rem;background:#444;color:#fff;border-radius:4px;cursor:pointer}
     #play iframe{flex:1;border:0;width:100%;height:100%}
   </style>
@@ -27,51 +25,48 @@ html
   <div class="grid" id="grid"></div>
 
   <div id="play">
-    <menu><button onclick="closeGame()">← Back</button> <span id="title"></span></menu>
+    <menu>
+      <button onclick="closeGame()">← Back</button>
+      <span id="title"></span>
+    </menu>
     <iframe id="frame"></iframe>
   </div>
 
   <script>
-    // build gallery once the page loads
+    // fetch games/ directory listing from GitHub Pages
     fetch('games/')
       .then(r => r.text())
-      .then(txt => {
-        // simple regex: grab all folder names that appear in href="folder/"
-        const folders = [...new Set(txt.match(/href="([^"/]+)\//g))]
-                       .map(s => s.slice(6, -2));
+      .then(text => {
+        // grab every *.html href
+        const htmlFiles = [...text.matchAll(/href="([^"]+)\.html"/g)]
+                          .map(m => m[1])
+                          .filter(n => n !== 'index'); // safety
         const grid = document.getElementById('grid');
-        folders.forEach(id => {
+        htmlFiles.forEach(name => {
           const card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = `
-            <img src="games/${id}/thumbnail.jpg" loading="lazy" alt="${id}">
-            <h3>${id.replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase())}</h3>`;
-          card.onclick = () => openGame(id);
+            <img src="games/${name}.jpg" loading="lazy" alt="${name}">
+            <h3>${name.replace(/[-_]/g,' ').replace(/\b\w,g=>g.toUpperCase())}</h3>`;
+          card.onclick = () => openGame(name);
           grid.appendChild(card);
         });
       });
 
-    function openGame(id) {
-      document.getElementById('title').textContent = id.replace(/[-_]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-      document.getElementById('frame').src = `games/${id}/index.html`;
+    function openGame(name) {
+      document.getElementById('title').textContent = name.replace(/[-_]/g,' ').replace(/\b\w,g=>g.toUpperCase());
+      document.getElementById('frame').src = `games/${name}.html`;
       document.getElementById('play').style.display = 'flex';
-      history.pushState({id}, '', `#${id}`);
+      history.pushState({name}, '', `#${name}`);
     }
     function closeGame() {
       document.getElementById('play').style.display = 'none';
       document.getElementById('frame').src = 'about:blank';
       history.pushState({}, '', location.pathname);
     }
-    // handle back/forward
     window.addEventListener('popstate', () => {
-      if (location.hash) {
-        const id = location.hash.slice(1);
-        if (document.getElementById('play').style.display !== 'flex') openGame(id);
-      } else {
-        closeGame();
-      }
+      location.hash ? openGame(location.hash.slice(1)) : closeGame();
     });
-    // deep-link on fresh load
     if (location.hash) openGame(location.hash.slice(1));
   </script>
 </body>
