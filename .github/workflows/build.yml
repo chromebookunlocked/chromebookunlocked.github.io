@@ -23,6 +23,9 @@ jobs:
       - name: Generate index.html
         run: npm run build
 
+      - name: Copy games folder to dist
+        run: cp -r games dist/
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
