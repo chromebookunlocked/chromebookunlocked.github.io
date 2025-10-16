@@ -102,7 +102,6 @@ const html = `
   <div class="grid">
     ${games.map((g) => {
       const thumbPath = ["thumbnail.png", "thumbnail.jpg", "thumb.png", "thumb.jpg"]
-@@ -46,34 +107,59 @@
       `;
     }).join("")}
   </div>
