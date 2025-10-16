@@ -5,9 +5,7 @@ const gamesDir = path.join(__dirname, "games");
 const outputDir = path.join(__dirname, "dist");
 const outputFile = path.join(outputDir, "index.html");
 
-if (!fs.existsSync(outputDir)) {
-  fs.mkdirSync(outputDir);
-}
+if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
 
 const games = fs
   .readdirSync(gamesDir)
@@ -20,39 +18,62 @@ const html = `
   <meta charset="UTF-8" />
   <title>My Game Arcade</title>
   <style>
-    body { font-family: sans-serif; background: #121212; color: white; text-align: center; }
-    h1 { margin-top: 40px; }
+    body { font-family: sans-serif; background: #121212; color: white; margin: 0; }
+    h1 { margin: 20px; text-align: center; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 20px; max-width: 1000px; margin: auto; }
-    .card { background: #1e1e1e; padding: 10px; border-radius: 10px; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; }
+    .card { background: #1e1e1e; padding: 10px; border-radius: 10px; transition: transform 0.2s; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
     .card:hover { transform: scale(1.05); background: #292929; }
     .thumb { width: 180px; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; background: #333; }
-    a { color: #00eaff; text-decoration: none; font-size: 18px; }
+    .viewer { display: none; width: 100%; height: 100vh; }
+    iframe { width: 100%; height: 100%; border: none; }
+    #backBtn { position: absolute; top: 10px; left: 10px; background: #00eaff; color: black; padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer; display: none; }
   </style>
 </head>
 <body>
   <h1>🎮 My Game Arcade</h1>
   <div class="grid">
-    ${games
-      .map((g) => {
-        const thumbPath = ["thumbnail.png", "thumbnail.jpg", "thumb.png", "thumb.jpg"]
-          .find((img) => fs.existsSync(path.join(gamesDir, g, img)));
-
-        const thumbTag = thumbPath
-          ? `<img class="thumb" src="games/${g}/${thumbPath}" alt="${g} thumbnail">`
-          : `<div class="thumb"></div>`;
-
-        return `
-          <div class="card">
-            ${thumbTag}
-            <a href="games/${g}/index.html" target="_blank">${g}</a>
-          </div>
-        `;
-      })
-      .join("")}
+    ${games.map((g) => {
+      const thumbPath = ["thumbnail.png", "thumbnail.jpg", "thumb.png", "thumb.jpg"]
+        .find((img) => fs.existsSync(path.join(gamesDir, g, img)));
+      const thumbTag = thumbPath
+        ? `<img class="thumb" src="games/${g}/${thumbPath}" alt="${g} thumbnail">`
+        : `<div class="thumb"></div>`;
+      return `
+        <div class="card" onclick="openGame('games/${g}/index.html')">
+          ${thumbTag}
+          <div>${g}</div>
+        </div>
+      `;
+    }).join("")}
   </div>
+  <div class="viewer">
+    <button id="backBtn" onclick="closeGame()">⬅ Back</button>
+    <iframe id="gameFrame" src=""></iframe>
+  </div>
+
+  <script>
+    const grid = document.querySelector('.grid');
+    const viewer = document.querySelector('.viewer');
+    const frame = document.getElementById('gameFrame');
+    const backBtn = document.getElementById('backBtn');
+
+    function openGame(url) {
+      frame.src = url;
+      grid.style.display = 'none';
+      viewer.style.display = 'block';
+      backBtn.style.display = 'block';
+    }
+
+    function closeGame() {
+      frame.src = '';
+      grid.style.display = 'grid';
+      viewer.style.display = 'none';
+      backBtn.style.display = 'none';
+    }
+  </script>
 </body>
 </html>
 `;
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Generated index.html with ${games.length} games`);
+console.log(`✅ Generated arcade with ${games.length} games`);
