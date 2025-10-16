@@ -79,6 +79,14 @@
     });
 
     if (location.hash) openGame(location.hash.slice(1));
+    // Prevent page scroll during gameplay
+    window.addEventListener('keydown', function(e) {
+      const blockedKeys = ['ArrowUp', 'ArrowDown', ' ', 'Spacebar']; 
+      if (viewer.style.display === 'block' && blockedKeys.includes(e.key)) {
+        e.preventDefault();
+      }
+    }, false);
+
   </script>
 </body>
 </html>
