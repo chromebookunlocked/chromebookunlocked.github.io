@@ -1,4 +1,21 @@
- <meta charset="UTF-8" />
+ const fs = require("fs");
+const path = require("path");
+
+const gamesDir = path.join(__dirname, "games");
+const outputDir = path.join(__dirname, "dist");
+const outputFile = path.join(outputDir, "index.html");
+
+if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
+
+const games = fs
+  .readdirSync(gamesDir)
+  .filter((file) => fs.lstatSync(path.join(gamesDir, file)).isDirectory());
+
+const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
   <title>My Game Arcade</title>
   <style>
     body { font-family: sans-serif; background: #121212; color: white; margin: 0; }
@@ -85,7 +102,7 @@
   <div class="grid">
     ${games.map((g) => {
       const thumbPath = ["thumbnail.png", "thumbnail.jpg", "thumb.png", "thumb.jpg"]
-@@ -46,34 +107,59 @@ const html = `
+@@ -46,34 +107,59 @@
       `;
     }).join("")}
   </div>
