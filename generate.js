@@ -1,4 +1,4 @@
- const fs = require("fs");
+const fs = require("fs");
 const path = require("path");
 
 const gamesDir = path.join(__dirname, "games");
@@ -102,6 +102,15 @@ const html = `
   <div class="grid">
     ${games.map((g) => {
       const thumbPath = ["thumbnail.png", "thumbnail.jpg", "thumb.png", "thumb.jpg"]
+        .find((img) => fs.existsSync(path.join(gamesDir, g, img)));
+      const thumbTag = thumbPath
+        ? `<img class="thumb" src="games/${g}/${thumbPath}" alt="${g} thumbnail">`
+        : `<div class="thumb"></div>`;
+      return `
+        <div class="card" onclick="openGame('games/${g}/index.html')">
+          ${thumbTag}
+          <div>${g}</div>
+        </div>
       `;
     }).join("")}
   </div>
