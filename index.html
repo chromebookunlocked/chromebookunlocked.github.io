@@ -3,17 +3,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>🎮 My Game Arcade</title>
+<title>Arcade</title>
 <style>
   body { font-family:sans-serif; margin:0; background:#1c0033; color:#eee; overflow-x:hidden; display:flex; }
-  #sidebar { width:250px; background:#330066; padding:1rem; height:100vh; overflow-y:auto; transition: all 0.3s ease; }
+  #sidebar { width:250px; background:#330066; padding:1rem; height:100vh; overflow-y:auto; transition: all 0.3s ease; position:relative; }
   #sidebar.collapsed { width:50px; }
-  #sidebar header { display:flex; align-items:center; margin-bottom:2rem; }
-  #sidebar header img { height:40px; margin-right:0.5rem; }
-  #sidebar header h1 { font-size:1.2rem; color:#ffccff; margin:0; display:inline; }
-  #sidebar button.toggle { margin-bottom:1rem; background:#660099; color:#fff; border:none; width:100%; padding:0.5rem; cursor:pointer; border-radius:6px; }
+  #sidebar header { display:flex; justify-content:center; margin-bottom:2rem; }
+  #sidebar header img { height:60px; }
+  #toggleBtn { position:absolute; top:50%; right:-15px; transform:translateY(-50%); background:#660099; color:#fff; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; }
   #sidebar ul { list-style:none; padding:0; margin:0; }
-  #sidebar li { cursor:pointer; padding:0.3rem 0.5rem; border-radius:4px; transition:0.2s; }
+  #sidebar li { cursor:pointer; padding:0.5rem 0.5rem; border-radius:4px; transition:0.2s; white-space:nowrap; }
   #sidebar li:hover { background:#660099; }
   #content { flex:1; padding:1rem; overflow:auto; }
   .category { margin-bottom:2rem; }
@@ -35,11 +34,10 @@
 <div id="sidebar">
   <header>
     <img src="logo.png" alt="Logo">
-    <h1>Arcade</h1>
   </header>
-  <button class="toggle" onclick="toggleSidebar()">☰</button>
+  <button id="toggleBtn" onclick="toggleSidebar()">›</button>
   <ul id="categoryList">
-    <li onclick="filterCategory('Shooter')">Shooter</li><li onclick="filterCategory('Uncategorized')">Uncategorized</li>
+    <li onclick="filterCategory('All Games')">All Games</li><li onclick="filterCategory('Shooter')">Shooter</li><li onclick="filterCategory('Uncategorized')">Uncategorized</li>
   </ul>
 </div>
 
@@ -54,6 +52,38 @@
   </div>
 
   <div id="allGames">
+    
+      <div class="category" data-category="All Games">
+        <h2 onclick="filterCategory('All Games')">All Games</h2>
+        <div class="grid">
+          
+              <div class="card" onclick="openGame('1v1.lol')">
+                <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
+                <div>1v1.lol</div>
+              </div>
+            
+              <div class="card" onclick="openGame('Age Of War')">
+                <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
+                <div>Age Of War</div>
+              </div>
+            
+              <div class="card" onclick="openGame('Among Us')">
+                <img class="thumb" src="games/Among Us/thumbnail.jpg" alt="Among Us">
+                <div>Among Us</div>
+              </div>
+            
+              <div class="card" onclick="openGame('Backrooms')">
+                <img class="thumb" src="games/Backrooms/thumbnail.jpg" alt="Backrooms">
+                <div>Backrooms</div>
+              </div>
+            
+              <div class="card" onclick="openGame('Baldi’s Basics')">
+                <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
+                <div>Baldi’s Basics</div>
+              </div>
+            
+        </div>
+      </div>
     
       <div class="category" data-category="Shooter">
         <h2 onclick="filterCategory('Shooter')">Shooter</h2>
@@ -129,15 +159,12 @@ function toggleSidebar() {
 function filterCategory(cat) {
   const categories = document.querySelectorAll('.category');
   categories.forEach(c => {
-    c.style.display = c.getAttribute('data-category') === cat ? 'block' : 'none';
+    c.style.display = (cat === 'All Games' || c.getAttribute('data-category') === cat) ? 'block' : 'none';
   });
 }
 
-// Show all categories by default
-function showAllCategories() {
-  const categories = document.querySelectorAll('.category');
-  categories.forEach(c => c.style.display = 'block');
-}
+// Show All Games by default
+filterCategory('All Games');
 
 // Prevent arrow keys / space from scrolling
 window.addEventListener('keydown', e => {
