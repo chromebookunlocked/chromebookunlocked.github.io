@@ -66,7 +66,7 @@ button { padding:0.4rem 0.8rem; border:none; border-radius:6px; cursor:pointer; 
 
 <div id="sidebar">
   <header>
-    <img src="logo.png" alt="Logo">
+    <img src="assets/logo.png" alt="Logo">
   </header>
 <button id="toggleBtn" onclick="toggleSidebar()" style="right:10px">›</button>
   <ul id="categoryList">
