@@ -8,9 +8,6 @@ const templateFile = path.join(__dirname, "index.template.html");
 
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
 
-const games = fs
-  .readdirSync(gamesDir)
-  .filter((file) => fs.lstatSync(path.join(gamesDir, file)).isDirectory());
 
 const html = `
 <!DOCTYPE html>
