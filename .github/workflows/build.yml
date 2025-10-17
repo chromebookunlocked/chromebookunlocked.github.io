@@ -25,7 +25,7 @@ jobs:
       - name: Build site
         run: npm run build
 
-      - name: Copy game and asset folders
+      - name: Copy game, data and asset folders
         run: |
           mkdir -p dist
           cp -r games dist/games
@@ -37,3 +37,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+          clean: true      # 🧼 Important! Remove deleted files
