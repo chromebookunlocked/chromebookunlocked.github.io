@@ -23,7 +23,7 @@ let games = fs.readdirSync(dataDir)
   });
 
 // Group games by category
-const categories = {};
+const categories = { "All Games": games };
 games.forEach(g => {
   if (!categories[g.category]) categories[g.category] = [];
   categories[g.category].push(g);
@@ -35,17 +35,16 @@ const html = `
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>🎮 My Game Arcade</title>
+<title>Arcade</title>
 <style>
   body { font-family:sans-serif; margin:0; background:#1c0033; color:#eee; overflow-x:hidden; display:flex; }
-  #sidebar { width:250px; background:#330066; padding:1rem; height:100vh; overflow-y:auto; transition: all 0.3s ease; }
+  #sidebar { width:250px; background:#330066; padding:1rem; height:100vh; overflow-y:auto; transition: all 0.3s ease; position:relative; }
   #sidebar.collapsed { width:50px; }
-  #sidebar header { display:flex; align-items:center; margin-bottom:2rem; }
-  #sidebar header img { height:40px; margin-right:0.5rem; }
-  #sidebar header h1 { font-size:1.2rem; color:#ffccff; margin:0; display:inline; }
-  #sidebar button.toggle { margin-bottom:1rem; background:#660099; color:#fff; border:none; width:100%; padding:0.5rem; cursor:pointer; border-radius:6px; }
+  #sidebar header { display:flex; justify-content:center; margin-bottom:2rem; }
+  #sidebar header img { height:60px; }
+  #toggleBtn { position:absolute; top:50%; right:-15px; transform:translateY(-50%); background:#660099; color:#fff; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; }
   #sidebar ul { list-style:none; padding:0; margin:0; }
-  #sidebar li { cursor:pointer; padding:0.3rem 0.5rem; border-radius:4px; transition:0.2s; }
+  #sidebar li { cursor:pointer; padding:0.5rem 0.5rem; border-radius:4px; transition:0.2s; white-space:nowrap; }
   #sidebar li:hover { background:#660099; }
   #content { flex:1; padding:1rem; overflow:auto; }
   .category { margin-bottom:2rem; }
@@ -67,9 +66,8 @@ const html = `
 <div id="sidebar">
   <header>
     <img src="logo.png" alt="Logo">
-    <h1>Arcade</h1>
   </header>
-  <button class="toggle" onclick="toggleSidebar()">☰</button>
+  <button id="toggleBtn" onclick="toggleSidebar()">›</button>
   <ul id="categoryList">
     ${Object.keys(categories).map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`).join('')}
   </ul>
@@ -137,15 +135,12 @@ function toggleSidebar() {
 function filterCategory(cat) {
   const categories = document.querySelectorAll('.category');
   categories.forEach(c => {
-    c.style.display = c.getAttribute('data-category') === cat ? 'block' : 'none';
+    c.style.display = (cat === 'All Games' || c.getAttribute('data-category') === cat) ? 'block' : 'none';
   });
 }
 
-// Show all categories by default
-function showAllCategories() {
-  const categories = document.querySelectorAll('.category');
-  categories.forEach(c => c.style.display = 'block');
-}
+// Show All Games by default
+filterCategory('All Games');
 
 // Prevent arrow keys / space from scrolling
 window.addEventListener('keydown', e => {
@@ -159,4 +154,4 @@ window.addEventListener('keydown', e => {
 `;
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Generated arcade with ${games.length} games and sidebar`);
+console.log(`✅ Generated arcade with ${games.length} games, modern sidebar and All Games default`);
