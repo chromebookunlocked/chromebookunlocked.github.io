@@ -35,7 +35,7 @@
   <header>
     <img src="logo.png" alt="Logo">
   </header>
-  <button id="toggleBtn" onclick="toggleSidebar()">›</button>
+  <button id="toggleBtn" onclick="toggleSidebar()" style="right:-10px">›</button>
   <ul id="categoryList">
     <li onclick="filterCategory('All Games')">All Games</li><li onclick="filterCategory('Shooter')">Shooter</li><li onclick="filterCategory('Uncategorized')">Uncategorized</li>
   </ul>
@@ -157,9 +157,15 @@ function toggleSidebar() {
 }
 
 function filterCategory(cat) {
-  const categories = document.querySelectorAll('.category');
-  categories.forEach(c => {
-    c.style.display = (cat === 'All Games' || c.getAttribute('data-category') === cat) ? 'block' : 'none';
+  const allCategories = document.querySelectorAll('.category');
+  allCategories.forEach(c => {
+    if (cat === 'All Games') {
+      // Show only the All Games section, hide others
+      c.style.display = (c.getAttribute('data-category') === 'All Games') ? 'block' : 'none';
+    } else {
+      // Show only the selected category
+      c.style.display = (c.getAttribute('data-category') === cat) ? 'block' : 'none';
+    }
   });
 }
 
