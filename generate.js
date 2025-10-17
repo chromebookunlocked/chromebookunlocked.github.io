@@ -67,7 +67,7 @@ const html = `
   <header>
     <img src="logo.png" alt="Logo">
   </header>
-  <button id="toggleBtn" onclick="toggleSidebar()" style="right:-20px">›</button>
+  <button id="toggleBtn" onclick="toggleSidebar()" style="right:10px">›</button>
   <ul id="categoryList">
     ${Object.keys(categories).map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`).join('')}
   </ul>
