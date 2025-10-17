@@ -37,28 +37,29 @@ const html = `
 <meta charset="UTF-8">
 <title>Arcade</title>
 <style>
-  body { font-family:sans-serif; margin:0; background:#1c0033; color:#eee; overflow-x:hidden; display:flex; }
-  #sidebar { width:250px; background:#330066; padding:1rem; height:100vh; overflow-y:auto; transition: all 0.3s ease; position:relative; }
-  #sidebar.collapsed { width:50px; }
-  #sidebar header { display:flex; justify-content:center; margin-bottom:2rem; }
-  #sidebar header img { height:60px; }
-  #toggleBtn { position:absolute; top:50%; right:-15px; transform:translateY(-50%); background:#660099; color:#fff; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; }
-  #sidebar ul { list-style:none; padding:0; margin:0; }
-  #sidebar li { cursor:pointer; padding:0.5rem 0.5rem; border-radius:4px; transition:0.2s; white-space:nowrap; }
-  #sidebar li:hover { background:#660099; }
-  #content { flex:1; padding:1rem; overflow:auto; }
-  .category { margin-bottom:2rem; }
-  .category h2 { color:#ffccff; cursor:pointer; margin-bottom:0.5rem; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem; }
-  .card { background:#4d0066; border-radius:8px; overflow:hidden; cursor:pointer; transition:transform .2s; display:flex; flex-direction:column; align-items:center; }
-  .card:hover { transform:scale(1.05); background:#660099; }
-  .thumb { width:180px; height:120px; object-fit:cover; margin-bottom:0.5rem; border-radius:6px; background:#330033; }
-  .viewer { width:100%; height:70vh; display:flex; flex-direction:column; margin-bottom:2rem; display:none; }
-  iframe { width:100%; height:100%; border:none; }
-  #controls { display:flex; justify-content:space-between; margin-bottom:0.5rem; }
-  button { padding:0.4rem 0.8rem; border:none; border-radius:6px; cursor:pointer; font-size:14px; }
-  #backBtn { background:#ff99ff; color:black; }
-  #fullscreenBtn { background:#cc66ff; color:black; }
+body { font-family:sans-serif; margin:0; background:#1c0033; color:#eee; overflow-x:hidden; display:flex; }
+#sidebar { width:250px; background:#330066; padding:1rem; height:100vh; overflow-y:auto; transition: all 0.3s ease; position:relative; }
+#sidebar.collapsed { width:50px; }
+#sidebar header { display:flex; justify-content:center; margin-bottom:2rem; }
+#sidebar header img { height:60px; }
+#toggleBtn { position:absolute; top:50%; right:-10px; transform:translateY(-50%); background:#660099; color:#fff; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition: all 0.3s; }
+#sidebar ul { list-style:none; padding:0; margin:0; transition: font-size 0.3s; }
+#sidebar li { cursor:pointer; padding:0.5rem 0.5rem; border-radius:4px; transition:0.2s; white-space:nowrap; font-size:16px; }
+#sidebar.collapsed ul li { font-size:0; }
+#sidebar li:hover { background:#660099; }
+#content { flex:1; padding:1rem; overflow:auto; }
+.category { margin-bottom:2rem; }
+.category h2 { color:#ffccff; cursor:pointer; margin-bottom:0.5rem; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem; }
+.card { background:#4d0066; border-radius:8px; overflow:hidden; cursor:pointer; transition:transform .2s; display:flex; flex-direction:column; align-items:center; }
+.card:hover { transform:scale(1.05); background:#660099; }
+.thumb { width:180px; height:120px; object-fit:cover; margin-bottom:0.5rem; border-radius:6px; background:#330033; }
+.viewer { width:100%; height:70vh; display:flex; flex-direction:column; margin-bottom:2rem; display:none; }
+iframe { width:100%; height:100%; border:none; }
+#controls { display:flex; justify-content:space-between; margin-bottom:0.5rem; }
+button { padding:0.4rem 0.8rem; border:none; border-radius:6px; cursor:pointer; font-size:14px; }
+#backBtn { background:#ff99ff; color:black; }
+#fullscreenBtn { background:#cc66ff; color:black; }
 </style>
 </head>
 <body>
@@ -67,7 +68,7 @@ const html = `
   <header>
     <img src="logo.png" alt="Logo">
   </header>
-  <button id="toggleBtn" onclick="toggleSidebar()" style="right:10px">›</button>
+<button id="toggleBtn" onclick="toggleSidebar()" style="right:10px">›</button>
   <ul id="categoryList">
     ${Object.keys(categories).map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`).join('')}
   </ul>
@@ -115,6 +116,8 @@ function openGame(folder) {
   frame.src = 'games/' + folder + '/index.html';
   viewer.style.display = 'flex';
   gameTitle.textContent = folder;
+  // Show All Games under the game window
+  filterCategory('All Games');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -136,10 +139,8 @@ function filterCategory(cat) {
   const allCategories = document.querySelectorAll('.category');
   allCategories.forEach(c => {
     if (cat === 'All Games') {
-      // Show only the All Games section, hide others
       c.style.display = (c.getAttribute('data-category') === 'All Games') ? 'block' : 'none';
     } else {
-      // Show only the selected category
       c.style.display = (c.getAttribute('data-category') === cat) ? 'block' : 'none';
     }
   });
@@ -160,4 +161,4 @@ window.addEventListener('keydown', e => {
 `;
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Generated arcade with ${games.length} games, modern sidebar and All Games default`);
+console.log(`✅ Generated arcade with ${games.length} games, sidebar collapse, logo, and All Games view`);
