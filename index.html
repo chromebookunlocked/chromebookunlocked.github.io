@@ -1,247 +1,87 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8" />
   <title>Arcade</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
-    :root {
-      --bg: #1a1126;
-      --card: #2b1b3f;
-      --highlight: #7d4cff;
-      --text: #eee;
-      --gap: 1.2rem;
-      --card-width: 260px;
-    }
-    * { box-sizing: border-box; }
     body {
-      font-family: system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      margin: 0;
-      display: flex;
-      min-height: 100vh;
-    }
-
-    /* Sidebar */
-    .sidebar {
-      width: 240px;
-      background: #221631;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .sidebar img.logo {
-      max-width: 100%;
-      margin-bottom: 1rem;
-    }
-    .sidebar h2 {
-      margin: 0 0 0.5rem;
-      font-size: 1rem;
-      color: var(--highlight);
-    }
-    .category-list button {
-      background: none;
-      border: none;
-      color: var(--text);
-      text-align: left;
-      font-size: 0.95rem;
-      padding: 0.4rem 0;
-      cursor: pointer;
-      width: 100%;
-    }
-    .category-list button:hover,
-    .category-list button.active {
-      color: var(--highlight);
-    }
-
-    main {
-      flex: 1;
-      padding: 2rem;
-      overflow-y: auto;
-    }
-
-    h1 { text-align: center; margin-bottom: 1rem; }
-
-    .viewer {
-      background: black;
-      width: 100%;
-      height: 70vh;
-      margin-bottom: 2rem;
-      border-radius: 10px;
-      overflow: hidden;
-      position: relative;
-      display: none;
-    }
-    .viewer iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-    .viewer menu {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      display: flex;
-      gap: 10px;
-    }
-    .viewer button {
-      border: none;
-      padding: .4rem .8rem;
-      background: var(--highlight);
+      background: #111;
       color: #fff;
-      border-radius: 4px;
-      cursor: pointer;
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 0 20px;
     }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill,minmax(var(--card-width),1fr));
-      gap: var(--gap);
+    h1 {
+      text-align: center;
+      margin-top: 20px;
     }
-
-    .card {
-      background: var(--card);
+    h2 {
+      margin-top: 40px;
+    }
+    .game-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-start;
+      margin-top: 10px;
+    }
+    .game-card {
+      width: 200px;
+      background: #222;
+      padding: 10px;
       border-radius: 8px;
-      overflow: hidden;
       cursor: pointer;
-      transition: transform .2s, background .2s;
+      transition: transform 0.2s;
     }
-    .card:hover {
-      transform: scale(1.04);
-      background: #362351;
+    .game-card:hover {
+      transform: scale(1.05);
+      background: #333;
     }
-    .card img {
+    .game-card img {
       width: 100%;
-      height: 160px;
+      border-radius: 6px;
+      height: 120px;
       object-fit: cover;
-      display: block;
     }
-    .card h3 {
-      margin: .7rem .9rem 1rem;
-      font-size: 1rem;
+    .game-card p {
+      text-align: center;
+      margin: 8px 0 0;
     }
-
-    .hide-cursor {
-      cursor: none;
+    #game-view {
+      margin-top: 20px;
+      text-align: center;
+    }
+    iframe {
+      width: 100%;
+      max-width: 1000px;
+      height: 600px;
+      border: none;
+      border-radius: 10px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <aside class="sidebar">
-    <img src="logo-placeholder.png" alt="Logo" class="logo">
-    <h2>Categories</h2>
-    <div class="category-list" id="categories"></div>
-  </aside>
-
-  <main>
-    <h1>Pick a game</h1>
-
-    <div class="viewer" id="viewer">
-      <menu>
-        <button onclick="closeGame()">← Back</button>
-        <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
-      </menu>
-      <iframe id="frame"></iframe>
-    </div>
-
-    <div class="grid" id="grid"></div>
-  </main>
+  <h1>🎮 Arcade</h1>
+  <div id="game-view"></div>
 
   <script>
-    const games = [{"id":"1v1.lol","category":"Uncategorized","thumb":"thumbnail.png"},{"id":"Age Of War","category":"Uncategorized","thumb":"thumbnail.png"},{"id":"Among Us","category":"Uncategorized","thumb":"thumbnail.jpg"},{"id":"Backrooms","category":"Uncategorized","thumb":"thumbnail.jpg"},{"id":"Baldi’s Basics","category":"Uncategorized","thumb":"thumbnail.png"}];
-    const grid = document.getElementById('grid');
-    const categoryContainer = document.getElementById('categories');
-    const frame = document.getElementById('frame');
-    const viewer = document.getElementById('viewer');
+    const gameView = document.getElementById('game-view');
 
-    let currentCategory = 'All';
-    let playingId = null;
-
-    // Build category list
-    const categories = new Set(['All']);
-    games.forEach(g => categories.add(g.category));
-    categories.forEach(cat => {
-      const btn = document.createElement('button');
-      btn.textContent = cat;
-      btn.onclick = () => {
-        currentCategory = cat;
-        document.querySelectorAll('.category-list button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderGames();
-      };
-      if (cat === 'All') btn.classList.add('active');
-      categoryContainer.appendChild(btn);
-    });
-
-    function renderGames() {
-      grid.innerHTML = '';
-      games.filter(g => currentCategory === 'All' || g.category === currentCategory)
-        .forEach(game => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <img src="games/${game.id}/${game.thumb}" alt="${game.id}">
-            <h3>${formatName(game.id)}</h3>
-          `;
-          card.onclick = () => openGame(game.id);
-          grid.appendChild(card);
-          updateGameStats(game.id, 'impression');
-        });
+    function openGame(name) {
+      gameView.innerHTML = `
+        <iframe src="games/${name}/index.html"></iframe>
+      `;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function openGame(id) {
-      playingId = id;
-      frame.src = `games/${id}/index.html`;
-      viewer.style.display = 'block';
-      viewer.scrollIntoView({ behavior: 'smooth' });
-      updateGameStats(id, 'open');
-    }
-
-    function closeGame() {
-      frame.src = 'about:blank';
-      viewer.style.display = 'none';
-      playingId = null;
-    }
-
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        viewer.requestFullscreen().catch(err => console.log(err));
-      } else {
-        document.exitFullscreen();
-      }
-    }
-
-    function formatName(id) {
-      return id.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    }
-
-    // Stats tracking
-    function updateGameStats(id, type) {
-      const url = `games/${id}/stats.json`;
-      fetch(url)
-        .then(r => r.json())
-        .then(data => {
-          if (type === 'impression') data.impressions++;
-          if (type === 'open') data.opens++;
-          return fetch(url, {
-            method: 'PUT',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(data)
-          }).catch(()=>{});
-        }).catch(()=>{});
-    }
-
-    // prevent arrow key scroll when game open
-    window.addEventListener('keydown', (e) => {
-      const blocked = [' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-      if (viewer.style.display === 'block' && blocked.includes(e.key)) {
+    // prevent spacebar and arrow keys from scrolling
+    window.addEventListener('keydown', function(e) {
+      if ([" ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
         e.preventDefault();
       }
-    });
-
-    renderGames();
+    }, false);
   </script>
 </body>
 </html>
