@@ -2,245 +2,148 @@ const fs = require("fs");
 const path = require("path");
 
 const gamesDir = path.join(__dirname, "games");
-const outputDir = path.join(__dirname, "dist");
-const outputFile = path.join(outputDir, "index.html");
-const templateFile = path.join(__dirname, "index.template.html");
+const dataDir = path.join(__dirname, "data");
+const distDir = path.join(__dirname, "dist");
+const outputFile = path.join(distDir, "index.html");
 
-if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
+// make sure dist folder exists
+if (!fs.existsSync(distDir)) {
+  fs.mkdirSync(distDir, { recursive: true });
+}
 
+// make sure data folder exists
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
 
-const html = `
+// read all JSON files from data
+const gameDataFiles = fs.readdirSync(dataDir).filter(file => file.endsWith(".json"));
+
+const categories = {};
+
+gameDataFiles.forEach(file => {
+  const filePath = path.join(dataDir, file);
+  try {
+    const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
+
+    // only add game if folder exists
+    const gameFolder = path.join(gamesDir, data.name);
+    if (fs.existsSync(gameFolder)) {
+      if (!categories[data.category]) categories[data.category] = [];
+      categories[data.category].push(data);
+    }
+  } catch (err) {
+    console.error(`❌ Failed to parse ${file}:`, err);
+  }
+});
+
+// start building HTML
+let html = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>🎮 My Game Arcade</title>
+  <title>Arcade</title>
   <style>
-    * { box-sizing: border-box; }
-    body { 
-      font-family: sans-serif; 
-      background: #121212; 
-      color: white; 
-      margin: 0; 
-      overflow-x: hidden;
+    body {
+      background: #111;
+      color: #fff;
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 0 20px;
     }
-    h1 { margin: 20px; text-align: center; }
-
-    .viewer {
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+    h2 {
+      margin-top: 40px;
+    }
+    .game-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-start;
+      margin-top: 10px;
+    }
+    .game-card {
+      width: 200px;
+      background: #222;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .game-card:hover {
+      transform: scale(1.05);
+      background: #333;
+    }
+    .game-card img {
       width: 100%;
-      height: 70vh;
-      position: relative;
-      display: none;
-      margin-bottom: 30px;
-      background: black;
+      border-radius: 6px;
+      height: 120px;
+      object-fit: cover;
     }
-
-    iframe { 
-      width: 100%; 
-      height: 100%; 
-      border: none; 
-      display: block;
+    .game-card p {
+      text-align: center;
+      margin: 8px 0 0;
     }
-
-    #backBtn, #fullscreenBtn { 
-      position: absolute; 
-      top: 10px; 
-      padding: 10px 15px; 
-      border: none; 
-      border-radius: 8px; 
-      cursor: pointer; 
-      z-index: 10;
-      font-size: 14px;
+    #game-view {
+      margin-top: 20px;
+      text-align: center;
     }
-
-    #backBtn {
-      left: 10px;
-      background: #00eaff;
-      color: black;
-      display: none;
-    }
-
-    #fullscreenBtn {
-      right: 10px;
-      background: #00ff99;
-      color: black;
-      display: none;
-    }
-
-    .grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-      gap: 20px; 
-      padding: 20px; 
-      max-width: 1200px; 
-      margin: auto; 
-    }
-
-    .card { 
-      background: #1e1e1e; 
-      padding: 10px; 
-      border-radius: 10px; 
-      transition: transform 0.2s; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      cursor: pointer; 
-    }
-
-    .card:hover { 
-      transform: scale(1.05); 
-      background: #292929; 
-    }
-
-    .thumb { 
-      width: 180px; 
-      height: 120px; 
-      object-fit: cover; 
-      border-radius: 8px; 
-      margin-bottom: 10px; 
-      background: #333; 
-    }
-
-    .hide-cursor {
-      cursor: none;
+    iframe {
+      width: 100%;
+      max-width: 1000px;
+      height: 600px;
+      border: none;
+      border-radius: 10px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>🎮 My Game Arcade</h1>
+  <h1>🎮 Arcade</h1>
+  <div id="game-view"></div>
+`;
 
-  <div class="viewer" id="viewer">
-    <button id="backBtn" onclick="closeGame()">⬅ Back</button>
-    <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-    <iframe id="gameFrame" src=""></iframe>
-  </div>
+// categories and games
+for (const category in categories) {
+  html += `<h2>${category}</h2><div class="game-grid">`;
+  categories[category].forEach(game => {
+    const thumbPath = `games/${game.name}/thumbnail.png`;
+    html += `
+      <div class="game-card" onclick="openGame('${game.name}')">
+        <img src="${thumbPath}" alt="${game.name}">
+        <p>${game.name}</p>
+      </div>
+    `;
+  });
+  html += `</div>`;
+}
 
-  <div class="grid">
-    ${games.map((g) => {
-      const thumbPath = ["thumbnail.png", "thumbnail.jpg", "thumb.png", "thumb.jpg"]
-        .find((img) => fs.existsSync(path.join(gamesDir, g, img)));
-      const thumbTag = thumbPath
-        ? `<img class="thumb" src="games/${g}/${thumbPath}" alt="${g} thumbnail">`
-        : `<div class="thumb"></div>`;
-
-      const prettyName = g.replace(/[-_]/g, " ").replace(/\b\\w/g, c => c.toUpperCase());
-
-      return `
-        <div class="card" onclick="openGame('games/${g}/index.html')">
-          ${thumbTag}
-          <div>${prettyName}</div>
-        </div>
-      `;
-    }).join("")}
-  </div>
-
+html += `
   <script>
-    const grid = document.querySelector('.grid');
-    const viewer = document.getElementById('viewer');
-    const frame = document.getElementById('gameFrame');
-    const backBtn = document.getElementById('backBtn');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const gameView = document.getElementById('game-view');
 
-    function openGame(url) {
-      frame.src = url;
-      viewer.style.display = 'block';
-      backBtn.style.display = 'block';
-      fullscreenBtn.style.display = 'block';
+    function openGame(name) {
+      gameView.innerHTML = \`
+        <iframe src="games/\${name}/index.html"></iframe>
+      \`;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function closeGame() {
-      frame.src = '';
-      viewer.style.display = 'none';
-      backBtn.style.display = 'none';
-      fullscreenBtn.style.display = 'none';
-      document.body.classList.remove('hide-cursor');
-    }
-
-    function toggleFullscreen() {
-      const iframe = frame;
-      if (!document.fullscreenElement) {
-        iframe.requestFullscreen().catch(err => console.log(err));
-      } else {
-        document.exitFullscreen();
-      }
-    }
-
-    // 🖱️ Pointer lock & hide cursor
-    frame.addEventListener('click', () => {
-      document.body.requestPointerLock =
-        document.body.requestPointerLock ||
-        document.body.mozRequestPointerLock;
-      if (document.body.requestPointerLock) {
-        document.body.requestPointerLock();
-        document.body.classList.add('hide-cursor');
-      }
-    });
-
-    // Exit pointer lock
-    document.addEventListener('pointerlockchange', () => {
-      if (document.pointerLockElement !== document.body) {
-        document.body.classList.remove('hide-cursor');
-      }
-    });
-
-    // 🛑 Prevent arrow keys / space from scrolling
-    window.addEventListener('keydown', (e) => {
-      const keys = [' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-      if (keys.includes(e.key)) {
+    // prevent spacebar and arrow keys from scrolling
+    window.addEventListener('keydown', function(e) {
+      if ([" ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
         e.preventDefault();
       }
-    });
+    }, false);
   </script>
 </body>
 </html>
 `;
 
+// write to dist/index.html
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Generated arcade with ${games.length} games and fullscreen support`);
-const games = fs.readdirSync(gamesDir).filter(f =>
-  fs.lstatSync(path.join(gamesDir, f)).isDirectory()
-);
-
-// Create stats.json for each game if missing
-games.forEach(game => {
-  const statsFile = path.join(gamesDir, game, "stats.json");
-  if (!fs.existsSync(statsFile)) {
-    const data = {
-      id: game,
-      category: "Uncategorized",
-      impressions: 0,
-      opens: 0,
-      timePlayed: 0
-    };
-    fs.writeFileSync(statsFile, JSON.stringify(data, null, 2));
-  }
-});
-
-// Load stats to build game list
-const gameData = games.map(game => {
-  const statsFile = path.join(gamesDir, game, "stats.json");
-  const data = JSON.parse(fs.readFileSync(statsFile, "utf-8"));
-  const thumbPath = ["thumbnail.png", "thumbnail.jpg", "thumb.png", "thumb.jpg"]
-    .find(img => fs.existsSync(path.join(gamesDir, game, img)));
-  return {
-    id: game,
-    category: data.category || "Uncategorized",
-    thumb: thumbPath || ""
-  };
-});
-
-// Delete stats for removed folders automatically
-const statFiles = fs.readdirSync(gamesDir)
-  .filter(f => fs.existsSync(path.join(gamesDir, f, "stats.json")));
-statFiles.forEach(stat => {
-  if (!games.includes(stat)) {
-    fs.unlinkSync(path.join(gamesDir, stat, "stats.json"));
-  }
-});
-
-let template = fs.readFileSync(templateFile, "utf-8");
-template = template.replace("__GAMES__", JSON.stringify(gameData));
-
-fs.writeFileSync(outputFile, template);
-console.log(`✅ Built ${games.length} games with categories & stats`);
+console.log(`✅ index.html generated with ${gameDataFiles.length} game(s)`);
