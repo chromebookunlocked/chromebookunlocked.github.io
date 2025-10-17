@@ -1,306 +1,247 @@
-const fs = require("fs");
-const path = require("path");
-
-const gamesDir = path.join(__dirname, "games");
-const outputDir = path.join(__dirname, "dist");
-const outputFile = path.join(outputDir, "index.html");
-
-if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
-
-const games = fs
-  .readdirSync(gamesDir)
-  .filter((file) => fs.lstatSync(path.join(gamesDir, file)).isDirectory());
-
-const html = `
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>My Game Arcade</title>
-  <title>🎮 My Game Arcade</title>
+  <meta charset="utf-8">
+  <title>Arcade</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
-    * { box-sizing: border-box; }
-    body { 
-      font-family: sans-serif; 
-      background: #121212; 
-      color: white; 
-      margin: 0; 
-      overflow-x: hidden;
+    :root {
+      --bg: #1a1126;
+      --card: #2b1b3f;
+      --highlight: #7d4cff;
+      --text: #eee;
+      --gap: 1.2rem;
+      --card-width: 260px;
     }
     * { box-sizing: border-box; }
-    body { font-family: sans-serif; background: #121212; color: white; margin: 0; overflow-x: hidden; }
-    h1 { margin: 20px; text-align: center; }
-    .grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-      gap: 20px; 
-      padding: 20px; 
-      max-width: 1200px; 
-      margin: auto; 
+    body {
+      font-family: system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      display: flex;
+      min-height: 100vh;
     }
-    .card { 
-      background: #1e1e1e; 
-      padding: 10px; 
-      border-radius: 10px; 
-      transition: transform 0.2s; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      cursor: pointer; 
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: #221631;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
-    .card:hover { transform: scale(1.05); background: #292929; }
-    .thumb { 
-      width: 180px; 
-      height: 120px; 
-      object-fit: cover; 
-      border-radius: 8px; 
-      margin-bottom: 10px; 
-      background: #333; 
+    .sidebar img.logo {
+      max-width: 100%;
+      margin-bottom: 1rem;
     }
+    .sidebar h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
+      color: var(--highlight);
+    }
+    .category-list button {
+      background: none;
+      border: none;
+      color: var(--text);
+      text-align: left;
+      font-size: 0.95rem;
+      padding: 0.4rem 0;
+      cursor: pointer;
+      width: 100%;
+    }
+    .category-list button:hover,
+    .category-list button.active {
+      color: var(--highlight);
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    h1 { text-align: center; margin-bottom: 1rem; }
 
     .viewer {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
+      background: black;
       width: 100%;
       height: 70vh;
+      margin-bottom: 2rem;
+      border-radius: 10px;
+      overflow: hidden;
       position: relative;
       display: none;
-      margin-bottom: 30px;
-      background: black;
-      z-index: 10;
     }
-
-    iframe { 
-      width: 100%; 
-      height: 100%; 
-      border: none; 
-      display: block;
-
-    iframe {
+    .viewer iframe {
       width: 100%;
       height: 100%;
-      border: none;
+      border: 0;
     }
-    #backBtn { 
-
-    #backBtn, #fullscreenBtn { 
-      position: absolute; 
-      top: 10px; 
-      left: 10px; 
-      background: #00eaff; 
-      color: black; 
-      padding: 10px 15px; 
-      border: none; 
-      border-radius: 8px; 
-      cursor: pointer; 
-      display: none; 
-      z-index: 10;
-      font-size: 14px;
-    }
-
-    #closeBtn {
+    .viewer menu {
       position: absolute;
       top: 10px;
-    #backBtn {
       left: 10px;
-      background: #00eaff;
-      color: black;
-      display: none;
+      display: flex;
+      gap: 10px;
     }
-
-    #fullscreenBtn {
-      right: 10px;
-      background: red;
-      color: white;
+    .viewer button {
       border: none;
-      font-size: 20px;
-      padding: 5px 10px;
+      padding: .4rem .8rem;
+      background: var(--highlight);
+      color: #fff;
+      border-radius: 4px;
       cursor: pointer;
-      border-radius: 5px;
-      z-index: 11;
-      background: #00ff99;
-      color: black;
-      display: none;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      padding: 20px;
-      max-width: 1200px;
-      margin: auto;
-      padding-top: 75vh; /* push grid below game viewer */
-    .grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-      gap: 20px; 
-      padding: 20px; 
-      max-width: 1200px; 
-      margin: auto; 
+      grid-template-columns: repeat(auto-fill,minmax(var(--card-width),1fr));
+      gap: var(--gap);
     }
-
-    .card { 
-      background: #1e1e1e; 
-      padding: 10px; 
-      border-radius: 10px; 
-      transition: transform 0.2s; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      cursor: pointer; 
-    }
-    .hide-cursor {
-      cursor: none;
 
     .card {
-      background: #1e1e1e;
-      padding: 10px;
-      border-radius: 10px;
-      transition: transform 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-    .card:hover { 
-      transform: scale(1.05); 
-      background: #292929; 
-    }
-
-    .card:hover {
-      transform: scale(1.05);
-      background: #292929;
-    .thumb { 
-      width: 180px; 
-      height: 120px; 
-      object-fit: cover; 
-      border-radius: 8px; 
-      margin-bottom: 10px; 
-      background: #333; 
-    }
-
-    .thumb {
-      width: 180px;
-      height: 120px;
-      object-fit: cover;
+      background: var(--card);
       border-radius: 8px;
-      margin-bottom: 10px;
-      background: #333;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .2s, background .2s;
+    }
+    .card:hover {
+      transform: scale(1.04);
+      background: #362351;
+    }
+    .card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+    .card h3 {
+      margin: .7rem .9rem 1rem;
+      font-size: 1rem;
+    }
+
     .hide-cursor {
       cursor: none;
     }
   </style>
 </head>
 <body>
-  <h1>🎮 My Game Arcade</h1>
+  <aside class="sidebar">
+    <img src="logo-placeholder.png" alt="Logo" class="logo">
+    <h2>Categories</h2>
+    <div class="category-list" id="categories"></div>
+  </aside>
 
-  <div class="viewer">
-  <div class="viewer" id="viewer">
-    <button id="backBtn" onclick="closeGame()">⬅ Back</button>
-    <button id="closeBtn" onclick="closeGame()">✖</button>
-    <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-    <iframe id="gameFrame" src=""></iframe>
-  </div>
+  <main>
+    <h1>Pick a game</h1>
 
-  <h1>🎮 My Game Arcade</h1>
-  <div class="grid">
-    ${games.map((g) => {
-      const thumbPath = ["thumbnail.png", "thumbnail.jpg", "thumb.png", "thumb.jpg"]
-        .find((img) => fs.existsSync(path.join(gamesDir, g, img)));
-      const thumbTag = thumbPath
-        ? `<img class="thumb" src="games/${g}/${thumbPath}" alt="${g} thumbnail">`
-        : `<div class="thumb"></div>`;
+    <div class="viewer" id="viewer">
+      <menu>
+        <button onclick="closeGame()">← Back</button>
+        <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+      </menu>
+      <iframe id="frame"></iframe>
+    </div>
 
-      // Make folder name look nicer
-      const prettyName = g.replace(/[-_]/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-      const prettyName = g.replace(/[-_]/g, " ").replace(/\b\\w/g, c => c.toUpperCase());
-
-      return `
-        <div class="card" onclick="openGame('games/${g}/index.html')">
-          ${thumbTag}
-          <div>${g}</div>
-          <div>${prettyName}</div>
-        </div>
-      `;
-    }).join("")}
-  </div>
+    <div class="grid" id="grid"></div>
+  </main>
 
   <script>
-    const viewer = document.querySelector('.viewer');
-    const grid = document.querySelector('.grid');
+    const games = __GAMES__;
+    const grid = document.getElementById('grid');
+    const categoryContainer = document.getElementById('categories');
+    const frame = document.getElementById('frame');
     const viewer = document.getElementById('viewer');
-    const frame = document.getElementById('gameFrame');
-    const backBtn = document.getElementById('backBtn');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
 
-    function openGame(url) {
-      frame.src = url;
+    let currentCategory = 'All';
+    let playingId = null;
+
+    // Build category list
+    const categories = new Set(['All']);
+    games.forEach(g => categories.add(g.category));
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.textContent = cat;
+      btn.onclick = () => {
+        currentCategory = cat;
+        document.querySelectorAll('.category-list button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderGames();
+      };
+      if (cat === 'All') btn.classList.add('active');
+      categoryContainer.appendChild(btn);
+    });
+
+    function renderGames() {
+      grid.innerHTML = '';
+      games.filter(g => currentCategory === 'All' || g.category === currentCategory)
+        .forEach(game => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src="games/${game.id}/${game.thumb}" alt="${game.id}">
+            <h3>${formatName(game.id)}</h3>
+          `;
+          card.onclick = () => openGame(game.id);
+          grid.appendChild(card);
+          updateGameStats(game.id, 'impression');
+        });
+    }
+
+    function openGame(id) {
+      playingId = id;
+      frame.src = `games/${id}/index.html`;
       viewer.style.display = 'block';
-      backBtn.style.display = 'block';
-      fullscreenBtn.style.display = 'block';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      viewer.scrollIntoView({ behavior: 'smooth' });
+      updateGameStats(id, 'open');
     }
 
     function closeGame() {
-      frame.src = '';
+      frame.src = 'about:blank';
       viewer.style.display = 'none';
-      backBtn.style.display = 'none';
-      fullscreenBtn.style.display = 'none';
-      document.body.classList.remove('hide-cursor');
+      playingId = null;
     }
 
     function toggleFullscreen() {
-      const iframe = frame;
       if (!document.fullscreenElement) {
-        iframe.requestFullscreen().catch(err => console.log(err));
+        viewer.requestFullscreen().catch(err => console.log(err));
       } else {
         document.exitFullscreen();
       }
     }
 
-    // 🖱️ Pointer lock & hide cursor
-    frame.addEventListener('click', () => {
-      const iframeDoc = frame.contentWindow.document;
-      const iframeBody = iframeDoc.body;
+    function formatName(id) {
+      return id.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
 
-      // Try to lock the pointer on the parent page
-      document.body.requestPointerLock =
-        document.body.requestPointerLock ||
-        document.body.mozRequestPointerLock;
-      if (document.body.requestPointerLock) {
-        document.body.requestPointerLock();
-        document.body.classList.add('hide-cursor');
-      }
-    });
+    // Stats tracking
+    function updateGameStats(id, type) {
+      const url = `games/${id}/stats.json`;
+      fetch(url)
+        .then(r => r.json())
+        .then(data => {
+          if (type === 'impression') data.impressions++;
+          if (type === 'open') data.opens++;
+          return fetch(url, {
+            method: 'PUT',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(data)
+          }).catch(()=>{});
+        }).catch(()=>{});
+    }
 
-    // 🧭 Escape pointer lock when exiting game
-    // Exit pointer lock
-    document.addEventListener('pointerlockchange', () => {
-      if (document.pointerLockElement !== document.body) {
-        document.body.classList.remove('hide-cursor');
-      }
-    });
-
-    // 🛑 Prevent arrow keys / space from scrolling
+    // prevent arrow key scroll when game open
     window.addEventListener('keydown', (e) => {
-      const keys = [' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-      if (keys.includes(e.key)) {
-    // Prevent arrow keys and spacebar from scrolling when in game
-    window.addEventListener('keydown', function(e) {
-      const blockedKeys = ['ArrowUp', 'ArrowDown', ' ', 'Spacebar'];
-      if (viewer.style.display === 'block' && blockedKeys.includes(e.key)) {
+      const blocked = [' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+      if (viewer.style.display === 'block' && blocked.includes(e.key)) {
         e.preventDefault();
       }
     });
-    }, false);
+
+    renderGames();
   </script>
 </body>
 </html>
-`;
-
-fs.writeFileSync(outputFile, html);
-console.log(`✅ Generated arcade with ${games.length} games and pointer lock`);
-console.log(`✅ Generated arcade with ${games.length} games`);
-console.log(`✅ Generated arcade with ${games.length} games and fullscreen support`);
