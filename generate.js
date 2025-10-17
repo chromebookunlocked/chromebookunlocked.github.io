@@ -1,126 +1,107 @@
-<!doctype html>
+const fs = require("fs");
+const path = require("path");
+
+const gamesDir = path.join(__dirname, "games");
+const outputDir = path.join(__dirname, "dist");
+const outputFile = path.join(outputDir, "index.html");
+const templateFile = path.join(__dirname, "index.template.html");
+
+if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
+
+const games = fs
+  .readdirSync(gamesDir)
+  .filter((file) => fs.lstatSync(path.join(gamesDir, file)).isDirectory());
+
+const html = `
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Arcade</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>🎮 My Game Arcade</title>
   <style>
-    :root {
-      --bg: #1a1126;
-      --card: #2b1b3f;
-      --highlight: #7d4cff;
-      --text: #eee;
-      --gap: 1.2rem;
-      --card-width: 260px;
-    }
     * { box-sizing: border-box; }
-    body {
-      font-family: system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      margin: 0;
-      display: flex;
-      min-height: 100vh;
+    body { 
+      font-family: sans-serif; 
+      background: #121212; 
+      color: white; 
+      margin: 0; 
+      overflow-x: hidden;
     }
-
-    /* Sidebar */
-    .sidebar {
-      width: 240px;
-      background: #221631;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .sidebar img.logo {
-      max-width: 100%;
-      margin-bottom: 1rem;
-    }
-    .sidebar h2 {
-      margin: 0 0 0.5rem;
-      font-size: 1rem;
-      color: var(--highlight);
-    }
-    .category-list button {
-      background: none;
-      border: none;
-      color: var(--text);
-      text-align: left;
-      font-size: 0.95rem;
-      padding: 0.4rem 0;
-      cursor: pointer;
-      width: 100%;
-    }
-    .category-list button:hover,
-    .category-list button.active {
-      color: var(--highlight);
-    }
-
-    main {
-      flex: 1;
-      padding: 2rem;
-      overflow-y: auto;
-    }
-
-    h1 { text-align: center; margin-bottom: 1rem; }
+    h1 { margin: 20px; text-align: center; }
 
     .viewer {
-      background: black;
       width: 100%;
       height: 70vh;
-      margin-bottom: 2rem;
-      border-radius: 10px;
-      overflow: hidden;
       position: relative;
       display: none;
-    }
-    .viewer iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-    .viewer menu {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      display: flex;
-      gap: 10px;
-    }
-    .viewer button {
-      border: none;
-      padding: .4rem .8rem;
-      background: var(--highlight);
-      color: #fff;
-      border-radius: 4px;
-      cursor: pointer;
+      margin-bottom: 30px;
+      background: black;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill,minmax(var(--card-width),1fr));
-      gap: var(--gap);
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 8px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: transform .2s, background .2s;
-    }
-    .card:hover {
-      transform: scale(1.04);
-      background: #362351;
-    }
-    .card img {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
+    iframe { 
+      width: 100%; 
+      height: 100%; 
+      border: none; 
       display: block;
     }
-    .card h3 {
-      margin: .7rem .9rem 1rem;
-      font-size: 1rem;
+
+    #backBtn, #fullscreenBtn { 
+      position: absolute; 
+      top: 10px; 
+      padding: 10px 15px; 
+      border: none; 
+      border-radius: 8px; 
+      cursor: pointer; 
+      z-index: 10;
+      font-size: 14px;
+    }
+
+    #backBtn {
+      left: 10px;
+      background: #00eaff;
+      color: black;
+      display: none;
+    }
+
+    #fullscreenBtn {
+      right: 10px;
+      background: #00ff99;
+      color: black;
+      display: none;
+    }
+
+    .grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+      gap: 20px; 
+      padding: 20px; 
+      max-width: 1200px; 
+      margin: auto; 
+    }
+
+    .card { 
+      background: #1e1e1e; 
+      padding: 10px; 
+      border-radius: 10px; 
+      transition: transform 0.2s; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      cursor: pointer; 
+    }
+
+    .card:hover { 
+      transform: scale(1.05); 
+      background: #292929; 
+    }
+
+    .thumb { 
+      width: 180px; 
+      height: 120px; 
+      object-fit: cover; 
+      border-radius: 8px; 
+      margin-bottom: 10px; 
+      background: #333; 
     }
 
     .hide-cursor {
@@ -129,119 +110,140 @@
   </style>
 </head>
 <body>
-  <aside class="sidebar">
-    <img src="logo-placeholder.png" alt="Logo" class="logo">
-    <h2>Categories</h2>
-    <div class="category-list" id="categories"></div>
-  </aside>
+  <h1>🎮 My Game Arcade</h1>
 
-  <main>
-    <h1>Pick a game</h1>
+  <div class="viewer" id="viewer">
+    <button id="backBtn" onclick="closeGame()">⬅ Back</button>
+    <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    <iframe id="gameFrame" src=""></iframe>
+  </div>
 
-    <div class="viewer" id="viewer">
-      <menu>
-        <button onclick="closeGame()">← Back</button>
-        <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
-      </menu>
-      <iframe id="frame"></iframe>
-    </div>
+  <div class="grid">
+    ${games.map((g) => {
+      const thumbPath = ["thumbnail.png", "thumbnail.jpg", "thumb.png", "thumb.jpg"]
+        .find((img) => fs.existsSync(path.join(gamesDir, g, img)));
+      const thumbTag = thumbPath
+        ? `<img class="thumb" src="games/${g}/${thumbPath}" alt="${g} thumbnail">`
+        : `<div class="thumb"></div>`;
 
-    <div class="grid" id="grid"></div>
-  </main>
+      const prettyName = g.replace(/[-_]/g, " ").replace(/\b\\w/g, c => c.toUpperCase());
+
+      return `
+        <div class="card" onclick="openGame('games/${g}/index.html')">
+          ${thumbTag}
+          <div>${prettyName}</div>
+        </div>
+      `;
+    }).join("")}
+  </div>
 
   <script>
-    const games = __GAMES__;
-    const grid = document.getElementById('grid');
-    const categoryContainer = document.getElementById('categories');
-    const frame = document.getElementById('frame');
+    const grid = document.querySelector('.grid');
     const viewer = document.getElementById('viewer');
+    const frame = document.getElementById('gameFrame');
+    const backBtn = document.getElementById('backBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
 
-    let currentCategory = 'All';
-    let playingId = null;
-
-    // Build category list
-    const categories = new Set(['All']);
-    games.forEach(g => categories.add(g.category));
-    categories.forEach(cat => {
-      const btn = document.createElement('button');
-      btn.textContent = cat;
-      btn.onclick = () => {
-        currentCategory = cat;
-        document.querySelectorAll('.category-list button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        renderGames();
-      };
-      if (cat === 'All') btn.classList.add('active');
-      categoryContainer.appendChild(btn);
-    });
-
-    function renderGames() {
-      grid.innerHTML = '';
-      games.filter(g => currentCategory === 'All' || g.category === currentCategory)
-        .forEach(game => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <img src="games/${game.id}/${game.thumb}" alt="${game.id}">
-            <h3>${formatName(game.id)}</h3>
-          `;
-          card.onclick = () => openGame(game.id);
-          grid.appendChild(card);
-          updateGameStats(game.id, 'impression');
-        });
-    }
-
-    function openGame(id) {
-      playingId = id;
-      frame.src = `games/${id}/index.html`;
+    function openGame(url) {
+      frame.src = url;
       viewer.style.display = 'block';
-      viewer.scrollIntoView({ behavior: 'smooth' });
-      updateGameStats(id, 'open');
+      backBtn.style.display = 'block';
+      fullscreenBtn.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function closeGame() {
-      frame.src = 'about:blank';
+      frame.src = '';
       viewer.style.display = 'none';
-      playingId = null;
+      backBtn.style.display = 'none';
+      fullscreenBtn.style.display = 'none';
+      document.body.classList.remove('hide-cursor');
     }
 
     function toggleFullscreen() {
+      const iframe = frame;
       if (!document.fullscreenElement) {
-        viewer.requestFullscreen().catch(err => console.log(err));
+        iframe.requestFullscreen().catch(err => console.log(err));
       } else {
         document.exitFullscreen();
       }
     }
 
-    function formatName(id) {
-      return id.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-    }
-
-    // Stats tracking
-    function updateGameStats(id, type) {
-      const url = `games/${id}/stats.json`;
-      fetch(url)
-        .then(r => r.json())
-        .then(data => {
-          if (type === 'impression') data.impressions++;
-          if (type === 'open') data.opens++;
-          return fetch(url, {
-            method: 'PUT',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify(data)
-          }).catch(()=>{});
-        }).catch(()=>{});
-    }
-
-    // prevent arrow key scroll when game open
-    window.addEventListener('keydown', (e) => {
-      const blocked = [' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-      if (viewer.style.display === 'block' && blocked.includes(e.key)) {
-        e.preventDefault();
+    // 🖱️ Pointer lock & hide cursor
+    frame.addEventListener('click', () => {
+      document.body.requestPointerLock =
+        document.body.requestPointerLock ||
+        document.body.mozRequestPointerLock;
+      if (document.body.requestPointerLock) {
+        document.body.requestPointerLock();
+        document.body.classList.add('hide-cursor');
       }
     });
 
-    renderGames();
+    // Exit pointer lock
+    document.addEventListener('pointerlockchange', () => {
+      if (document.pointerLockElement !== document.body) {
+        document.body.classList.remove('hide-cursor');
+      }
+    });
+
+    // 🛑 Prevent arrow keys / space from scrolling
+    window.addEventListener('keydown', (e) => {
+      const keys = [' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+      if (keys.includes(e.key)) {
+        e.preventDefault();
+      }
+    });
   </script>
 </body>
 </html>
+`;
+
+fs.writeFileSync(outputFile, html);
+console.log(`✅ Generated arcade with ${games.length} games and fullscreen support`);
+const games = fs.readdirSync(gamesDir).filter(f =>
+  fs.lstatSync(path.join(gamesDir, f)).isDirectory()
+);
+
+// Create stats.json for each game if missing
+games.forEach(game => {
+  const statsFile = path.join(gamesDir, game, "stats.json");
+  if (!fs.existsSync(statsFile)) {
+    const data = {
+      id: game,
+      category: "Uncategorized",
+      impressions: 0,
+      opens: 0,
+      timePlayed: 0
+    };
+    fs.writeFileSync(statsFile, JSON.stringify(data, null, 2));
+  }
+});
+
+// Load stats to build game list
+const gameData = games.map(game => {
+  const statsFile = path.join(gamesDir, game, "stats.json");
+  const data = JSON.parse(fs.readFileSync(statsFile, "utf-8"));
+  const thumbPath = ["thumbnail.png", "thumbnail.jpg", "thumb.png", "thumb.jpg"]
+    .find(img => fs.existsSync(path.join(gamesDir, game, img)));
+  return {
+    id: game,
+    category: data.category || "Uncategorized",
+    thumb: thumbPath || ""
+  };
+});
+
+// Delete stats for removed folders automatically
+const statFiles = fs.readdirSync(gamesDir)
+  .filter(f => fs.existsSync(path.join(gamesDir, f, "stats.json")));
+statFiles.forEach(stat => {
+  if (!games.includes(stat)) {
+    fs.unlinkSync(path.join(gamesDir, stat, "stats.json"));
+  }
+});
+
+let template = fs.readFileSync(templateFile, "utf-8");
+template = template.replace("__GAMES__", JSON.stringify(gameData));
+
+fs.writeFileSync(outputFile, template);
+console.log(`✅ Built ${games.length} games with categories & stats`);
