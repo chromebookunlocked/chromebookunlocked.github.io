@@ -1,18 +1,20 @@
-name: Build & Deploy Arcade
+name: Build and Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -20,14 +22,18 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Generate index.html
+      - name: Build site
         run: npm run build
 
-      - name: Copy games folder to dist
-        run: cp -r games dist/
+      - name: Copy game and asset folders
+        run: |
+          mkdir -p dist
+          cp -r games dist/games
+          cp -r data dist/data
+          cp -r assets dist/assets
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
