@@ -14,12 +14,11 @@ let games = fs.readdirSync(dataDir)
   .filter(f => f.endsWith(".json"))
   .map(f => {
     const json = JSON.parse(fs.readFileSync(path.join(dataDir, f)));
-    // Ensure default values
     return {
       folder: json.folder || f.replace(".json", ""),
       name: json.name || f.replace(".json", ""),
       category: json.category || "Uncategorized",
-      thumbs: json.thumbs || [], // optional multiple thumbnails
+      thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.png", "thumbnail.jpg"]
     };
   });
 
@@ -38,19 +37,24 @@ const html = `
 <meta charset="UTF-8">
 <title>🎮 My Game Arcade</title>
 <style>
-  body { font-family:sans-serif; margin:0; background:#1c0033; color:#eee; overflow-x:hidden; }
-  header { display:flex; align-items:center; padding:1rem; background:#2a004d; }
-  header img { height:40px; margin-right:1rem; }
-  header h1 { font-size:1.5rem; margin:0; color:#ffccff; }
-  #sidebar { position:fixed; top:0; left:0; width:200px; height:100vh; background:#330066; padding:1rem; overflow-y:auto; }
-  #sidebar h2 { color:#ffccff; font-size:1.1rem; margin-top:2rem; }
-  #content { margin-left:220px; padding:1rem; }
+  body { font-family:sans-serif; margin:0; background:#1c0033; color:#eee; overflow-x:hidden; display:flex; }
+  #sidebar { width:250px; background:#330066; padding:1rem; height:100vh; overflow-y:auto; transition: all 0.3s ease; }
+  #sidebar.collapsed { width:50px; }
+  #sidebar header { display:flex; align-items:center; margin-bottom:2rem; }
+  #sidebar header img { height:40px; margin-right:0.5rem; }
+  #sidebar header h1 { font-size:1.2rem; color:#ffccff; margin:0; display:inline; }
+  #sidebar button.toggle { margin-bottom:1rem; background:#660099; color:#fff; border:none; width:100%; padding:0.5rem; cursor:pointer; border-radius:6px; }
+  #sidebar ul { list-style:none; padding:0; margin:0; }
+  #sidebar li { cursor:pointer; padding:0.3rem 0.5rem; border-radius:4px; transition:0.2s; }
+  #sidebar li:hover { background:#660099; }
+  #content { flex:1; padding:1rem; overflow:auto; }
   .category { margin-bottom:2rem; }
+  .category h2 { color:#ffccff; cursor:pointer; margin-bottom:0.5rem; }
   .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem; }
   .card { background:#4d0066; border-radius:8px; overflow:hidden; cursor:pointer; transition:transform .2s; display:flex; flex-direction:column; align-items:center; }
   .card:hover { transform:scale(1.05); background:#660099; }
-  .thumb { width:180px; height:120px; object-fit:cover; margin-bottom:0.5rem; background:#330033; border-radius:6px; }
-  .viewer { width:100%; height:70vh; display:flex; flex-direction:column; margin-bottom:2rem; }
+  .thumb { width:180px; height:120px; object-fit:cover; margin-bottom:0.5rem; border-radius:6px; background:#330033; }
+  .viewer { width:100%; height:70vh; display:flex; flex-direction:column; margin-bottom:2rem; display:none; }
   iframe { width:100%; height:100%; border:none; }
   #controls { display:flex; justify-content:space-between; margin-bottom:0.5rem; }
   button { padding:0.4rem 0.8rem; border:none; border-radius:6px; cursor:pointer; font-size:14px; }
@@ -60,17 +64,19 @@ const html = `
 </head>
 <body>
 
-<header>
-  <img src="logo.png" alt="Logo">
-  <h1>My Game Arcade</h1>
-</header>
-
 <div id="sidebar">
-  ${Object.keys(categories).map(cat => `<h2>${cat}</h2>`).join('')}
+  <header>
+    <img src="logo.png" alt="Logo">
+    <h1>Arcade</h1>
+  </header>
+  <button class="toggle" onclick="toggleSidebar()">☰</button>
+  <ul id="categoryList">
+    ${Object.keys(categories).map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`).join('')}
+  </ul>
 </div>
 
 <div id="content">
-  <div class="viewer" id="viewer" style="display:none;">
+  <div class="viewer" id="viewer">
     <div id="controls">
       <button id="backBtn" onclick="closeGame()">← Back</button>
       <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
@@ -79,22 +85,24 @@ const html = `
     <iframe id="gameFrame" src=""></iframe>
   </div>
 
-  ${Object.keys(categories).map(cat => `
-    <div class="category">
-      <h2>${cat}</h2>
-      <div class="grid">
-        ${categories[cat].map(g => {
-          const thumb = g.thumbs.length ? g.thumbs[0] : "thumb.png";
-          return `
-            <div class="card" onclick="openGame('${g.folder}')">
-              <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
-              <div>${g.name}</div>
-            </div>
-          `;
-        }).join('')}
+  <div id="allGames">
+    ${Object.keys(categories).map(cat => `
+      <div class="category" data-category="${cat}">
+        <h2 onclick="filterCategory('${cat}')">${cat}</h2>
+        <div class="grid">
+          ${categories[cat].map(g => {
+            const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
+            return `
+              <div class="card" onclick="openGame('${g.folder}')">
+                <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
+                <div>${g.name}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
       </div>
-    </div>
-  `).join('')}
+    `).join('')}
+  </div>
 </div>
 
 <script>
@@ -103,6 +111,7 @@ const frame = document.getElementById('gameFrame');
 const backBtn = document.getElementById('backBtn');
 const fullscreenBtn = document.getElementById('fullscreenBtn');
 const gameTitle = document.getElementById('gameTitle');
+const sidebar = document.getElementById('sidebar');
 
 function openGame(folder) {
   frame.src = 'games/' + folder + '/index.html';
@@ -121,6 +130,23 @@ function toggleFullscreen() {
   else document.exitFullscreen();
 }
 
+function toggleSidebar() {
+  sidebar.classList.toggle('collapsed');
+}
+
+function filterCategory(cat) {
+  const categories = document.querySelectorAll('.category');
+  categories.forEach(c => {
+    c.style.display = c.getAttribute('data-category') === cat ? 'block' : 'none';
+  });
+}
+
+// Show all categories by default
+function showAllCategories() {
+  const categories = document.querySelectorAll('.category');
+  categories.forEach(c => c.style.display = 'block');
+}
+
 // Prevent arrow keys / space from scrolling
 window.addEventListener('keydown', e => {
   const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
@@ -133,4 +159,4 @@ window.addEventListener('keydown', e => {
 `;
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Generated arcade with ${games.length} games in ${Object.keys(categories).length} categories`);
+console.log(`✅ Generated arcade with ${games.length} games and sidebar`);
