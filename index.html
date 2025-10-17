@@ -1,93 +1,125 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>🎮 My Game Arcade</title>
+  <meta charset="utf-8">
+  <title>Arcade</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
+    :root {
+      --bg: #1a1126;
+      --card: #2b1b3f;
+      --highlight: #7d4cff;
+      --text: #eee;
+      --gap: 1.2rem;
+      --card-width: 260px;
+    }
     * { box-sizing: border-box; }
-    body { 
-      font-family: sans-serif; 
-      background: #121212; 
-      color: white; 
-      margin: 0; 
-      overflow-x: hidden;
+    body {
+      font-family: system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      display: flex;
+      min-height: 100vh;
     }
-    h1 { margin: 20px; text-align: center; }
 
-    .viewer {
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: #221631;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .sidebar img.logo {
+      max-width: 100%;
+      margin-bottom: 1rem;
+    }
+    .sidebar h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
+      color: var(--highlight);
+    }
+    .category-list button {
+      background: none;
+      border: none;
+      color: var(--text);
+      text-align: left;
+      font-size: 0.95rem;
+      padding: 0.4rem 0;
+      cursor: pointer;
       width: 100%;
-      height: 70vh;
-      position: relative;
-      display: none;
-      margin-bottom: 30px;
-      background: black;
+    }
+    .category-list button:hover,
+    .category-list button.active {
+      color: var(--highlight);
     }
 
-    iframe { 
-      width: 100%; 
-      height: 100%; 
-      border: none; 
+    main {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    h1 { text-align: center; margin-bottom: 2rem; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(var(--card-width),1fr));
+      gap: var(--gap);
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .2s, background .2s;
+    }
+    .card:hover {
+      transform: scale(1.04);
+      background: #362351;
+    }
+    .card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
       display: block;
     }
-
-    #backBtn, #fullscreenBtn { 
-      position: absolute; 
-      top: 10px; 
-      padding: 10px 15px; 
-      border: none; 
-      border-radius: 8px; 
-      cursor: pointer; 
-      z-index: 10;
-      font-size: 14px;
+    .card h3 {
+      margin: .7rem .9rem 1rem;
+      font-size: 1rem;
     }
 
-    #backBtn {
-      left: 10px;
-      background: #00eaff;
-      color: black;
+    #play {
+      position: fixed;
+      inset: 0;
+      background: #000;
       display: none;
+      flex-direction: column;
+      z-index: 1000;
     }
-
-    #fullscreenBtn {
-      right: 10px;
-      background: #00ff99;
-      color: black;
-      display: none;
+    #play menu {
+      background: #221631;
+      padding: .5rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
     }
-
-    .grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-      gap: 20px; 
-      padding: 20px; 
-      max-width: 1200px; 
-      margin: auto; 
+    #play button {
+      border: none;
+      padding: .4rem .8rem;
+      background: var(--highlight);
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
     }
-
-    .card { 
-      background: #1e1e1e; 
-      padding: 10px; 
-      border-radius: 10px; 
-      transition: transform 0.2s; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      cursor: pointer; 
-    }
-
-    .card:hover { 
-      transform: scale(1.05); 
-      background: #292929; 
-    }
-
-    .thumb { 
-      width: 180px; 
-      height: 120px; 
-      object-fit: cover; 
-      border-radius: 8px; 
-      margin-bottom: 10px; 
-      background: #333; 
+    #play iframe {
+      flex: 1;
+      border: 0;
+      width: 100%;
+      height: 100%;
     }
 
     .hide-cursor {
@@ -96,105 +128,118 @@
   </style>
 </head>
 <body>
-  <h1>🎮 My Game Arcade</h1>
+  <aside class="sidebar">
+    <img src="logo-placeholder.png" alt="Logo" class="logo">
+    <h2>Categories</h2>
+    <div class="category-list" id="categories"></div>
+  </aside>
 
-  <div class="viewer" id="viewer">
-    <button id="backBtn" onclick="closeGame()">⬅ Back</button>
-    <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-    <iframe id="gameFrame" src=""></iframe>
-  </div>
+  <main>
+    <h1>Pick a game</h1>
+    <div class="grid" id="grid"></div>
+  </main>
 
-  <div class="grid">
-    
-        <div class="card" onclick="openGame('games/1v1.lol/index.html')">
-          <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol thumbnail">
-          <div>1v1.lol</div>
-        </div>
-      
-        <div class="card" onclick="openGame('games/Age Of War/index.html')">
-          <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War thumbnail">
-          <div>Age Of War</div>
-        </div>
-      
-        <div class="card" onclick="openGame('games/Among Us/index.html')">
-          <img class="thumb" src="games/Among Us/thumbnail.jpg" alt="Among Us thumbnail">
-          <div>Among Us</div>
-        </div>
-      
-        <div class="card" onclick="openGame('games/Backrooms/index.html')">
-          <img class="thumb" src="games/Backrooms/thumbnail.jpg" alt="Backrooms thumbnail">
-          <div>Backrooms</div>
-        </div>
-      
-        <div class="card" onclick="openGame('games/Baldi’s Basics/index.html')">
-          <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics thumbnail">
-          <div>Baldi’s Basics</div>
-        </div>
-      
-        <div class="card" onclick="openGame('games/Basket Random/index.html')">
-          <div class="thumb"></div>
-          <div>Basket Random</div>
-        </div>
-      
+  <div id="play">
+    <menu>
+      <button onclick="closeGame()">← Back</button>
+      <span id="title"></span>
+    </menu>
+    <iframe id="frame"></iframe>
   </div>
 
   <script>
-    const grid = document.querySelector('.grid');
-    const viewer = document.getElementById('viewer');
-    const frame = document.getElementById('gameFrame');
-    const backBtn = document.getElementById('backBtn');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const games = [{"id":"1v1.lol","category":"Uncategorized","thumb":"thumbnail.png"},{"id":"Age Of War","category":"Uncategorized","thumb":"thumbnail.png"},{"id":"Among Us","category":"Uncategorized","thumb":"thumbnail.jpg"},{"id":"Backrooms","category":"Uncategorized","thumb":"thumbnail.jpg"},{"id":"Baldi’s Basics","category":"Uncategorized","thumb":"thumbnail.png"},{"id":"Basket Random","category":"Uncategorized","thumb":""}];
 
-    function openGame(url) {
-      frame.src = url;
-      viewer.style.display = 'block';
-      backBtn.style.display = 'block';
-      fullscreenBtn.style.display = 'block';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    const grid = document.getElementById('grid');
+    const categoryContainer = document.getElementById('categories');
+    const frame = document.getElementById('frame');
+    const playView = document.getElementById('play');
+
+    let currentCategory = 'All';
+
+    // Build category list from game metadata
+    const categories = new Set(['All']);
+    games.forEach(g => categories.add(g.category));
+
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.textContent = cat;
+      btn.onclick = () => {
+        currentCategory = cat;
+        document.querySelectorAll('.category-list button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderGames();
+      };
+      if (cat === 'All') btn.classList.add('active');
+      categoryContainer.appendChild(btn);
+    });
+
+    function renderGames() {
+      grid.innerHTML = '';
+      games.filter(g => currentCategory === 'All' || g.category === currentCategory)
+        .forEach(game => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src="games/${game.id}/${game.thumb}" alt="${game.id}">
+            <h3>${formatName(game.id)}</h3>
+          `;
+          card.onclick = () => openGame(game.id);
+          grid.appendChild(card);
+          // count impression
+          updateGameStats(game.id, 'impression');
+        });
+    }
+
+    function openGame(id) {
+      document.getElementById('title').textContent = formatName(id);
+      frame.src = `games/${id}/index.html`;
+      playView.style.display = 'flex';
+      history.pushState({id}, '', `#${id}`);
+      updateGameStats(id, 'open');
     }
 
     function closeGame() {
-      frame.src = '';
-      viewer.style.display = 'none';
-      backBtn.style.display = 'none';
-      fullscreenBtn.style.display = 'none';
-      document.body.classList.remove('hide-cursor');
+      playView.style.display = 'none';
+      frame.src = 'about:blank';
+      history.pushState({}, '', location.pathname);
     }
 
-    function toggleFullscreen() {
-      const iframe = frame;
-      if (!document.fullscreenElement) {
-        iframe.requestFullscreen().catch(err => console.log(err));
-      } else {
-        document.exitFullscreen();
-      }
+    function formatName(id) {
+      return id.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
     }
 
-    // 🖱️ Pointer lock & hide cursor
-    frame.addEventListener('click', () => {
-      document.body.requestPointerLock =
-        document.body.requestPointerLock ||
-        document.body.mozRequestPointerLock;
-      if (document.body.requestPointerLock) {
-        document.body.requestPointerLock();
-        document.body.classList.add('hide-cursor');
-      }
+    window.addEventListener('popstate', () => {
+      if (location.hash) openGame(location.hash.slice(1));
+      else closeGame();
     });
 
-    // Exit pointer lock
-    document.addEventListener('pointerlockchange', () => {
-      if (document.pointerLockElement !== document.body) {
-        document.body.classList.remove('hide-cursor');
-      }
-    });
+    // ⏳ Stats system
+    function updateGameStats(id, type) {
+      const url = `games/${id}/stats.json`;
+      fetch(url)
+        .then(r => r.json())
+        .then(data => {
+          if (type === 'impression') data.impressions++;
+          if (type === 'open') data.opens++;
+          return fetch(url, {
+            method: 'PUT',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(data)
+          }).catch(()=>{});
+        }).catch(()=>{});
+    }
 
-    // 🛑 Prevent arrow keys / space from scrolling
-    window.addEventListener('keydown', (e) => {
-      const keys = [' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-      if (keys.includes(e.key)) {
+    // Prevent page scroll during gameplay
+    window.addEventListener('keydown', function(e) {
+      const blockedKeys = ['ArrowUp', 'ArrowDown', ' ', 'Spacebar']; 
+      if (playView.style.display === 'flex' && blockedKeys.includes(e.key)) {
         e.preventDefault();
       }
-    });
+    }, false);
+
+    renderGames();
   </script>
 </body>
 </html>
+
