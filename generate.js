@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 
-// Paths
 const dataDir = path.join(__dirname, "data");
 const gamesDir = path.join(__dirname, "games");
 const outputDir = path.join(__dirname, "dist");
@@ -39,6 +38,9 @@ const html = `
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
+* {
+  box-sizing: border-box;
+}
 body {
   font-family: 'Orbitron', sans-serif;
   margin: 0;
@@ -119,6 +121,7 @@ body {
   background: black;
   border-radius: 10px;
   overflow: hidden;
+  position: relative;
 }
 #controls {
   display: flex;
@@ -128,6 +131,7 @@ body {
   margin: 0 auto;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
+  visibility: hidden;
 }
 button {
   padding: 0.4rem 0.8rem;
@@ -148,6 +152,8 @@ iframe {
   width: 100%;
   height: 100%;
   border: none;
+  display: block;
+  overflow: hidden;
 }
 
 /* Game cards */
@@ -220,7 +226,7 @@ iframe {
           ${categories[cat].map(g => {
             const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
             return `
-              <div class="card" onclick="openGame('${g.folder}', '${g.name}')">
+              <div class="card" onclick="openGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}')">
                 <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
                 <div>${g.name}</div>
               </div>
@@ -236,30 +242,29 @@ iframe {
 const viewer = document.getElementById('viewer');
 const frame = document.getElementById('gameFrame');
 const gameTitle = document.getElementById('gameTitle');
+const controls = document.getElementById('controls');
 
-// Redirect from / to /main
 if (window.location.pathname === '/' || window.location.pathname === '') {
   window.location.replace(window.location.origin + '/main');
 }
 
-function openGame(folder, name) {
+function openGame(folderEncoded, nameEncoded) {
+  const folder = decodeURIComponent(folderEncoded);
+  const name = decodeURIComponent(nameEncoded);
   frame.src = 'games/' + folder + '/index.html';
   viewer.style.display = 'flex';
+  controls.style.visibility = 'visible';
   gameTitle.textContent = name;
   window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  // Update hash route
-  window.location.hash = '#/game/' + folder;
-
-  // Show All Games
+  window.location.hash = '#/game/' + folderEncoded;
   filterCategory('All Games');
 }
 
 function closeGame() {
   frame.src = '';
   viewer.style.display = 'none';
+  controls.style.visibility = 'hidden';
   gameTitle.textContent = '';
-  // Clear hash
   window.location.hash = '';
 }
 
@@ -287,20 +292,19 @@ function handleRouting() {
   const hash = window.location.hash;
   if (hash.startsWith('#/game/')) {
     const folder = hash.replace('#/game/', '');
-    const card = document.querySelector(\`.card[onclick*="'\${folder}'"]\`);
+    const card = [...document.querySelectorAll('.card')].find(el => el.getAttribute('onclick')?.includes(folder));
     if (card) {
-      const gameName = card.querySelector('div').innerText;
-      openGame(folder, gameName);
+      const name = card.querySelector('div').innerText;
+      openGame(folder, encodeURIComponent(name));
     }
   } else {
     closeGame();
   }
 }
 
-// Show All Games by default
 filterCategory('All Games');
 
-// Prevent arrow keys / space from scrolling
+// Block page scrolling with arrows and space
 window.addEventListener('keydown', e => {
   const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
   if (blocked.includes(e.key)) e.preventDefault();
@@ -312,4 +316,4 @@ window.addEventListener('keydown', e => {
 `;
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Generated arcade with redirect, floating controls, and hash-based routing`);
+console.log(`✅ Generated arcade with button hiding, space fix, and stretchable game viewer`);
