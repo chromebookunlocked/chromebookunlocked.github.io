@@ -8,6 +8,7 @@ const outputFile = path.join(outputDir, "index.html");
 
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
 
+// Read JSON files
 let games = fs.readdirSync(dataDir)
   .filter(f => f.endsWith(".json"))
   .map(f => {
@@ -20,12 +21,14 @@ let games = fs.readdirSync(dataDir)
     };
   });
 
+// Group games by category
 const categories = { "All Games": games };
 games.forEach(g => {
   if (!categories[g.category]) categories[g.category] = [];
   categories[g.category].push(g);
 });
 
+// Generate HTML
 const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -36,6 +39,8 @@ const html = `
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
 * { box-sizing: border-box; }
+body {
+  font-family: 'Orbitron', sans-serif;
 html, body {
   margin: 0;
   padding: 0;
@@ -91,14 +96,29 @@ html, body {
   transition: margin-left 0.3s;
 }
 
+/* Viewer & Controls */
+.viewer {
+  width: 100%;
+  max-width: 1280px;
+  height: 720px;
+  display: none;
+  flex-direction: column;
+  margin: 0 auto 2rem auto;
+  background: black;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
 /* Controls */
 #controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
   max-width: 1280px;
+  margin: 0 auto;
   margin: 0 auto 0.5rem auto;
   padding: 0.5rem;
+  margin-bottom: 0.5rem;
   visibility: hidden;
 }
 button {
@@ -110,6 +130,7 @@ button {
 }
 #backBtn { background: #ff99ff; color: black; }
 #fullscreenBtn { background: #cc66ff; color: black; }
+iframe {
 
 /* Game Viewer */
 .viewer {
@@ -130,12 +151,18 @@ button {
   width: 100%;
   height: 100%;
   border: none;
+  display: block;
   overflow: hidden;
   background: black;
 }
-.viewer iframe::-webkit-scrollbar { display: none !important; }
-.viewer iframe { scrollbar-width: none !important; }
+.viewer iframe::-webkit-scrollbar {
+  display: none !important;
+}
+.viewer iframe {
+  scrollbar-width: none !important;
+}
 
+/* Overlay for start screen */
 /* Overlay for Play */
 #startOverlay {
   position: absolute;
@@ -175,20 +202,16 @@ button {
   box-shadow: 0 0 15px #ff66ff;
 }
 
-/* Game Grid */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
+/* Game cards */
+.category { margin-bottom: 2rem; }
+.category h2 { color: #ffccff; cursor: pointer; margin-bottom: 0.5rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
 .card {
   background: #4d0066;
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   transition: transform .2s;
-  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -233,22 +256,24 @@ button {
     <iframe id="gameFrame" src=""></iframe>
   </div>
 
-  ${Object.keys(categories).map(cat => `
-    <div class="category" data-category="${cat}">
-      <h2 onclick="filterCategory('${cat}')">${cat}</h2>
-      <div class="grid">
-        ${categories[cat].map(g => {
-          const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
-          return `
-            <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
-              <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
-              <div>${g.name}</div>
-            </div>
-          `;
-        }).join('')}
+  <div id="allGames">
+    ${Object.keys(categories).map(cat => `
+      <div class="category" data-category="${cat}">
+        <h2 onclick="filterCategory('${cat}')">${cat}</h2>
+        <div class="grid">
+          ${categories[cat].map(g => {
+            const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
+            return `
+              <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
+                <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
+                <div>${g.name}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
       </div>
-    </div>
-  `).join('')}
+    `).join('')}
+  </div>
 </div>
 
 <script>
@@ -259,6 +284,7 @@ const controls = document.getElementById('controls');
 const startOverlay = document.getElementById('startOverlay');
 const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
+
 let currentGameFolder = null;
 
 // Redirect / → /main
@@ -317,12 +343,14 @@ function filterCategory(cat) {
   });
 }
 
+// Hash router
 // Default category on load
 filterCategory('All Games');
 
 // Hash routing
 window.addEventListener('load', handleRouting);
 window.addEventListener('hashchange', handleRouting);
+
 function handleRouting() {
   const hash = window.location.hash;
   if (hash.startsWith('#/game/')) {
@@ -350,8 +378,5 @@ window.addEventListener('keydown', e => {
 `;
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Generated arcade with original grid restored, black game background, no scrollbars, All Games default`);
-
-
-fs.writeFileSync(outputFile, html);
-console.log(`✅ Generated arcade with original grid restored, black game background, no scrollbars, All Games default`);
+console.log(`✅ Generated arcade with overlay play screen, scroll fix, and hash routing`);
+console.log(`✅ Generated arcade with black game background, no scrollbars, and default All Games view`);
