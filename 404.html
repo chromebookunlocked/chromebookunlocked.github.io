@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting…</title>
+    <script>
+      // This will redirect any unknown route back to index.html
+      const redirectTo = window.location.protocol + '//' + window.location.host + '/main' + window.location.pathname + window.location.search;
+      window.location.replace(redirectTo);
+    </script>
+  </head>
+  <body>
+    Redirecting…
+  </body>
+</html>
