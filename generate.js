@@ -36,6 +36,7 @@ const html = `
 <head>
 <meta charset="UTF-8">
 <title>Arcade</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
@@ -61,9 +62,7 @@ body {
   left: 0;
   z-index: 1000;
 }
-#sidebar:hover {
-  width: 250px;
-}
+#sidebar:hover { width: 250px; }
 #sidebar header {
   display: flex;
   justify-content: center;
@@ -108,34 +107,24 @@ body {
   flex: 1;
   padding: 1rem;
   overflow: auto;
-  margin-left: 60px; /* reserve space for collapsed sidebar */
+  margin-left: 60px;
   transition: margin-left 0.3s;
 }
 
 /* Game Viewer */
-.viewer {
-  width: 100%;
-  max-width: 1280px;
-  height: 720px;
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 2rem;
+.viewer-wrapper {
   display: none;
-  background: black;
-  margin-left: auto;
-  margin-right: auto;
-  border-radius: 10px;
-  overflow: hidden;
-}
-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
+  max-width: 1280px;
+  margin: 0 auto 2rem;
+  position: relative;
 }
 #controls {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.3rem;
+  position: relative;
+  top: -10px;
 }
 button {
   padding: 0.4rem 0.8rem;
@@ -151,6 +140,21 @@ button {
 #fullscreenBtn {
   background: #cc66ff;
   color: black;
+}
+.viewer {
+  width: 100%;
+  max-width: 1280px;
+  height: 720px;
+  display: flex;
+  flex-direction: column;
+  background: black;
+  border-radius: 10px;
+  overflow: hidden;
+}
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 
 /* Game cards */
@@ -193,6 +197,13 @@ button {
 </head>
 <body>
 
+<!-- Redirect if user lands on root -->
+<script>
+if (window.location.pathname === '/' || window.location.pathname === '') {
+  window.location.replace('/main');
+}
+</script>
+
 <div id="sidebar">
   <header>
     <img src="assets/logo.png" alt="Logo">
@@ -203,13 +214,15 @@ button {
 </div>
 
 <div id="content">
-  <div class="viewer" id="viewer">
+  <div class="viewer-wrapper" id="viewerWrapper">
     <div id="controls">
       <button id="backBtn" onclick="closeGame()">← Back</button>
-      <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
       <span id="gameTitle"></span>
+      <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
     </div>
-    <iframe id="gameFrame" src=""></iframe>
+    <div class="viewer" id="viewer">
+      <iframe id="gameFrame" src=""></iframe>
+    </div>
   </div>
 
   <div id="allGames">
@@ -233,21 +246,23 @@ button {
 </div>
 
 <script>
-const viewer = document.getElementById('viewer');
+const viewerWrapper = document.getElementById('viewerWrapper');
 const frame = document.getElementById('gameFrame');
 const gameTitle = document.getElementById('gameTitle');
 
 function openGame(folder, name) {
   frame.src = 'games/' + folder + '/index.html';
-  viewer.style.display = 'flex';
+  viewerWrapper.style.display = 'block';
   gameTitle.textContent = name;
   filterCategory('All Games');
+  window.history.pushState({}, '', '/game/' + encodeURIComponent(folder));
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function closeGame() {
   frame.src = '';
-  viewer.style.display = 'none';
+  viewerWrapper.style.display = 'none';
+  window.history.pushState({}, '', '/main');
 }
 
 function toggleFullscreen() {
@@ -266,7 +281,17 @@ function filterCategory(cat) {
   });
 }
 
-filterCategory('All Games');
+// If refreshing on a game URL, load it
+window.addEventListener('DOMContentLoaded', () => {
+  const path = window.location.pathname;
+  if (path.startsWith('/game/')) {
+    const folder = decodeURIComponent(path.replace('/game/', ''));
+    const gameName = folder;
+    openGame(folder, gameName);
+  } else {
+    filterCategory('All Games');
+  }
+});
 
 // Prevent arrow keys / space from scrolling
 window.addEventListener('keydown', e => {
@@ -280,4 +305,4 @@ window.addEventListener('keydown', e => {
 `;
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Generated arcade with sidebar hover glow, smooth text sink, Orbitron font, and no toggle button`);
+console.log(`✅ Generated arcade with redirect, fixed control spacing, persistent game URL`);
