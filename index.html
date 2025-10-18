@@ -8,6 +8,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
 * { box-sizing: border-box; }
+body {
+  font-family: 'Orbitron', sans-serif;
 html, body {
   margin: 0;
   padding: 0;
@@ -63,14 +65,29 @@ html, body {
   transition: margin-left 0.3s;
 }
 
+/* Viewer & Controls */
+.viewer {
+  width: 100%;
+  max-width: 1280px;
+  height: 720px;
+  display: none;
+  flex-direction: column;
+  margin: 0 auto 2rem auto;
+  background: black;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
 /* Controls */
 #controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
   max-width: 1280px;
+  margin: 0 auto;
   margin: 0 auto 0.5rem auto;
   padding: 0.5rem;
+  margin-bottom: 0.5rem;
   visibility: hidden;
 }
 button {
@@ -82,6 +99,7 @@ button {
 }
 #backBtn { background: #ff99ff; color: black; }
 #fullscreenBtn { background: #cc66ff; color: black; }
+iframe {
 
 /* Game Viewer */
 .viewer {
@@ -102,12 +120,18 @@ button {
   width: 100%;
   height: 100%;
   border: none;
+  display: block;
   overflow: hidden;
   background: black;
 }
-.viewer iframe::-webkit-scrollbar { display: none !important; }
-.viewer iframe { scrollbar-width: none !important; }
+.viewer iframe::-webkit-scrollbar {
+  display: none !important;
+}
+.viewer iframe {
+  scrollbar-width: none !important;
+}
 
+/* Overlay for start screen */
 /* Overlay for Play */
 #startOverlay {
   position: absolute;
@@ -147,20 +171,16 @@ button {
   box-shadow: 0 0 15px #ff66ff;
 }
 
-/* Game Grid */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
+/* Game cards */
+.category { margin-bottom: 2rem; }
+.category h2 { color: #ffccff; cursor: pointer; margin-bottom: 0.5rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
 .card {
   background: #4d0066;
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   transition: transform .2s;
-  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -205,88 +225,90 @@ button {
     <iframe id="gameFrame" src=""></iframe>
   </div>
 
-  
-    <div class="category" data-category="All Games">
-      <h2 onclick="filterCategory('All Games')">All Games</h2>
-      <div class="grid">
-        
-            <div class="card" onclick="prepareGame('1v1.lol', '1v1.lol', 'games/1v1.lol/thumbnail.png')">
-              <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
-              <div>1v1.lol</div>
-            </div>
+  <div id="allGames">
+    
+      <div class="category" data-category="All Games">
+        <h2 onclick="filterCategory('All Games')">All Games</h2>
+        <div class="grid">
           
-            <div class="card" onclick="prepareGame('Age%20Of%20War', 'Age%20Of%20War', 'games/Age Of War/thumbnail.png')">
-              <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
-              <div>Age Of War</div>
-            </div>
-          
-            <div class="card" onclick="prepareGame('Backrooms%202D', 'Backrooms%202D', 'games/Backrooms 2D/thumbnail.jpg')">
-              <img class="thumb" src="games/Backrooms 2D/thumbnail.jpg" alt="Backrooms 2D">
-              <div>Backrooms 2D</div>
-            </div>
-          
-            <div class="card" onclick="prepareGame('Bad%20Piggies', 'Bad%20Piggies', 'games/Bad Piggies/thumbnail.jpg')">
-              <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
-              <div>Bad Piggies</div>
-            </div>
-          
-            <div class="card" onclick="prepareGame('Baldi%E2%80%99s%20Basics', 'Baldi%E2%80%99s%20Basics', 'games/Baldi’s Basics/thumbnail.png')">
-              <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
-              <div>Baldi’s Basics</div>
-            </div>
-          
-            <div class="card" onclick="prepareGame('Block%20Blast', 'Block%20Blast', 'games/Block Blast/thumbnail.jpg')">
-              <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
-              <div>Block Blast</div>
-            </div>
-          
+              <div class="card" onclick="prepareGame('1v1.lol', '1v1.lol', 'games/1v1.lol/thumbnail.png')">
+                <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
+                <div>1v1.lol</div>
+              </div>
+            
+              <div class="card" onclick="prepareGame('Age%20Of%20War', 'Age%20Of%20War', 'games/Age Of War/thumbnail.png')">
+                <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
+                <div>Age Of War</div>
+              </div>
+            
+              <div class="card" onclick="prepareGame('Backrooms%202D', 'Backrooms%202D', 'games/Backrooms 2D/thumbnail.jpg')">
+                <img class="thumb" src="games/Backrooms 2D/thumbnail.jpg" alt="Backrooms 2D">
+                <div>Backrooms 2D</div>
+              </div>
+            
+              <div class="card" onclick="prepareGame('Bad%20Piggies', 'Bad%20Piggies', 'games/Bad Piggies/thumbnail.jpg')">
+                <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
+                <div>Bad Piggies</div>
+              </div>
+            
+              <div class="card" onclick="prepareGame('Baldi%E2%80%99s%20Basics', 'Baldi%E2%80%99s%20Basics', 'games/Baldi’s Basics/thumbnail.png')">
+                <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
+                <div>Baldi’s Basics</div>
+              </div>
+            
+              <div class="card" onclick="prepareGame('Block%20Blast', 'Block%20Blast', 'games/Block Blast/thumbnail.jpg')">
+                <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
+                <div>Block Blast</div>
+              </div>
+            
+        </div>
       </div>
-    </div>
-  
-    <div class="category" data-category="Shooter">
-      <h2 onclick="filterCategory('Shooter')">Shooter</h2>
-      <div class="grid">
-        
-            <div class="card" onclick="prepareGame('1v1.lol', '1v1.lol', 'games/1v1.lol/thumbnail.png')">
-              <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
-              <div>1v1.lol</div>
-            </div>
+    
+      <div class="category" data-category="Shooter">
+        <h2 onclick="filterCategory('Shooter')">Shooter</h2>
+        <div class="grid">
           
+              <div class="card" onclick="prepareGame('1v1.lol', '1v1.lol', 'games/1v1.lol/thumbnail.png')">
+                <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
+                <div>1v1.lol</div>
+              </div>
+            
+        </div>
       </div>
-    </div>
-  
-    <div class="category" data-category="Uncategorized">
-      <h2 onclick="filterCategory('Uncategorized')">Uncategorized</h2>
-      <div class="grid">
-        
-            <div class="card" onclick="prepareGame('Age%20Of%20War', 'Age%20Of%20War', 'games/Age Of War/thumbnail.png')">
-              <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
-              <div>Age Of War</div>
-            </div>
+    
+      <div class="category" data-category="Uncategorized">
+        <h2 onclick="filterCategory('Uncategorized')">Uncategorized</h2>
+        <div class="grid">
           
-            <div class="card" onclick="prepareGame('Backrooms%202D', 'Backrooms%202D', 'games/Backrooms 2D/thumbnail.jpg')">
-              <img class="thumb" src="games/Backrooms 2D/thumbnail.jpg" alt="Backrooms 2D">
-              <div>Backrooms 2D</div>
-            </div>
-          
-            <div class="card" onclick="prepareGame('Bad%20Piggies', 'Bad%20Piggies', 'games/Bad Piggies/thumbnail.jpg')">
-              <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
-              <div>Bad Piggies</div>
-            </div>
-          
-            <div class="card" onclick="prepareGame('Baldi%E2%80%99s%20Basics', 'Baldi%E2%80%99s%20Basics', 'games/Baldi’s Basics/thumbnail.png')">
-              <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
-              <div>Baldi’s Basics</div>
-            </div>
-          
-            <div class="card" onclick="prepareGame('Block%20Blast', 'Block%20Blast', 'games/Block Blast/thumbnail.jpg')">
-              <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
-              <div>Block Blast</div>
-            </div>
-          
+              <div class="card" onclick="prepareGame('Age%20Of%20War', 'Age%20Of%20War', 'games/Age Of War/thumbnail.png')">
+                <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
+                <div>Age Of War</div>
+              </div>
+            
+              <div class="card" onclick="prepareGame('Backrooms%202D', 'Backrooms%202D', 'games/Backrooms 2D/thumbnail.jpg')">
+                <img class="thumb" src="games/Backrooms 2D/thumbnail.jpg" alt="Backrooms 2D">
+                <div>Backrooms 2D</div>
+              </div>
+            
+              <div class="card" onclick="prepareGame('Bad%20Piggies', 'Bad%20Piggies', 'games/Bad Piggies/thumbnail.jpg')">
+                <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
+                <div>Bad Piggies</div>
+              </div>
+            
+              <div class="card" onclick="prepareGame('Baldi%E2%80%99s%20Basics', 'Baldi%E2%80%99s%20Basics', 'games/Baldi’s Basics/thumbnail.png')">
+                <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
+                <div>Baldi’s Basics</div>
+              </div>
+            
+              <div class="card" onclick="prepareGame('Block%20Blast', 'Block%20Blast', 'games/Block Blast/thumbnail.jpg')">
+                <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
+                <div>Block Blast</div>
+              </div>
+            
+        </div>
       </div>
-    </div>
-  
+    
+  </div>
 </div>
 
 <script>
@@ -297,6 +319,7 @@ const controls = document.getElementById('controls');
 const startOverlay = document.getElementById('startOverlay');
 const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
+
 let currentGameFolder = null;
 
 // Redirect / → /main
@@ -355,12 +378,14 @@ function filterCategory(cat) {
   });
 }
 
+// Hash router
 // Default category on load
 filterCategory('All Games');
 
 // Hash routing
 window.addEventListener('load', handleRouting);
 window.addEventListener('hashchange', handleRouting);
+
 function handleRouting() {
   const hash = window.location.hash;
   if (hash.startsWith('#/game/')) {
