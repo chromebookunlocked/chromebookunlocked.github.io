@@ -8,7 +8,6 @@ const outputFile = path.join(outputDir, "index.html");
 
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
 
-// Read JSON files
 let games = fs.readdirSync(dataDir)
   .filter(f => f.endsWith(".json"))
   .map(f => {
@@ -21,14 +20,12 @@ let games = fs.readdirSync(dataDir)
     };
   });
 
-// Group games by category
 const categories = { "All Games": games };
 games.forEach(g => {
   if (!categories[g.category]) categories[g.category] = [];
   categories[g.category].push(g);
 });
 
-// Generate HTML
 const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -39,10 +36,12 @@ const html = `
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
 * { box-sizing: border-box; }
-body {
-  font-family: 'Orbitron', sans-serif;
+html, body {
   margin: 0;
+  padding: 0;
+  height: 100%;
   background: #1c0033;
+  font-family: 'Orbitron', sans-serif;
   color: #eee;
   overflow: hidden;
   display: flex;
@@ -92,27 +91,14 @@ body {
   transition: margin-left 0.3s;
 }
 
-/* Viewer & Controls */
-.viewer {
-  width: 100%;
-  max-width: 1280px;
-  height: 720px;
-  display: none;
-  flex-direction: column;
-  margin: 0 auto 2rem auto;
-  background: black;
-  border-radius: 10px;
-  overflow: hidden;
-  position: relative;
-}
+/* Controls */
 #controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
   max-width: 1280px;
-  margin: 0 auto;
+  margin: 0 auto 0.5rem auto;
   padding: 0.5rem;
-  margin-bottom: 0.5rem;
   visibility: hidden;
 }
 button {
@@ -124,15 +110,37 @@ button {
 }
 #backBtn { background: #ff99ff; color: black; }
 #fullscreenBtn { background: #cc66ff; color: black; }
-iframe {
+
+/* Game Viewer */
+.viewer {
+  position: relative;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1280px;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto 2rem auto;
+  background: black;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.viewer iframe {
   width: 100%;
   height: 100%;
   border: none;
-  display: block;
   overflow: hidden;
+  background: black;
+}
+.viewer iframe::-webkit-scrollbar {
+  display: none !important;
+}
+.viewer iframe {
+  scrollbar-width: none !important;
 }
 
-/* Overlay for start screen */
+/* Overlay for Play */
 #startOverlay {
   position: absolute;
   inset: 0;
@@ -256,6 +264,7 @@ const startName = document.getElementById('startName');
 
 let currentGameFolder = null;
 
+// Redirect / → /main
 if (window.location.pathname === '/' || window.location.pathname === '') {
   window.location.replace(window.location.origin + '/main');
 }
@@ -311,10 +320,12 @@ function filterCategory(cat) {
   });
 }
 
-// Hash router
+// Default category on load
+filterCategory('All Games');
+
+// Hash routing
 window.addEventListener('load', handleRouting);
 window.addEventListener('hashchange', handleRouting);
-
 function handleRouting() {
   const hash = window.location.hash;
   if (hash.startsWith('#/game/')) {
@@ -342,4 +353,4 @@ window.addEventListener('keydown', e => {
 `;
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Generated arcade with overlay play screen, scroll fix, and hash routing`);
+console.log(`✅ Generated arcade with black game background, no scrollbars, and default All Games view`);
