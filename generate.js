@@ -1,4 +1,32 @@
-// ... same code above
+const fs = require("fs");
+const path = require("path");
+
+const dataDir = path.join(__dirname, "data");
+const gamesDir = path.join(__dirname, "games");
+const outputDir = path.join(__dirname, "dist");
+const outputFile = path.join(outputDir, "index.html");
+
+if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
+
+// Read JSON files
+let games = fs.readdirSync(dataDir)
+  .filter(f => f.endsWith(".json"))
+  .map(f => {
+    const json = JSON.parse(fs.readFileSync(path.join(dataDir, f)));
+    return {
+      folder: json.folder || f.replace(".json", ""),
+      name: json.name || f.replace(".json", ""),
+      category: json.category || "Uncategorized",
+      thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.png", "thumbnail.jpg"]
+    };
+  });
+
+// Group games by category
+const categories = { "All Games": games };
+games.forEach(g => {
+  if (!categories[g.category]) categories[g.category] = [];
+  categories[g.category].push(g);
+});
 
 // Generate HTML
 const html = `
@@ -11,15 +39,16 @@ const html = `
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; overflow: hidden; }
 body {
   font-family: 'Orbitron', sans-serif;
+  margin: 0;
   background: #1c0033;
   color: #eee;
+  overflow: hidden;
   display: flex;
 }
 
-/* Sidebar — unchanged */
+/* Sidebar */
 #sidebar {
   width: 60px;
   background: #330066;
@@ -53,6 +82,7 @@ body {
   color: #fff;
 }
 
+/* Content */
 #content {
   flex: 1;
   padding: 1rem;
@@ -62,26 +92,29 @@ body {
   transition: margin-left 0.3s;
 }
 
-/* Game viewer wrapper */
+/* Viewer & Controls */
 .viewer {
   width: 100%;
+  max-width: 1280px;
+  height: 720px;
   display: none;
   flex-direction: column;
-  align-items: center;
   margin: 0 auto 2rem auto;
+  background: black;
+  border-radius: 10px;
+  overflow: hidden;
   position: relative;
 }
-
 #controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 1280px;
-  margin: 0 auto 0.5rem auto;
+  max-width: 1280px;
+  margin: 0 auto;
   padding: 0.5rem;
+  margin-bottom: 0.5rem;
   visibility: hidden;
 }
-
 button {
   padding: 0.4rem 0.8rem;
   border: none;
@@ -91,30 +124,15 @@ button {
 }
 #backBtn { background: #ff99ff; color: black; }
 #fullscreenBtn { background: #cc66ff; color: black; }
-
-/* Fixed 16:9 aspect ratio */
-.viewer-inner {
-  position: relative;
-  width: 100%;
-  max-width: 1280px;
-  aspect-ratio: 16 / 9;
-  background: black; /* fills corners with black */
-  overflow: hidden;
-  border-radius: 10px;
-}
-
 iframe {
   width: 100%;
   height: 100%;
   border: none;
   display: block;
   overflow: hidden;
-  background: black;
 }
-iframe::-webkit-scrollbar { display: none; }
-iframe { scrollbar-width: none; }
 
-/* Start overlay */
+/* Overlay for start screen */
 #startOverlay {
   position: absolute;
   inset: 0;
@@ -153,7 +171,7 @@ iframe { scrollbar-width: none; }
   box-shadow: 0 0 15px #ff66ff;
 }
 
-/* Game cards — unchanged */
+/* Game cards */
 .category { margin-bottom: 2rem; }
 .category h2 { color: #ffccff; cursor: pointer; margin-bottom: 0.5rem; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
@@ -180,6 +198,7 @@ iframe { scrollbar-width: none; }
 </head>
 <body>
 
+<!-- Sidebar -->
 <div id="sidebar">
   <header>
     <img src="assets/logo.png" alt="Logo">
@@ -189,6 +208,7 @@ iframe { scrollbar-width: none; }
   </ul>
 </div>
 
+<!-- Content -->
 <div id="content">
   <div id="controls">
     <button id="backBtn" onclick="closeGame()">← Back</button>
@@ -197,14 +217,12 @@ iframe { scrollbar-width: none; }
   </div>
 
   <div class="viewer" id="viewer">
-    <div class="viewer-inner">
-      <div id="startOverlay">
-        <img id="startThumb" src="" alt="Game Thumbnail">
-        <h1 id="startName"></h1>
-        <button id="startButton" onclick="startGame()">▶ Play</button>
-      </div>
-      <iframe id="gameFrame" src="" scrolling="no"></iframe>
+    <div id="startOverlay">
+      <img id="startThumb" src="" alt="Game Thumbnail">
+      <h1 id="startName"></h1>
+      <button id="startButton" onclick="startGame()">▶ Play</button>
     </div>
+    <iframe id="gameFrame" src=""></iframe>
   </div>
 
   <div id="allGames">
@@ -228,11 +246,100 @@ iframe { scrollbar-width: none; }
 </div>
 
 <script>
-// (JavaScript is same as your previous working version)
+const viewer = document.getElementById('viewer');
+const frame = document.getElementById('gameFrame');
+const gameTitle = document.getElementById('gameTitle');
+const controls = document.getElementById('controls');
+const startOverlay = document.getElementById('startOverlay');
+const startThumb = document.getElementById('startThumb');
+const startName = document.getElementById('startName');
+
+let currentGameFolder = null;
+
+if (window.location.pathname === '/' || window.location.pathname === '') {
+  window.location.replace(window.location.origin + '/main');
+}
+
+function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
+  const folder = decodeURIComponent(folderEncoded);
+  const name = decodeURIComponent(nameEncoded);
+  currentGameFolder = folder;
+  frame.src = '';
+  viewer.style.display = 'flex';
+  controls.style.visibility = 'visible';
+  gameTitle.textContent = name;
+  startThumb.src = thumbSrc;
+  startName.textContent = name;
+  startOverlay.style.opacity = '1';
+  startOverlay.style.pointerEvents = 'auto';
+  window.location.hash = '#/game/' + folderEncoded;
+  filterCategory('All Games');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startGame() {
+  if (!currentGameFolder) return;
+  frame.src = 'games/' + currentGameFolder + '/index.html';
+  startOverlay.style.opacity = '0';
+  startOverlay.style.pointerEvents = 'none';
+}
+
+function closeGame() {
+  frame.src = '';
+  viewer.style.display = 'none';
+  controls.style.visibility = 'hidden';
+  gameTitle.textContent = '';
+  currentGameFolder = null;
+  startOverlay.style.opacity = '1';
+  startOverlay.style.pointerEvents = 'auto';
+  window.location.hash = '';
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) frame.requestFullscreen().catch(e=>console.log(e));
+  else document.exitFullscreen();
+}
+
+function filterCategory(cat) {
+  const allCategories = document.querySelectorAll('.category');
+  allCategories.forEach(c => {
+    if (cat === 'All Games') {
+      c.style.display = (c.getAttribute('data-category') === 'All Games') ? 'block' : 'none';
+    } else {
+      c.style.display = (c.getAttribute('data-category') === cat) ? 'block' : 'none';
+    }
+  });
+}
+
+// Hash router
+window.addEventListener('load', handleRouting);
+window.addEventListener('hashchange', handleRouting);
+
+function handleRouting() {
+  const hash = window.location.hash;
+  if (hash.startsWith('#/game/')) {
+    const folder = decodeURIComponent(hash.replace('#/game/', ''));
+    const card = [...document.querySelectorAll('.card')].find(el => el.getAttribute('onclick')?.includes(encodeURIComponent(folder)));
+    if (card) {
+      const name = card.querySelector('div').innerText;
+      const thumb = card.querySelector('img').src;
+      prepareGame(encodeURIComponent(folder), encodeURIComponent(name), thumb);
+    }
+  } else {
+    closeGame();
+  }
+}
+
+// Prevent arrow keys / space scrolling
+window.addEventListener('keydown', e => {
+  const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
+  if (blocked.includes(e.key)) e.preventDefault();
+});
 </script>
+
 </body>
 </html>
 `;
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Game viewer now has black borders and scrollbars hidden`);
+console.log(`✅ Generated arcade with overlay play screen, scroll fix, and hash routing`);
