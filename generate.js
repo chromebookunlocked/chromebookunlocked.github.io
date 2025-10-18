@@ -38,15 +38,13 @@ const html = `
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 body {
   font-family: 'Orbitron', sans-serif;
   margin: 0;
   background: #1c0033;
   color: #eee;
-  overflow-x: hidden;
+  overflow: hidden;
   display: flex;
 }
 
@@ -63,38 +61,21 @@ body {
   left: 0;
   z-index: 1000;
 }
-#sidebar:hover {
-  width: 250px;
-}
-#sidebar header {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 2rem;
-}
-#sidebar header img {
-  height: 60px;
-  width: auto;
-}
-#sidebar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+#sidebar:hover { width: 250px; }
+#sidebar header { display: flex; justify-content: center; margin-bottom: 2rem; }
+#sidebar header img { height: 60px; width: auto; }
+#sidebar ul { list-style: none; padding: 0; margin: 0; }
 #sidebar li {
   cursor: pointer;
-  padding: 0.5rem 0.5rem;
+  padding: 0.5rem;
   border-radius: 4px;
   transition: 0.3s ease;
   white-space: nowrap;
   font-size: 16px;
   opacity: 0;
   transform: translateY(5px);
-  text-align: left;
 }
-#sidebar:hover li {
-  opacity: 1;
-  transform: translateY(0);
-}
+#sidebar:hover li { opacity: 1; transform: translateY(0); }
 #sidebar li:hover {
   background: #660099;
   box-shadow: 0 0 10px #ff99ff;
@@ -105,12 +86,13 @@ body {
 #content {
   flex: 1;
   padding: 1rem;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   margin-left: 60px;
   transition: margin-left 0.3s;
 }
 
-/* Game Viewer */
+/* Viewer & Controls */
 .viewer {
   width: 100%;
   max-width: 1280px;
@@ -140,14 +122,8 @@ button {
   cursor: pointer;
   font-size: 14px;
 }
-#backBtn {
-  background: #ff99ff;
-  color: black;
-}
-#fullscreenBtn {
-  background: #cc66ff;
-  color: black;
-}
+#backBtn { background: #ff99ff; color: black; }
+#fullscreenBtn { background: #cc66ff; color: black; }
 iframe {
   width: 100%;
   height: 100%;
@@ -156,20 +132,49 @@ iframe {
   overflow: hidden;
 }
 
-/* Game cards */
-.category {
-  margin-bottom: 2rem;
-}
-.category h2 {
-  color: #ffccff;
-  cursor: pointer;
-  margin-bottom: 0.5rem;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+/* Overlay for start screen */
+#startOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #330066 0%, #1c0033 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 1rem;
+  z-index: 10;
+  transition: opacity 0.5s ease;
 }
+#startOverlay img {
+  width: 300px;
+  max-width: 80%;
+  border-radius: 10px;
+  box-shadow: 0 0 20px #ff99ff;
+}
+#startOverlay h1 {
+  margin: 0;
+  font-size: 2rem;
+  color: #fff;
+}
+#startButton {
+  padding: 0.8rem 2rem;
+  font-size: 1.2rem;
+  background: #ff99ff;
+  color: black;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+#startButton:hover {
+  background: #ff66ff;
+  box-shadow: 0 0 15px #ff66ff;
+}
+
+/* Game cards */
+.category { margin-bottom: 2rem; }
+.category h2 { color: #ffccff; cursor: pointer; margin-bottom: 0.5rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
 .card {
   background: #4d0066;
   border-radius: 8px;
@@ -180,10 +185,7 @@ iframe {
   flex-direction: column;
   align-items: center;
 }
-.card:hover {
-  transform: scale(1.05);
-  background: #660099;
-}
+.card:hover { transform: scale(1.05); background: #660099; }
 .thumb {
   width: 180px;
   height: 120px;
@@ -215,6 +217,11 @@ iframe {
   </div>
 
   <div class="viewer" id="viewer">
+    <div id="startOverlay">
+      <img id="startThumb" src="" alt="Game Thumbnail">
+      <h1 id="startName"></h1>
+      <button id="startButton" onclick="startGame()">▶ Play</button>
+    </div>
     <iframe id="gameFrame" src=""></iframe>
   </div>
 
@@ -226,7 +233,7 @@ iframe {
           ${categories[cat].map(g => {
             const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
             return `
-              <div class="card" onclick="openGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}')">
+              <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
                 <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
                 <div>${g.name}</div>
               </div>
@@ -243,21 +250,38 @@ const viewer = document.getElementById('viewer');
 const frame = document.getElementById('gameFrame');
 const gameTitle = document.getElementById('gameTitle');
 const controls = document.getElementById('controls');
+const startOverlay = document.getElementById('startOverlay');
+const startThumb = document.getElementById('startThumb');
+const startName = document.getElementById('startName');
+
+let currentGameFolder = null;
 
 if (window.location.pathname === '/' || window.location.pathname === '') {
   window.location.replace(window.location.origin + '/main');
 }
 
-function openGame(folderEncoded, nameEncoded) {
+function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
   const folder = decodeURIComponent(folderEncoded);
   const name = decodeURIComponent(nameEncoded);
-  frame.src = 'games/' + folder + '/index.html';
+  currentGameFolder = folder;
+  frame.src = '';
   viewer.style.display = 'flex';
   controls.style.visibility = 'visible';
   gameTitle.textContent = name;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  startThumb.src = thumbSrc;
+  startName.textContent = name;
+  startOverlay.style.opacity = '1';
+  startOverlay.style.pointerEvents = 'auto';
   window.location.hash = '#/game/' + folderEncoded;
   filterCategory('All Games');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startGame() {
+  if (!currentGameFolder) return;
+  frame.src = 'games/' + currentGameFolder + '/index.html';
+  startOverlay.style.opacity = '0';
+  startOverlay.style.pointerEvents = 'none';
 }
 
 function closeGame() {
@@ -265,6 +289,9 @@ function closeGame() {
   viewer.style.display = 'none';
   controls.style.visibility = 'hidden';
   gameTitle.textContent = '';
+  currentGameFolder = null;
+  startOverlay.style.opacity = '1';
+  startOverlay.style.pointerEvents = 'auto';
   window.location.hash = '';
 }
 
@@ -291,20 +318,19 @@ window.addEventListener('hashchange', handleRouting);
 function handleRouting() {
   const hash = window.location.hash;
   if (hash.startsWith('#/game/')) {
-    const folder = hash.replace('#/game/', '');
-    const card = [...document.querySelectorAll('.card')].find(el => el.getAttribute('onclick')?.includes(folder));
+    const folder = decodeURIComponent(hash.replace('#/game/', ''));
+    const card = [...document.querySelectorAll('.card')].find(el => el.getAttribute('onclick')?.includes(encodeURIComponent(folder)));
     if (card) {
       const name = card.querySelector('div').innerText;
-      openGame(folder, encodeURIComponent(name));
+      const thumb = card.querySelector('img').src;
+      prepareGame(encodeURIComponent(folder), encodeURIComponent(name), thumb);
     }
   } else {
     closeGame();
   }
 }
 
-filterCategory('All Games');
-
-// Block page scrolling with arrows and space
+// Prevent arrow keys / space scrolling
 window.addEventListener('keydown', e => {
   const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
   if (blocked.includes(e.key)) e.preventDefault();
@@ -316,4 +342,4 @@ window.addEventListener('keydown', e => {
 `;
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Generated arcade with button hiding, space fix, and stretchable game viewer`);
+console.log(`✅ Generated arcade with overlay play screen, scroll fix, and hash routing`);
