@@ -133,12 +133,8 @@ button {
   overflow: hidden;
   background: black;
 }
-.viewer iframe::-webkit-scrollbar {
-  display: none !important;
-}
-.viewer iframe {
-  scrollbar-width: none !important;
-}
+.viewer iframe::-webkit-scrollbar { display: none !important; }
+.viewer iframe { scrollbar-width: none !important; }
 
 /* Overlay for Play */
 #startOverlay {
@@ -179,16 +175,20 @@ button {
   box-shadow: 0 0 15px #ff66ff;
 }
 
-/* Game cards */
-.category { margin-bottom: 2rem; }
-.category h2 { color: #ffccff; cursor: pointer; margin-bottom: 0.5rem; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+/* Game Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
 .card {
   background: #4d0066;
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
   transition: transform .2s;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -233,24 +233,22 @@ button {
     <iframe id="gameFrame" src=""></iframe>
   </div>
 
-  <div id="allGames">
-    ${Object.keys(categories).map(cat => `
-      <div class="category" data-category="${cat}">
-        <h2 onclick="filterCategory('${cat}')">${cat}</h2>
-        <div class="grid">
-          ${categories[cat].map(g => {
-            const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
-            return `
-              <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
-                <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
-                <div>${g.name}</div>
-              </div>
-            `;
-          }).join('')}
-        </div>
+  ${Object.keys(categories).map(cat => `
+    <div class="category" data-category="${cat}">
+      <h2 onclick="filterCategory('${cat}')">${cat}</h2>
+      <div class="grid">
+        ${categories[cat].map(g => {
+          const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
+          return `
+            <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
+              <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
+              <div>${g.name}</div>
+            </div>
+          `;
+        }).join('')}
       </div>
-    `).join('')}
-  </div>
+    </div>
+  `).join('')}
 </div>
 
 <script>
@@ -261,7 +259,6 @@ const controls = document.getElementById('controls');
 const startOverlay = document.getElementById('startOverlay');
 const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
-
 let currentGameFolder = null;
 
 // Redirect / → /main
@@ -353,4 +350,4 @@ window.addEventListener('keydown', e => {
 `;
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Generated arcade with black game background, no scrollbars, and default All Games view`);
+console.log(`✅ Generated arcade with original grid restored, black game background, no scrollbars, All Games default`);
