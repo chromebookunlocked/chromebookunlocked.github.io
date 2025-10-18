@@ -37,8 +37,10 @@ const html = `
 <meta charset="UTF-8">
 <title>Arcade</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
 body {
-  font-family: sans-serif;
+  font-family: 'Orbitron', sans-serif;
   margin: 0;
   background: #1c0033;
   color: #eee;
@@ -59,7 +61,7 @@ body {
   left: 0;
   z-index: 1000;
 }
-#sidebar.expanded {
+#sidebar:hover {
   width: 250px;
 }
 #sidebar header {
@@ -71,24 +73,8 @@ body {
   height: 60px;
   width: auto;
 }
-#toggleBtn {
-  position: absolute;
-  top: 50%;
-  right: -15px;
-  transform: translateY(-50%);
-  background: #660099;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
-}
+
+/* Sidebar text effect */
 #sidebar ul {
   list-style: none;
   padding: 0;
@@ -98,13 +84,23 @@ body {
   cursor: pointer;
   padding: 0.5rem 0.5rem;
   border-radius: 4px;
-  transition: 0.2s;
+  transition: 0.3s ease;
   white-space: nowrap;
   font-size: 16px;
-  overflow: hidden;
+  opacity: 0;
+  transform: translateY(5px);
+  text-align: left;
 }
+#sidebar:hover li {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Glow on hover */
 #sidebar li:hover {
   background: #660099;
+  box-shadow: 0 0 10px #ff99ff;
+  color: #fff;
 }
 
 /* Content */
@@ -193,14 +189,6 @@ button {
   border-radius: 6px;
   background: #330033;
 }
-
-/* Hover expand sidebar */
-#sidebar:hover {
-  width: 250px;
-}
-#sidebar:hover ~ #content {
-  margin-left: 60px; /* keep content fixed, no shift */
-}
 </style>
 </head>
 <body>
@@ -209,7 +197,6 @@ button {
   <header>
     <img src="assets/logo.png" alt="Logo">
   </header>
-  <button id="toggleBtn" onclick="toggleSidebar()">›</button>
   <ul id="categoryList">
     ${Object.keys(categories).map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`).join('')}
   </ul>
@@ -249,7 +236,6 @@ button {
 const viewer = document.getElementById('viewer');
 const frame = document.getElementById('gameFrame');
 const gameTitle = document.getElementById('gameTitle');
-const sidebar = document.getElementById('sidebar');
 
 function openGame(folder, name) {
   frame.src = 'games/' + folder + '/index.html';
@@ -267,10 +253,6 @@ function closeGame() {
 function toggleFullscreen() {
   if (!document.fullscreenElement) frame.requestFullscreen().catch(e=>console.log(e));
   else document.exitFullscreen();
-}
-
-function toggleSidebar() {
-  sidebar.classList.toggle('expanded');
 }
 
 function filterCategory(cat) {
@@ -298,4 +280,4 @@ window.addEventListener('keydown', e => {
 `;
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Generated arcade with ${games.length} games and sidebar overlay behavior`);
+console.log(`✅ Generated arcade with sidebar hover glow, smooth text sink, Orbitron font, and no toggle button`);
