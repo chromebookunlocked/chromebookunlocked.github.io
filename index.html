@@ -7,6 +7,9 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
+* {
+  box-sizing: border-box;
+}
 body {
   font-family: 'Orbitron', sans-serif;
   margin: 0;
@@ -87,6 +90,7 @@ body {
   background: black;
   border-radius: 10px;
   overflow: hidden;
+  position: relative;
 }
 #controls {
   display: flex;
@@ -96,6 +100,7 @@ body {
   margin: 0 auto;
   padding: 0.5rem;
   margin-bottom: 0.5rem;
+  visibility: hidden;
 }
 button {
   padding: 0.4rem 0.8rem;
@@ -116,6 +121,8 @@ iframe {
   width: 100%;
   height: 100%;
   border: none;
+  display: block;
+  overflow: hidden;
 }
 
 /* Game cards */
@@ -191,27 +198,27 @@ iframe {
                 <div>1v1.lol</div>
               </div>
             
-              <div class="card" onclick="openGame('Age Of War', 'Age Of War')">
+              <div class="card" onclick="openGame('Age%20Of%20War', 'Age%20Of%20War')">
                 <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
                 <div>Age Of War</div>
               </div>
             
-              <div class="card" onclick="openGame('Backrooms 2D', 'Backrooms 2D')">
+              <div class="card" onclick="openGame('Backrooms%202D', 'Backrooms%202D')">
                 <img class="thumb" src="games/Backrooms 2D/thumbnail.jpg" alt="Backrooms 2D">
                 <div>Backrooms 2D</div>
               </div>
             
-              <div class="card" onclick="openGame('Bad Piggies', 'Bad Piggies')">
+              <div class="card" onclick="openGame('Bad%20Piggies', 'Bad%20Piggies')">
                 <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
                 <div>Bad Piggies</div>
               </div>
             
-              <div class="card" onclick="openGame('Baldi’s Basics', 'Baldi’s Basics')">
+              <div class="card" onclick="openGame('Baldi%E2%80%99s%20Basics', 'Baldi%E2%80%99s%20Basics')">
                 <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
                 <div>Baldi’s Basics</div>
               </div>
             
-              <div class="card" onclick="openGame('Block Blast', 'Block Blast')">
+              <div class="card" onclick="openGame('Block%20Blast', 'Block%20Blast')">
                 <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
                 <div>Block Blast</div>
               </div>
@@ -235,27 +242,27 @@ iframe {
         <h2 onclick="filterCategory('Uncategorized')">Uncategorized</h2>
         <div class="grid">
           
-              <div class="card" onclick="openGame('Age Of War', 'Age Of War')">
+              <div class="card" onclick="openGame('Age%20Of%20War', 'Age%20Of%20War')">
                 <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
                 <div>Age Of War</div>
               </div>
             
-              <div class="card" onclick="openGame('Backrooms 2D', 'Backrooms 2D')">
+              <div class="card" onclick="openGame('Backrooms%202D', 'Backrooms%202D')">
                 <img class="thumb" src="games/Backrooms 2D/thumbnail.jpg" alt="Backrooms 2D">
                 <div>Backrooms 2D</div>
               </div>
             
-              <div class="card" onclick="openGame('Bad Piggies', 'Bad Piggies')">
+              <div class="card" onclick="openGame('Bad%20Piggies', 'Bad%20Piggies')">
                 <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
                 <div>Bad Piggies</div>
               </div>
             
-              <div class="card" onclick="openGame('Baldi’s Basics', 'Baldi’s Basics')">
+              <div class="card" onclick="openGame('Baldi%E2%80%99s%20Basics', 'Baldi%E2%80%99s%20Basics')">
                 <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
                 <div>Baldi’s Basics</div>
               </div>
             
-              <div class="card" onclick="openGame('Block Blast', 'Block Blast')">
+              <div class="card" onclick="openGame('Block%20Blast', 'Block%20Blast')">
                 <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
                 <div>Block Blast</div>
               </div>
@@ -270,30 +277,29 @@ iframe {
 const viewer = document.getElementById('viewer');
 const frame = document.getElementById('gameFrame');
 const gameTitle = document.getElementById('gameTitle');
+const controls = document.getElementById('controls');
 
-// Redirect from / to /main
 if (window.location.pathname === '/' || window.location.pathname === '') {
   window.location.replace(window.location.origin + '/main');
 }
 
-function openGame(folder, name) {
+function openGame(folderEncoded, nameEncoded) {
+  const folder = decodeURIComponent(folderEncoded);
+  const name = decodeURIComponent(nameEncoded);
   frame.src = 'games/' + folder + '/index.html';
   viewer.style.display = 'flex';
+  controls.style.visibility = 'visible';
   gameTitle.textContent = name;
   window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  // Update hash route
-  window.location.hash = '#/game/' + folder;
-
-  // Show All Games
+  window.location.hash = '#/game/' + folderEncoded;
   filterCategory('All Games');
 }
 
 function closeGame() {
   frame.src = '';
   viewer.style.display = 'none';
+  controls.style.visibility = 'hidden';
   gameTitle.textContent = '';
-  // Clear hash
   window.location.hash = '';
 }
 
@@ -321,20 +327,19 @@ function handleRouting() {
   const hash = window.location.hash;
   if (hash.startsWith('#/game/')) {
     const folder = hash.replace('#/game/', '');
-    const card = document.querySelector(`.card[onclick*="'${folder}'"]`);
+    const card = [...document.querySelectorAll('.card')].find(el => el.getAttribute('onclick')?.includes(folder));
     if (card) {
-      const gameName = card.querySelector('div').innerText;
-      openGame(folder, gameName);
+      const name = card.querySelector('div').innerText;
+      openGame(folder, encodeURIComponent(name));
     }
   } else {
     closeGame();
   }
 }
 
-// Show All Games by default
 filterCategory('All Games');
 
-// Prevent arrow keys / space from scrolling
+// Block page scrolling with arrows and space
 window.addEventListener('keydown', e => {
   const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
   if (blocked.includes(e.key)) e.preventDefault();
