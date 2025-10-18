@@ -4,7 +4,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Arcade</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
@@ -30,7 +29,9 @@ body {
   left: 0;
   z-index: 1000;
 }
-#sidebar:hover { width: 250px; }
+#sidebar:hover {
+  width: 250px;
+}
 #sidebar header {
   display: flex;
   justify-content: center;
@@ -40,8 +41,6 @@ body {
   height: 60px;
   width: auto;
 }
-
-/* Sidebar text effect */
 #sidebar ul {
   list-style: none;
   padding: 0;
@@ -62,8 +61,6 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
-
-/* Glow on hover */
 #sidebar li:hover {
   background: #660099;
   box-shadow: 0 0 10px #ff99ff;
@@ -80,19 +77,25 @@ body {
 }
 
 /* Game Viewer */
-.viewer-wrapper {
-  display: none;
+.viewer {
+  width: 100%;
   max-width: 1280px;
-  margin: 0 auto 2rem;
-  position: relative;
+  height: 720px;
+  display: none;
+  flex-direction: column;
+  margin: 0 auto 2rem auto;
+  background: black;
+  border-radius: 10px;
+  overflow: hidden;
 }
 #controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.3rem;
-  position: relative;
-  top: -10px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 button {
   padding: 0.4rem 0.8rem;
@@ -108,16 +111,6 @@ button {
 #fullscreenBtn {
   background: #cc66ff;
   color: black;
-}
-.viewer {
-  width: 100%;
-  max-width: 1280px;
-  height: 720px;
-  display: flex;
-  flex-direction: column;
-  background: black;
-  border-radius: 10px;
-  overflow: hidden;
 }
 iframe {
   width: 100%;
@@ -165,13 +158,7 @@ iframe {
 </head>
 <body>
 
-<!-- Redirect if user lands on root -->
-<script>
-if (window.location.pathname === '/' || window.location.pathname === '') {
-  window.location.replace('/main');
-}
-</script>
-
+<!-- Sidebar -->
 <div id="sidebar">
   <header>
     <img src="assets/logo.png" alt="Logo">
@@ -181,16 +168,16 @@ if (window.location.pathname === '/' || window.location.pathname === '') {
   </ul>
 </div>
 
+<!-- Content -->
 <div id="content">
-  <div class="viewer-wrapper" id="viewerWrapper">
-    <div id="controls">
-      <button id="backBtn" onclick="closeGame()">← Back</button>
-      <span id="gameTitle"></span>
-      <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-    </div>
-    <div class="viewer" id="viewer">
-      <iframe id="gameFrame" src=""></iframe>
-    </div>
+  <div id="controls">
+    <button id="backBtn" onclick="closeGame()">← Back</button>
+    <span id="gameTitle"></span>
+    <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+  </div>
+
+  <div class="viewer" id="viewer">
+    <iframe id="gameFrame" src=""></iframe>
   </div>
 
   <div id="allGames">
@@ -280,23 +267,34 @@ if (window.location.pathname === '/' || window.location.pathname === '') {
 </div>
 
 <script>
-const viewerWrapper = document.getElementById('viewerWrapper');
+const viewer = document.getElementById('viewer');
 const frame = document.getElementById('gameFrame');
 const gameTitle = document.getElementById('gameTitle');
 
+// Redirect from / to /main
+if (window.location.pathname === '/' || window.location.pathname === '') {
+  window.location.replace(window.location.origin + '/main');
+}
+
 function openGame(folder, name) {
   frame.src = 'games/' + folder + '/index.html';
-  viewerWrapper.style.display = 'block';
+  viewer.style.display = 'flex';
   gameTitle.textContent = name;
-  filterCategory('All Games');
-  window.history.pushState({}, '', '/game/' + encodeURIComponent(folder));
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Update hash route
+  window.location.hash = '#/game/' + folder;
+
+  // Show All Games
+  filterCategory('All Games');
 }
 
 function closeGame() {
   frame.src = '';
-  viewerWrapper.style.display = 'none';
-  window.history.pushState({}, '', '/main');
+  viewer.style.display = 'none';
+  gameTitle.textContent = '';
+  // Clear hash
+  window.location.hash = '';
 }
 
 function toggleFullscreen() {
@@ -315,17 +313,26 @@ function filterCategory(cat) {
   });
 }
 
-// If refreshing on a game URL, load it
-window.addEventListener('DOMContentLoaded', () => {
-  const path = window.location.pathname;
-  if (path.startsWith('/game/')) {
-    const folder = decodeURIComponent(path.replace('/game/', ''));
-    const gameName = folder;
-    openGame(folder, gameName);
+// Hash router
+window.addEventListener('load', handleRouting);
+window.addEventListener('hashchange', handleRouting);
+
+function handleRouting() {
+  const hash = window.location.hash;
+  if (hash.startsWith('#/game/')) {
+    const folder = hash.replace('#/game/', '');
+    const card = document.querySelector(`.card[onclick*="'${folder}'"]`);
+    if (card) {
+      const gameName = card.querySelector('div').innerText;
+      openGame(folder, gameName);
+    }
   } else {
-    filterCategory('All Games');
+    closeGame();
   }
-});
+}
+
+// Show All Games by default
+filterCategory('All Games');
 
 // Prevent arrow keys / space from scrolling
 window.addEventListener('keydown', e => {
