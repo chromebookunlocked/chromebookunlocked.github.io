@@ -4,127 +4,40 @@
 <head>
 <meta charset="UTF-8">
 <title>Arcade</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-  body { margin:0; font-family:sans-serif; background:#1c0033; color:#eee; display:flex; overflow-x:hidden; }
-  /* Sidebar overlay minimized */
-  #sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    background: #330066;
-    width: 60px;
-    padding: 0.5rem;
-    overflow-y: auto;
-    transition: width 0.3s ease;
-    z-index: 10;
-  }
-  #sidebar:hover {
-    width: 240px;
-  }
-  #sidebar header {
-    display: flex;
-    justify-content: center;
-    padding: 0.5rem 0;
-  }
-  #sidebar header img {
-    height: 50px;
-    max-width: 100%;
-  }
-  #categoryList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  #categoryList li {
-    padding: 0.6rem 0.5rem;
-    cursor: pointer;
-    white-space: nowrap;
-    border-radius: 4px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: background 0.2s;
-  }
-  #categoryList li:hover {
-    background: #660099;
-  }
-
-  #content {
-    flex: 1;
-    padding: 1rem;
-    margin-left: 60px; /* so content is not under sidebar */
-    transition: margin-left 0.3s;
-  }
-
-  /* Viewer layout */
-  .viewer {
-    display: none;
-    margin-bottom: 2rem;
-    display: flex;
-    gap: 1rem;
-    position: relative;
-  }
-
-  #gameFrame {
-    background: black;
-    width: 800px;
-    height: 600px;
-    border: none;
-    border-radius: 8px;
-    flex-shrink: 0;
-  }
-
-  #thumbColumn {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    max-height: 600px;
-    overflow-y: auto;
-  }
-
-  #thumbColumn img {
-    width: 120px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 6px;
-    background: #330033;
-  }
-
-  #controls {
-    position: absolute;
-    top: -40px;
-    left: 0;
-    display: flex;
-    gap: 0.5rem;
-  }
-  #controls button {
-    background: #cc66ff;
-    color: black;
-    padding: 0.3rem 0.8rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  #backBtn {
-    background: #ff99ff;
-  }
-
-  /* Game cards */
-  .category { margin-bottom: 2rem; }
-  .category h2 { color:#ffccff; cursor:pointer; margin-bottom:0.5rem; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem; }
-  .card { background:#4d0066; border-radius:8px; overflow:hidden; cursor:pointer; transition:transform .2s; display:flex; flex-direction:column; align-items:center; }
-  .card:hover { transform:scale(1.05); background:#660099; }
-  .thumb { width:180px; height:120px; object-fit:cover; margin-bottom:0.5rem; border-radius:6px; background:#330033; }
+body { font-family:sans-serif; margin:0; background:#1c0033; color:#eee; overflow-x:hidden; display:flex; }
+#sidebar { width:250px; background:#330066; padding:1rem; height:100vh; overflow-y:auto; transition: all 0.3s ease; position:relative; }
+#sidebar.collapsed { width:50px; }
+#sidebar header { display:flex; justify-content:center; margin-bottom:2rem; }
+#sidebar header img { height:60px; }
+#toggleBtn { position:absolute; top:50%; right:-10px; transform:translateY(-50%); background:#660099; color:#fff; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition: all 0.3s; }
+#sidebar ul { list-style:none; padding:0; margin:0; transition: font-size 0.3s; }
+#sidebar li { cursor:pointer; padding:0.5rem 0.5rem; border-radius:4px; transition:0.2s; white-space:nowrap; font-size:16px; }
+#sidebar.collapsed ul li { font-size:0; }
+#sidebar li:hover { background:#660099; }
+#content { flex:1; padding:1rem; overflow:auto; }
+.category { margin-bottom:2rem; }
+.category h2 { color:#ffccff; cursor:pointer; margin-bottom:0.5rem; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:1rem; }
+.card { background:#4d0066; border-radius:8px; overflow:hidden; cursor:pointer; transition:transform .2s; display:flex; flex-direction:column; align-items:center; }
+.card:hover { transform:scale(1.05); background:#660099; }
+.thumb { width:180px; height:120px; object-fit:cover; margin-bottom:0.5rem; border-radius:6px; background:#330033; }
+.viewer { width:100%; height:70vh; display:flex; flex-direction:column; margin-bottom:2rem; display:none; }
+iframe { width:100%; height:100%; border:none; }
+#controls { display:flex; justify-content:space-between; margin-bottom:0.5rem; }
+button { padding:0.4rem 0.8rem; border:none; border-radius:6px; cursor:pointer; font-size:14px; }
+#backBtn { background:#ff99ff; color:black; }
+#fullscreenBtn { background:#cc66ff; color:black; }
 </style>
 </head>
 <body>
 
 <div id="sidebar">
   <header>
+    <img src="logo.png" alt="Logo">
     <img src="assets/logo.png" alt="Logo">
   </header>
+<button id="toggleBtn" onclick="toggleSidebar()" style="right:10px">›</button>
   <ul id="categoryList">
     <li onclick="filterCategory('All Games')">All Games</li><li onclick="filterCategory('Shooter')">Shooter</li><li onclick="filterCategory('Uncategorized')">Uncategorized</li>
   </ul>
@@ -134,10 +47,10 @@
   <div class="viewer" id="viewer">
     <div id="controls">
       <button id="backBtn" onclick="closeGame()">← Back</button>
-      <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+      <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+      <span id="gameTitle"></span>
     </div>
     <iframe id="gameFrame" src=""></iframe>
-    <div id="thumbColumn"></div>
   </div>
 
   <div id="allGames">
@@ -146,36 +59,36 @@
         <h2 onclick="filterCategory('All Games')">All Games</h2>
         <div class="grid">
           
-            <div class="card" onclick="openGame('1v1.lol')">
-              <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
-              <div>1v1.lol</div>
-            </div>
-          
-            <div class="card" onclick="openGame('Age Of War')">
-              <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
-              <div>Age Of War</div>
-            </div>
-          
-            <div class="card" onclick="openGame('Backrooms 2D')">
-              <img class="thumb" src="games/Backrooms 2D/thumbnail.png" alt="Backrooms 2D">
-              <div>Backrooms 2D</div>
-            </div>
-          
-            <div class="card" onclick="openGame('Bad Piggies')">
-              <img class="thumb" src="games/Bad Piggies/thumbnail.png" alt="Bad Piggies">
-              <div>Bad Piggies</div>
-            </div>
-          
-            <div class="card" onclick="openGame('Baldi’s Basics')">
-              <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
-              <div>Baldi’s Basics</div>
-            </div>
-          
-            <div class="card" onclick="openGame('Block Blast')">
-              <img class="thumb" src="games/Block Blast/thumbnail.png" alt="Block Blast">
-              <div>Block Blast</div>
-            </div>
-          
+              <div class="card" onclick="openGame('1v1.lol')">
+                <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
+                <div>1v1.lol</div>
+              </div>
+            
+              <div class="card" onclick="openGame('Age Of War')">
+                <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
+                <div>Age Of War</div>
+              </div>
+            
+              <div class="card" onclick="openGame('Backrooms 2D')">
+                <img class="thumb" src="games/Backrooms 2D/thumbnail.jpg" alt="Backrooms 2D">
+                <div>Backrooms 2D</div>
+              </div>
+            
+              <div class="card" onclick="openGame('Bad Piggies')">
+                <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
+                <div>Bad Piggies</div>
+              </div>
+            
+              <div class="card" onclick="openGame('Baldi’s Basics')">
+                <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
+                <div>Baldi’s Basics</div>
+              </div>
+            
+              <div class="card" onclick="openGame('Block Blast')">
+                <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
+                <div>Block Blast</div>
+              </div>
+            
         </div>
       </div>
     
@@ -183,11 +96,11 @@
         <h2 onclick="filterCategory('Shooter')">Shooter</h2>
         <div class="grid">
           
-            <div class="card" onclick="openGame('1v1.lol')">
-              <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
-              <div>1v1.lol</div>
-            </div>
-          
+              <div class="card" onclick="openGame('1v1.lol')">
+                <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
+                <div>1v1.lol</div>
+              </div>
+            
         </div>
       </div>
     
@@ -195,31 +108,31 @@
         <h2 onclick="filterCategory('Uncategorized')">Uncategorized</h2>
         <div class="grid">
           
-            <div class="card" onclick="openGame('Age Of War')">
-              <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
-              <div>Age Of War</div>
-            </div>
-          
-            <div class="card" onclick="openGame('Backrooms 2D')">
-              <img class="thumb" src="games/Backrooms 2D/thumbnail.png" alt="Backrooms 2D">
-              <div>Backrooms 2D</div>
-            </div>
-          
-            <div class="card" onclick="openGame('Bad Piggies')">
-              <img class="thumb" src="games/Bad Piggies/thumbnail.png" alt="Bad Piggies">
-              <div>Bad Piggies</div>
-            </div>
-          
-            <div class="card" onclick="openGame('Baldi’s Basics')">
-              <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
-              <div>Baldi’s Basics</div>
-            </div>
-          
-            <div class="card" onclick="openGame('Block Blast')">
-              <img class="thumb" src="games/Block Blast/thumbnail.png" alt="Block Blast">
-              <div>Block Blast</div>
-            </div>
-          
+              <div class="card" onclick="openGame('Age Of War')">
+                <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
+                <div>Age Of War</div>
+              </div>
+            
+              <div class="card" onclick="openGame('Backrooms 2D')">
+                <img class="thumb" src="games/Backrooms 2D/thumbnail.jpg" alt="Backrooms 2D">
+                <div>Backrooms 2D</div>
+              </div>
+            
+              <div class="card" onclick="openGame('Bad Piggies')">
+                <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
+                <div>Bad Piggies</div>
+              </div>
+            
+              <div class="card" onclick="openGame('Baldi’s Basics')">
+                <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
+                <div>Baldi’s Basics</div>
+              </div>
+            
+              <div class="card" onclick="openGame('Block Blast')">
+                <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
+                <div>Block Blast</div>
+              </div>
+            
         </div>
       </div>
     
@@ -229,38 +142,37 @@
 <script>
 const viewer = document.getElementById('viewer');
 const frame = document.getElementById('gameFrame');
-const thumbColumn = document.getElementById('thumbColumn');
+const backBtn = document.getElementById('backBtn');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+const gameTitle = document.getElementById('gameTitle');
+const sidebar = document.getElementById('sidebar');
 
 function openGame(folder) {
   frame.src = 'games/' + folder + '/index.html';
   viewer.style.display = 'flex';
-  // Show All Games under
+  gameTitle.textContent = folder;
+  // Show All Games under the game window
   filterCategory('All Games');
   window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  // Load thumbnails in column
-  thumbColumn.innerHTML = '';
-  const formats = ['png','jpg','jpeg','webp'];
-  formats.forEach(ext => {
-    const img = new Image();
-    img.src = 'games/' + folder + '/thumbnail.' + ext;
-    img.onload = () => thumbColumn.appendChild(img);
-  });
 }
 
 function closeGame() {
   frame.src = '';
   viewer.style.display = 'none';
-  thumbColumn.innerHTML = '';
 }
 
 function toggleFullscreen() {
-  if (!document.fullscreenElement) viewer.requestFullscreen().catch(e=>console.log(e));
+  if (!document.fullscreenElement) frame.requestFullscreen().catch(e=>console.log(e));
   else document.exitFullscreen();
 }
 
+function toggleSidebar() {
+  sidebar.classList.toggle('collapsed');
+}
+
 function filterCategory(cat) {
-  document.querySelectorAll('.category').forEach(c => {
+  const allCategories = document.querySelectorAll('.category');
+  allCategories.forEach(c => {
     if (cat === 'All Games') {
       c.style.display = (c.getAttribute('data-category') === 'All Games') ? 'block' : 'none';
     } else {
@@ -269,14 +181,14 @@ function filterCategory(cat) {
   });
 }
 
-// prevent scroll with arrow keys / space when in game view
+// Show All Games by default
+filterCategory('All Games');
+
+// Prevent arrow keys / space from scrolling
 window.addEventListener('keydown', e => {
   const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
-  if (viewer.style.display === 'flex' && blocked.includes(e.key)) e.preventDefault();
+  if (blocked.includes(e.key)) e.preventDefault();
 });
-
-// Start with All Games
-filterCategory('All Games');
 </script>
 
 </body>
