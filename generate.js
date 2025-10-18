@@ -351,3 +351,7 @@ window.addEventListener('keydown', e => {
 
 fs.writeFileSync(outputFile, html);
 console.log(`✅ Generated arcade with original grid restored, black game background, no scrollbars, All Games default`);
+
+
+fs.writeFileSync(outputFile, html);
+console.log(`✅ Generated arcade with original grid restored, black game background, no scrollbars, All Games default`);
