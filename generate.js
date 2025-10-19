@@ -358,6 +358,3 @@ window.addEventListener('keydown', e => {
 
 fs.writeFileSync(outputFile, html);
 console.log(`✅ Fixed layout — proper grid restored, sidebar overlay, responsive cards`);
-
-fs.writeFileSync(sitemapFile, sitemapContent);
-console.log(`✅ Generated sitemap.xml with ${urls.length} URLs`);
