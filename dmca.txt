@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DMCA Notice - ChromebookUnlocked</title>
+<style>
+  body {
+    font-family: sans-serif;
+    background: #1c0033;
+    color: #eee;
+    margin: 0;
+    padding: 2rem;
+  }
+  h1 { color: #ff66ff; }
+  pre { white-space: pre-wrap; font-size: 0.9rem; }
+  a { color: #ff66ff; text-decoration: underline; }
+</style>
+</head>
+<body>
+  <h1>DMCA Notice</h1>
+  <pre>
+DMCA
+Last Updated: October 19, 2025
+ChromebookUnlocked.Github.io (the "Site") respects the intellectual property rights of others and expects its users to do the same. In accordance with the Digital Millennium Copyright Act of 1998, the text of which may be found on the U.S. Copyright Office website at http://www.copyright.gov/legislation/dmca.pdf, and specifically in accordance with 17 USC § 512(c)(3), ChromebookUnlocked.Github.io will respond expeditiously to claims of copyright infringement committed using the ChromebookUnlocked.Github.io service and/or any ChromebookUnlocked.Github.io website (the "Site") if such claims are reported to ChromebookUnlocked.Github.io's Designated Email identified below.
+
+DMCA Notice of Alleged Infringement ("Notice")
+If you are a copyright owner, authorized to act on behalf of one, or authorized to act under any exclusive right under copyright, please report alleged copyright infringements taking place on or through the Site by completing a DMCA Notice of Alleged Infringement and delivering it to ChromebookUnlocked.Github.io's Designated Email. Upon receipt of Notice as described below, ChromebookUnlocked.Github.io will take whatever action, in its sole discretion, it deems appropriate, including removal of the challenged content from the Site. Please note that if you fail to comply with all of the requirements of this section and of 17 USC § 512(c)(3) your DMCA notice may not be valid.
+
+To submit a Notice, please include:
+
+1. Identification of the copyrighted work that you claim has been infringed, or if multiple works are covered, a representative list.
+2. Identification of the material or link you claim is infringing (including the URL or exact location).
+3. Your company affiliation (if applicable), mailing address, phone number, and email address.
+4. Include the following statements:
+   - "I hereby state that I have a good faith belief that the disputed use of the copyrighted material is not authorized by the copyright owner, its agent, or the law (e.g., as a fair use)."
+   - "I hereby state that the information in this Notice is accurate and, under penalty of perjury, that I am the owner, or authorized to act on behalf of the owner, of the copyright or of an exclusive right under the copyright that is allegedly infringed."
+5. Your full legal name and electronic or physical signature.
+
+Deliver this Notice, with all items completed, to ChromebookUnlocked.Github.io's Designated Email: **html5game77@gmail.com**
+
+  </pre>
+</body>
+</html>
