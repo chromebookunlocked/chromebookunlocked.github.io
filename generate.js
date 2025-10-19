@@ -359,24 +359,5 @@ window.addEventListener('keydown', e => {
 fs.writeFileSync(outputFile, html);
 console.log(`✅ Fixed layout — proper grid restored, sidebar overlay, responsive cards`);
 
-// --- Generate sitemap.xml ---
-const sitemapFile = path.join(outputDir, 'sitemap.xml');
-const siteUrl = 'https://chromebookunlocked.github.io';
-
-const urls = [
-  `${siteUrl}/`  // homepage
-];
-
-games.forEach(g => {
-  const folderEncoded = encodeURIComponent(g.folder);
-  urls.push(`${siteUrl}/#/game/${folderEncoded}`);
-});
-
-const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map(u => `  <url><loc>${u}</loc></url>`).join('\n')}
-</urlset>
-`;
-
 fs.writeFileSync(sitemapFile, sitemapContent);
 console.log(`✅ Generated sitemap.xml with ${urls.length} URLs`);
