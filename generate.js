@@ -247,6 +247,14 @@ button {
 
 <!-- Content -->
 <div id="content">
+  <!-- TOP BANNER AD (Main Page) -->
+  <div class="ad-top">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-1033412505744705"
+         data-ad-slot="TOP_SLOT_ID"
+         data-ad-format="horizontal"></ins>
+  </div>
   <div id="controls">
     <button id="backBtn" onclick="closeGame()">← Back</button>
     <span id="gameTitle"></span>
@@ -254,6 +262,15 @@ button {
   </div>
 
   <div class="viewer" id="viewer">
+        <!-- Banner ad above the game window -->
+      <div class="ad-above-game">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-1033412505744705"
+             data-ad-slot="ABOVE_GAME_SLOT_ID"
+             data-ad-format="horizontal"></ins>
+      </div>
+
     <div id="startOverlay">
       <img id="startThumb" src="" alt="Game Thumbnail">
       <h1 id="startName"></h1>
