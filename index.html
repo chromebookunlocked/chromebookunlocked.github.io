@@ -341,7 +341,8 @@ function closeGame() {
   currentGameFolder = null;
   startOverlay.style.opacity = '1';
   startOverlay.style.pointerEvents = 'auto';
-  window.location.hash = '';
+  // Reset URL to main page without hash
+  history.pushState({}, '', siteUrl + '/'); 
 }
 
 function toggleFullscreen() {
