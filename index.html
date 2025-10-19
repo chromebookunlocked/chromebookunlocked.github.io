@@ -307,6 +307,10 @@ const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
 let currentGameFolder = null;
 
+// redirect root → /main
+if (window.location.pathname === '/' || window.location.pathname === '') {
+  window.location.replace(window.location.origin + '/main');
+}
 
 
 function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
@@ -341,8 +345,7 @@ function closeGame() {
   currentGameFolder = null;
   startOverlay.style.opacity = '1';
   startOverlay.style.pointerEvents = 'auto';
-  // Reset URL to main page without hash
-  history.pushState({}, '', siteUrl + '/'); 
+  window.location.hash = '';
 }
 
 function toggleFullscreen() {
