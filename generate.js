@@ -269,10 +269,6 @@ const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
 let currentGameFolder = null;
 
-// redirect root → /main
-if (window.location.pathname === '/' || window.location.pathname === '') {
-  window.location.replace(window.location.origin + '/main');
-}
 
 
 function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
