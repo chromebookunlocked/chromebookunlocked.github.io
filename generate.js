@@ -228,6 +228,41 @@ button {
   background: #ff99ff;
   color: black;
 }
+/* Ads styling */
+.ad-top {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.viewer-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.ad-above-game {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.ad-right {
+  min-width: 160px;
+  max-width: 300px;
+}
+
+@media (max-width: 900px) {
+  .viewer-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+  .ad-right {
+    display: none;
+  }
+}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705"
      crossorigin="anonymous"></script>
