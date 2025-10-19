@@ -356,26 +356,19 @@ window.addEventListener('keydown', e => {
 </body>
 </html>
 `;
-// --- Generate sitemap.xml ---
+// --- Generate sitemap.xml (Google-friendly) ---
 const sitemapFile = path.join(outputDir, "sitemap.xml");
 const baseURL = "https://chromebookunlocked.github.io";
 
-let urls = [`<url><loc>${baseURL}/</loc></url>`];
-
-// Add each game folder URL
-games.forEach(g => {
-  const folderEncoded = encodeURIComponent(g.folder);
-  urls.push(`<url><loc>${baseURL}/#/game/${folderEncoded}</loc></url>`);
-});
-
+// Only include homepage (no hash URLs)
 const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.join("\n")}
+  <url><loc>${baseURL}/</loc></url>
 </urlset>
 `;
 
 fs.writeFileSync(sitemapFile, sitemapContent);
-console.log(`✅ Sitemap generated with ${games.length} games`);
+console.log(`✅ Sitemap generated (homepage only, hash URLs excluded)`);
 
 fs.writeFileSync(outputFile, html);
 console.log(`✅ Fixed layout — proper grid restored, sidebar overlay, responsive cards`);
