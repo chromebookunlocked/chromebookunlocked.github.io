@@ -210,8 +210,27 @@ button {
 
 /* Scrollbar Hide */
 ::-webkit-scrollbar { display: none; }
+
+#dmcaLink {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: #ff66ff;
+  color: black;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  text-decoration: none;
+  z-index: 10000;
+  transition: 0.2s;
+}
+#dmcaLink:hover {
+  background: #ff99ff;
+  color: black;
+}
 </style>
 </head>
+<a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
 <body>
 
 <!-- Sidebar -->
