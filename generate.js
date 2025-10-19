@@ -304,6 +304,8 @@ function closeGame() {
   startOverlay.style.opacity = '1';
   startOverlay.style.pointerEvents = 'auto';
   window.location.hash = '';
+  // Reset to homepage URL without hash
+  history.replaceState({}, '', '/');
 }
 
 function toggleFullscreen() {
