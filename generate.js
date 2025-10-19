@@ -229,6 +229,8 @@ button {
   color: black;
 }
 </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705"
+     crossorigin="anonymous"></script>
 </head>
 <a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
 <body>
