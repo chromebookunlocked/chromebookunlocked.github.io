@@ -327,13 +327,14 @@ function filterCategory(cat) {
 // Default category on load
 filterCategory('All Games');
 
-// Hash routing
 window.addEventListener('load', handleRouting);
-window.addEventListener('hashchange', handleRouting);
+window.addEventListener('popstate', handleRouting);
+
 function handleRouting() {
-  const hash = window.location.hash;
-  if (hash.startsWith('#/game/')) {
-    const folder = decodeURIComponent(hash.replace('#/game/', ''));
+  const path = window.location.pathname; // e.g., /games/chromebookunlocked/index.html
+  const match = path.match(/\/games\/([^\/]+)\/index\.html$/);
+  if (match) {
+    const folder = decodeURIComponent(match[1]);
     const card = [...document.querySelectorAll('.card')].find(el => el.getAttribute('onclick')?.includes(encodeURIComponent(folder)));
     if (card) {
       const name = card.querySelector('div').innerText;
@@ -344,6 +345,7 @@ function handleRouting() {
     closeGame();
   }
 }
+
 
 // Prevent arrow keys / space scrolling
 window.addEventListener('keydown', e => {
