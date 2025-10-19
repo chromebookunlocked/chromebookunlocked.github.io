@@ -5,7 +5,6 @@ const dataDir = path.join(__dirname, "data");
 const gamesDir = path.join(__dirname, "games");
 const outputDir = path.join(__dirname, "dist");
 const outputFile = path.join(outputDir, "index.html");
-const siteUrl = 'https://chromebookunlocked.github.io';
 
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
 
@@ -270,6 +269,10 @@ const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
 let currentGameFolder = null;
 
+// redirect root → /main
+if (window.location.pathname === '/' || window.location.pathname === '') {
+  window.location.replace(window.location.origin + '/main');
+}
 
 
 function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
@@ -304,8 +307,7 @@ function closeGame() {
   currentGameFolder = null;
   startOverlay.style.opacity = '1';
   startOverlay.style.pointerEvents = 'auto';
-  // Reset URL to main page without hash
-  history.pushState({}, '', siteUrl + '/'); 
+  window.location.hash = '';
 }
 
 function toggleFullscreen() {
