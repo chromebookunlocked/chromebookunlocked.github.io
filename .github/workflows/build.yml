@@ -25,16 +25,17 @@ jobs:
       - name: Build site
         run: npm run build
 
-      - name: Copy game, data and asset folders
+      - name: Copy game, data, asset folders and ads.txt
         run: |
           mkdir -p dist
           cp -r games dist/games
           cp -r data dist/data
           cp -r assets dist/assets
+          cp ads.txt dist/ads.txt   # ✅ This line ensures ads.txt stays
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          clean: true      # 🧼 Important! Remove deleted files
+          clean: true
