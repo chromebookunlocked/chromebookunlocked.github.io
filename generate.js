@@ -129,8 +129,6 @@ button {
 }
 
 .viewer iframe {
-  width: 100%;
-  height: 100%;
   border: none;
   background: black;
   aspect-ratio: 16 / 9;
