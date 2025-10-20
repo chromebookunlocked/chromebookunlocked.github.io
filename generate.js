@@ -43,7 +43,8 @@ html, body {
   background: #1c0033;
   font-family: 'Orbitron', sans-serif;
   color: #eee;
-  overflow: hidden;
+  overflow-y: auto;      /* SCROLL ENABLED */
+  overflow-x: hidden;
 }
 
 /* Sidebar */
@@ -83,8 +84,7 @@ html, body {
 /* Content */
 #content {
   padding: 1rem;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: visible;
   margin-left: 60px;
   width: calc(100% - 60px);
   transition: margin-left 0.3s;
@@ -129,7 +129,6 @@ button {
   width: 100%;
   height: 100%;
   border: none;
-  overflow: hidden;
   background: black;
 }
 .viewer iframe::-webkit-scrollbar { display: none !important; }
@@ -208,8 +207,17 @@ button {
   background: #330033;
 }
 
-/* Scrollbar Hide */
-::-webkit-scrollbar { display: none; }
+/* Scrollbar visible */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #660099;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #1c0033;
+}
 
 #dmcaLink {
   position: fixed;
@@ -228,31 +236,8 @@ button {
   background: #ff99ff;
   color: black;
 }
+
 /* Ads styling */
-.ad-top {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
-}
-
-.viewer-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 15px;
-}
-
-.ad-above-game {
-  width: 100%;
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.ad-right {
-  min-width: 160px;
-  max-width: 300px;
-}
 .banner-ad {
   width: 100%;
   max-width: 1280px;
@@ -260,28 +245,30 @@ button {
   display: flex;
   justify-content: center;
 }
-
+.viewer-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 15px;
+}
+.ad-left {
+  min-width: 160px;
+  max-width: 300px;
+}
 @media (max-width: 900px) {
-  .viewer-wrapper {
-    flex-direction: column;
-    align-items: center;
-  }
-  .ad-right {
-    display: none;
-  }
+  .viewer-wrapper { flex-direction: column; align-items: center; }
+  .ad-left { display: none; }
 }
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705"
      crossorigin="anonymous"></script>
 </head>
-<a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
 <body>
+<a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
 
 <!-- Sidebar -->
 <div id="sidebar">
-  <header>
-    <img src="assets/logo.png" alt="Logo">
-  </header>
+  <header><img src="assets/logo.png" alt="Logo"></header>
   <ul id="categoryList">
     ${Object.keys(categories).map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`).join('')}
   </ul>
@@ -290,36 +277,36 @@ button {
 <!-- Content -->
 <div id="content">
 <!-- Banner Ad Top -->
-<div id="topBannerAd" class="banner-ad">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705"
-       crossorigin="anonymous"></script>
-  <!-- banner top -->
+<div class="banner-ad">
   <ins class="adsbygoogle"
        style="display:block"
        data-ad-client="ca-pub-1033412505744705"
        data-ad-slot="9227909948"
        data-ad-format="auto"
        data-full-width-responsive="true"></ins>
-  <script>
-       (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>
-  <div id="controls">
-    <button id="backBtn" onclick="closeGame()">← Back</button>
-    <span id="gameTitle"></span>
-    <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+
+<div id="controls">
+  <button id="backBtn" onclick="closeGame()">← Back</button>
+  <span id="gameTitle"></span>
+  <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+</div>
+
+<div class="viewer-wrapper">
+  <!-- Left Column Ad -->
+  <div class="ad-left">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-1033412505744705"
+         data-ad-slot="8674016809"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
 
+  <!-- Game Viewer -->
   <div class="viewer" id="viewer">
-        <!-- Banner ad above the game window -->
-      <div class="ad-above-game">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-1033412505744705"
-             data-ad-slot="ABOVE_GAME_SLOT_ID"
-             data-ad-format="horizontal"></ins>
-      </div>
-
     <div id="startOverlay">
       <img id="startThumb" src="" alt="Game Thumbnail">
       <h1 id="startName"></h1>
@@ -327,23 +314,24 @@ button {
     </div>
     <iframe id="gameFrame" src=""></iframe>
   </div>
+</div>
 
-  ${Object.keys(categories).map(cat => `
-    <div class="category" data-category="${cat}">
-      <h2 onclick="filterCategory('${cat}')">${cat}</h2>
-      <div class="grid">
-        ${categories[cat].map(g => {
-          const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
-          return `
-            <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
-              <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
-              <div>${g.name}</div>
-            </div>
-          `;
-        }).join('')}
-      </div>
+${Object.keys(categories).map(cat => `
+  <div class="category" data-category="${cat}">
+    <h2 onclick="filterCategory('${cat}')">${cat}</h2>
+    <div class="grid">
+      ${categories[cat].map(g => {
+        const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
+        return `
+          <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
+            <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
+            <div>${g.name}</div>
+          </div>
+        `;
+      }).join('')}
     </div>
-  `).join('')}
+  </div>
+`).join('')}
 </div>
 
 <script>
@@ -355,8 +343,6 @@ const startOverlay = document.getElementById('startOverlay');
 const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
 let currentGameFolder = null;
-
-
 
 function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
   const folder = decodeURIComponent(folderEncoded);
@@ -391,7 +377,6 @@ function closeGame() {
   startOverlay.style.opacity = '1';
   startOverlay.style.pointerEvents = 'auto';
   window.location.hash = '';
-  // Reset to homepage URL without hash
   history.replaceState({}, '', '/');
 }
 
@@ -431,8 +416,6 @@ function handleRouting() {
   }
 }
 
-
-
 // Prevent arrow keys / space scrolling
 window.addEventListener('keydown', e => {
   const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
@@ -443,11 +426,10 @@ window.addEventListener('keydown', e => {
 </body>
 </html>
 `;
-// --- Generate sitemap.xml (Google-friendly) ---
+
 const sitemapFile = path.join(outputDir, "sitemap.xml");
 const baseURL = "https://chromebookunlocked.github.io";
 
-// Only include homepage (no hash URLs)
 const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${baseURL}/</loc></url>
@@ -455,7 +437,7 @@ const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
 `;
 
 fs.writeFileSync(sitemapFile, sitemapContent);
-console.log(`✅ Sitemap generated (homepage only, hash URLs excluded)`);
+console.log(`✅ Sitemap generated`);
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Fixed layout — proper grid restored, sidebar overlay, responsive cards`);
+console.log(`✅ Layout updated with ads, DMCA, and scrolling enabled`);
