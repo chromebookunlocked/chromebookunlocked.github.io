@@ -1,3 +1,4 @@
+// generate.js
 const fs = require("fs");
 const path = require("path");
 
@@ -43,9 +44,10 @@ html, body {
   background: #1c0033;
   font-family: 'Orbitron', sans-serif;
   color: #eee;
-  overflow: hidden;
+  overflow: hidden; /* No global scrollbars - handled by content/sidebar */
 }
 
+/* Sidebar */
 #sidebar {
   width: 60px;
   background: #330066;
@@ -79,6 +81,7 @@ html, body {
   color: #fff;
 }
 
+/* Content */
 #content {
   padding: 1rem;
   overflow-y: auto;
@@ -86,8 +89,10 @@ html, body {
   margin-left: 60px;
   width: calc(100% - 60px);
   transition: margin-left 0.3s;
+  height: 100vh;
 }
 
+/* Controls */
 #controls {
   display: flex;
   justify-content: space-between;
@@ -107,15 +112,7 @@ button {
 #backBtn { background: #ff99ff; color: black; }
 #fullscreenBtn { background: #cc66ff; color: black; }
 
-.viewer-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 15px;
-  max-width: 1280px;
-  margin: 0 auto;
-}
-
+/* Game Viewer */
 .viewer {
   position: relative;
   display: none;
@@ -123,7 +120,8 @@ button {
   justify-content: center;
   align-items: center;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  max-width: 1280px;
+  margin: 0 auto 2rem auto;
   background: black;
   border-radius: 10px;
   overflow: hidden;
@@ -132,12 +130,12 @@ button {
   width: 100%;
   height: 100%;
   border: none;
-  overflow: hidden;
   background: black;
+  aspect-ratio: 16/9;
+  object-fit: contain;
 }
-.viewer iframe::-webkit-scrollbar { display: none !important; }
-.viewer iframe { scrollbar-width: none !important; }
 
+/* Overlay for Play */
 #startOverlay {
   position: absolute;
   inset: 0;
@@ -176,6 +174,7 @@ button {
   box-shadow: 0 0 15px #ff66ff;
 }
 
+/* Game Grid */
 .category { margin-top: 2rem; }
 .category h2 {
   color: #ffccff;
@@ -209,8 +208,11 @@ button {
   background: #330033;
 }
 
-::-webkit-scrollbar { display: none; }
+/* Hide Scrollbar visually */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-thumb { background: #660099; border-radius: 4px; }
 
+/* DMCA Link */
 #dmcaLink {
   position: fixed;
   bottom: 10px;
@@ -228,37 +230,12 @@ button {
   background: #ff99ff;
   color: black;
 }
-
-/* ADS */
-.banner-ad {
-  width: 100%;
-  max-width: 1280px;
-  margin: 1rem auto;
-  display: flex;
-  justify-content: center;
-}
-#adColumn {
-  min-width: 160px;
-  max-width: 300px;
-  min-height: 300px;
-  display: none;
-}
-
-@media (max-width: 900px) {
-  .viewer-wrapper {
-    flex-direction: column;
-    align-items: center;
-  }
-  #adColumn {
-    display: none !important;
-  }
-}
 </style>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705" crossorigin="anonymous"></script>
 </head>
 <body>
 <a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
 
+<!-- Sidebar -->
 <div id="sidebar">
   <header>
     <img src="assets/logo.png" alt="Logo">
@@ -268,43 +245,21 @@ button {
   </ul>
 </div>
 
+<!-- Content -->
 <div id="content">
-  <!-- Banner Ad Top -->
-  <div id="topBannerAd" class="banner-ad">
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-1033412505744705"
-         data-ad-slot="9227909948"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-  </div>
-
   <div id="controls">
     <button id="backBtn" onclick="closeGame()">← Back</button>
     <span id="gameTitle"></span>
     <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
   </div>
 
-  <div class="viewer-wrapper">
-    <!-- Ad Column -->
-    <div id="adColumn">
-      <ins class="adsbygoogle"
-           style="display:block;min-width:160px;min-height:300px"
-           data-ad-client="ca-pub-1033412505744705"
-           data-ad-slot="8674016809"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
+  <div class="viewer" id="viewer">
+    <div id="startOverlay">
+      <img id="startThumb" src="" alt="Game Thumbnail">
+      <h1 id="startName"></h1>
+      <button id="startButton" onclick="startGame()">▶ Play</button>
     </div>
-
-    <!-- Game Viewer -->
-    <div class="viewer" id="viewer">
-      <div id="startOverlay">
-        <img id="startThumb" src="" alt="Game Thumbnail">
-        <h1 id="startName"></h1>
-        <button id="startButton" onclick="startGame()">▶ Play</button>
-      </div>
-      <iframe id="gameFrame" src=""></iframe>
-    </div>
+    <iframe id="gameFrame" src=""></iframe>
   </div>
 
   ${Object.keys(categories).map(cat => `
@@ -333,7 +288,6 @@ const controls = document.getElementById('controls');
 const startOverlay = document.getElementById('startOverlay');
 const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
-const adColumn = document.getElementById('adColumn');
 let currentGameFolder = null;
 
 function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
@@ -350,12 +304,7 @@ function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
   startOverlay.style.pointerEvents = 'auto';
   window.location.hash = '#/game/' + folderEncoded;
   filterCategory('All Games');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  adColumn.style.display = 'block';
-  setTimeout(() => {
-    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) { console.log(e); }
-  }, 300);
+  document.getElementById('content').scrollTop = 0;
 }
 
 function startGame() {
@@ -374,7 +323,6 @@ function closeGame() {
   startOverlay.style.opacity = '1';
   startOverlay.style.pointerEvents = 'auto';
   window.location.hash = '';
-  adColumn.style.display = 'none';
   history.replaceState({}, '', '/');
 }
 
@@ -393,6 +341,8 @@ function filterCategory(cat) {
     }
   });
 }
+
+// Default category on load
 filterCategory('All Games');
 
 window.addEventListener('load', handleRouting);
@@ -422,7 +372,7 @@ window.addEventListener('keydown', e => {
 </html>
 `;
 
-// ✅ Generate sitemap (no hash URLs)
+// --- Generate sitemap.xml ---
 const sitemapFile = path.join(outputDir, "sitemap.xml");
 const baseURL = "https://chromebookunlocked.github.io";
 const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
@@ -430,6 +380,7 @@ const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
   <url><loc>${baseURL}/</loc></url>
 </urlset>`;
 fs.writeFileSync(sitemapFile, sitemapContent);
+console.log(`✅ Sitemap generated`);
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Build complete with working AdSense top and column ads.`);
+console.log(`✅ Cleaned & fixed layout — scrollable sidebar, scalable game window`);
