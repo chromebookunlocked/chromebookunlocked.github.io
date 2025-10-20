@@ -345,9 +345,11 @@ function saveRecentlyPlayed(folder, name, thumb) {
 
 function renderRecentlyPlayed() {
   recentlyGrid.innerHTML = recentlyPlayed.slice(0, 7).map(g => `
-    <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', '${g.thumb}')">
-      <img class="thumb" src="${g.thumb}" alt="${g.name}">
-      <div>${g.name}</div>
+${games.map(g => (
+  `<div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${g.thumbs[0]}')">
+    <img class="thumb" src="games/${g.folder}/${g.thumbs[0]}" alt="${g.name}">
+    <div>${g.name}</div
+
     </div>
   `).join('') + (recentlyPlayed.length > 7 ? `
     <div class="card" onclick="filterCategory('Recently Played')">⋯</div>
