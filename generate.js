@@ -409,48 +409,28 @@ function loadLastPlayed() {
 </div>
 
 
-  // Add "more" card at the end
-  const moreCard = document.createElement('div');
-  moreCard.className = 'card more-games';
-  moreCard.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:140px;font-size:2rem;">...</div>`;
-  moreCard.onclick = () => filterCategory('Recently Played');
-  grid.appendChild(moreCard);
-}
+// --- Generate Last Played HTML ---
+const lastPlayed = []; // initially empty, real data comes from browser localStorage
+const lastPlayedHTML = `
+<div class="category" data-category="Recently Played">
+  <h2>Last Played</h2>
+  <div class="grid">
+    ${lastPlayed.map(game => {
+      const thumb = game.thumbs && game.thumbs.length ? game.thumbs[0] : "thumbnail.png";
+      return `
+        <div class="card" onclick="prepareGame('${encodeURIComponent(game.folder)}','${encodeURIComponent(game.name)}','games/${game.folder}/${thumb}')">
+          <img class="thumb" src="games/${game.folder}/${thumb}" alt="${game.name}">
+          <div>${game.name}</div>
+        </div>
+      `;
+    }).join('')}
+    <div class="card more-games" onclick="filterCategory('Recently Played')">
+      <div style="display:flex;justify-content:center;align-items:center;height:140px;font-size:2rem;">...</div>
+    </div>
+  </div>
+</div>
+`;
 
-// Save last played game
-function saveLastPlayed(folder, name, thumb) {
-  let lastPlayed = JSON.parse(localStorage.getItem('lastPlayedGames') || '[]');
-  // Remove if already exists
-  lastPlayed = lastPlayed.filter(g => g.folder !== folder);
-  lastPlayed.unshift({ folder, name, thumb }); // add to beginning
-  lastPlayed = lastPlayed.slice(0, 5); // keep last 5 games
-  localStorage.setItem('lastPlayedGames', JSON.stringify(lastPlayed));
-  loadLastPlayed();
-}
-
-// Modify prepareGame to save last played
-function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
-  const folder = decodeURIComponent(folderEncoded);
-  const name = decodeURIComponent(nameEncoded);
-  currentGameFolder = folder;
-  frame.src = '';
-  viewer.style.display = 'flex';
-  controls.style.visibility = 'visible';
-  gameTitle.textContent = name;
-  startThumb.src = thumbSrc;
-  startName.textContent = name;
-  startOverlay.style.opacity = '1';
-  startOverlay.style.pointerEvents = 'auto';
-  window.location.hash = '#/game/' + folderEncoded;
-  filterCategory('All Games');
-  document.getElementById('content').scrollTop = 0;
-
-  // Save to last played
-  saveLastPlayed(folder, name, thumbSrc);
-}
-
-// Load last played on page load
-window.addEventListener('load', loadLastPlayed);
 
 </script>
 </body>
