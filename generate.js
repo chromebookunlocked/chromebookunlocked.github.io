@@ -232,6 +232,16 @@ button {
   background: #ff99ff;
   color: black;
 }
+#lastPlayedGrid {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+#lastPlayedGrid::-webkit-scrollbar { height: 8px; }
+#lastPlayedGrid::-webkit-scrollbar-thumb { background: #660099; border-radius: 4px; }
+.card.more-games { flex: 0 0 120px; display: flex; justify-content: center; align-items: center; font-size: 2rem; background: #330066; }
+
 </style>
 </head>
 <body>
@@ -249,6 +259,16 @@ button {
 
 <!-- Content -->
 <div id="content">
+  <!-- Last Played Games -->
+  <div class="category" data-category="Last Played" id="lastPlayedCategory">
+    <h2>Last Played</h2>
+    <div class="grid" id="lastPlayedGrid">
+      <!-- Last played games will be injected here via JS -->
+      <div class="card more-games" onclick="filterCategory('Recently Played')">
+        <div style="display:flex;justify-content:center;align-items:center;height:140px;font-size:2rem;">...</div>
+      </div>
+    </div>
+  </div>
   <div id="controls">
     <button id="backBtn" onclick="closeGame()">← Back</button>
     <span id="gameTitle"></span>
@@ -369,6 +389,69 @@ window.addEventListener('keydown', e => {
   const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
   if (blocked.includes(e.key)) e.preventDefault();
 });
+
+// ------------------- Last Played Games -------------------
+
+// Load last played games from localStorage
+function loadLastPlayed() {
+  const lastPlayed = JSON.parse(localStorage.getItem('lastPlayedGames') || '[]');
+  const grid = document.getElementById('lastPlayedGrid');
+  grid.innerHTML = ''; // clear existing
+
+  lastPlayed.forEach(game => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <img class="thumb" src="${game.thumb}" alt="${game.name}">
+      <div>${game.name}</div>
+    `;
+    card.onclick = () => prepareGame(encodeURIComponent(game.folder), encodeURIComponent(game.name), game.thumb);
+    grid.appendChild(card);
+  });
+
+  // Add "more" card at the end
+  const moreCard = document.createElement('div');
+  moreCard.className = 'card more-games';
+  moreCard.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:140px;font-size:2rem;">...</div>`;
+  moreCard.onclick = () => filterCategory('Recently Played');
+  grid.appendChild(moreCard);
+}
+
+// Save last played game
+function saveLastPlayed(folder, name, thumb) {
+  let lastPlayed = JSON.parse(localStorage.getItem('lastPlayedGames') || '[]');
+  // Remove if already exists
+  lastPlayed = lastPlayed.filter(g => g.folder !== folder);
+  lastPlayed.unshift({ folder, name, thumb }); // add to beginning
+  lastPlayed = lastPlayed.slice(0, 5); // keep last 5 games
+  localStorage.setItem('lastPlayedGames', JSON.stringify(lastPlayed));
+  loadLastPlayed();
+}
+
+// Modify prepareGame to save last played
+function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
+  const folder = decodeURIComponent(folderEncoded);
+  const name = decodeURIComponent(nameEncoded);
+  currentGameFolder = folder;
+  frame.src = '';
+  viewer.style.display = 'flex';
+  controls.style.visibility = 'visible';
+  gameTitle.textContent = name;
+  startThumb.src = thumbSrc;
+  startName.textContent = name;
+  startOverlay.style.opacity = '1';
+  startOverlay.style.pointerEvents = 'auto';
+  window.location.hash = '#/game/' + folderEncoded;
+  filterCategory('All Games');
+  document.getElementById('content').scrollTop = 0;
+
+  // Save to last played
+  saveLastPlayed(folder, name, thumbSrc);
+}
+
+// Load last played on page load
+window.addEventListener('load', loadLastPlayed);
+
 </script>
 </body>
 </html>
