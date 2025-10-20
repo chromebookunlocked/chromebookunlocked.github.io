@@ -232,16 +232,6 @@ button {
   background: #ff99ff;
   color: black;
 }
-#lastPlayedGrid {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  padding-bottom: 1rem;
-}
-#lastPlayedGrid::-webkit-scrollbar { height: 8px; }
-#lastPlayedGrid::-webkit-scrollbar-thumb { background: #660099; border-radius: 4px; }
-.card.more-games { flex: 0 0 120px; display: flex; justify-content: center; align-items: center; font-size: 2rem; background: #330066; }
-
 </style>
 </head>
 <body>
@@ -259,16 +249,6 @@ button {
 
 <!-- Content -->
 <div id="content">
-  <!-- Last Played Games -->
-  <div class="category" data-category="Last Played" id="lastPlayedCategory">
-    <h2>Last Played</h2>
-    <div class="grid" id="lastPlayedGrid">
-      <!-- Last played games will be injected here via JS -->
-      <div class="card more-games" onclick="filterCategory('Recently Played')">
-        <div style="display:flex;justify-content:center;align-items:center;height:140px;font-size:2rem;">...</div>
-      </div>
-    </div>
-  </div>
   <div id="controls">
     <button id="backBtn" onclick="closeGame()">← Back</button>
     <span id="gameTitle"></span>
@@ -389,49 +369,6 @@ window.addEventListener('keydown', e => {
   const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
   if (blocked.includes(e.key)) e.preventDefault();
 });
-
-// ------------------- Last Played Games -------------------
-
-// Load last played games from localStorage
-function loadLastPlayed() {
-  const lastPlayed = JSON.parse(localStorage.getItem('lastPlayedGames') || '[]');
-  const grid = document.getElementById('lastPlayedGrid');
-  grid.innerHTML = ''; // clear existing
-
-<div class="category" data-category="Recently Played">
-  <h2>Last Played</h2>
-  <div class="grid">
-    ${lastPlayedCards}
-    <div class="card more-games" onclick="filterCategory('Recently Played')">
-      <div style="display:flex;justify-content:center;align-items:center;height:140px;font-size:2rem;">...</div>
-    </div>
-  </div>
-</div>
-
-
-// --- Generate Last Played HTML ---
-const lastPlayed = []; // initially empty, real data comes from browser localStorage
-const lastPlayedHTML = `
-<div class="category" data-category="Recently Played">
-  <h2>Last Played</h2>
-  <div class="grid">
-    ${lastPlayed.map(game => {
-      const thumb = game.thumbs && game.thumbs.length ? game.thumbs[0] : "thumbnail.png";
-      return `
-        <div class="card" onclick="prepareGame('${encodeURIComponent(game.folder)}','${encodeURIComponent(game.name)}','games/${game.folder}/${thumb}')">
-          <img class="thumb" src="games/${game.folder}/${thumb}" alt="${game.name}">
-          <div>${game.name}</div>
-        </div>
-      `;
-    }).join('')}
-    <div class="card more-games" onclick="filterCategory('Recently Played')">
-      <div style="display:flex;justify-content:center;align-items:center;height:140px;font-size:2rem;">...</div>
-    </div>
-  </div>
-</div>
-`;
-
-
 </script>
 </body>
 </html>
