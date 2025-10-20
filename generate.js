@@ -21,7 +21,7 @@ let games = fs.readdirSync(dataDir)
     };
   });
 
-const categories = { "All Games": games };
+const categories = { "Home": games }; // “Home” replaces All Games
 games.forEach(g => {
   if (!categories[g.category]) categories[g.category] = [];
   categories[g.category].push(g);
@@ -32,16 +32,11 @@ const html = `
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Arcade</title>
+<title>Chromebook Unlocked Games</title>
+<link rel="icon" type="image/png" href="assets/logo.png">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705" crossorigin="anonymous"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-
-:root {
-  --base-font: clamp(12px, 1.2vw, 18px);
-  --thumb-height: clamp(100px, 20vh, 160px);
-  --sidebar-width: clamp(50px, 6vw, 70px);
-}
 
 * { box-sizing: border-box; }
 html, body {
@@ -52,12 +47,10 @@ html, body {
   font-family: 'Orbitron', sans-serif;
   color: #eee;
   overflow: hidden;
-  font-size: var(--base-font);
 }
 
-/* Sidebar */
 #sidebar {
-  width: var(--sidebar-width);
+  width: 60px;
   background: #330066;
   padding: 1rem 0;
   height: 100vh;
@@ -78,7 +71,7 @@ html, body {
   border-radius: 4px;
   transition: 0.3s ease;
   white-space: nowrap;
-  font-size: 1em;
+  font-size: 16px;
   opacity: 0;
   transform: translateY(5px);
 }
@@ -89,18 +82,17 @@ html, body {
   color: #fff;
 }
 
-/* Content */
 #content {
   padding: 1rem;
   overflow-y: auto;
   overflow-x: hidden;
-  margin-left: var(--sidebar-width);
-  width: calc(100% - var(--sidebar-width));
+  margin-left: 60px;
+  width: calc(100% - 60px);
   transition: margin-left 0.3s;
   height: 100vh;
+  transform-origin: top center;
 }
 
-/* Controls */
 #controls {
   display: flex;
   justify-content: space-between;
@@ -109,19 +101,17 @@ html, body {
   margin: 0 auto 0.5rem auto;
   padding: 0.5rem;
   visibility: hidden;
-  font-size: 1.2em;
 }
 button {
   padding: 0.4rem 0.8rem;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 1em;
+  font-size: 14px;
 }
 #backBtn { background: #ff99ff; color: black; }
 #fullscreenBtn { background: #cc66ff; color: black; }
 
-/* Game Viewer */
 .viewer {
   position: relative;
   display: none;
@@ -133,16 +123,12 @@ button {
   background: transparent;
   border-radius: 10px;
   overflow: hidden;
-  transform: scale(1);
-  transform-origin: top center;
 }
-
 .viewer::before {
   content: "";
   display: block;
-  padding-top: 56.25%; /* 16:9 */
+  padding-top: 56.25%;
 }
-
 .viewer iframe {
   position: absolute;
   top: 0;
@@ -155,7 +141,6 @@ button {
   overflow: hidden;
 }
 
-/* Overlay for Play */
 #startOverlay {
   position: absolute;
   inset: 0;
@@ -169,19 +154,15 @@ button {
   transition: opacity 0.5s ease;
 }
 #startOverlay img {
-  width: clamp(200px, 40vw, 300px);
+  width: 300px;
   max-width: 80%;
   border-radius: 10px;
   box-shadow: 0 0 20px #ff99ff;
 }
-#startOverlay h1 {
-  margin: 0;
-  font-size: clamp(1.5rem, 2.5vw, 3rem);
-  color: #fff;
-}
+#startOverlay h1 { margin: 0; font-size: 2rem; color: #fff; }
 #startButton {
   padding: 0.8rem 2rem;
-  font-size: clamp(1rem, 1.5vw, 1.5rem);
+  font-size: 1.2rem;
   background: #ff99ff;
   color: black;
   border: none;
@@ -194,7 +175,6 @@ button {
   box-shadow: 0 0 15px #ff66ff;
 }
 
-/* Game Grid */
 .category { margin-top: 2rem; }
 .category h2 {
   color: #ffccff;
@@ -203,7 +183,7 @@ button {
 }
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1rem;
   justify-content: center;
 }
@@ -221,28 +201,16 @@ button {
 .card:hover { transform: scale(1.05); background: #660099; }
 .thumb {
   width: 100%;
-  height: var(--thumb-height);
+  height: 140px;
   object-fit: cover;
   margin-bottom: 0.5rem;
   border-radius: 6px;
   background: #330033;
 }
 
-/* Transparent More Card */
-.card.more {
-  background: rgba(255, 255, 255, 0.1);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 2rem;
-  color: #ffccff;
-}
-
-/* Scrollbar */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-thumb { background: #660099; border-radius: 4px; }
 
-/* DMCA */
 #dmcaLink {
   position: fixed;
   bottom: 10px;
@@ -257,23 +225,33 @@ button {
   transition: 0.2s;
 }
 #dmcaLink:hover { background: #ff99ff; color: black; }
+
+#recentlyMore {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255,255,255,0.05);
+  border: 2px dashed #ff99ff;
+  font-size: 2rem;
+  color: #ff99ff;
+}
+#recentlyMore:hover {
+  background: rgba(255,255,255,0.1);
+}
 </style>
 </head>
 <body>
 <a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
 
-<!-- Sidebar -->
 <div id="sidebar">
-  <header>
-    <img src="assets/logo.png" alt="Logo">
-  </header>
+  <header><img src="assets/logo.png" alt="Logo"></header>
   <ul id="categoryList">
+    <li onclick="filterCategory('Home')">Home</li>
     <li onclick="filterCategory('Recently Played')">Recently Played</li>
-    ${Object.keys(categories).map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`).join('')}
+    ${Object.keys(categories).filter(c => c !== 'Home').map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`).join('')}
   </ul>
 </div>
 
-<!-- Content -->
 <div id="content">
   <div id="controls">
     <button id="backBtn" onclick="closeGame()">← Back</button>
@@ -281,7 +259,6 @@ button {
     <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
   </div>
 
-  <!-- Viewer -->
   <div class="viewer" id="viewer">
     <div id="startOverlay">
       <img id="startThumb" src="" alt="Game Thumbnail">
@@ -291,13 +268,11 @@ button {
     <iframe id="gameFrame" src=""></iframe>
   </div>
 
-  <!-- Recently Played (empty, JS fills it) -->
-  <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
-    <h2 onclick="filterCategory('Recently Played')">Recently Played</h2>
-    <div class="grid" id="recentlyPlayedGrid"></div>
+  <div class="category" data-category="Home">
+    <h2>Recently Played</h2>
+    <div class="grid" id="recentlyGrid"></div>
   </div>
 
-  <!-- All Categories -->
   ${Object.keys(categories).map(cat => `
     <div class="category" data-category="${cat}">
       <h2 onclick="filterCategory('${cat}')">${cat}</h2>
@@ -324,48 +299,7 @@ const controls = document.getElementById('controls');
 const startOverlay = document.getElementById('startOverlay');
 const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
-const recentlyPlayedGrid = document.getElementById('recentlyPlayedGrid');
 let currentGameFolder = null;
-
-const MAX_RECENT = 12;
-
-function loadRecentlyPlayed() {
-  const list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
-  updateRecentlyPlayedUI(list);
-}
-
-function saveRecentlyPlayed(game) {
-  let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
-  list = list.filter(g => g.folder !== game.folder);
-  list.unshift(game);
-  if (list.length > MAX_RECENT) list = list.slice(0, MAX_RECENT);
-  localStorage.setItem('recentlyPlayed', JSON.stringify(list));
-  updateRecentlyPlayedUI(list);
-}
-
-function updateRecentlyPlayedUI(list) {
-  recentlyPlayedGrid.innerHTML = '';
-  if (list.length === 0) {
-    document.getElementById('recentlyPlayedSection').style.display = 'none';
-    return;
-  }
-  document.getElementById('recentlyPlayedSection').style.display = 'block';
-
-  list.forEach(g => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.onclick = () => prepareGame(encodeURIComponent(g.folder), encodeURIComponent(g.name), g.thumb);
-    card.innerHTML = \`<img class="thumb" src="\${g.thumb}" alt="\${g.name}"><div>\${g.name}</div>\`;
-    recentlyPlayedGrid.appendChild(card);
-  });
-
-  // Three dots card
-  const moreCard = document.createElement('div');
-  moreCard.className = 'card more';
-  moreCard.textContent = '⋯';
-  moreCard.onclick = () => filterCategory('Recently Played');
-  recentlyPlayedGrid.appendChild(moreCard);
-}
 
 function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
   const folder = decodeURIComponent(folderEncoded);
@@ -380,11 +314,9 @@ function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
   startOverlay.style.opacity = '1';
   startOverlay.style.pointerEvents = 'auto';
   window.location.hash = '#/game/' + folderEncoded;
-  filterCategory('All Games');
+  filterCategory('Home');
   document.getElementById('content').scrollTop = 0;
-
-  // Save to recently played
-  saveRecentlyPlayed({ folder, name, thumb: thumbSrc });
+  saveRecentlyPlayed(folder, name, thumbSrc);
 }
 
 function startGame() {
@@ -412,21 +344,57 @@ function toggleFullscreen() {
 }
 
 function filterCategory(cat) {
-  const allCategories = document.querySelectorAll('.category');
-  allCategories.forEach(c => {
-    if (cat === 'All Games') {
-      c.style.display = (c.getAttribute('data-category') === 'All Games') ? 'block' : 'none';
-      document.getElementById('recentlyPlayedSection').style.display = recentlyPlayedGrid.children.length ? 'block' : 'none';
-    } else {
-      c.style.display = (c.getAttribute('data-category') === cat) ? 'block' : 'none';
-    }
+  document.querySelectorAll('.category').forEach(c => {
+    c.style.display = (cat === 'Home' && c.getAttribute('data-category') === 'Home') ||
+                      (c.getAttribute('data-category') === cat) ? 'block' : 'none';
   });
 }
 
-filterCategory('All Games');
-loadRecentlyPlayed();
+// recently played
+function saveRecentlyPlayed(folder, name, thumb) {
+  let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+  list = list.filter(g => g.folder !== folder);
+  list.unshift({folder, name, thumb});
+  if (list.length > 20) list.pop();
+  localStorage.setItem('recentlyPlayed', JSON.stringify(list));
+  renderRecentlyPlayed();
+}
 
-window.addEventListener('load', handleRouting);
+function renderRecentlyPlayed() {
+  const container = document.getElementById('recentlyGrid');
+  let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+  container.innerHTML = list.slice(0, 7).map(g => `
+    <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', '${g.thumb}')">
+      <img class="thumb" src="${g.thumb}" alt="${g.name}">
+      <div>${g.name}</div>
+    </div>
+  `).join('') + `
+    <div class="card" id="recentlyMore" onclick="filterCategory('Recently Played')">…</div>
+  `;
+
+  let fullContainer = document.querySelector('[data-category="Recently Played"]');
+  if (!fullContainer) {
+    const home = document.getElementById('content');
+    const section = document.createElement('div');
+    section.className = 'category';
+    section.setAttribute('data-category', 'Recently Played');
+    section.innerHTML = '<h2>Recently Played</h2><div class="grid"></div>';
+    home.appendChild(section);
+  }
+  document.querySelector('[data-category="Recently Played"] .grid').innerHTML = list.map(g => `
+    <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', '${g.thumb}')">
+      <img class="thumb" src="${g.thumb}" alt="${g.name}">
+      <div>${g.name}</div>
+    </div>
+  `).join('');
+}
+
+window.addEventListener('load', () => {
+  renderRecentlyPlayed();
+  filterCategory('Home');
+  handleRouting();
+  scaleContent();
+});
 window.addEventListener('hashchange', handleRouting);
 function handleRouting() {
   const hash = window.location.hash;
@@ -443,6 +411,14 @@ function handleRouting() {
   }
 }
 
+// Scale UI based on window size
+function scaleContent() {
+  const baseWidth = 1280;
+  const scale = Math.min(window.innerWidth / baseWidth, 1);
+  document.getElementById('content').style.transform = 'scale(' + scale + ')';
+}
+window.addEventListener('resize', scaleContent);
+
 // Prevent arrow keys / space scrolling
 window.addEventListener('keydown', e => {
   const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
@@ -453,7 +429,7 @@ window.addEventListener('keydown', e => {
 </html>
 `;
 
-// --- Generate sitemap.xml ---
+// --- Sitemap ---
 const sitemapFile = path.join(outputDir, "sitemap.xml");
 const baseURL = "https://chromebookunlocked.github.io";
 const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
@@ -464,4 +440,4 @@ fs.writeFileSync(sitemapFile, sitemapContent);
 console.log(`✅ Sitemap generated`);
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Responsive layout + Recently Played category added`);
+console.log(`✅ Responsive scaling UI + Home & Recently Played added`);
