@@ -295,15 +295,13 @@ button {
     <div class="grid" id="recentlyGrid"></div>
     <h2>All Games</h2>
     <div class="grid">
-      ${games.map(g => {
-        const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
-        return `
-          <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
-            <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
-            <div>${g.name}</div>
-          </div>
-        `;
-      }).join('')}
+${games.map(g => (
+  `<div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${g.thumbs[0]}')">
+    <img class="thumb" src="games/${g.folder}/${g.thumbs[0]}" alt="${g.name}">
+    <div>${g.name}</div>
+  </div>`
+)).join('')}
+
     </div>
   </div>
 
