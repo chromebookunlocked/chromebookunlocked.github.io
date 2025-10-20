@@ -271,7 +271,11 @@ button {
   </header>
 <ul id="categoryList">
   <li onclick="filterCategory('Home')">Home</li>
+  ${Object.keys(categories)
+    .filter(cat => cat !== 'All Games') // exclude "All Games"
+    .map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`).join('')}
 </ul>
+
 
 </div>
 
