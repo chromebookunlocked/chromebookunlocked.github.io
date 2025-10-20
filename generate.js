@@ -43,11 +43,9 @@ html, body {
   background: #1c0033;
   font-family: 'Orbitron', sans-serif;
   color: #eee;
-  overflow-y: auto;      /* SCROLL ENABLED */
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
-/* Sidebar */
 #sidebar {
   width: 60px;
   background: #330066;
@@ -81,16 +79,15 @@ html, body {
   color: #fff;
 }
 
-/* Content */
 #content {
   padding: 1rem;
-  overflow: visible;
+  overflow-y: auto;
+  overflow-x: hidden;
   margin-left: 60px;
   width: calc(100% - 60px);
   transition: margin-left 0.3s;
 }
 
-/* Controls */
 #controls {
   display: flex;
   justify-content: space-between;
@@ -110,7 +107,15 @@ button {
 #backBtn { background: #ff99ff; color: black; }
 #fullscreenBtn { background: #cc66ff; color: black; }
 
-/* Game Viewer */
+.viewer-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 15px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
 .viewer {
   position: relative;
   display: none;
@@ -118,9 +123,7 @@ button {
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 1280px;
   aspect-ratio: 16 / 9;
-  margin: 0 auto 2rem auto;
   background: black;
   border-radius: 10px;
   overflow: hidden;
@@ -129,12 +132,12 @@ button {
   width: 100%;
   height: 100%;
   border: none;
+  overflow: hidden;
   background: black;
 }
 .viewer iframe::-webkit-scrollbar { display: none !important; }
 .viewer iframe { scrollbar-width: none !important; }
 
-/* Overlay for Play */
 #startOverlay {
   position: absolute;
   inset: 0;
@@ -173,7 +176,6 @@ button {
   box-shadow: 0 0 15px #ff66ff;
 }
 
-/* Game Grid */
 .category { margin-top: 2rem; }
 .category h2 {
   color: #ffccff;
@@ -207,17 +209,7 @@ button {
   background: #330033;
 }
 
-/* Scrollbar visible */
-::-webkit-scrollbar {
-  width: 10px;
-}
-::-webkit-scrollbar-thumb {
-  background: #660099;
-  border-radius: 5px;
-}
-::-webkit-scrollbar-track {
-  background: #1c0033;
-}
+::-webkit-scrollbar { display: none; }
 
 #dmcaLink {
   position: fixed;
@@ -237,7 +229,7 @@ button {
   color: black;
 }
 
-/* Ads styling */
+/* ADS */
 .banner-ad {
   width: 100%;
   max-width: 1280px;
@@ -245,93 +237,92 @@ button {
   display: flex;
   justify-content: center;
 }
-.viewer-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 15px;
-}
-.ad-left {
+#adColumn {
   min-width: 160px;
   max-width: 300px;
+  min-height: 300px;
+  display: none;
 }
+
 @media (max-width: 900px) {
-  .viewer-wrapper { flex-direction: column; align-items: center; }
-  .ad-left { display: none; }
+  .viewer-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+  #adColumn {
+    display: none !important;
+  }
 }
 </style>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705"
-     crossorigin="anonymous"></script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705" crossorigin="anonymous"></script>
 </head>
 <body>
 <a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
 
-<!-- Sidebar -->
 <div id="sidebar">
-  <header><img src="assets/logo.png" alt="Logo"></header>
+  <header>
+    <img src="assets/logo.png" alt="Logo">
+  </header>
   <ul id="categoryList">
     ${Object.keys(categories).map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`).join('')}
   </ul>
 </div>
 
-<!-- Content -->
 <div id="content">
-<!-- Banner Ad Top -->
-<div class="banner-ad">
-  <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-1033412505744705"
-       data-ad-slot="9227909948"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-</div>
-
-<div id="controls">
-  <button id="backBtn" onclick="closeGame()">← Back</button>
-  <span id="gameTitle"></span>
-  <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-</div>
-
-<div class="viewer-wrapper">
-  <!-- Left Column Ad -->
-  <div class="ad-left">
+  <!-- Banner Ad Top -->
+  <div id="topBannerAd" class="banner-ad">
     <ins class="adsbygoogle"
          style="display:block"
          data-ad-client="ca-pub-1033412505744705"
-         data-ad-slot="8674016809"
+         data-ad-slot="9227909948"
          data-ad-format="auto"
          data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
 
-  <!-- Game Viewer -->
-  <div class="viewer" id="viewer">
-    <div id="startOverlay">
-      <img id="startThumb" src="" alt="Game Thumbnail">
-      <h1 id="startName"></h1>
-      <button id="startButton" onclick="startGame()">▶ Play</button>
-    </div>
-    <iframe id="gameFrame" src=""></iframe>
+  <div id="controls">
+    <button id="backBtn" onclick="closeGame()">← Back</button>
+    <span id="gameTitle"></span>
+    <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
   </div>
-</div>
 
-${Object.keys(categories).map(cat => `
-  <div class="category" data-category="${cat}">
-    <h2 onclick="filterCategory('${cat}')">${cat}</h2>
-    <div class="grid">
-      ${categories[cat].map(g => {
-        const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
-        return `
-          <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
-            <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
-            <div>${g.name}</div>
-          </div>
-        `;
-      }).join('')}
+  <div class="viewer-wrapper">
+    <!-- Ad Column -->
+    <div id="adColumn">
+      <ins class="adsbygoogle"
+           style="display:block;min-width:160px;min-height:300px"
+           data-ad-client="ca-pub-1033412505744705"
+           data-ad-slot="8674016809"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
+
+    <!-- Game Viewer -->
+    <div class="viewer" id="viewer">
+      <div id="startOverlay">
+        <img id="startThumb" src="" alt="Game Thumbnail">
+        <h1 id="startName"></h1>
+        <button id="startButton" onclick="startGame()">▶ Play</button>
+      </div>
+      <iframe id="gameFrame" src=""></iframe>
     </div>
   </div>
-`).join('')}
+
+  ${Object.keys(categories).map(cat => `
+    <div class="category" data-category="${cat}">
+      <h2 onclick="filterCategory('${cat}')">${cat}</h2>
+      <div class="grid">
+        ${categories[cat].map(g => {
+          const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
+          return `
+            <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
+              <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
+              <div>${g.name}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+  `).join('')}
 </div>
 
 <script>
@@ -342,6 +333,7 @@ const controls = document.getElementById('controls');
 const startOverlay = document.getElementById('startOverlay');
 const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
+const adColumn = document.getElementById('adColumn');
 let currentGameFolder = null;
 
 function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
@@ -359,6 +351,11 @@ function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
   window.location.hash = '#/game/' + folderEncoded;
   filterCategory('All Games');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  adColumn.style.display = 'block';
+  setTimeout(() => {
+    try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) { console.log(e); }
+  }, 300);
 }
 
 function startGame() {
@@ -377,6 +374,7 @@ function closeGame() {
   startOverlay.style.opacity = '1';
   startOverlay.style.pointerEvents = 'auto';
   window.location.hash = '';
+  adColumn.style.display = 'none';
   history.replaceState({}, '', '/');
 }
 
@@ -395,8 +393,6 @@ function filterCategory(cat) {
     }
   });
 }
-
-// Default category on load
 filterCategory('All Games');
 
 window.addEventListener('load', handleRouting);
@@ -422,22 +418,18 @@ window.addEventListener('keydown', e => {
   if (blocked.includes(e.key)) e.preventDefault();
 });
 </script>
-
 </body>
 </html>
 `;
 
+// ✅ Generate sitemap (no hash URLs)
 const sitemapFile = path.join(outputDir, "sitemap.xml");
 const baseURL = "https://chromebookunlocked.github.io";
-
 const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${baseURL}/</loc></url>
-</urlset>
-`;
-
+</urlset>`;
 fs.writeFileSync(sitemapFile, sitemapContent);
-console.log(`✅ Sitemap generated`);
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Layout updated with ads, DMCA, and scrolling enabled`);
+console.log(`✅ Build complete with working AdSense top and column ads.`);
