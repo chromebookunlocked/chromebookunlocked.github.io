@@ -398,16 +398,16 @@ function loadLastPlayed() {
   const grid = document.getElementById('lastPlayedGrid');
   grid.innerHTML = ''; // clear existing
 
-  lastPlayed.forEach(game => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <img class="thumb" src="${game.thumb}" alt="${game.name}">
-      <div>${game.name}</div>
-    `;
-    card.onclick = () => prepareGame(encodeURIComponent(game.folder), encodeURIComponent(game.name), game.thumb);
-    grid.appendChild(card);
-  });
+<div class="category" data-category="Recently Played">
+  <h2>Last Played</h2>
+  <div class="grid">
+    ${lastPlayedCards}
+    <div class="card more-games" onclick="filterCategory('Recently Played')">
+      <div style="display:flex;justify-content:center;align-items:center;height:140px;font-size:2rem;">...</div>
+    </div>
+  </div>
+</div>
+
 
   // Add "more" card at the end
   const moreCard = document.createElement('div');
