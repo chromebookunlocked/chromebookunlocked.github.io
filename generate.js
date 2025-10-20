@@ -126,15 +126,17 @@ button {
   margin: 0 auto 2rem auto;
   background: black;
   border-radius: 10px;
-  overflow: hidden;
+  overflow: hidden; /* hides anything overflowing inside the viewer */
 }
+
 .viewer iframe {
   width: 100%;
   height: 100%;
   border: none;
   background: black;
-  aspect-ratio: 16/9;
+  aspect-ratio: 16 / 9;
   object-fit: contain;
+  overflow: hidden; /* Hides the iframe scrollbars */
 }
 
 /* Overlay for Play */
