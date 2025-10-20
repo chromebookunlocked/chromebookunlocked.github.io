@@ -351,9 +351,6 @@ ${games.map(g => {
     <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
       <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
       <div>${g.name}</div>
-    </div>
-  `;
-}).join('')}
 
 
     </div>
