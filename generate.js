@@ -253,6 +253,13 @@ button {
   min-width: 160px;
   max-width: 300px;
 }
+.banner-ad {
+  width: 100%;
+  max-width: 1280px;
+  margin: 1rem auto;
+  display: flex;
+  justify-content: center;
+}
 
 @media (max-width: 900px) {
   .viewer-wrapper {
@@ -282,14 +289,21 @@ button {
 
 <!-- Content -->
 <div id="content">
-  <!-- TOP BANNER AD (Main Page) -->
-  <div class="ad-top">
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-1033412505744705"
-         data-ad-slot="TOP_SLOT_ID"
-         data-ad-format="horizontal"></ins>
-  </div>
+<!-- Banner Ad Top -->
+<div id="topBannerAd" class="banner-ad">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705"
+       crossorigin="anonymous"></script>
+  <!-- banner top -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-1033412505744705"
+       data-ad-slot="9227909948"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>
+       (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
   <div id="controls">
     <button id="backBtn" onclick="closeGame()">← Back</button>
     <span id="gameTitle"></span>
