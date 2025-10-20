@@ -88,25 +88,36 @@ button {
 /* Game Viewer */
 .viewer {
   position: relative;
-  display: none;
-  flex-direction: column;
+  display: none; /* use 'flex' to show when needed */
   justify-content: center;
   align-items: center;
   width: 100%;
   max-width: 1280px;
   margin: 0 auto 2rem auto;
-  background: black;
+  background: transparent; /* transparent background */
   border-radius: 10px;
-  overflow: hidden;
+  overflow: hidden; /* prevents scrollbars */
 }
+
+/* Maintain fixed aspect ratio with padding trick */
+.viewer::before {
+  content: "";
+  display: block;
+  padding-top: 56.25%; /* 16:9 ratio (9/16 = 0.5625) */
+}
+
 .viewer iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   border: none;
-  background: black;
-  aspect-ratio: 16/9;
-  object-fit: contain;
+  background: transparent; /* ensures transparency if supported */
+  object-fit: contain; /* keeps content inside without stretching */
+  overflow: hidden; /* prevent iframe scrollbars */
 }
+
 
 /* Overlay for Play */
 #startOverlay {
