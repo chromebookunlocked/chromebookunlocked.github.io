@@ -32,7 +32,9 @@ const html = `
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Arcade</title>
+<title>Chromebook Unlocked Games</title>
+<link rel="icon" type="image/png" href="assets/logo.png">
+
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705" crossorigin="anonymous"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
@@ -267,10 +269,10 @@ button {
   <header>
     <img src="assets/logo.png" alt="Logo">
   </header>
-  <ul id="categoryList">
-    <li onclick="filterCategory('Recently Played')">Recently Played</li>
-    ${Object.keys(categories).map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`).join('')}
-  </ul>
+<ul id="categoryList">
+  <li onclick="filterCategory('Home')">Home</li>
+</ul>
+
 </div>
 
 <!-- Content -->
@@ -297,24 +299,21 @@ button {
     <div class="grid" id="recentlyPlayedGrid"></div>
   </div>
 
-  <!-- All Categories -->
-  ${Object.keys(categories).map(cat => `
-    <div class="category" data-category="${cat}">
-      <h2 onclick="filterCategory('${cat}')">${cat}</h2>
-      <div class="grid">
-        ${categories[cat].map(g => {
-          const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
-          return `
-            <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
-              <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
-              <div>${g.name}</div>
-            </div>
-          `;
-        }).join('')}
-      </div>
-    </div>
-  `).join('')}
+<div class="category" data-category="Home">
+  <h2>Home</h2>
+  <div class="grid">
+    ${games.map(g => {
+      const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
+      return `
+        <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
+          <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
+          <div>${g.name}</div>
+        </div>
+      `;
+    }).join('')}
+  </div>
 </div>
+
 
 <script>
 const viewer = document.getElementById('viewer');
@@ -414,16 +413,15 @@ function toggleFullscreen() {
 function filterCategory(cat) {
   const allCategories = document.querySelectorAll('.category');
   allCategories.forEach(c => {
-    if (cat === 'All Games') {
-      c.style.display = (c.getAttribute('data-category') === 'All Games') ? 'block' : 'none';
+    if (cat === 'Home') {
+      c.style.display = 'block';
       document.getElementById('recentlyPlayedSection').style.display = recentlyPlayedGrid.children.length ? 'block' : 'none';
     } else {
       c.style.display = (c.getAttribute('data-category') === cat) ? 'block' : 'none';
     }
   });
 }
-
-filterCategory('All Games');
+filterCategory('Home');
 loadRecentlyPlayed();
 
 window.addEventListener('load', handleRouting);
