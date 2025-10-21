@@ -1,4 +1,3 @@
-// generate.js (Part 1 of 2)
 const fs = require("fs");
 const path = require("path");
 
@@ -10,7 +9,7 @@ const outputFile = path.join(outputDir, "index.html");
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
 
 // Load games
-let games = fs.readdirSync(dataDir)
+const games = fs.readdirSync(dataDir)
   .filter(f => f.endsWith(".json"))
   .map(f => {
     const json = JSON.parse(fs.readFileSync(path.join(dataDir, f)));
@@ -29,6 +28,33 @@ games.forEach(g => {
   categories[g.category].push(g);
 });
 
+// Helper function to generate game card HTML
+const generateGameCard = (game) => {
+  const thumb = game.thumbs.find(t => fs.existsSync(path.join(gamesDir, game.folder, t))) || game.thumbs[0];
+  return `
+    <div class="card" onclick="prepareGame('${encodeURIComponent(game.folder)}','${encodeURIComponent(game.name)}','games/${game.folder}/${thumb}')">
+      <img class="thumb" src="games/${game.folder}/${thumb}" alt="${game.name}">
+      <div>${game.name}</div>
+    </div>`;
+};
+
+// Generate category sections
+const categorySections = Object.keys(categories)
+  .map(cat => `
+    <div class="category" data-category="${cat}" style="display:none;">
+      <h2>${cat}</h2>
+      <div class="grid">
+        ${categories[cat].map(generateGameCard).join('')}
+      </div>
+    </div>`).join('');
+
+// Generate sidebar categories
+const sidebarCategories = Object.keys(categories)
+  .filter(cat => cat !== "Recently Played")
+  .map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`)
+  .join("");
+
+// Build complete HTML (using let instead of const)
 const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -257,10 +283,7 @@ button {
   <header><img src="assets/logo.png" alt="Logo"></header>
   <ul id="categoryList">
     <li onclick="filterCategory('Home')">Home</li>
-    ${Object.keys(categories)
-      .filter(cat => cat !== "Recently Played")
-      .map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`)
-      .join("")}
+    ${sidebarCategories}
   </ul>
 </div>
 
@@ -292,34 +315,12 @@ button {
   <div class="category" data-category="Home">
     <h2>All Games</h2>
     <div class="grid">
-      ${games.map(g => {
-        const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
-        return `
-        <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}','${encodeURIComponent(g.name)}','games/${g.folder}/${thumb}')">
-          <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
-          <div>${g.name}</div>
-        </div>`;
-      }).join("")}
+      ${games.map(generateGameCard).join('')}
     </div>
   </div>
-`;
-// --- Part 2 of generate.js ---
-html += `
+
   <!-- Other Categories -->
-// Other Categories
-${Object.keys(categories)
-  .map(cat => `
-    <div class="category" data-category="${cat}" style="display:none;">
-      <h2>${cat}</h2>
-      <div class="grid">
-        ${categories[cat].map(g => {
-          const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
-          return '<div class="card" onclick="prepareGame(\'' + encodeURIComponent(g.folder) + '\',\'' + encodeURIComponent(g.name) + '\',\'games/' + g.folder + '/' + thumb + '\')">' +
-                 '<img class="thumb" src="games/' + g.folder + '/' + thumb + '" alt="' + g.name + '">' +
-                 '<div>' + g.name + '</div></div>';
-        }).join('')}
-      </div>
-    </div>`).join('')}
+  ${categorySections}
 
 </div>
 
@@ -373,7 +374,7 @@ function updateRecentlyPlayedUI(list, homeView = false) {
   }
   document.getElementById('recentlyPlayedSection').style.display = 'block';
 
-  let displayList = homeView ? list.slice(0,7) : list;
+  const displayList = homeView ? list.slice(0,7) : list;
   displayList.forEach(g => {
     const card = document.createElement('div');
     card.className = 'card';
@@ -441,14 +442,14 @@ function filterCategory(cat) {
     if (cat === 'Home') {
       c.style.display = (category === 'Home' || category === 'Recently Played') ? 'block' : 'none';
       updateRecentlyPlayedUI(JSON.parse(localStorage.getItem('recentlyPlayed') || '[]'), true);
-      document.getElementById('recentBackBtn')?.style.display = 'none';
+      document.getElementById('recentBackBtn').style.display = 'none';
     } else if (cat === 'Recently Played') {
       c.style.display = 'block';
       updateRecentlyPlayedUI(JSON.parse(localStorage.getItem('recentlyPlayed') || '[]'), false);
-      document.getElementById('recentBackBtn')?.style.display = 'inline-block';
+      document.getElementById('recentBackBtn').style.display = 'inline-block';
     } else {
       c.style.display = category === cat ? 'block' : 'none';
-      document.getElementById('recentBackBtn')?.style.display = 'none';
+      document.getElementById('recentBackBtn').style.display = 'none';
     }
   });
   document.getElementById('content').scrollTop = 0;
