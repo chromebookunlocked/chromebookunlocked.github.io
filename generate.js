@@ -21,12 +21,14 @@ let games = fs.readdirSync(dataDir)
     };
   });
 
+// Build categories
 const categories = {};
 games.forEach(g => {
   if (!categories[g.category]) categories[g.category] = [];
   categories[g.category].push(g);
 });
 
+// Generate HTML
 const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -34,8 +36,8 @@ const html = `
 <meta charset="UTF-8">
 <title>Chromebook Unlocked Games</title>
 <link rel="icon" type="image/png" href="assets/logo.png">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705" crossorigin="anonymous"></script>
 
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705" crossorigin="anonymous"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
@@ -139,11 +141,12 @@ button {
 .viewer::before {
   content: "";
   display: block;
-  padding-top: 56.25%; /* 16:9 ratio */
+  padding-top: 56.25%; /* 16:9 */
 }
 .viewer iframe {
   position: absolute;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   border: none;
@@ -152,7 +155,7 @@ button {
   overflow: hidden;
 }
 
-/* Overlay */
+/* Overlay for Play */
 #startOverlay {
   position: absolute;
   inset: 0;
@@ -263,8 +266,9 @@ button {
   <ul id="categoryList">
     <li onclick="filterCategory('Home')">Home</li>
     ${Object.keys(categories)
+      .filter(cat => cat !== "All Games" && cat !== "Recently Played")
       .map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`)
-      .join('')}
+      .join("")}
   </ul>
 </div>
 
@@ -276,7 +280,6 @@ button {
     <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
   </div>
 
-  <!-- Game Viewer -->
   <div class="viewer" id="viewer">
     <div id="startOverlay">
       <img id="startThumb" src="" alt="Game Thumbnail">
@@ -286,14 +289,14 @@ button {
     <iframe id="gameFrame" src=""></iframe>
   </div>
 
-  <!-- Recently Played (Home Section Only) -->
+  <!-- Recently Played -->
   <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
     <h2>Recently Played</h2>
     <div class="grid" id="recentlyPlayedGrid"></div>
   </div>
 
-  <!-- All Games (Home) -->
-  <div class="category" data-category="Home" id="homeSection">
+  <!-- All Games (Home Grid) -->
+  <div class="category" data-category="Home">
     <h2>All Games</h2>
     <div class="grid">
       ${games.map(g => {
@@ -303,12 +306,13 @@ button {
             <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
             <div>${g.name}</div>
           </div>`;
-      }).join('')}
+      }).join("")}
     </div>
   </div>
 
   <!-- Other Categories -->
-  ${Object.keys(categories).map(cat => `
+  ${Object.keys(categories)
+    .map(cat => `
     <div class="category" data-category="${cat}" style="display:none;">
       <h2>${cat}</h2>
       <div class="grid">
@@ -319,10 +323,9 @@ button {
               <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
               <div>${g.name}</div>
             </div>`;
-        }).join('')}
+        }).join("")}
       </div>
-    </div>
-  `).join('')}
+    </div>`).join("")}
 </div>
 
 <script>
@@ -335,12 +338,12 @@ const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
 const recentlyPlayedGrid = document.getElementById('recentlyPlayedGrid');
 let currentGameFolder = null;
-
 const MAX_RECENT = 12;
 
+// Check if game still exists
 function gameExists(folder) {
+  const xhr = new XMLHttpRequest();
   try {
-    const xhr = new XMLHttpRequest();
     xhr.open('HEAD', 'games/' + folder + '/index.html', false);
     xhr.send();
     return xhr.status !== 404;
@@ -349,6 +352,7 @@ function gameExists(folder) {
   }
 }
 
+// Load recently played, removing missing games
 function loadRecentlyPlayed() {
   let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
   list = list.filter(g => gameExists(g.folder));
@@ -366,12 +370,16 @@ function saveRecentlyPlayed(game) {
   updateRecentlyPlayedUI(list);
 }
 
+// Update UI for recently played
 function updateRecentlyPlayedUI(list) {
   recentlyPlayedGrid.innerHTML = '';
-  if (!list.length) return document.getElementById('recentlyPlayedSection').style.display = 'none';
+  if (!list.length) {
+    document.getElementById('recentlyPlayedSection').style.display = 'none';
+    return;
+  }
   document.getElementById('recentlyPlayedSection').style.display = 'block';
-  const displayList = list.slice(0, 5);
-  displayList.forEach(g => {
+
+  list.slice(0, 7).forEach(g => {
     const card = document.createElement('div');
     card.className = 'card';
     card.onclick = () => prepareGame(encodeURIComponent(g.folder), encodeURIComponent(g.name), g.thumb);
@@ -379,16 +387,15 @@ function updateRecentlyPlayedUI(list) {
     recentlyPlayedGrid.appendChild(card);
   });
 
-  // Add "⋯" card at the end
-  if (list.length > 5) {
-    const moreCard = document.createElement('div');
-    moreCard.className = 'card more';
-    moreCard.textContent = '⋯';
-    moreCard.onclick = () => filterCategory('Recently Played');
-    recentlyPlayedGrid.appendChild(moreCard);
-  }
+  // Add transparent "⋯" card
+  const moreCard = document.createElement('div');
+  moreCard.className = 'card more';
+  moreCard.textContent = '⋯';
+  moreCard.onclick = () => filterCategory('Recently Played');
+  recentlyPlayedGrid.appendChild(moreCard);
 }
 
+// Game player functions
 function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
   const folder = decodeURIComponent(folderEncoded);
   const name = decodeURIComponent(nameEncoded);
@@ -429,20 +436,15 @@ function toggleFullscreen() {
   else document.exitFullscreen();
 }
 
+// Filter categories
 function filterCategory(cat) {
-  const cats = document.querySelectorAll('.category');
-  cats.forEach(c => {
-    const current = c.getAttribute('data-category');
+  const all = document.querySelectorAll('.category');
+  all.forEach(c => {
+    const category = c.getAttribute('data-category');
     if (cat === 'Home') {
-      document.getElementById('recentlyPlayedSection').style.display =
-        recentlyPlayedGrid.children.length ? 'block' : 'none';
-      document.getElementById('homeSection').style.display = 'block';
-      if (current !== 'Home' && current !== 'Recently Played')
-        c.style.display = 'none';
+      c.style.display = (category === 'Home' || category === 'Recently Played') ? 'block' : 'none';
     } else {
-      c.style.display = (current === cat) ? 'block' : 'none';
-      if (current === 'Recently Played') document.getElementById('recentlyPlayedSection').style.display = 'none';
-      if (current === 'Home') document.getElementById('homeSection').style.display = 'none';
+      c.style.display = category === cat ? 'block' : 'none';
     }
   });
   document.getElementById('content').scrollTop = 0;
@@ -455,6 +457,7 @@ loadRecentlyPlayed();
 </html>
 `;
 
+// --- Sitemap generation ---
 const sitemapFile = path.join(outputDir, "sitemap.xml");
 const baseURL = "https://chromebookunlocked.github.io";
 const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
@@ -465,4 +468,4 @@ fs.writeFileSync(sitemapFile, sitemapContent);
 console.log("✅ Sitemap generated");
 
 fs.writeFileSync(outputFile, html);
-console.log("✅ Home shows Recently Played + All Games only; working categories; clean viewer");
+console.log("✅ Home shows Recently Played + All Games, other categories fixed, viewer 16:9 transparent.");
