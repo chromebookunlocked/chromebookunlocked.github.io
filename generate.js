@@ -313,11 +313,10 @@ html += `
         <div class="grid">
           ${categories[cat].map(g => {
             const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
-            return \`
-            <div class="card" onclick="prepareGame('\${encodeURIComponent(g.folder)}','\${encodeURIComponent(g.name)}','games/\${g.folder}/\${thumb}')">
-              <img class="thumb" src="games/\${g.folder}/\${thumb}" alt="\${g.name}">
-              <div>\${g.name}</div>
-            </div>\`;
+return '<div class="card" onclick="prepareGame(\'' + encodeURIComponent(g.folder) + '\',\'' + encodeURIComponent(g.name) + '\',\'games/' + g.folder + '/' + thumb + '\')">' +
+       '<img class="thumb" src="games/' + g.folder + '/' + thumb + '" alt="' + g.name + '">' +
+       '<div>' + g.name + '</div></div>';
+
           }).join('')}
         </div>
       </div>`).join('')}
