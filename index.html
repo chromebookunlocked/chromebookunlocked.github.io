@@ -7,130 +7,212 @@
 <link rel="icon" type="image/png" href="assets/logo.png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
 :root {
   --base-font: clamp(12px, 1.2vw, 18px);
   --thumb-height: clamp(100px, 20vh, 160px);
   --sidebar-width: clamp(50px, 6vw, 70px);
 }
+
 * { box-sizing: border-box; }
 html, body {
-  margin: 0; padding: 0; height: 100%;
-  background: #1c0033; font-family: 'Orbitron', sans-serif;
-  color: #eee; overflow: hidden; font-size: var(--base-font);
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #1c0033;
+  font-family: 'Orbitron', sans-serif;
+  color: #eee;
+  overflow: hidden;
+  font-size: var(--base-font);
 }
 
 /* Sidebar */
 #sidebar {
-  width: var(--sidebar-width); background: #330066;
-  padding: 1rem 0; height: 100vh; overflow-y: auto;
-  transition: width 0.3s ease; position: fixed; top: 0; left: 0;
+  width: var(--sidebar-width);
+  background: #330066;
+  padding: 1rem 0;
+  height: 100vh;
+  overflow-y: auto;
+  position: fixed;
+  top: 0;
+  left: 0;
   z-index: 1000;
+  transition: width 0.3s ease;
 }
 #sidebar:hover { width: 250px; }
 #sidebar header { display: flex; justify-content: center; margin-bottom: 2rem; }
 #sidebar header img { height: 60px; width: auto; }
 #sidebar ul { list-style: none; padding: 0; margin: 0; }
 #sidebar li {
-  cursor: pointer; padding: 0.5rem; border-radius: 4px;
-  transition: 0.3s ease; white-space: nowrap; font-size: 1em;
-  opacity: 0; transform: translateY(5px);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: 0.3s ease;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(5px);
 }
 #sidebar:hover li { opacity: 1; transform: translateY(0); }
 #sidebar li:hover {
-  background: #660099; box-shadow: 0 0 10px #ff99ff; color: #fff;
+  background: #660099;
+  box-shadow: 0 0 10px #ff99ff;
+  color: #fff;
 }
 
 /* Content */
 #content {
-  padding: 1rem; overflow-y: auto; overflow-x: hidden;
+  padding: 1rem;
+  overflow-y: auto;
+  overflow-x: hidden;
   margin-left: var(--sidebar-width);
   width: calc(100% - var(--sidebar-width));
-  transition: margin-left 0.3s; height: 100vh;
+  transition: margin-left 0.3s;
+  height: 100vh;
 }
 
 /* Controls */
 #controls {
-  display: flex; justify-content: space-between; align-items: center;
-  max-width: 1280px; margin: 0 auto 0.5rem auto;
-  padding: 0.5rem; visibility: hidden; font-size: 1.2em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto 0.5rem auto;
+  padding: 0.5rem;
+  visibility: hidden;
+  font-size: 1.2em;
 }
-button { padding: 0.4rem 0.8rem; border: none; border-radius: 6px; cursor: pointer; font-size: 1em; }
+button {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1em;
+}
 #backBtn { background: #ff99ff; color: black; }
 #fullscreenBtn { background: #cc66ff; color: black; }
 
 /* Viewer */
 .viewer {
-  position: relative; display: none; justify-content: center; align-items: center;
-  width: 100%; max-width: 1280px; margin: 0 auto 2rem auto;
-  background: transparent; border-radius: 10px; overflow: hidden;
+  position: relative;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto 2rem auto;
+  background: transparent;
+  border-radius: 10px;
+  overflow: hidden;
 }
-.viewer::before { content: ""; display: block; padding-top: 56.25%; }
+.viewer::before {
+  content: "";
+  display: block;
+  padding-top: 56.25%;
+}
 .viewer iframe {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  border: none; background: transparent; object-fit: contain; overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  object-fit: contain;
 }
 
-/* Start Overlay */
+/* Overlay for Play */
 #startOverlay {
-  position: absolute; inset: 0;
+  position: absolute;
+  inset: 0;
   background: linear-gradient(180deg, #330066 0%, #1c0033 100%);
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-  gap: 1rem; z-index: 10; transition: opacity 0.5s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  z-index: 10;
+  transition: opacity 0.5s ease;
 }
 #startOverlay img {
   width: clamp(200px, 40vw, 300px);
-  border-radius: 10px; box-shadow: 0 0 20px #ff99ff;
+  max-width: 80%;
+  border-radius: 10px;
+  box-shadow: 0 0 20px #ff99ff;
 }
-#startOverlay h1 { margin: 0; font-size: clamp(1.5rem, 2.5vw, 3rem); color: #fff; }
+#startOverlay h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.5vw, 3rem);
+  color: #fff;
+}
 #startButton {
-  padding: 0.8rem 2rem; font-size: clamp(1rem, 1.5vw, 1.5rem);
-  background: #ff99ff; color: black; border: none; border-radius: 8px; cursor: pointer;
-  transition: 0.2s;
-}
-#startButton:hover { background: #ff66ff; box-shadow: 0 0 15px #ff66ff; }
-
-/* Game Grid */
-.category { margin-top: 2rem; }
-.category h2 { color: #ffccff; margin-bottom: 0.5rem; cursor: pointer; }
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr));
-  gap: 1rem; justify-content: center;
-}
-.card {
-  background: #4d0066; border-radius: 8px; overflow: hidden;
-  cursor: pointer; transition: transform .2s; text-align: center;
-  display: flex; flex-direction: column; align-items: center;
-}
-.card:hover { transform: scale(1.05); background: #660099; }
-.thumb { width: 100%; height: var(--thumb-height); object-fit: cover; margin-bottom: 0.5rem; border-radius: 6px; }
-.card.more {
-  background: rgba(255,255,255,0.1);
-  display: flex; justify-content: center; align-items: center;
-  font-size: 2rem; color: #ffccff;
-}
-
-/* Back to home */
-#recentBackBtn {
-  display: none;
+  padding: 0.8rem 2rem;
+  font-size: clamp(1rem, 1.5vw, 1.5rem);
   background: #ff99ff;
   color: black;
   border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
-  margin-bottom: 1rem;
+  border-radius: 8px;
   cursor: pointer;
+  transition: 0.2s;
+}
+#startButton:hover {
+  background: #ff66ff;
+  box-shadow: 0 0 15px #ff66ff;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-thumb { background: #660099; border-radius: 4px; }
+/* Game Grid */
+.category { margin-top: 2rem; }
+.category h2 {
+  color: #ffccff;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr));
+  gap: 1rem;
+  justify-content: center;
+}
+.card {
+  background: #4d0066;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .2s;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.card:hover { transform: scale(1.05); background: #660099; }
+.thumb {
+  width: 100%;
+  height: var(--thumb-height);
+  object-fit: cover;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  background: #330033;
+}
+.card.more {
+  background: rgba(255,255,255,0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  color: #ffccff;
+}
 
 /* DMCA */
 #dmcaLink {
-  position: fixed; bottom: 10px; right: 10px;
-  background: #ff66ff; color: black; padding: 0.3rem 0.6rem;
-  border-radius: 6px; font-size: 0.8rem; text-decoration: none; z-index: 10000;
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: #ff66ff;
+  color: black;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  text-decoration: none;
+  z-index: 10000;
   transition: 0.2s;
 }
 #dmcaLink:hover { background: #ff99ff; color: black; }
@@ -139,20 +221,22 @@ button { padding: 0.4rem 0.8rem; border: none; border-radius: 6px; cursor: point
 <body>
 <a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
 
+<!-- Sidebar -->
 <div id="sidebar">
   <header><img src="assets/logo.png" alt="Logo"></header>
   <ul id="categoryList">
     <li onclick="filterCategory('Home')">Home</li>
-    <li onclick="filterCategory('Recently Played')">Recently Played</li>
     <li onclick="filterCategory('Shooter')">Shooter</li><li onclick="filterCategory('Uncategorized')">Uncategorized</li>
   </ul>
 </div>
 
+<!-- Content -->
 <div id="content">
   <div id="controls">
     <button id="backBtn" onclick="closeGame()">← Back</button>
     <span id="gameTitle"></span>
     <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    <button id="recentBackBtn" onclick="backToHome()" style="display:none;">← Home</button>
   </div>
 
   <div class="viewer" id="viewer">
@@ -167,48 +251,58 @@ button { padding: 0.4rem 0.8rem; border: none; border-radius: 6px; cursor: point
   <!-- Recently Played -->
   <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
     <h2>Recently Played</h2>
-    <button id="recentBackBtn" onclick="backToHome()">← Back to Home</button>
     <div class="grid" id="recentlyPlayedGrid"></div>
   </div>
 
-  <!-- All Games -->
+  <!-- All Games (Home) -->
   <div class="category" data-category="Home">
     <h2>All Games</h2>
     <div class="grid">
-      <div class="card" onclick="prepareGame('1v1.lol', '1v1.lol', 'games/1v1.lol/thumbnail.png')">
-          <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
-          <div>1v1.lol</div>
-        </div><div class="card" onclick="prepareGame('Age%20Of%20War', 'Age%20Of%20War', 'games/Age Of War/thumbnail.png')">
-          <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
-          <div>Age Of War</div>
-        </div><div class="card" onclick="prepareGame('Backrooms%202D', 'Backrooms%202D', 'games/Backrooms 2D/thumbnail.jpg')">
-          <img class="thumb" src="games/Backrooms 2D/thumbnail.jpg" alt="Backrooms 2D">
-          <div>Backrooms 2D</div>
-        </div><div class="card" onclick="prepareGame('Bad%20Piggies', 'Bad%20Piggies', 'games/Bad Piggies/thumbnail.jpg')">
-          <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
-          <div>Bad Piggies</div>
-        </div><div class="card" onclick="prepareGame('Bad%20Time%20Simulator', 'Bad%20Time%20Simulator', 'games/Bad Time Simulator/thumbnail.jpg')">
-          <img class="thumb" src="games/Bad Time Simulator/thumbnail.jpg" alt="Bad Time Simulator">
-          <div>Bad Time Simulator</div>
-        </div><div class="card" onclick="prepareGame('Baldi%E2%80%99s%20Basics', 'Baldi%E2%80%99s%20Basics', 'games/Baldi’s Basics/thumbnail.png')">
-          <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
-          <div>Baldi’s Basics</div>
-        </div><div class="card" onclick="prepareGame('Blackjack', 'Blackjack', 'games/Blackjack/thumbnail.png')">
-          <img class="thumb" src="games/Blackjack/thumbnail.png" alt="Blackjack">
-          <div>Blackjack</div>
-        </div><div class="card" onclick="prepareGame('Block%20Blast', 'Block%20Blast', 'games/Block Blast/thumbnail.jpg')">
-          <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
-          <div>Block Blast</div>
-        </div><div class="card" onclick="prepareGame('Burrito%20Bison%20Launcha%20Libre', 'Burrito%20Bison%20Launcha%20Libre', 'games/Burrito Bison Launcha Libre/thumbnail.jpg')">
-          <img class="thumb" src="games/Burrito Bison Launcha Libre/thumbnail.jpg" alt="Burrito Bison Launcha Libre">
-          <div>Burrito Bison Launcha Libre</div>
-        </div><div class="card" onclick="prepareGame('Capybara%20Clicker', 'Capybara%20Clicker', 'games/Capybara Clicker/thumbnail.png')">
-          <img class="thumb" src="games/Capybara Clicker/thumbnail.png" alt="Capybara Clicker">
-          <div>Capybara Clicker</div>
-        </div><div class="card" onclick="prepareGame('The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb', 'The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb', 'games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg')">
-          <img class="thumb" src="games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg" alt="The Binding of Isaac - Wrath of the Lamb">
-          <div>The Binding of Isaac - Wrath of the Lamb</div>
-        </div>
+      
+    <div class="card" onclick="prepareGame('1v1.lol','1v1.lol','games/1v1.lol/thumbnail.png')">
+      <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
+      <div>1v1.lol</div>
+    </div>
+    <div class="card" onclick="prepareGame('Age%20Of%20War','Age%20Of%20War','games/Age Of War/thumbnail.png')">
+      <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
+      <div>Age Of War</div>
+    </div>
+    <div class="card" onclick="prepareGame('Backrooms%202D','Backrooms%202D','games/Backrooms 2D/thumbnail.jpg')">
+      <img class="thumb" src="games/Backrooms 2D/thumbnail.jpg" alt="Backrooms 2D">
+      <div>Backrooms 2D</div>
+    </div>
+    <div class="card" onclick="prepareGame('Bad%20Piggies','Bad%20Piggies','games/Bad Piggies/thumbnail.jpg')">
+      <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
+      <div>Bad Piggies</div>
+    </div>
+    <div class="card" onclick="prepareGame('Bad%20Time%20Simulator','Bad%20Time%20Simulator','games/Bad Time Simulator/thumbnail.jpg')">
+      <img class="thumb" src="games/Bad Time Simulator/thumbnail.jpg" alt="Bad Time Simulator">
+      <div>Bad Time Simulator</div>
+    </div>
+    <div class="card" onclick="prepareGame('Baldi%E2%80%99s%20Basics','Baldi%E2%80%99s%20Basics','games/Baldi’s Basics/thumbnail.png')">
+      <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
+      <div>Baldi’s Basics</div>
+    </div>
+    <div class="card" onclick="prepareGame('Blackjack','Blackjack','games/Blackjack/thumbnail.png')">
+      <img class="thumb" src="games/Blackjack/thumbnail.png" alt="Blackjack">
+      <div>Blackjack</div>
+    </div>
+    <div class="card" onclick="prepareGame('Block%20Blast','Block%20Blast','games/Block Blast/thumbnail.jpg')">
+      <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
+      <div>Block Blast</div>
+    </div>
+    <div class="card" onclick="prepareGame('Burrito%20Bison%20Launcha%20Libre','Burrito%20Bison%20Launcha%20Libre','games/Burrito Bison Launcha Libre/thumbnail.jpg')">
+      <img class="thumb" src="games/Burrito Bison Launcha Libre/thumbnail.jpg" alt="Burrito Bison Launcha Libre">
+      <div>Burrito Bison Launcha Libre</div>
+    </div>
+    <div class="card" onclick="prepareGame('Capybara%20Clicker','Capybara%20Clicker','games/Capybara Clicker/thumbnail.png')">
+      <img class="thumb" src="games/Capybara Clicker/thumbnail.png" alt="Capybara Clicker">
+      <div>Capybara Clicker</div>
+    </div>
+    <div class="card" onclick="prepareGame('The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb','The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb','games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg')">
+      <img class="thumb" src="games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg" alt="The Binding of Isaac - Wrath of the Lamb">
+      <div>The Binding of Isaac - Wrath of the Lamb</div>
+    </div>
     </div>
   </div>
 
@@ -217,81 +311,93 @@ button { padding: 0.4rem 0.8rem; border: none; border-radius: 6px; cursor: point
     <div class="category" data-category="Shooter" style="display:none;">
       <h2>Shooter</h2>
       <div class="grid">
-        <div class="card" onclick="prepareGame('1v1.lol', '1v1.lol', 'games/1v1.lol/thumbnail.png')">
-            <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
-            <div>1v1.lol</div>
-          </div>
+        
+    <div class="card" onclick="prepareGame('1v1.lol','1v1.lol','games/1v1.lol/thumbnail.png')">
+      <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
+      <div>1v1.lol</div>
+    </div>
       </div>
     </div>
     <div class="category" data-category="Uncategorized" style="display:none;">
       <h2>Uncategorized</h2>
       <div class="grid">
-        <div class="card" onclick="prepareGame('Age%20Of%20War', 'Age%20Of%20War', 'games/Age Of War/thumbnail.png')">
-            <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
-            <div>Age Of War</div>
-          </div><div class="card" onclick="prepareGame('Backrooms%202D', 'Backrooms%202D', 'games/Backrooms 2D/thumbnail.jpg')">
-            <img class="thumb" src="games/Backrooms 2D/thumbnail.jpg" alt="Backrooms 2D">
-            <div>Backrooms 2D</div>
-          </div><div class="card" onclick="prepareGame('Bad%20Piggies', 'Bad%20Piggies', 'games/Bad Piggies/thumbnail.jpg')">
-            <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
-            <div>Bad Piggies</div>
-          </div><div class="card" onclick="prepareGame('Bad%20Time%20Simulator', 'Bad%20Time%20Simulator', 'games/Bad Time Simulator/thumbnail.jpg')">
-            <img class="thumb" src="games/Bad Time Simulator/thumbnail.jpg" alt="Bad Time Simulator">
-            <div>Bad Time Simulator</div>
-          </div><div class="card" onclick="prepareGame('Baldi%E2%80%99s%20Basics', 'Baldi%E2%80%99s%20Basics', 'games/Baldi’s Basics/thumbnail.png')">
-            <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
-            <div>Baldi’s Basics</div>
-          </div><div class="card" onclick="prepareGame('Blackjack', 'Blackjack', 'games/Blackjack/thumbnail.png')">
-            <img class="thumb" src="games/Blackjack/thumbnail.png" alt="Blackjack">
-            <div>Blackjack</div>
-          </div><div class="card" onclick="prepareGame('Block%20Blast', 'Block%20Blast', 'games/Block Blast/thumbnail.jpg')">
-            <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
-            <div>Block Blast</div>
-          </div><div class="card" onclick="prepareGame('Burrito%20Bison%20Launcha%20Libre', 'Burrito%20Bison%20Launcha%20Libre', 'games/Burrito Bison Launcha Libre/thumbnail.jpg')">
-            <img class="thumb" src="games/Burrito Bison Launcha Libre/thumbnail.jpg" alt="Burrito Bison Launcha Libre">
-            <div>Burrito Bison Launcha Libre</div>
-          </div><div class="card" onclick="prepareGame('Capybara%20Clicker', 'Capybara%20Clicker', 'games/Capybara Clicker/thumbnail.png')">
-            <img class="thumb" src="games/Capybara Clicker/thumbnail.png" alt="Capybara Clicker">
-            <div>Capybara Clicker</div>
-          </div><div class="card" onclick="prepareGame('The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb', 'The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb', 'games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg')">
-            <img class="thumb" src="games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg" alt="The Binding of Isaac - Wrath of the Lamb">
-            <div>The Binding of Isaac - Wrath of the Lamb</div>
-          </div>
+        
+    <div class="card" onclick="prepareGame('Age%20Of%20War','Age%20Of%20War','games/Age Of War/thumbnail.png')">
+      <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
+      <div>Age Of War</div>
+    </div>
+    <div class="card" onclick="prepareGame('Backrooms%202D','Backrooms%202D','games/Backrooms 2D/thumbnail.jpg')">
+      <img class="thumb" src="games/Backrooms 2D/thumbnail.jpg" alt="Backrooms 2D">
+      <div>Backrooms 2D</div>
+    </div>
+    <div class="card" onclick="prepareGame('Bad%20Piggies','Bad%20Piggies','games/Bad Piggies/thumbnail.jpg')">
+      <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
+      <div>Bad Piggies</div>
+    </div>
+    <div class="card" onclick="prepareGame('Bad%20Time%20Simulator','Bad%20Time%20Simulator','games/Bad Time Simulator/thumbnail.jpg')">
+      <img class="thumb" src="games/Bad Time Simulator/thumbnail.jpg" alt="Bad Time Simulator">
+      <div>Bad Time Simulator</div>
+    </div>
+    <div class="card" onclick="prepareGame('Baldi%E2%80%99s%20Basics','Baldi%E2%80%99s%20Basics','games/Baldi’s Basics/thumbnail.png')">
+      <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
+      <div>Baldi’s Basics</div>
+    </div>
+    <div class="card" onclick="prepareGame('Blackjack','Blackjack','games/Blackjack/thumbnail.png')">
+      <img class="thumb" src="games/Blackjack/thumbnail.png" alt="Blackjack">
+      <div>Blackjack</div>
+    </div>
+    <div class="card" onclick="prepareGame('Block%20Blast','Block%20Blast','games/Block Blast/thumbnail.jpg')">
+      <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
+      <div>Block Blast</div>
+    </div>
+    <div class="card" onclick="prepareGame('Burrito%20Bison%20Launcha%20Libre','Burrito%20Bison%20Launcha%20Libre','games/Burrito Bison Launcha Libre/thumbnail.jpg')">
+      <img class="thumb" src="games/Burrito Bison Launcha Libre/thumbnail.jpg" alt="Burrito Bison Launcha Libre">
+      <div>Burrito Bison Launcha Libre</div>
+    </div>
+    <div class="card" onclick="prepareGame('Capybara%20Clicker','Capybara%20Clicker','games/Capybara Clicker/thumbnail.png')">
+      <img class="thumb" src="games/Capybara Clicker/thumbnail.png" alt="Capybara Clicker">
+      <div>Capybara Clicker</div>
+    </div>
+    <div class="card" onclick="prepareGame('The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb','The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb','games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg')">
+      <img class="thumb" src="games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg" alt="The Binding of Isaac - Wrath of the Lamb">
+      <div>The Binding of Isaac - Wrath of the Lamb</div>
+    </div>
       </div>
     </div>
+
 </div>
 
 <script>
-const frame = document.getElementById('gameFrame');
 const viewer = document.getElementById('viewer');
+const frame = document.getElementById('gameFrame');
 const controls = document.getElementById('controls');
 const gameTitle = document.getElementById('gameTitle');
 const startOverlay = document.getElementById('startOverlay');
 const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
 const recentlyPlayedGrid = document.getElementById('recentlyPlayedGrid');
-const recentBackBtn = document.getElementById('recentBackBtn');
 let currentGameFolder = null;
 const MAX_RECENT = 25;
 
+// Utility to check if game exists
 function gameExists(folder) {
   try {
     const xhr = new XMLHttpRequest();
     xhr.open('HEAD', 'games/' + folder + '/index.html', false);
     xhr.send();
     return xhr.status !== 404;
-  } catch {
-    return false;
-  }
+  } catch { return false; }
 }
 
+// Load Recently Played, removing missing games
 function loadRecentlyPlayed() {
   let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
   list = list.filter(g => gameExists(g.folder));
   localStorage.setItem('recentlyPlayed', JSON.stringify(list));
-  updateRecentlyPlayedUI(list, false);
+  updateRecentlyPlayedUI(list, true);
 }
 
+// Save game to Recently Played
 function saveRecentlyPlayed(game) {
   let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
   list = list.filter(g => g.folder !== game.folder);
@@ -299,49 +405,39 @@ function saveRecentlyPlayed(game) {
   if (list.length > MAX_RECENT) list = list.slice(0, MAX_RECENT);
   list = list.filter(g => gameExists(g.folder));
   localStorage.setItem('recentlyPlayed', JSON.stringify(list));
-  updateRecentlyPlayedUI(list, false);
+  updateRecentlyPlayedUI(list, true);
 }
 
-function updateRecentlyPlayedUI(list, full) {
+// Update Recently Played UI
+function updateRecentlyPlayedUI(list, homeView = false) {
   recentlyPlayedGrid.innerHTML = '';
-  if (!list.length) { document.getElementById('recentlyPlayedSection').style.display = 'none'; return; }
+  if (!list.length) {
+    document.getElementById('recentlyPlayedSection').style.display = 'none';
+    return;
+  }
   document.getElementById('recentlyPlayedSection').style.display = 'block';
 
-  const displayList = full ? list : list.slice(0, 7);
+  const displayList = homeView ? list.slice(0,7) : list;
   displayList.forEach(g => {
-    const c = document.createElement('div');
-    c.className = 'card';
-    c.onclick = () => prepareGame(encodeURIComponent(g.folder), encodeURIComponent(g.name), g.thumb);
-    c.innerHTML = `<img class="thumb" src="${g.thumb}" alt="${g.name}"><div>${g.name}</div>`;
-    recentlyPlayedGrid.appendChild(c);
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.onclick = () => prepareGame(encodeURIComponent(g.folder), encodeURIComponent(g.name), g.thumb);
+    card.innerHTML = `<img class="thumb" src="${g.thumb}" alt="${g.name}"><div>${g.name}</div>`;
+    recentlyPlayedGrid.appendChild(card);
   });
 
-  if (!full && list.length > 7) {
-    const more = document.createElement('div');
-    more.className = 'card more';
-    more.textContent = '⋯';
-    more.onclick = () => openFullRecentlyPlayed();
-    recentlyPlayedGrid.appendChild(more);
+  // Transparent ⋯ box only in home view and only as last item
+  if (homeView && list.length > 7) {
+    const moreCard = document.createElement('div');
+    moreCard.className = 'card more';
+    moreCard.textContent = '⋯';
+    moreCard.onclick = () => filterCategory('Recently Played');
+    recentlyPlayedGrid.appendChild(moreCard);
   }
 }
 
-function openFullRecentlyPlayed() {
-  window.location.hash = '#/recently-played';
-  const list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
-  updateRecentlyPlayedUI(list, true);
-  recentBackBtn.style.display = 'inline-block';
-  document.querySelectorAll('.category').forEach(c => {
-    c.style.display = c.getAttribute('data-category') === 'Recently Played' ? 'block' : 'none';
-  });
-}
-
-function backToHome() {
-  window.location.hash = '';
-  recentBackBtn.style.display = 'none';
-  filterCategory('Home');
-}
-
-function prepareGame(folderEncoded, nameEncoded, thumb) {
+// Game functions
+function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
   const folder = decodeURIComponent(folderEncoded);
   const name = decodeURIComponent(nameEncoded);
   currentGameFolder = folder;
@@ -349,13 +445,13 @@ function prepareGame(folderEncoded, nameEncoded, thumb) {
   viewer.style.display = 'flex';
   controls.style.visibility = 'visible';
   gameTitle.textContent = name;
-  startThumb.src = thumb;
+  startThumb.src = thumbSrc;
   startName.textContent = name;
   startOverlay.style.opacity = '1';
   startOverlay.style.pointerEvents = 'auto';
   window.location.hash = '#/game/' + folderEncoded;
   document.getElementById('content').scrollTop = 0;
-  saveRecentlyPlayed({ folder, name, thumb });
+  saveRecentlyPlayed({ folder, name, thumb: thumbSrc });
 }
 
 function startGame() {
@@ -371,6 +467,8 @@ function closeGame() {
   controls.style.visibility = 'hidden';
   gameTitle.textContent = '';
   currentGameFolder = null;
+  startOverlay.style.opacity = '1';
+  startOverlay.style.pointerEvents = 'auto';
   window.location.hash = '';
 }
 
@@ -379,34 +477,62 @@ function toggleFullscreen() {
   else document.exitFullscreen();
 }
 
+// Filter categories
 function filterCategory(cat) {
-  document.querySelectorAll('.category').forEach(c => {
+  const all = document.querySelectorAll('.category');
+  all.forEach(c => {
     const category = c.getAttribute('data-category');
     if (cat === 'Home') {
       c.style.display = (category === 'Home' || category === 'Recently Played') ? 'block' : 'none';
-      recentBackBtn.style.display = 'none';
+      updateRecentlyPlayedUI(JSON.parse(localStorage.getItem('recentlyPlayed') || '[]'), true);
+      document.getElementById('recentBackBtn').style.display = 'none';
+    } else if (cat === 'Recently Played') {
+      c.style.display = 'block';
+      updateRecentlyPlayedUI(JSON.parse(localStorage.getItem('recentlyPlayed') || '[]'), false);
+      document.getElementById('recentBackBtn').style.display = 'inline-block';
     } else {
       c.style.display = category === cat ? 'block' : 'none';
-      recentBackBtn.style.display = cat === 'Recently Played' ? 'inline-block' : 'none';
+      document.getElementById('recentBackBtn').style.display = 'none';
     }
   });
   document.getElementById('content').scrollTop = 0;
 }
 
-function checkHashGame() {
+// Back to home from Recently Played
+function backToHome() {
+  filterCategory('Home');
+}
+
+// Hash routing for direct game or Recently Played
+function handleRouting() {
   const hash = window.location.hash;
   if (hash.startsWith('#/game/')) {
-    const folder = decodeURIComponent(hash.split('#/game/')[1]);
-    const game = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]').find(g => g.folder === folder);
-    if (game && gameExists(folder)) prepareGame(encodeURIComponent(game.folder), encodeURIComponent(game.name), game.thumb);
-  } else if (hash === '#/recently-played') {
-    openFullRecentlyPlayed();
+    const folder = decodeURIComponent(hash.replace('#/game/', ''));
+    const card = [...document.querySelectorAll('.card')]
+      .find(el => el.getAttribute('onclick')?.includes(encodeURIComponent(folder)));
+    if (card) {
+      const name = card.querySelector('div').innerText;
+      const thumb = card.querySelector('img').src;
+      prepareGame(encodeURIComponent(folder), encodeURIComponent(name), thumb);
+    }
+  } else if (hash === '#/recent') {
+    filterCategory('Recently Played');
+  } else {
+    closeGame();
+    filterCategory('Home');
   }
 }
 
 filterCategory('Home');
 loadRecentlyPlayed();
-checkHashGame();
+window.addEventListener('hashchange', handleRouting);
+window.addEventListener('load', handleRouting);
+
+// Prevent arrow keys / space scrolling
+window.addEventListener('keydown', e => {
+  const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
+  if (blocked.includes(e.key)) e.preventDefault();
+});
 </script>
 </body>
 </html>
