@@ -21,7 +21,7 @@ let games = fs.readdirSync(dataDir)
     };
   });
 
-const categories = { "All Games": games };
+const categories = {};
 games.forEach(g => {
   if (!categories[g.category]) categories[g.category] = [];
   categories[g.category].push(g);
@@ -34,7 +34,6 @@ const html = `
 <meta charset="UTF-8">
 <title>Chromebook Unlocked Games</title>
 <link rel="icon" type="image/png" href="assets/logo.png">
-
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705" crossorigin="anonymous"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
@@ -44,7 +43,6 @@ const html = `
   --thumb-height: clamp(100px, 20vh, 160px);
   --sidebar-width: clamp(50px, 6vw, 70px);
 }
-
 * { box-sizing: border-box; }
 html, body {
   margin: 0;
@@ -138,13 +136,11 @@ button {
   transform: scale(1);
   transform-origin: top center;
 }
-
 .viewer::before {
   content: "";
   display: block;
-  padding-top: 56.25%; /* 16:9 */
+  padding-top: 56.25%; /* 16:9 ratio */
 }
-
 .viewer iframe {
   position: absolute;
   top: 0;
@@ -157,7 +153,7 @@ button {
   overflow: hidden;
 }
 
-/* Overlay for Play */
+/* Overlay */
 #startOverlay {
   position: absolute;
   inset: 0;
@@ -229,10 +225,8 @@ button {
   border-radius: 6px;
   background: #330033;
 }
-
-/* Transparent More Card */
 .card.more {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,0.1);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -266,17 +260,13 @@ button {
 
 <!-- Sidebar -->
 <div id="sidebar">
-  <header>
-    <img src="assets/logo.png" alt="Logo">
-  </header>
-<ul id="categoryList">
-  <li onclick="filterCategory('Home')">Home</li>
-  ${Object.keys(categories)
-    .filter(cat => cat !== 'All Games') // exclude "All Games"
-    .map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`).join('')}
-</ul>
-
-
+  <header><img src="assets/logo.png" alt="Logo"></header>
+  <ul id="categoryList">
+    <li onclick="filterCategory('Home')">Home</li>
+    ${Object.keys(categories)
+      .map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`)
+      .join('')}
+  </ul>
 </div>
 
 <!-- Content -->
@@ -287,7 +277,6 @@ button {
     <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
   </div>
 
-  <!-- Viewer -->
   <div class="viewer" id="viewer">
     <div id="startOverlay">
       <img id="startThumb" src="" alt="Game Thumbnail">
@@ -297,33 +286,50 @@ button {
     <iframe id="gameFrame" src=""></iframe>
   </div>
 
-  <!-- Recently Played (empty, JS fills it) -->
+  <!-- Recently Played -->
   <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
-    <h2 onclick="filterCategory('Recently Played')">Recently Played</h2>
+    <h2>Recently Played</h2>
     <div class="grid" id="recentlyPlayedGrid"></div>
   </div>
 
-<div class="category" data-category="Home">
-  <h2>Home</h2>
-  <div class="grid">
-    ${games.map(g => {
-      const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
-      return `
-        <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
-          <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
-          <div>${g.name}</div>
-        </div>
-      `;
-    }).join('')}
+  <!-- Home -->
+  <div class="category" data-category="Home">
+    <h2>Home</h2>
+    <div class="grid">
+      ${games.map(g => {
+        const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
+        return `
+          <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
+            <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
+            <div>${g.name}</div>
+          </div>`;
+      }).join('')}
+    </div>
   </div>
-</div>
 
+  <!-- Other Categories -->
+  ${Object.keys(categories).map(cat => `
+    <div class="category" data-category="${cat}" style="display:none;">
+      <h2>${cat}</h2>
+      <div class="grid">
+        ${categories[cat].map(g => {
+          const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
+          return `
+            <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
+              <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
+              <div>${g.name}</div>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `).join('')}
+</div>
 
 <script>
 const viewer = document.getElementById('viewer');
 const frame = document.getElementById('gameFrame');
-const gameTitle = document.getElementById('gameTitle');
 const controls = document.getElementById('controls');
+const gameTitle = document.getElementById('gameTitle');
 const startOverlay = document.getElementById('startOverlay');
 const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
@@ -332,8 +338,21 @@ let currentGameFolder = null;
 
 const MAX_RECENT = 12;
 
+function gameExists(folder) {
+  const xhr = new XMLHttpRequest();
+  try {
+    xhr.open('HEAD', 'games/' + folder + '/index.html', false);
+    xhr.send();
+    return xhr.status !== 404;
+  } catch {
+    return false;
+  }
+}
+
 function loadRecentlyPlayed() {
-  const list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+  let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+  list = list.filter(g => gameExists(g.folder));
+  localStorage.setItem('recentlyPlayed', JSON.stringify(list));
   updateRecentlyPlayedUI(list);
 }
 
@@ -342,18 +361,15 @@ function saveRecentlyPlayed(game) {
   list = list.filter(g => g.folder !== game.folder);
   list.unshift(game);
   if (list.length > MAX_RECENT) list = list.slice(0, MAX_RECENT);
+  list = list.filter(g => gameExists(g.folder));
   localStorage.setItem('recentlyPlayed', JSON.stringify(list));
   updateRecentlyPlayedUI(list);
 }
 
 function updateRecentlyPlayedUI(list) {
   recentlyPlayedGrid.innerHTML = '';
-  if (list.length === 0) {
-    document.getElementById('recentlyPlayedSection').style.display = 'none';
-    return;
-  }
+  if (!list.length) return document.getElementById('recentlyPlayedSection').style.display = 'none';
   document.getElementById('recentlyPlayedSection').style.display = 'block';
-
   list.forEach(g => {
     const card = document.createElement('div');
     card.className = 'card';
@@ -361,13 +377,6 @@ function updateRecentlyPlayedUI(list) {
     card.innerHTML = \`<img class="thumb" src="\${g.thumb}" alt="\${g.name}"><div>\${g.name}</div>\`;
     recentlyPlayedGrid.appendChild(card);
   });
-
-  // Three dots card
-  const moreCard = document.createElement('div');
-  moreCard.className = 'card more';
-  moreCard.textContent = '⋯';
-  moreCard.onclick = () => filterCategory('Recently Played');
-  recentlyPlayedGrid.appendChild(moreCard);
 }
 
 function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
@@ -383,10 +392,7 @@ function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
   startOverlay.style.opacity = '1';
   startOverlay.style.pointerEvents = 'auto';
   window.location.hash = '#/game/' + folderEncoded;
-  filterCategory('All Games');
   document.getElementById('content').scrollTop = 0;
-
-  // Save to recently played
   saveRecentlyPlayed({ folder, name, thumb: thumbSrc });
 }
 
@@ -406,56 +412,35 @@ function closeGame() {
   startOverlay.style.opacity = '1';
   startOverlay.style.pointerEvents = 'auto';
   window.location.hash = '';
-  history.replaceState({}, '', '/');
 }
 
 function toggleFullscreen() {
-  if (!document.fullscreenElement) frame.requestFullscreen().catch(e=>console.log(e));
+  if (!document.fullscreenElement) frame.requestFullscreen().catch(()=>{});
   else document.exitFullscreen();
 }
 
 function filterCategory(cat) {
-  const allCategories = document.querySelectorAll('.category');
-  allCategories.forEach(c => {
+  const categories = document.querySelectorAll('.category');
+  categories.forEach(c => {
+    const current = c.getAttribute('data-category');
     if (cat === 'Home') {
       c.style.display = 'block';
-      document.getElementById('recentlyPlayedSection').style.display = recentlyPlayedGrid.children.length ? 'block' : 'none';
+      document.getElementById('recentlyPlayedSection').style.display =
+        recentlyPlayedGrid.children.length ? 'block' : 'none';
     } else {
-      c.style.display = (c.getAttribute('data-category') === cat) ? 'block' : 'none';
+      c.style.display = current === cat ? 'block' : 'none';
     }
   });
+  document.getElementById('content').scrollTop = 0;
 }
+
 filterCategory('Home');
 loadRecentlyPlayed();
-
-window.addEventListener('load', handleRouting);
-window.addEventListener('hashchange', handleRouting);
-function handleRouting() {
-  const hash = window.location.hash;
-  if (hash.startsWith('#/game/')) {
-    const folder = decodeURIComponent(hash.replace('#/game/', ''));
-    const card = [...document.querySelectorAll('.card')].find(el => el.getAttribute('onclick')?.includes(encodeURIComponent(folder)));
-    if (card) {
-      const name = card.querySelector('div').innerText;
-      const thumb = card.querySelector('img').src;
-      prepareGame(encodeURIComponent(folder), encodeURIComponent(name), thumb);
-    }
-  } else {
-    closeGame();
-  }
-}
-
-// Prevent arrow keys / space scrolling
-window.addEventListener('keydown', e => {
-  const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
-  if (blocked.includes(e.key)) e.preventDefault();
-});
 </script>
 </body>
 </html>
 `;
 
-// --- Generate sitemap.xml ---
 const sitemapFile = path.join(outputDir, "sitemap.xml");
 const baseURL = "https://chromebookunlocked.github.io";
 const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
@@ -463,7 +448,7 @@ const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
   <url><loc>${baseURL}/</loc></url>
 </urlset>`;
 fs.writeFileSync(sitemapFile, sitemapContent);
-console.log(`✅ Sitemap generated`);
+console.log("✅ Sitemap generated");
 
 fs.writeFileSync(outputFile, html);
-console.log(`✅ Responsive layout + Recently Played category added`);
+console.log("✅ Fixed categories + auto-clean Recently Played + ratio-safe viewer");
