@@ -1,4 +1,4 @@
-// generate.js
+// generate.js (Part 1 of 2)
 const fs = require("fs");
 const path = require("path");
 
@@ -9,6 +9,7 @@ const outputFile = path.join(outputDir, "index.html");
 
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
 
+// Load games
 let games = fs.readdirSync(dataDir)
   .filter(f => f.endsWith(".json"))
   .map(f => {
@@ -28,7 +29,6 @@ games.forEach(g => {
   categories[g.category].push(g);
 });
 
-// Generate HTML
 const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -36,8 +36,6 @@ const html = `
 <meta charset="UTF-8">
 <title>Chromebook Unlocked Games</title>
 <link rel="icon" type="image/png" href="assets/logo.png">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705" crossorigin="anonymous"></script>
-
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
@@ -66,11 +64,11 @@ html, body {
   padding: 1rem 0;
   height: 100vh;
   overflow-y: auto;
-  transition: width 0.3s ease;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
+  transition: width 0.3s ease;
 }
 #sidebar:hover { width: 250px; }
 #sidebar header { display: flex; justify-content: center; margin-bottom: 2rem; }
@@ -82,7 +80,6 @@ html, body {
   border-radius: 4px;
   transition: 0.3s ease;
   white-space: nowrap;
-  font-size: 1em;
   opacity: 0;
   transform: translateY(5px);
 }
@@ -122,14 +119,10 @@ button {
   cursor: pointer;
   font-size: 1em;
 }
-#backBtn, #recentBackBtn { background: #ff99ff; color: black; }
+#backBtn { background: #ff99ff; color: black; }
 #fullscreenBtn { background: #cc66ff; color: black; }
-#recentBackBtn {
-  display: none;
-  margin: 1rem 0;
-}
 
-/* Game Viewer */
+/* Viewer */
 .viewer {
   position: relative;
   display: none;
@@ -156,7 +149,6 @@ button {
   border: none;
   background: transparent;
   object-fit: contain;
-  overflow: hidden;
 }
 
 /* Overlay for Play */
@@ -240,10 +232,6 @@ button {
   color: #ffccff;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: #660099; border-radius: 4px; }
-
 /* DMCA */
 #dmcaLink {
   position: fixed;
@@ -261,7 +249,6 @@ button {
 #dmcaLink:hover { background: #ff99ff; color: black; }
 </style>
 </head>
-
 <body>
 <a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
 
@@ -271,7 +258,7 @@ button {
   <ul id="categoryList">
     <li onclick="filterCategory('Home')">Home</li>
     ${Object.keys(categories)
-      .filter(cat => cat !== "All Games" && cat !== "Recently Played")
+      .filter(cat => cat !== "Recently Played")
       .map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`)
       .join("")}
   </ul>
@@ -283,6 +270,7 @@ button {
     <button id="backBtn" onclick="closeGame()">← Back</button>
     <span id="gameTitle"></span>
     <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    <button id="recentBackBtn" onclick="backToHome()" style="display:none;">← Home</button>
   </div>
 
   <div class="viewer" id="viewer">
@@ -294,55 +282,229 @@ button {
     <iframe id="gameFrame" src=""></iframe>
   </div>
 
-  <button id="recentBackBtn" onclick="backToHome()">← Back to Home</button>
-
   <!-- Recently Played -->
   <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
     <h2>Recently Played</h2>
     <div class="grid" id="recentlyPlayedGrid"></div>
   </div>
 
-  <!-- All Games (Home Grid) -->
+  <!-- All Games (Home) -->
   <div class="category" data-category="Home">
     <h2>All Games</h2>
     <div class="grid">
       ${games.map(g => {
         const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
         return `
-          <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
-            <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
-            <div>${g.name}</div>
-          </div>`;
+        <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}','${encodeURIComponent(g.name)}','games/${g.folder}/${thumb}')">
+          <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
+          <div>${g.name}</div>
+        </div>`;
       }).join("")}
     </div>
   </div>
-
+`;
+// generate.js (Part 2 of 2)
+html += `
   <!-- Other Categories -->
   ${Object.keys(categories)
     .map(cat => `
-    <div class="category" data-category="${cat}" style="display:none;">
-      <h2>${cat}</h2>
-      <div class="grid">
-        ${categories[cat].map(g => {
-          const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
-          return `
-            <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}', '${encodeURIComponent(g.name)}', 'games/${g.folder}/${thumb}')">
-              <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
-              <div>${g.name}</div>
-            </div>`;
-        }).join("")}
-      </div>
-    </div>`).join("")}
+      <div class="category" data-category="${cat}" style="display:none;">
+        <h2>${cat}</h2>
+        <div class="grid">
+          ${categories[cat].map(g => {
+            const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
+            return \`
+            <div class="card" onclick="prepareGame('\${encodeURIComponent(g.folder)}','\${encodeURIComponent(g.name)}','games/\${g.folder}/\${thumb}')">
+              <img class="thumb" src="games/\${g.folder}/\${thumb}" alt="\${g.name}">
+              <div>\${g.name}</div>
+            </div>\`;
+          }).join('')}
+        </div>
+      </div>`).join('')}
 </div>
 
 <script>
-${fs.readFileSync(path.join(__dirname, "script_core.js"), "utf8")}
-</script>
+const viewer = document.getElementById('viewer');
+const frame = document.getElementById('gameFrame');
+const controls = document.getElementById('controls');
+const gameTitle = document.getElementById('gameTitle');
+const startOverlay = document.getElementById('startOverlay');
+const startThumb = document.getElementById('startThumb');
+const startName = document.getElementById('startName');
+const recentlyPlayedGrid = document.getElementById('recentlyPlayedGrid');
+const recentBackBtn = document.getElementById('recentBackBtn');
+let currentGameFolder = null;
+const MAX_RECENT = 25; // save last 25 games
 
+// Utility to check if game exists
+function gameExists(folder) {
+  try {
+    const xhr = new XMLHttpRequest();
+    xhr.open('HEAD', 'games/' + folder + '/index.html', false);
+    xhr.send();
+    return xhr.status !== 404;
+  } catch { return false; }
+}
+
+// Load Recently Played, remove missing games
+function loadRecentlyPlayed() {
+  let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+  list = list.filter(g => gameExists(g.folder));
+  localStorage.setItem('recentlyPlayed', JSON.stringify(list));
+  updateRecentlyPlayedUI(list, true);
+}
+
+// Save game to Recently Played
+function saveRecentlyPlayed(game) {
+  let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+  list = list.filter(g => g.folder !== game.folder);
+  list.unshift(game);
+  if (list.length > MAX_RECENT) list = list.slice(0, MAX_RECENT);
+  list = list.filter(g => gameExists(g.folder));
+  localStorage.setItem('recentlyPlayed', JSON.stringify(list));
+  updateRecentlyPlayedUI(list, true);
+}
+
+// Update Recently Played UI
+function updateRecentlyPlayedUI(list, homeView = false) {
+  recentlyPlayedGrid.innerHTML = '';
+  if (!list.length) {
+    document.getElementById('recentlyPlayedSection').style.display = 'none';
+    return;
+  }
+  document.getElementById('recentlyPlayedSection').style.display = 'block';
+
+  let displayList = homeView ? list.slice(0,7) : list;
+  displayList.forEach(g => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.onclick = () => prepareGame(encodeURIComponent(g.folder), encodeURIComponent(g.name), g.thumb);
+    card.innerHTML = \`<img class="thumb" src="\${g.thumb}" alt="\${g.name}"><div>\${g.name}</div>\`;
+    recentlyPlayedGrid.appendChild(card);
+  });
+
+  // Transparent ⋯ box only in home view
+  if (homeView && list.length > 7) {
+    const moreCard = document.createElement('div');
+    moreCard.className = 'card more';
+    moreCard.textContent = '⋯';
+    moreCard.onclick = () => filterCategory('Recently Played');
+    recentlyPlayedGrid.appendChild(moreCard);
+  }
+}
+
+// Game functions
+function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
+  const folder = decodeURIComponent(folderEncoded);
+  const name = decodeURIComponent(nameEncoded);
+  currentGameFolder = folder;
+  frame.src = '';
+  viewer.style.display = 'flex';
+  controls.style.visibility = 'visible';
+  gameTitle.textContent = name;
+  startThumb.src = thumbSrc;
+  startName.textContent = name;
+  startOverlay.style.opacity = '1';
+  startOverlay.style.pointerEvents = 'auto';
+  window.location.hash = '#/game/' + folderEncoded;
+  document.getElementById('content').scrollTop = 0;
+  saveRecentlyPlayed({ folder, name, thumb: thumbSrc });
+}
+
+function startGame() {
+  if (!currentGameFolder) return;
+  frame.src = 'games/' + currentGameFolder + '/index.html';
+  startOverlay.style.opacity = '0';
+  startOverlay.style.pointerEvents = 'none';
+}
+
+function closeGame() {
+  frame.src = '';
+  viewer.style.display = 'none';
+  controls.style.visibility = 'hidden';
+  gameTitle.textContent = '';
+  currentGameFolder = null;
+  startOverlay.style.opacity = '1';
+  startOverlay.style.pointerEvents = 'auto';
+  window.location.hash = '';
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) frame.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+}
+
+// Filter categories
+function filterCategory(cat) {
+  const all = document.querySelectorAll('.category');
+  all.forEach(c => {
+    const category = c.getAttribute('data-category');
+    if (cat === 'Home') {
+      c.style.display = (category === 'Home' || category === 'Recently Played') ? 'block' : 'none';
+      updateRecentlyPlayedUI(JSON.parse(localStorage.getItem('recentlyPlayed') || '[]'), true);
+      recentBackBtn.style.display = 'none';
+    } else if (cat === 'Recently Played') {
+      c.style.display = 'block';
+      updateRecentlyPlayedUI(JSON.parse(localStorage.getItem('recentlyPlayed') || '[]'), false);
+      recentBackBtn.style.display = 'inline-block';
+    } else {
+      c.style.display = category === cat ? 'block' : 'none';
+      recentBackBtn.style.display = 'none';
+    }
+  });
+  document.getElementById('content').scrollTop = 0;
+}
+
+// Back to home from Recently Played
+function backToHome() {
+  filterCategory('Home');
+}
+
+// Hash routing for direct game or Recently Played
+function handleRouting() {
+  const hash = window.location.hash;
+  if (hash.startsWith('#/game/')) {
+    const folder = decodeURIComponent(hash.replace('#/game/', ''));
+    const card = [...document.querySelectorAll('.card')]
+      .find(el => el.getAttribute('onclick')?.includes(encodeURIComponent(folder)));
+    if (card) {
+      const name = card.querySelector('div').innerText;
+      const thumb = card.querySelector('img').src;
+      prepareGame(encodeURIComponent(folder), encodeURIComponent(name), thumb);
+    }
+  } else if (hash === '#/recent') {
+    filterCategory('Recently Played');
+  } else {
+    closeGame();
+    filterCategory('Home');
+  }
+}
+
+filterCategory('Home');
+loadRecentlyPlayed();
+window.addEventListener('hashchange', handleRouting);
+window.addEventListener('load', handleRouting);
+
+// Prevent arrow keys / space scrolling
+window.addEventListener('keydown', e => {
+  const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
+  if (blocked.includes(e.key)) e.preventDefault();
+});
+</script>
 </body>
 </html>
 `;
 
-// Write output
 fs.writeFileSync(outputFile, html);
-console.log("✅ Full site generated with functional Recently Played (Home row + full view).");
+console.log("✅ Build complete: index.html generated with Home, All Games, Recently Played and categories.");
+
+// --- Sitemap ---
+const sitemapFile = path.join(outputDir, "sitemap.xml");
+const baseURL = "https://chromebookunlocked.github.io";
+const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>${baseURL}/</loc></url>
+  <url><loc>${baseURL}/#/recent</loc></url>
+</urlset>`;
+fs.writeFileSync(sitemapFile, sitemapContent);
+console.log("✅ Sitemap generated");
