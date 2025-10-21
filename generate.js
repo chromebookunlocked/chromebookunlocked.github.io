@@ -304,7 +304,6 @@ button {
   </div>
 `;
 // generate.js (Part 2 of 2)
-
 html += `
   <!-- Other Categories -->
   ${Object.keys(categories)
@@ -314,9 +313,12 @@ html += `
         <div class="grid">
           ${categories[cat].map(g => {
             const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
-            return '<div class="card" onclick="prepareGame(\\'' + encodeURIComponent(g.folder) + '\\',\\'' + encodeURIComponent(g.name) + '\\',\\'games/' + g.folder + '/' + thumb + '\\')">' +
-                   '<img class="thumb" src="games/' + g.folder + '/' + thumb + '" alt="' + g.name + '">' +
-                   '<div>' + g.name + '</div></div>';
+            return `
+            <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}','${encodeURIComponent(g.name)}','games/${g.folder}/${thumb}')">
+              <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
+              <div>${g.name}</div>
+            </div>
+            `;
           }).join('')}
         </div>
       </div>
@@ -500,7 +502,7 @@ window.addEventListener('keydown', e => {
 fs.writeFileSync(outputFile, html);
 console.log("✅ Build complete: index.html generated with Home, All Games, Recently Played and categories.");
 
-// --- Sitemap ---
+// Sitemap
 const sitemapFile = path.join(outputDir, "sitemap.xml");
 const baseURL = "https://chromebookunlocked.github.io";
 const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
