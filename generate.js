@@ -303,7 +303,7 @@ button {
     </div>
   </div>
 `;
-// generate.js (Part 2 of 2)
+// --- Part 2 of generate.js ---
 html += `
   <!-- Other Categories -->
   ${Object.keys(categories)
@@ -313,20 +313,14 @@ html += `
         <div class="grid">
           ${categories[cat].map(g => {
             const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
-            return `
-            <div class="card" onclick="prepareGame('${encodeURIComponent(g.folder)}','${encodeURIComponent(g.name)}','games/${g.folder}/${thumb}')">
-              <img class="thumb" src="games/${g.folder}/${thumb}" alt="${g.name}">
-              <div>${g.name}</div>
-            </div>
-            `;
+            return \`<div class="card" onclick="prepareGame('\${encodeURIComponent(g.folder)}','\${encodeURIComponent(g.name)}','games/\${g.folder}/\${thumb}')">
+                      <img class="thumb" src="games/\${g.folder}/\${thumb}" alt="\${g.name}">
+                      <div>\${g.name}</div>
+                    </div>\`;
           }).join('')}
         </div>
-      </div>
-    `).join('')}
+      </div>`).join('')}
 </div>
-
-<!-- Back button for Recently Played -->
-<button id="recentBackBtn" onclick="backToHome()" style="display:none; position:fixed; top:10px; left:270px; z-index:1000; padding:0.5rem 1rem; background:#ff99ff; color:black; border:none; border-radius:5px; cursor:pointer;">← Back</button>
 
 <script>
 const viewer = document.getElementById('viewer');
@@ -337,11 +331,10 @@ const startOverlay = document.getElementById('startOverlay');
 const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
 const recentlyPlayedGrid = document.getElementById('recentlyPlayedGrid');
-const recentBackBtn = document.getElementById('recentBackBtn');
 let currentGameFolder = null;
 const MAX_RECENT = 25;
 
-// Check if game exists
+// Utility to check if game exists
 function gameExists(folder) {
   try {
     const xhr = new XMLHttpRequest();
@@ -351,7 +344,7 @@ function gameExists(folder) {
   } catch { return false; }
 }
 
-// Load recently played and filter missing games
+// Load Recently Played, removing missing games
 function loadRecentlyPlayed() {
   let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
   list = list.filter(g => gameExists(g.folder));
@@ -359,7 +352,7 @@ function loadRecentlyPlayed() {
   updateRecentlyPlayedUI(list, true);
 }
 
-// Save game to recently played
+// Save game to Recently Played
 function saveRecentlyPlayed(game) {
   let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
   list = list.filter(g => g.folder !== game.folder);
@@ -379,7 +372,7 @@ function updateRecentlyPlayedUI(list, homeView = false) {
   }
   document.getElementById('recentlyPlayedSection').style.display = 'block';
 
-  const displayList = homeView ? list.slice(0,7) : list;
+  let displayList = homeView ? list.slice(0,7) : list;
   displayList.forEach(g => {
     const card = document.createElement('div');
     card.className = 'card';
@@ -388,7 +381,7 @@ function updateRecentlyPlayedUI(list, homeView = false) {
     recentlyPlayedGrid.appendChild(card);
   });
 
-  // Transparent ⋯ box only on home
+  // Transparent ⋯ box only in home view and only as last item
   if (homeView && list.length > 7) {
     const moreCard = document.createElement('div');
     moreCard.className = 'card more';
@@ -447,24 +440,25 @@ function filterCategory(cat) {
     if (cat === 'Home') {
       c.style.display = (category === 'Home' || category === 'Recently Played') ? 'block' : 'none';
       updateRecentlyPlayedUI(JSON.parse(localStorage.getItem('recentlyPlayed') || '[]'), true);
-      recentBackBtn.style.display = 'none';
+      document.getElementById('recentBackBtn')?.style.display = 'none';
     } else if (cat === 'Recently Played') {
       c.style.display = 'block';
       updateRecentlyPlayedUI(JSON.parse(localStorage.getItem('recentlyPlayed') || '[]'), false);
-      recentBackBtn.style.display = 'inline-block';
+      document.getElementById('recentBackBtn')?.style.display = 'inline-block';
     } else {
       c.style.display = category === cat ? 'block' : 'none';
-      recentBackBtn.style.display = 'none';
+      document.getElementById('recentBackBtn')?.style.display = 'none';
     }
   });
   document.getElementById('content').scrollTop = 0;
 }
 
+// Back to home from Recently Played
 function backToHome() {
   filterCategory('Home');
 }
 
-// Handle direct URL hash
+// Hash routing for direct game or Recently Played
 function handleRouting() {
   const hash = window.location.hash;
   if (hash.startsWith('#/game/')) {
@@ -502,7 +496,7 @@ window.addEventListener('keydown', e => {
 fs.writeFileSync(outputFile, html);
 console.log("✅ Build complete: index.html generated with Home, All Games, Recently Played and categories.");
 
-// Sitemap
+// --- Sitemap ---
 const sitemapFile = path.join(outputDir, "sitemap.xml");
 const baseURL = "https://chromebookunlocked.github.io";
 const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
