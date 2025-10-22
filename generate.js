@@ -38,9 +38,8 @@ const generateGameCard = (game) => {
     </div>`;
 };
 
-// Generate individual category sections (for sidebar navigation)
+// Generate category sections
 const categorySections = Object.keys(categories)
-  .filter(cat => cat !== "Recently Played")
   .map(cat => `
     <div class="category" data-category="${cat}" style="display:none;">
       <h2>${cat}</h2>
@@ -55,7 +54,7 @@ const sidebarCategories = Object.keys(categories)
   .map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`)
   .join("");
 
-// Build complete HTML
+// Build complete HTML (using let instead of const)
 const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -284,7 +283,6 @@ button {
   <header><img src="assets/logo.png" alt="Logo"></header>
   <ul id="categoryList">
     <li onclick="filterCategory('Home')">Home</li>
-    <li onclick="filterCategory('All Games')">All Games</li>
     ${sidebarCategories}
   </ul>
 </div>
@@ -295,6 +293,7 @@ button {
     <button id="backBtn" onclick="closeGame()">← Back</button>
     <span id="gameTitle"></span>
     <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    <button id="recentBackBtn" onclick="backToHome()" style="display:none;">← Home</button>
   </div>
 
   <div class="viewer" id="viewer">
@@ -312,20 +311,15 @@ button {
     <div class="grid" id="recentlyPlayedGrid"></div>
   </div>
 
-  <!-- Home Page with Category Rows -->
-  <div id="homeContainer" data-category="Home">
-    <!-- Categories will be dynamically inserted here -->
-  </div>
-
-  <!-- All Games (Full Grid) -->
-  <div class="category" data-category="All Games" style="display:none;">
+  <!-- All Games (Home) -->
+  <div class="category" data-category="Home">
     <h2>All Games</h2>
     <div class="grid">
       ${games.map(generateGameCard).join('')}
     </div>
   </div>
 
-  <!-- Other Categories (Full Grids) -->
+  <!-- Other Categories -->
   ${categorySections}
 
 </div>
@@ -339,30 +333,8 @@ const startOverlay = document.getElementById('startOverlay');
 const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
 const recentlyPlayedGrid = document.getElementById('recentlyPlayedGrid');
-const homeContainer = document.getElementById('homeContainer');
 let currentGameFolder = null;
 const MAX_RECENT = 25;
-
-// Store all games data for dynamic rendering
-const allGames = ${JSON.stringify(games.map(g => {
-  const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
-  return {
-    folder: g.folder,
-    name: g.name,
-    category: g.category,
-    thumb: `games/${g.folder}/${thumb}`
-  };
-}))};
-
-const categoriesData = ${JSON.stringify(categories)};
-
-// Calculate how many cards fit in one row
-function getCardsPerRow() {
-  const contentWidth = document.getElementById('content').offsetWidth;
-  const cardMinWidth = 140;
-  const gap = 16;
-  return Math.floor((contentWidth - gap) / (cardMinWidth + gap));
-}
 
 // Utility to check if game exists
 function gameExists(folder) {
@@ -374,12 +346,12 @@ function gameExists(folder) {
   } catch { return false; }
 }
 
-// Load Recently Played
+// Load Recently Played, removing missing games
 function loadRecentlyPlayed() {
   let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
   list = list.filter(g => gameExists(g.folder));
   localStorage.setItem('recentlyPlayed', JSON.stringify(list));
-  return list;
+  updateRecentlyPlayedUI(list, true);
 }
 
 // Save game to Recently Played
@@ -390,114 +362,35 @@ function saveRecentlyPlayed(game) {
   if (list.length > MAX_RECENT) list = list.slice(0, MAX_RECENT);
   list = list.filter(g => gameExists(g.folder));
   localStorage.setItem('recentlyPlayed', JSON.stringify(list));
+  updateRecentlyPlayedUI(list, true);
 }
 
-// Create a game card element
-function createCard(game) {
-  const card = document.createElement('div');
-  card.className = 'card';
-  card.onclick = () => prepareGame(encodeURIComponent(game.folder), encodeURIComponent(game.name), game.thumb);
-  card.innerHTML = \`<img class="thumb" src="\${game.thumb}" alt="\${game.name}"><div>\${game.name}</div>\`;
-  return card;
-}
+// Update Recently Played UI
+function updateRecentlyPlayedUI(list, homeView = false) {
+  recentlyPlayedGrid.innerHTML = '';
+  if (!list.length) {
+    document.getElementById('recentlyPlayedSection').style.display = 'none';
+    return;
+  }
+  document.getElementById('recentlyPlayedSection').style.display = 'block';
 
-// Create a "more" card
-function createMoreCard(categoryName, currentRow) {
-  const moreCard = document.createElement('div');
-  moreCard.className = 'card more';
-  moreCard.textContent = '⋯';
-  moreCard.onclick = () => expandCategory(categoryName, currentRow);
-  return moreCard;
-}
-
-// Expand a category to show next row
-function expandCategory(categoryName, currentRow) {
-  const categorySection = document.querySelector(\`[data-home-category="\${categoryName}"]\`);
-  if (!categorySection) return;
-  
-  const grid = categorySection.querySelector('.grid');
-  const cardsPerRow = getCardsPerRow();
-  
-  let games;
-  if (categoryName === 'Recently Played') {
-    games = loadRecentlyPlayed();
-  } else {
-    games = allGames.filter(g => g.category === categoryName);
-  }
-  
-  const startIdx = (currentRow + 1) * cardsPerRow;
-  const endIdx = Math.min(startIdx + cardsPerRow, games.length);
-  const hasMore = endIdx < games.length;
-  
-  // Remove the old "more" card
-  const oldMoreCard = grid.querySelector('.card.more');
-  if (oldMoreCard) oldMoreCard.remove();
-  
-  // Add new cards
-  for (let i = startIdx; i < endIdx; i++) {
-    grid.appendChild(createCard(games[i]));
-  }
-  
-  // Add new "more" card if needed
-  if (hasMore) {
-    grid.appendChild(createMoreCard(categoryName, currentRow + 1));
-  }
-}
-
-// Render home page with category rows
-function renderHomePage() {
-  homeContainer.innerHTML = '';
-  const cardsPerRow = getCardsPerRow();
-  
-  // Recently Played section
-  const recentGames = loadRecentlyPlayed();
-  if (recentGames.length > 0) {
-    const recentSection = document.createElement('div');
-    recentSection.className = 'category';
-    recentSection.setAttribute('data-home-category', 'Recently Played');
-    recentSection.innerHTML = '<h2>Recently Played</h2><div class="grid"></div>';
-    const grid = recentSection.querySelector('.grid');
-    
-    const displayCount = Math.min(cardsPerRow - 1, recentGames.length);
-    const hasMore = recentGames.length > displayCount;
-    
-    for (let i = 0; i < displayCount; i++) {
-      grid.appendChild(createCard(recentGames[i]));
-    }
-    
-    if (hasMore) {
-      grid.appendChild(createMoreCard('Recently Played', 0));
-    }
-    
-    homeContainer.appendChild(recentSection);
-  }
-  
-  // Category sections (excluding "Recently Played")
-  Object.keys(categoriesData).forEach(catName => {
-    if (catName === 'Recently Played') return;
-    
-    const catGames = allGames.filter(g => g.category === catName);
-    if (catGames.length === 0) return;
-    
-    const catSection = document.createElement('div');
-    catSection.className = 'category';
-    catSection.setAttribute('data-home-category', catName);
-    catSection.innerHTML = \`<h2>\${catName}</h2><div class="grid"></div>\`;
-    const grid = catSection.querySelector('.grid');
-    
-    const displayCount = Math.min(cardsPerRow - 1, catGames.length);
-    const hasMore = catGames.length > displayCount;
-    
-    for (let i = 0; i < displayCount; i++) {
-      grid.appendChild(createCard(catGames[i]));
-    }
-    
-    if (hasMore) {
-      grid.appendChild(createMoreCard(catName, 0));
-    }
-    
-    homeContainer.appendChild(catSection);
+  const displayList = homeView ? list.slice(0,7) : list;
+  displayList.forEach(g => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.onclick = () => prepareGame(encodeURIComponent(g.folder), encodeURIComponent(g.name), g.thumb);
+    card.innerHTML = \`<img class="thumb" src="\${g.thumb}" alt="\${g.name}"><div>\${g.name}</div>\`;
+    recentlyPlayedGrid.appendChild(card);
   });
+
+  // Transparent ⋯ box only in home view and only as last item
+  if (homeView && list.length > 7) {
+    const moreCard = document.createElement('div');
+    moreCard.className = 'card more';
+    moreCard.textContent = '⋯';
+    moreCard.onclick = () => filterCategory('Recently Played');
+    recentlyPlayedGrid.appendChild(moreCard);
+  }
 }
 
 // Game functions
@@ -516,9 +409,6 @@ function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
   window.location.hash = '#/game/' + folderEncoded;
   document.getElementById('content').scrollTop = 0;
   saveRecentlyPlayed({ folder, name, thumb: thumbSrc });
-  
-  // Show only All Games grid when game is open
-  filterCategory('All Games', true);
 }
 
 function startGame() {
@@ -537,7 +427,6 @@ function closeGame() {
   startOverlay.style.opacity = '1';
   startOverlay.style.pointerEvents = 'auto';
   window.location.hash = '';
-  filterCategory('Home');
 }
 
 function toggleFullscreen() {
@@ -546,61 +435,55 @@ function toggleFullscreen() {
 }
 
 // Filter categories
-function filterCategory(cat, fromGameOpen = false) {
-  const all = document.querySelectorAll('.category, #homeContainer');
-  
+function filterCategory(cat) {
+  const all = document.querySelectorAll('.category');
   all.forEach(c => {
-    const category = c.getAttribute('data-category') || c.getAttribute('data-home-category');
-    
+    const category = c.getAttribute('data-category');
     if (cat === 'Home') {
-      if (c.id === 'homeContainer') {
-        c.style.display = 'block';
-        if (!fromGameOpen) renderHomePage();
-      } else {
-        c.style.display = 'none';
-      }
-    } else if (cat === 'All Games') {
-      if (category === 'All Games') {
-        c.style.display = 'block';
-      } else {
-        c.style.display = 'none';
-      }
+      c.style.display = (category === 'Home' || category === 'Recently Played') ? 'block' : 'none';
+      updateRecentlyPlayedUI(JSON.parse(localStorage.getItem('recentlyPlayed') || '[]'), true);
+      document.getElementById('recentBackBtn').style.display = 'none';
+    } else if (cat === 'Recently Played') {
+      c.style.display = 'block';
+      updateRecentlyPlayedUI(JSON.parse(localStorage.getItem('recentlyPlayed') || '[]'), false);
+      document.getElementById('recentBackBtn').style.display = 'inline-block';
     } else {
-      if (category === cat) {
-        c.style.display = 'block';
-      } else {
-        c.style.display = 'none';
-      }
+      c.style.display = category === cat ? 'block' : 'none';
+      document.getElementById('recentBackBtn').style.display = 'none';
     }
   });
-  
   document.getElementById('content').scrollTop = 0;
 }
 
-// Hash routing
+// Back to home from Recently Played
+function backToHome() {
+  filterCategory('Home');
+}
+
+// Hash routing for direct game or Recently Played
 function handleRouting() {
   const hash = window.location.hash;
   if (hash.startsWith('#/game/')) {
     const folder = decodeURIComponent(hash.replace('#/game/', ''));
-    const game = allGames.find(g => g.folder === folder);
-    if (game) {
-      prepareGame(encodeURIComponent(game.folder), encodeURIComponent(game.name), game.thumb);
+    const card = [...document.querySelectorAll('.card')]
+      .find(el => el.getAttribute('onclick')?.includes(encodeURIComponent(folder)));
+    if (card) {
+      const name = card.querySelector('div').innerText;
+      const thumb = card.querySelector('img').src;
+      prepareGame(encodeURIComponent(folder), encodeURIComponent(name), thumb);
     }
+  } else if (hash === '#/recent') {
+    filterCategory('Recently Played');
   } else {
     closeGame();
     filterCategory('Home');
   }
 }
 
-// Initialize
 filterCategory('Home');
+loadRecentlyPlayed();
 window.addEventListener('hashchange', handleRouting);
 window.addEventListener('load', handleRouting);
-window.addEventListener('resize', () => {
-  if (homeContainer.style.display !== 'none') {
-    renderHomePage();
-  }
-});
 
 // Prevent arrow keys / space scrolling
 window.addEventListener('keydown', e => {
