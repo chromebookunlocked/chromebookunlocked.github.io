@@ -38,27 +38,19 @@ const generateGameCard = (game) => {
     </div>`;
 };
 
-// Generate category sections for individual category view
+// Generate individual category sections (for sidebar navigation)
 const categorySections = Object.keys(categories)
+  .filter(cat => cat !== "Recently Played")
   .map(cat => `
     <div class="category" data-category="${cat}" style="display:none;">
       <h2>${cat}</h2>
-      <div class="grid full-grid">
+      <div class="grid">
         ${categories[cat].map(generateGameCard).join('')}
       </div>
     </div>`).join('');
 
-// Generate home page category rows (expandable)
-const homeCategorySections = Object.keys(categories)
-  .map(cat => `
-    <div class="category home-category" data-category="${cat}" data-home-cat="${cat}">
-      <h2 onclick="filterCategory('${cat}')" style="cursor:pointer;">${cat}</h2>
-      <div class="grid row-grid" id="homeGrid-${cat}"></div>
-    </div>`).join('');
-
-// Generate sidebar categories (including All Games)
-const sidebarCategories = `<li onclick="filterCategory('All Games')">All Games</li>` + 
-  Object.keys(categories)
+// Generate sidebar categories
+const sidebarCategories = Object.keys(categories)
   .filter(cat => cat !== "Recently Played")
   .map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`)
   .join("");
@@ -230,30 +222,14 @@ button {
 .category h2 {
   color: #ffccff;
   margin-bottom: 0.5rem;
+  cursor: pointer;
 }
 .grid {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr));
   gap: 1rem;
   justify-content: center;
 }
-
-/* Full grid for category/all games pages */
-.full-grid {
-  grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr));
-}
-
-/* Row grid for home page - single row with expand button */
-.row-grid {
-  grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr));
-  grid-auto-rows: minmax(var(--thumb-height), auto);
-  max-height: calc(var(--thumb-height) + 3rem);
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-.row-grid.expanded {
-  max-height: none;
-}
-
 .card {
   background: #4d0066;
   border-radius: 8px;
@@ -281,7 +257,6 @@ button {
   align-items: center;
   font-size: 2rem;
   color: #ffccff;
-  min-height: var(--thumb-height);
 }
 
 /* DMCA */
@@ -309,6 +284,7 @@ button {
   <header><img src="assets/logo.png" alt="Logo"></header>
   <ul id="categoryList">
     <li onclick="filterCategory('Home')">Home</li>
+    <li onclick="filterCategory('All Games')">All Games</li>
     ${sidebarCategories}
   </ul>
 </div>
@@ -330,26 +306,26 @@ button {
     <iframe id="gameFrame" src=""></iframe>
   </div>
 
-  <!-- Recently Played (Home View) -->
-  <div class="category home-category" data-category="Recently Played" data-home-cat="Recently Played" id="recentlyPlayedSection" style="display:none;">
+  <!-- Recently Played -->
+  <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
     <h2>Recently Played</h2>
-    <div class="grid row-grid" id="recentlyPlayedGrid"></div>
+    <div class="grid" id="recentlyPlayedGrid"></div>
   </div>
 
-  <!-- Home Page Categories (Expandable Rows) -->
-  <div id="homeCategories">
-    ${homeCategorySections}
+  <!-- Home Page with Category Rows -->
+  <div id="homeContainer" data-category="Home">
+    <!-- Categories will be dynamically inserted here -->
   </div>
 
-  <!-- All Games (Full View) -->
+  <!-- All Games (Full Grid) -->
   <div class="category" data-category="All Games" style="display:none;">
     <h2>All Games</h2>
-    <div class="grid full-grid">
+    <div class="grid">
       ${games.map(generateGameCard).join('')}
     </div>
   </div>
 
-  <!-- Individual Category Pages (Full View) -->
+  <!-- Other Categories (Full Grids) -->
   ${categorySections}
 
 </div>
@@ -363,27 +339,29 @@ const startOverlay = document.getElementById('startOverlay');
 const startThumb = document.getElementById('startThumb');
 const startName = document.getElementById('startName');
 const recentlyPlayedGrid = document.getElementById('recentlyPlayedGrid');
-const homeCategories = document.getElementById('homeCategories');
+const homeContainer = document.getElementById('homeContainer');
 let currentGameFolder = null;
 const MAX_RECENT = 25;
 
-// All games data
-const allGames = ${JSON.stringify(games.map(g => ({
-  folder: g.folder,
-  name: g.name,
-  category: g.category,
-  thumb: g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0]
-})))};
+// Store all games data for dynamic rendering
+const allGames = ${JSON.stringify(games.map(g => {
+  const thumb = g.thumbs.find(t => fs.existsSync(path.join(gamesDir, g.folder, t))) || g.thumbs[0];
+  return {
+    folder: g.folder,
+    name: g.name,
+    category: g.category,
+    thumb: `games/${g.folder}/${thumb}`
+  };
+}))};
 
-const gamesByCategory = ${JSON.stringify(categories)};
+const categoriesData = ${JSON.stringify(categories)};
 
-// Calculate items per row based on grid
-function getItemsPerRow() {
-  const container = document.querySelector('.grid');
-  if (!container) return 7;
-  const containerWidth = container.offsetWidth;
-  const minWidth = 140;
-  return Math.floor(containerWidth / (minWidth + 16)) || 7;
+// Calculate how many cards fit in one row
+function getCardsPerRow() {
+  const contentWidth = document.getElementById('content').offsetWidth;
+  const cardMinWidth = 140;
+  const gap = 16;
+  return Math.floor((contentWidth - gap) / (cardMinWidth + gap));
 }
 
 // Utility to check if game exists
@@ -396,62 +374,12 @@ function gameExists(folder) {
   } catch { return false; }
 }
 
-// Create game card element
-function createGameCard(game) {
-  const card = document.createElement('div');
-  card.className = 'card';
-  card.onclick = () => prepareGame(encodeURIComponent(game.folder), encodeURIComponent(game.name), 'games/' + game.folder + '/' + game.thumb);
-  card.innerHTML = \`<img class="thumb" src="games/\${game.folder}/\${game.thumb}" alt="\${game.name}"><div>\${game.name}</div>\`;
-  return card;
-}
-
-// Create expand/collapse button
-function createMoreCard(categoryName, gridElement) {
-  const moreCard = document.createElement('div');
-  moreCard.className = 'card more';
-  moreCard.textContent = '⋯';
-  moreCard.onclick = () => {
-    if (gridElement.classList.contains('expanded')) {
-      gridElement.classList.remove('expanded');
-      moreCard.textContent = '⋯';
-    } else {
-      gridElement.classList.add('expanded');
-      moreCard.textContent = '−';
-    }
-  };
-  return moreCard;
-}
-
-// Populate home category row
-function populateHomeCategory(categoryName, games, gridElement) {
-  gridElement.innerHTML = '';
-  if (!games || games.length === 0) return;
-  
-  const itemsPerRow = getItemsPerRow();
-  const displayGames = games.slice(0, itemsPerRow - 1);
-  
-  displayGames.forEach(game => {
-    gridElement.appendChild(createGameCard(game));
-  });
-  
-  if (games.length > itemsPerRow - 1) {
-    gridElement.appendChild(createMoreCard(categoryName, gridElement));
-  }
-  
-  // Add remaining games (hidden initially)
-  if (games.length > itemsPerRow - 1) {
-    games.slice(itemsPerRow - 1).forEach(game => {
-      gridElement.appendChild(createGameCard(game));
-    });
-  }
-}
-
-// Load Recently Played, removing missing games
+// Load Recently Played
 function loadRecentlyPlayed() {
   let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
   list = list.filter(g => gameExists(g.folder));
   localStorage.setItem('recentlyPlayed', JSON.stringify(list));
-  updateRecentlyPlayedUI(list);
+  return list;
 }
 
 // Save game to Recently Played
@@ -462,28 +390,113 @@ function saveRecentlyPlayed(game) {
   if (list.length > MAX_RECENT) list = list.slice(0, MAX_RECENT);
   list = list.filter(g => gameExists(g.folder));
   localStorage.setItem('recentlyPlayed', JSON.stringify(list));
-  updateRecentlyPlayedUI(list);
 }
 
-// Update Recently Played UI
-function updateRecentlyPlayedUI(list) {
-  const section = document.getElementById('recentlyPlayedSection');
-  if (!list || list.length === 0) {
-    section.style.display = 'none';
-    return;
+// Create a game card element
+function createCard(game) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.onclick = () => prepareGame(encodeURIComponent(game.folder), encodeURIComponent(game.name), game.thumb);
+  card.innerHTML = \`<img class="thumb" src="\${game.thumb}" alt="\${game.name}"><div>\${game.name}</div>\`;
+  return card;
+}
+
+// Create a "more" card
+function createMoreCard(categoryName, currentRow) {
+  const moreCard = document.createElement('div');
+  moreCard.className = 'card more';
+  moreCard.textContent = '⋯';
+  moreCard.onclick = () => expandCategory(categoryName, currentRow);
+  return moreCard;
+}
+
+// Expand a category to show next row
+function expandCategory(categoryName, currentRow) {
+  const categorySection = document.querySelector(\`[data-home-category="\${categoryName}"]\`);
+  if (!categorySection) return;
+  
+  const grid = categorySection.querySelector('.grid');
+  const cardsPerRow = getCardsPerRow();
+  
+  let games;
+  if (categoryName === 'Recently Played') {
+    games = loadRecentlyPlayed();
+  } else {
+    games = allGames.filter(g => g.category === categoryName);
   }
-  section.style.display = 'block';
-  populateHomeCategory('Recently Played', list, recentlyPlayedGrid);
+  
+  const startIdx = (currentRow + 1) * cardsPerRow;
+  const endIdx = Math.min(startIdx + cardsPerRow, games.length);
+  const hasMore = endIdx < games.length;
+  
+  // Remove the old "more" card
+  const oldMoreCard = grid.querySelector('.card.more');
+  if (oldMoreCard) oldMoreCard.remove();
+  
+  // Add new cards
+  for (let i = startIdx; i < endIdx; i++) {
+    grid.appendChild(createCard(games[i]));
+  }
+  
+  // Add new "more" card if needed
+  if (hasMore) {
+    grid.appendChild(createMoreCard(categoryName, currentRow + 1));
+  }
 }
 
-// Initialize home categories
-function initHomeCategories() {
-  Object.keys(gamesByCategory).forEach(cat => {
-    const gridElement = document.getElementById('homeGrid-' + cat);
-    if (gridElement) {
-      const games = allGames.filter(g => g.category === cat);
-      populateHomeCategory(cat, games, gridElement);
+// Render home page with category rows
+function renderHomePage() {
+  homeContainer.innerHTML = '';
+  const cardsPerRow = getCardsPerRow();
+  
+  // Recently Played section
+  const recentGames = loadRecentlyPlayed();
+  if (recentGames.length > 0) {
+    const recentSection = document.createElement('div');
+    recentSection.className = 'category';
+    recentSection.setAttribute('data-home-category', 'Recently Played');
+    recentSection.innerHTML = '<h2>Recently Played</h2><div class="grid"></div>';
+    const grid = recentSection.querySelector('.grid');
+    
+    const displayCount = Math.min(cardsPerRow - 1, recentGames.length);
+    const hasMore = recentGames.length > displayCount;
+    
+    for (let i = 0; i < displayCount; i++) {
+      grid.appendChild(createCard(recentGames[i]));
     }
+    
+    if (hasMore) {
+      grid.appendChild(createMoreCard('Recently Played', 0));
+    }
+    
+    homeContainer.appendChild(recentSection);
+  }
+  
+  // Category sections (excluding "Recently Played")
+  Object.keys(categoriesData).forEach(catName => {
+    if (catName === 'Recently Played') return;
+    
+    const catGames = allGames.filter(g => g.category === catName);
+    if (catGames.length === 0) return;
+    
+    const catSection = document.createElement('div');
+    catSection.className = 'category';
+    catSection.setAttribute('data-home-category', catName);
+    catSection.innerHTML = \`<h2>\${catName}</h2><div class="grid"></div>\`;
+    const grid = catSection.querySelector('.grid');
+    
+    const displayCount = Math.min(cardsPerRow - 1, catGames.length);
+    const hasMore = catGames.length > displayCount;
+    
+    for (let i = 0; i < displayCount; i++) {
+      grid.appendChild(createCard(catGames[i]));
+    }
+    
+    if (hasMore) {
+      grid.appendChild(createMoreCard(catName, 0));
+    }
+    
+    homeContainer.appendChild(catSection);
   });
 }
 
@@ -502,15 +515,10 @@ function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
   startOverlay.style.pointerEvents = 'auto';
   window.location.hash = '#/game/' + folderEncoded;
   document.getElementById('content').scrollTop = 0;
+  saveRecentlyPlayed({ folder, name, thumb: thumbSrc });
   
   // Show only All Games grid when game is open
-  document.querySelectorAll('.category').forEach(c => {
-    const cat = c.getAttribute('data-category');
-    c.style.display = cat === 'All Games' ? 'block' : 'none';
-  });
-  document.getElementById('homeCategories').style.display = 'none';
-  
-  saveRecentlyPlayed({ folder, name, thumb: thumbSrc.replace('games/' + folder + '/', '') });
+  filterCategory('All Games', true);
 }
 
 function startGame() {
@@ -538,31 +546,33 @@ function toggleFullscreen() {
 }
 
 // Filter categories
-function filterCategory(cat) {
-  const all = document.querySelectorAll('.category');
+function filterCategory(cat, fromGameOpen = false) {
+  const all = document.querySelectorAll('.category, #homeContainer');
   
-  if (cat === 'Home') {
-    // Show home view
-    all.forEach(c => c.style.display = 'none');
-    homeCategories.style.display = 'block';
+  all.forEach(c => {
+    const category = c.getAttribute('data-category') || c.getAttribute('data-home-category');
     
-    // Show home categories
-    document.querySelectorAll('.home-category').forEach(c => c.style.display = 'block');
-    
-    updateRecentlyPlayedUI(JSON.parse(localStorage.getItem('recentlyPlayed') || '[]'));
-  } else if (cat === 'All Games') {
-    // Show All Games full grid
-    all.forEach(c => {
-      c.style.display = c.getAttribute('data-category') === 'All Games' ? 'block' : 'none';
-    });
-    homeCategories.style.display = 'none';
-  } else {
-    // Show specific category full grid
-    all.forEach(c => {
-      c.style.display = c.getAttribute('data-category') === cat ? 'block' : 'none';
-    });
-    homeCategories.style.display = 'none';
-  }
+    if (cat === 'Home') {
+      if (c.id === 'homeContainer') {
+        c.style.display = 'block';
+        if (!fromGameOpen) renderHomePage();
+      } else {
+        c.style.display = 'none';
+      }
+    } else if (cat === 'All Games') {
+      if (category === 'All Games') {
+        c.style.display = 'block';
+      } else {
+        c.style.display = 'none';
+      }
+    } else {
+      if (category === cat) {
+        c.style.display = 'block';
+      } else {
+        c.style.display = 'none';
+      }
+    }
+  });
   
   document.getElementById('content').scrollTop = 0;
 }
@@ -574,7 +584,7 @@ function handleRouting() {
     const folder = decodeURIComponent(hash.replace('#/game/', ''));
     const game = allGames.find(g => g.folder === folder);
     if (game) {
-      prepareGame(encodeURIComponent(game.folder), encodeURIComponent(game.name), 'games/' + game.folder + '/' + game.thumb);
+      prepareGame(encodeURIComponent(game.folder), encodeURIComponent(game.name), game.thumb);
     }
   } else {
     closeGame();
@@ -584,14 +594,11 @@ function handleRouting() {
 
 // Initialize
 filterCategory('Home');
-loadRecentlyPlayed();
-initHomeCategories();
 window.addEventListener('hashchange', handleRouting);
 window.addEventListener('load', handleRouting);
 window.addEventListener('resize', () => {
-  if (window.location.hash === '' || window.location.hash === '#/') {
-    initHomeCategories();
-    updateRecentlyPlayedUI(JSON.parse(localStorage.getItem('recentlyPlayed') || '[]'));
+  if (homeContainer.style.display !== 'none') {
+    renderHomePage();
   }
 });
 
