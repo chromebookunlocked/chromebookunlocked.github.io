@@ -32,6 +32,7 @@ jobs:
           cp -r data dist/data
           cp -r assets dist/assets
           cp ads.txt dist/ads.txt   # ✅ This line ensures ads.txt stays
+          cp dmca.html dist/dmca.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
