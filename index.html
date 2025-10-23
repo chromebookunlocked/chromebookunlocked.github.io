@@ -1,538 +1,295 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Chromebook Unlocked Games</title>
-<link rel="icon" type="image/png" href="assets/logo.png">
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+  <meta charset="utf-8">
+  <title>Arcade</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    :root {
+      --bg: #1a1126;
+      --card: #2b1b3f;
+      --highlight: #7d4cff;
+      --text: #eee;
+      --gap: 1.2rem;
+      --card-width: 260px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      display: flex;
+      min-height: 100vh;
+    }
 
-:root {
-  --base-font: clamp(12px, 1.2vw, 18px);
-  --thumb-height: clamp(100px, 20vh, 160px);
-  --sidebar-width: clamp(50px, 6vw, 70px);
-}
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: #221631;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .sidebar img.logo {
+      max-width: 100%;
+      margin-bottom: 1rem;
+    }
+    .sidebar h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
+      color: var(--highlight);
+    }
+    .category-list button {
+      background: none;
+      border: none;
+      color: var(--text);
+      text-align: left;
+      font-size: 0.95rem;
+      padding: 0.4rem 0;
+      cursor: pointer;
+      width: 100%;
+    }
+    .category-list button:hover,
+    .category-list button.active {
+      color: var(--highlight);
+    }
 
-* { box-sizing: border-box; }
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  background: #1c0033;
-  font-family: 'Orbitron', sans-serif;
-  color: #eee;
-  overflow: hidden;
-  font-size: var(--base-font);
-}
+    main {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+    }
 
-/* Sidebar */
-#sidebar {
-  width: var(--sidebar-width);
-  background: #330066;
-  padding: 1rem 0;
-  height: 100vh;
-  overflow-y: auto;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  transition: width 0.3s ease;
-}
-#sidebar:hover { width: 250px; }
-#sidebar header { display: flex; justify-content: center; margin-bottom: 2rem; }
-#sidebar header img { height: 60px; width: auto; }
-#sidebar ul { list-style: none; padding: 0; margin: 0; }
-#sidebar li {
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: 0.3s ease;
-  white-space: nowrap;
-  opacity: 0;
-  transform: translateY(5px);
-}
-#sidebar:hover li { opacity: 1; transform: translateY(0); }
-#sidebar li:hover {
-  background: #660099;
-  box-shadow: 0 0 10px #ff99ff;
-  color: #fff;
-}
+    h1 { text-align: center; margin-bottom: 1rem; }
 
-/* Content */
-#content {
-  padding: 1rem;
-  overflow-y: auto;
-  overflow-x: hidden;
-  margin-left: var(--sidebar-width);
-  width: calc(100% - var(--sidebar-width));
-  transition: margin-left 0.3s;
-  height: 100vh;
-}
+    .viewer {
+      background: black;
+      width: 100%;
+      height: 70vh;
+      margin-bottom: 2rem;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      display: none;
+    }
+    .viewer iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .viewer menu {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .viewer button {
+      border: none;
+      padding: .4rem .8rem;
+      background: var(--highlight);
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
 
-/* Controls */
-#controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1280px;
-  margin: 0 auto 0.5rem auto;
-  padding: 0.5rem;
-  visibility: hidden;
-  font-size: 1.2em;
-}
-button {
-  padding: 0.4rem 0.8rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1em;
-}
-#backBtn { background: #ff99ff; color: black; }
-#fullscreenBtn { background: #cc66ff; color: black; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(var(--card-width),1fr));
+      gap: var(--gap);
+    }
 
-/* Viewer */
-.viewer {
-  position: relative;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  max-width: 1280px;
-  margin: 0 auto 2rem auto;
-  background: transparent;
-  border-radius: 10px;
-  overflow: hidden;
-}
-.viewer::before {
-  content: "";
-  display: block;
-  padding-top: 56.25%;
-}
-.viewer iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-  background: transparent;
-  object-fit: contain;
-}
+    .card {
+      background: var(--card);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .2s, background .2s;
+    }
+    .card:hover {
+      transform: scale(1.04);
+      background: #362351;
+    }
+    .card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+    }
+    .card h3 {
+      margin: .7rem .9rem 1rem;
+      font-size: 1rem;
+    }
 
-/* Overlay for Play */
-#startOverlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, #330066 0%, #1c0033 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  z-index: 10;
-  transition: opacity 0.5s ease;
-}
-#startOverlay img {
-  width: clamp(200px, 40vw, 300px);
-  max-width: 80%;
-  border-radius: 10px;
-  box-shadow: 0 0 20px #ff99ff;
-}
-#startOverlay h1 {
-  margin: 0;
-  font-size: clamp(1.5rem, 2.5vw, 3rem);
-  color: #fff;
-}
-#startButton {
-  padding: 0.8rem 2rem;
-  font-size: clamp(1rem, 1.5vw, 1.5rem);
-  background: #ff99ff;
-  color: black;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-#startButton:hover {
-  background: #ff66ff;
-  box-shadow: 0 0 15px #ff66ff;
-}
-
-/* Game Grid */
-.category { margin-top: 2rem; }
-.category h2 {
-  color: #ffccff;
-  margin-bottom: 0.5rem;
-  cursor: pointer;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr));
-  gap: 1rem;
-  justify-content: center;
-}
-.card {
-  background: #4d0066;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform .2s;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.card:hover { transform: scale(1.05); background: #660099; }
-.thumb {
-  width: 100%;
-  height: var(--thumb-height);
-  object-fit: cover;
-  margin-bottom: 0.5rem;
-  border-radius: 6px;
-  background: #330033;
-}
-.card.more {
-  background: rgba(255,255,255,0.1);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 2rem;
-  color: #ffccff;
-}
-
-/* DMCA */
-#dmcaLink {
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
-  background: #ff66ff;
-  color: black;
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  text-decoration: none;
-  z-index: 10000;
-  transition: 0.2s;
-}
-#dmcaLink:hover { background: #ff99ff; color: black; }
-</style>
+    .hide-cursor {
+      cursor: none;
+    }
+  </style>
 </head>
 <body>
-<a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
+  <aside class="sidebar">
+    <img src="logo-placeholder.png" alt="Logo" class="logo">
+    <h2>Categories</h2>
+    <div class="category-list" id="categories"></div>
+  </aside>
 
-<!-- Sidebar -->
-<div id="sidebar">
-  <header><img src="assets/logo.png" alt="Logo"></header>
-  <ul id="categoryList">
-    <li onclick="filterCategory('Home')">Home</li>
-    <li onclick="filterCategory('Shooter')">Shooter</li><li onclick="filterCategory('Uncategorized')">Uncategorized</li>
-  </ul>
-</div>
+  <main>
+    <h1>Pick a game</h1>
 
-<!-- Content -->
-<div id="content">
-  <div id="controls">
-    <button id="backBtn" onclick="closeGame()">← Back</button>
-    <span id="gameTitle"></span>
-    <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-    <button id="recentBackBtn" onclick="backToHome()" style="display:none;">← Home</button>
-  </div>
-
-  <div class="viewer" id="viewer">
-    <div id="startOverlay">
-      <img id="startThumb" src="" alt="Game Thumbnail">
-      <h1 id="startName"></h1>
-      <button id="startButton" onclick="startGame()">▶ Play</button>
-    </div>
-    <iframe id="gameFrame" src=""></iframe>
-  </div>
-
-  <!-- Recently Played -->
-  <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
-    <h2>Recently Played</h2>
-    <div class="grid" id="recentlyPlayedGrid"></div>
-  </div>
-
-  <!-- All Games (Home) -->
-  <div class="category" data-category="Home">
-    <h2>All Games</h2>
-    <div class="grid">
-      
-    <div class="card" onclick="prepareGame('1v1.lol','1v1.lol','games/1v1.lol/thumbnail.png')">
-      <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
-      <div>1v1.lol</div>
-    </div>
-    <div class="card" onclick="prepareGame('Age%20Of%20War','Age%20Of%20War','games/Age Of War/thumbnail.png')">
-      <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
-      <div>Age Of War</div>
-    </div>
-    <div class="card" onclick="prepareGame('Backrooms%202D','Backrooms%202D','games/Backrooms 2D/thumbnail.jpg')">
-      <img class="thumb" src="games/Backrooms 2D/thumbnail.jpg" alt="Backrooms 2D">
-      <div>Backrooms 2D</div>
-    </div>
-    <div class="card" onclick="prepareGame('Bad%20Piggies','Bad%20Piggies','games/Bad Piggies/thumbnail.jpg')">
-      <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
-      <div>Bad Piggies</div>
-    </div>
-    <div class="card" onclick="prepareGame('Bad%20Time%20Simulator','Bad%20Time%20Simulator','games/Bad Time Simulator/thumbnail.jpg')">
-      <img class="thumb" src="games/Bad Time Simulator/thumbnail.jpg" alt="Bad Time Simulator">
-      <div>Bad Time Simulator</div>
-    </div>
-    <div class="card" onclick="prepareGame('Baldi%E2%80%99s%20Basics','Baldi%E2%80%99s%20Basics','games/Baldi’s Basics/thumbnail.png')">
-      <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
-      <div>Baldi’s Basics</div>
-    </div>
-    <div class="card" onclick="prepareGame('Blackjack','Blackjack','games/Blackjack/thumbnail.png')">
-      <img class="thumb" src="games/Blackjack/thumbnail.png" alt="Blackjack">
-      <div>Blackjack</div>
-    </div>
-    <div class="card" onclick="prepareGame('Block%20Blast','Block%20Blast','games/Block Blast/thumbnail.jpg')">
-      <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
-      <div>Block Blast</div>
-    </div>
-    <div class="card" onclick="prepareGame('Burrito%20Bison%20Launcha%20Libre','Burrito%20Bison%20Launcha%20Libre','games/Burrito Bison Launcha Libre/thumbnail.jpg')">
-      <img class="thumb" src="games/Burrito Bison Launcha Libre/thumbnail.jpg" alt="Burrito Bison Launcha Libre">
-      <div>Burrito Bison Launcha Libre</div>
-    </div>
-    <div class="card" onclick="prepareGame('Capybara%20Clicker','Capybara%20Clicker','games/Capybara Clicker/thumbnail.png')">
-      <img class="thumb" src="games/Capybara Clicker/thumbnail.png" alt="Capybara Clicker">
-      <div>Capybara Clicker</div>
-    </div>
-    <div class="card" onclick="prepareGame('The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb','The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb','games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg')">
-      <img class="thumb" src="games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg" alt="The Binding of Isaac - Wrath of the Lamb">
-      <div>The Binding of Isaac - Wrath of the Lamb</div>
-    </div>
-    </div>
-  </div>
-
-  <!-- Other Categories -->
-  
-    <div class="category" data-category="Shooter" style="display:none;">
-      <h2>Shooter</h2>
-      <div class="grid">
-        
-    <div class="card" onclick="prepareGame('1v1.lol','1v1.lol','games/1v1.lol/thumbnail.png')">
-      <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
-      <div>1v1.lol</div>
-    </div>
-      </div>
-    </div>
-    <div class="category" data-category="Uncategorized" style="display:none;">
-      <h2>Uncategorized</h2>
-      <div class="grid">
-        
-    <div class="card" onclick="prepareGame('Age%20Of%20War','Age%20Of%20War','games/Age Of War/thumbnail.png')">
-      <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
-      <div>Age Of War</div>
-    </div>
-    <div class="card" onclick="prepareGame('Backrooms%202D','Backrooms%202D','games/Backrooms 2D/thumbnail.jpg')">
-      <img class="thumb" src="games/Backrooms 2D/thumbnail.jpg" alt="Backrooms 2D">
-      <div>Backrooms 2D</div>
-    </div>
-    <div class="card" onclick="prepareGame('Bad%20Piggies','Bad%20Piggies','games/Bad Piggies/thumbnail.jpg')">
-      <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
-      <div>Bad Piggies</div>
-    </div>
-    <div class="card" onclick="prepareGame('Bad%20Time%20Simulator','Bad%20Time%20Simulator','games/Bad Time Simulator/thumbnail.jpg')">
-      <img class="thumb" src="games/Bad Time Simulator/thumbnail.jpg" alt="Bad Time Simulator">
-      <div>Bad Time Simulator</div>
-    </div>
-    <div class="card" onclick="prepareGame('Baldi%E2%80%99s%20Basics','Baldi%E2%80%99s%20Basics','games/Baldi’s Basics/thumbnail.png')">
-      <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
-      <div>Baldi’s Basics</div>
-    </div>
-    <div class="card" onclick="prepareGame('Blackjack','Blackjack','games/Blackjack/thumbnail.png')">
-      <img class="thumb" src="games/Blackjack/thumbnail.png" alt="Blackjack">
-      <div>Blackjack</div>
-    </div>
-    <div class="card" onclick="prepareGame('Block%20Blast','Block%20Blast','games/Block Blast/thumbnail.jpg')">
-      <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
-      <div>Block Blast</div>
-    </div>
-    <div class="card" onclick="prepareGame('Burrito%20Bison%20Launcha%20Libre','Burrito%20Bison%20Launcha%20Libre','games/Burrito Bison Launcha Libre/thumbnail.jpg')">
-      <img class="thumb" src="games/Burrito Bison Launcha Libre/thumbnail.jpg" alt="Burrito Bison Launcha Libre">
-      <div>Burrito Bison Launcha Libre</div>
-    </div>
-    <div class="card" onclick="prepareGame('Capybara%20Clicker','Capybara%20Clicker','games/Capybara Clicker/thumbnail.png')">
-      <img class="thumb" src="games/Capybara Clicker/thumbnail.png" alt="Capybara Clicker">
-      <div>Capybara Clicker</div>
-    </div>
-    <div class="card" onclick="prepareGame('The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb','The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb','games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg')">
-      <img class="thumb" src="games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg" alt="The Binding of Isaac - Wrath of the Lamb">
-      <div>The Binding of Isaac - Wrath of the Lamb</div>
-    </div>
-      </div>
+    <div class="viewer" id="viewer">
+      <menu>
+        <button onclick="closeGame()">← Back</button>
+        <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+      </menu>
+      <iframe id="frame"></iframe>
     </div>
 
-</div>
+    <div class="grid" id="grid"></div>
+  </main>
 
-<script>
-const viewer = document.getElementById('viewer');
-const frame = document.getElementById('gameFrame');
-const controls = document.getElementById('controls');
-const gameTitle = document.getElementById('gameTitle');
-const startOverlay = document.getElementById('startOverlay');
-const startThumb = document.getElementById('startThumb');
-const startName = document.getElementById('startName');
-const recentlyPlayedGrid = document.getElementById('recentlyPlayedGrid');
-let currentGameFolder = null;
-const MAX_RECENT = 25;
-
-// Utility to check if game exists
-function gameExists(folder) {
-  try {
-    const xhr = new XMLHttpRequest();
-    xhr.open('HEAD', 'games/' + folder + '/index.html', false);
-    xhr.send();
-    return xhr.status !== 404;
-  } catch { return false; }
-}
-
-// Load Recently Played, removing missing games
-function loadRecentlyPlayed() {
-  let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
-  list = list.filter(g => gameExists(g.folder));
-  localStorage.setItem('recentlyPlayed', JSON.stringify(list));
-  updateRecentlyPlayedUI(list, true);
-}
-
-// Save game to Recently Played
-function saveRecentlyPlayed(game) {
-  let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
-  list = list.filter(g => g.folder !== game.folder);
-  list.unshift(game);
-  if (list.length > MAX_RECENT) list = list.slice(0, MAX_RECENT);
-  list = list.filter(g => gameExists(g.folder));
-  localStorage.setItem('recentlyPlayed', JSON.stringify(list));
-  updateRecentlyPlayedUI(list, true);
-}
-
-// Update Recently Played UI
-function updateRecentlyPlayedUI(list, homeView = false) {
-  recentlyPlayedGrid.innerHTML = '';
-  if (!list.length) {
-    document.getElementById('recentlyPlayedSection').style.display = 'none';
-    return;
+  <script>
+    const games = [
+  {
+    "name": "1v1.lol",
+    "folder": "1v1.lol",
+    "category": "Shooter",
+    "thumb": "thumbnail.png"
+  },
+  {
+    "name": "Age Of War",
+    "folder": "Age Of War",
+    "category": "Uncategorized",
+    "thumb": "thumbnail.png"
+  },
+  {
+    "name": "Backrooms 2D",
+    "folder": "Backrooms 2D",
+    "category": "Uncategorized",
+    "thumb": "thumbnail.jpg"
+  },
+  {
+    "name": "Bad Piggies",
+    "folder": "Bad Piggies",
+    "category": "Uncategorized",
+    "thumb": "thumbnail.jpg"
+  },
+  {
+    "name": "Bad Time Simulator",
+    "folder": "Bad Time Simulator",
+    "category": "Uncategorized",
+    "thumb": "thumbnail.jpg"
+  },
+  {
+    "name": "Baldi’s Basics",
+    "folder": "Baldi’s Basics",
+    "category": "Uncategorized",
+    "thumb": "thumbnail.png"
+  },
+  {
+    "name": "Blackjack",
+    "folder": "Blackjack",
+    "category": "Uncategorized",
+    "thumb": "thumbnail.png"
+  },
+  {
+    "name": "Block Blast",
+    "folder": "Block Blast",
+    "category": "Uncategorized",
+    "thumb": "thumbnail.jpg"
+  },
+  {
+    "name": "Burrito Bison Launcha Libre",
+    "folder": "Burrito Bison Launcha Libre",
+    "category": "Uncategorized",
+    "thumb": "thumbnail.jpg"
+  },
+  {
+    "name": "Capybara Clicker",
+    "folder": "Capybara Clicker",
+    "category": "Uncategorized",
+    "thumb": "thumbnail.png"
+  },
+  {
+    "name": "The Binding of Isaac - Wrath of the Lamb",
+    "folder": "The Binding of Isaac - Wrath of the Lamb",
+    "category": "Uncategorized",
+    "thumb": "thumbnail.jpg"
   }
-  document.getElementById('recentlyPlayedSection').style.display = 'block';
+]; // Placeholder injected by generate.js
 
-  const displayList = homeView ? list.slice(0,7) : list;
-  displayList.forEach(g => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.onclick = () => prepareGame(encodeURIComponent(g.folder), encodeURIComponent(g.name), g.thumb);
-    card.innerHTML = `<img class="thumb" src="${g.thumb}" alt="${g.name}"><div>${g.name}</div>`;
-    recentlyPlayedGrid.appendChild(card);
-  });
+    const grid = document.getElementById('grid');
+    const categoryContainer = document.getElementById('categories');
+    const frame = document.getElementById('frame');
+    const viewer = document.getElementById('viewer');
 
-  // Transparent ⋯ box only in home view and only as last item
-  if (homeView && list.length > 7) {
-    const moreCard = document.createElement('div');
-    moreCard.className = 'card more';
-    moreCard.textContent = '⋯';
-    moreCard.onclick = () => filterCategory('Recently Played');
-    recentlyPlayedGrid.appendChild(moreCard);
-  }
-}
+    let currentCategory = 'All';
+    let playingId = null;
 
-// Game functions
-function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
-  const folder = decodeURIComponent(folderEncoded);
-  const name = decodeURIComponent(nameEncoded);
-  currentGameFolder = folder;
-  frame.src = '';
-  viewer.style.display = 'flex';
-  controls.style.visibility = 'visible';
-  gameTitle.textContent = name;
-  startThumb.src = thumbSrc;
-  startName.textContent = name;
-  startOverlay.style.opacity = '1';
-  startOverlay.style.pointerEvents = 'auto';
-  window.location.hash = '#/game/' + folderEncoded;
-  document.getElementById('content').scrollTop = 0;
-  saveRecentlyPlayed({ folder, name, thumb: thumbSrc });
-}
+    // Build category list
+    const categories = new Set(['All']);
+    games.forEach(g => categories.add(g.category));
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.textContent = cat;
+      btn.onclick = () => {
+        currentCategory = cat;
+        document.querySelectorAll('.category-list button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderGames();
+      };
+      if (cat === 'All') btn.classList.add('active');
+      categoryContainer.appendChild(btn);
+    });
 
-function startGame() {
-  if (!currentGameFolder) return;
-  frame.src = 'games/' + currentGameFolder + '/index.html';
-  startOverlay.style.opacity = '0';
-  startOverlay.style.pointerEvents = 'none';
-}
-
-function closeGame() {
-  frame.src = '';
-  viewer.style.display = 'none';
-  controls.style.visibility = 'hidden';
-  gameTitle.textContent = '';
-  currentGameFolder = null;
-  startOverlay.style.opacity = '1';
-  startOverlay.style.pointerEvents = 'auto';
-  window.location.hash = '';
-}
-
-function toggleFullscreen() {
-  if (!document.fullscreenElement) frame.requestFullscreen().catch(()=>{});
-  else document.exitFullscreen();
-}
-
-// Filter categories
-function filterCategory(cat) {
-  const all = document.querySelectorAll('.category');
-  all.forEach(c => {
-    const category = c.getAttribute('data-category');
-    if (cat === 'Home') {
-      c.style.display = (category === 'Home' || category === 'Recently Played') ? 'block' : 'none';
-      updateRecentlyPlayedUI(JSON.parse(localStorage.getItem('recentlyPlayed') || '[]'), true);
-      document.getElementById('recentBackBtn').style.display = 'none';
-    } else if (cat === 'Recently Played') {
-      c.style.display = 'block';
-      updateRecentlyPlayedUI(JSON.parse(localStorage.getItem('recentlyPlayed') || '[]'), false);
-      document.getElementById('recentBackBtn').style.display = 'inline-block';
-    } else {
-      c.style.display = category === cat ? 'block' : 'none';
-      document.getElementById('recentBackBtn').style.display = 'none';
+    // Render game cards
+    function renderGames() {
+      grid.innerHTML = '';
+      games
+        .filter(g => currentCategory === 'All' || g.category === currentCategory)
+        .forEach(game => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src="games/${game.folder}/${game.thumb}" alt="${game.name}">
+            <h3>${game.name}</h3>
+          `;
+          card.onclick = () => openGame(game.folder);
+          grid.appendChild(card);
+        });
     }
-  });
-  document.getElementById('content').scrollTop = 0;
-}
 
-// Back to home from Recently Played
-function backToHome() {
-  filterCategory('Home');
-}
-
-// Hash routing for direct game or Recently Played
-function handleRouting() {
-  const hash = window.location.hash;
-  if (hash.startsWith('#/game/')) {
-    const folder = decodeURIComponent(hash.replace('#/game/', ''));
-    const card = [...document.querySelectorAll('.card')]
-      .find(el => el.getAttribute('onclick')?.includes(encodeURIComponent(folder)));
-    if (card) {
-      const name = card.querySelector('div').innerText;
-      const thumb = card.querySelector('img').src;
-      prepareGame(encodeURIComponent(folder), encodeURIComponent(name), thumb);
+    function openGame(folder) {
+      playingId = folder;
+      frame.src = \`games/\${folder}/index.html\`;
+      viewer.style.display = 'block';
+      viewer.scrollIntoView({ behavior: 'smooth' });
     }
-  } else if (hash === '#/recent') {
-    filterCategory('Recently Played');
-  } else {
-    closeGame();
-    filterCategory('Home');
-  }
-}
 
-filterCategory('Home');
-loadRecentlyPlayed();
-window.addEventListener('hashchange', handleRouting);
-window.addEventListener('load', handleRouting);
+    function closeGame() {
+      frame.src = 'about:blank';
+      viewer.style.display = 'none';
+      playingId = null;
+    }
 
-// Prevent arrow keys / space scrolling
-window.addEventListener('keydown', e => {
-  const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
-  if (blocked.includes(e.key)) e.preventDefault();
-});
-</script>
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        viewer.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Prevent arrow/space scrolling while in game
+    window.addEventListener('keydown', e => {
+      const blocked = [' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+      if (viewer.style.display === 'block' && blocked.includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+
+    renderGames();
+  </script>
 </body>
 </html>
