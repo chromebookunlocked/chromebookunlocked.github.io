@@ -226,7 +226,7 @@ button {
   <header><img src="assets/logo.png" alt="Logo"></header>
   <ul id="categoryList">
     <li onclick="filterCategory('Home')">Home</li>
-    <li onclick="filterCategory('Shooter')">Shooter</li><li onclick="filterCategory('Uncategorized')">Uncategorized</li><li onclick="filterCategory('Horror')">Horror</li><li onclick="filterCategory('Clickers')">Clickers</li>
+    <li onclick="filterCategory('Uncategorized')">Uncategorized</li><li onclick="filterCategory('Shooter')">Shooter</li><li onclick="filterCategory('Horror')">Horror</li><li onclick="filterCategory('Clickers')">Clickers</li>
   </ul>
 </div>
 
@@ -259,6 +259,10 @@ button {
     <h2>All Games</h2>
     <div class="grid">
       
+    <div class="card" onclick="prepareGame('10%20Minutes%20Till%20Dawn','10%20Minutes%20Till%20Dawn','games/10 Minutes Till Dawn/thumbnail.png')">
+      <img class="thumb" src="games/10 Minutes Till Dawn/thumbnail.png" alt="10 Minutes Till Dawn">
+      <div>10 Minutes Till Dawn</div>
+    </div>
     <div class="card" onclick="prepareGame('1v1.lol','1v1.lol','games/1v1.lol/thumbnail.png')">
       <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
       <div>1v1.lol</div>
@@ -388,20 +392,14 @@ button {
 
   <!-- Other Categories -->
   
-    <div class="category" data-category="Shooter" style="display:none;">
-      <h2>Shooter</h2>
-      <div class="grid">
-        
-    <div class="card" onclick="prepareGame('1v1.lol','1v1.lol','games/1v1.lol/thumbnail.png')">
-      <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
-      <div>1v1.lol</div>
-    </div>
-      </div>
-    </div>
     <div class="category" data-category="Uncategorized" style="display:none;">
       <h2>Uncategorized</h2>
       <div class="grid">
         
+    <div class="card" onclick="prepareGame('10%20Minutes%20Till%20Dawn','10%20Minutes%20Till%20Dawn','games/10 Minutes Till Dawn/thumbnail.png')">
+      <img class="thumb" src="games/10 Minutes Till Dawn/thumbnail.png" alt="10 Minutes Till Dawn">
+      <div>10 Minutes Till Dawn</div>
+    </div>
     <div class="card" onclick="prepareGame('Age%20Of%20War','Age%20Of%20War','games/Age Of War/thumbnail.png')">
       <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
       <div>Age Of War</div>
@@ -501,6 +499,16 @@ button {
     <div class="card" onclick="prepareGame('The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb','The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb','games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg')">
       <img class="thumb" src="games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg" alt="The Binding of Isaac - Wrath of the Lamb">
       <div>The Binding of Isaac - Wrath of the Lamb</div>
+    </div>
+      </div>
+    </div>
+    <div class="category" data-category="Shooter" style="display:none;">
+      <h2>Shooter</h2>
+      <div class="grid">
+        
+    <div class="card" onclick="prepareGame('1v1.lol','1v1.lol','games/1v1.lol/thumbnail.png')">
+      <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
+      <div>1v1.lol</div>
     </div>
       </div>
     </div>
