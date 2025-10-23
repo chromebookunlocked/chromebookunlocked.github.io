@@ -150,8 +150,7 @@
   </main>
 
   <script>
-    const games = __GAMES__; // Placeholder injected by generate.js
-
+    const games = __GAMES__;
     const grid = document.getElementById('grid');
     const categoryContainer = document.getElementById('categories');
     const frame = document.getElementById('frame');
@@ -176,28 +175,28 @@
       categoryContainer.appendChild(btn);
     });
 
-    // Render game cards
     function renderGames() {
       grid.innerHTML = '';
-      games
-        .filter(g => currentCategory === 'All' || g.category === currentCategory)
+      games.filter(g => currentCategory === 'All' || g.category === currentCategory)
         .forEach(game => {
           const card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = `
-            <img src="games/${game.folder}/${game.thumb}" alt="${game.name}">
-            <h3>${game.name}</h3>
+            <img src="games/${game.id}/${game.thumb}" alt="${game.id}">
+            <h3>${formatName(game.id)}</h3>
           `;
-          card.onclick = () => openGame(game.folder);
+          card.onclick = () => openGame(game.id);
           grid.appendChild(card);
+          updateGameStats(game.id, 'impression');
         });
     }
 
-    function openGame(folder) {
-      playingId = folder;
-      frame.src = \`games/\${folder}/index.html\`;
+    function openGame(id) {
+      playingId = id;
+      frame.src = `games/${id}/index.html`;
       viewer.style.display = 'block';
       viewer.scrollIntoView({ behavior: 'smooth' });
+      updateGameStats(id, 'open');
     }
 
     function closeGame() {
@@ -208,14 +207,34 @@
 
     function toggleFullscreen() {
       if (!document.fullscreenElement) {
-        viewer.requestFullscreen().catch(() => {});
+        viewer.requestFullscreen().catch(err => console.log(err));
       } else {
         document.exitFullscreen();
       }
     }
 
-    // Prevent arrow/space scrolling while in game
-    window.addEventListener('keydown', e => {
+    function formatName(id) {
+      return id.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    // Stats tracking
+    function updateGameStats(id, type) {
+      const url = `games/${id}/stats.json`;
+      fetch(url)
+        .then(r => r.json())
+        .then(data => {
+          if (type === 'impression') data.impressions++;
+          if (type === 'open') data.opens++;
+          return fetch(url, {
+            method: 'PUT',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify(data)
+          }).catch(()=>{});
+        }).catch(()=>{});
+    }
+
+    // prevent arrow key scroll when game open
+    window.addEventListener('keydown', (e) => {
       const blocked = [' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
       if (viewer.style.display === 'block' && blocked.includes(e.key)) {
         e.preventDefault();
