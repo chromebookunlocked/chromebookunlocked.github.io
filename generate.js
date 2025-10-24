@@ -54,7 +54,7 @@ const sidebarCategories = Object.keys(categories)
   .map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`)
   .join("");
 
-// Build complete HTML (using let instead of const)
+// Build complete HTML
 const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -155,21 +155,13 @@ button {
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 1280px;
-  margin: 0 auto 2rem auto;
+  aspect-ratio: 16 / 9;
   background: transparent;
   border-radius: 10px;
   overflow: hidden;
-}
-.viewer::before {
-  content: "";
-  display: block;
-  padding-top: 56.25%;
+  margin: 0 auto 2rem auto;
 }
 .viewer iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   border: none;
@@ -225,10 +217,23 @@ button {
 }
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
-  justify-content: center;
+  justify-items: center;
 }
+@media (max-width: 1200px) {
+  .grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 400px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
 .card {
   background: #4d0066;
   border-radius: 8px;
@@ -321,7 +326,6 @@ button {
 
   <!-- Other Categories -->
   ${categorySections}
-
 </div>
 
 <script>
@@ -383,7 +387,6 @@ function updateRecentlyPlayedUI(list, homeView = false) {
     recentlyPlayedGrid.appendChild(card);
   });
 
-  // Transparent ⋯ box only in home view and only as last item
   if (homeView && list.length > 7) {
     const moreCard = document.createElement('div');
     moreCard.className = 'card more';
@@ -455,12 +458,10 @@ function filterCategory(cat) {
   document.getElementById('content').scrollTop = 0;
 }
 
-// Back to home from Recently Played
 function backToHome() {
   filterCategory('Home');
 }
 
-// Hash routing for direct game or Recently Played
 function handleRouting() {
   const hash = window.location.hash;
   if (hash.startsWith('#/game/')) {
@@ -485,7 +486,6 @@ loadRecentlyPlayed();
 window.addEventListener('hashchange', handleRouting);
 window.addEventListener('load', handleRouting);
 
-// Prevent arrow keys / space scrolling
 window.addEventListener('keydown', e => {
   const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
   if (blocked.includes(e.key)) e.preventDefault();
@@ -504,7 +504,6 @@ const baseURL = "https://chromebookunlocked.github.io";
 const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${baseURL}/</loc></url>
-  <url><loc>${baseURL}/#/recent</loc></url>
 </urlset>`;
 fs.writeFileSync(sitemapFile, sitemapContent);
-console.log("✅ Sitemap generated");
+console.log("✅ Sitemap generated (main page only)");
