@@ -33,8 +33,10 @@ const generateGameCard = (game) => {
   const thumb = game.thumbs.find(t => fs.existsSync(path.join(gamesDir, game.folder, t))) || game.thumbs[0];
   return `
     <div class="card" onclick="prepareGame('${encodeURIComponent(game.folder)}','${encodeURIComponent(game.name)}','games/${game.folder}/${thumb}')">
-      <img class="thumb" src="games/${game.folder}/${thumb}" alt="${game.name}">
-      <div>${game.name}</div>
+      <div class="thumb-container">
+        <img class="thumb" src="games/${game.folder}/${thumb}" alt="${game.name}">
+      </div>
+      <div class="card-title">${game.name}</div>
     </div>`;
 };
 
@@ -54,7 +56,7 @@ const sidebarCategories = Object.keys(categories)
   .map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`)
   .join("");
 
-// Build complete HTML
+// Build full HTML
 const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -67,8 +69,11 @@ const html = `
 
 :root {
   --base-font: clamp(12px, 1.2vw, 18px);
-  --thumb-height: clamp(100px, 20vh, 160px);
+  --thumb-height: clamp(140px, 18vw, 200px);
   --sidebar-width: clamp(50px, 6vw, 70px);
+  --accent: #ff66ff;
+  --accent-dark: #cc33ff;
+  --background-dark: #1c0033;
 }
 
 * { box-sizing: border-box; }
@@ -76,7 +81,7 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: #1c0033;
+  background: var(--background-dark);
   font-family: 'Orbitron', sans-serif;
   color: #eee;
   overflow: hidden;
@@ -112,7 +117,7 @@ html, body {
 #sidebar:hover li { opacity: 1; transform: translateY(0); }
 #sidebar li:hover {
   background: #660099;
-  box-shadow: 0 0 10px #ff99ff;
+  box-shadow: 0 0 10px var(--accent);
   color: #fff;
 }
 
@@ -139,14 +144,24 @@ html, body {
   font-size: 1.2em;
 }
 button {
-  padding: 0.4rem 0.8rem;
+  padding: 0.6rem 1rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 1em;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: black;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 10px var(--accent);
 }
-#backBtn { background: #ff99ff; color: black; }
-#fullscreenBtn { background: #cc66ff; color: black; }
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px var(--accent);
+}
+#backBtn { background: linear-gradient(135deg, #ff99ff, var(--accent)); }
+#fullscreenBtn { background: linear-gradient(135deg, var(--accent-dark), #9933ff); }
 
 /* Viewer */
 .viewer {
@@ -186,7 +201,7 @@ button {
   width: clamp(200px, 40vw, 300px);
   max-width: 80%;
   border-radius: 10px;
-  box-shadow: 0 0 20px #ff99ff;
+  box-shadow: 0 0 20px var(--accent);
 }
 #startOverlay h1 {
   margin: 0;
@@ -196,12 +211,13 @@ button {
 #startButton {
   padding: 0.8rem 2rem;
   font-size: clamp(1rem, 1.5vw, 1.5rem);
-  background: #ff99ff;
+  background: var(--accent);
   color: black;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: 0.2s;
+  font-weight: bold;
 }
 #startButton:hover {
   background: #ff66ff;
@@ -221,46 +237,58 @@ button {
   gap: 1rem;
   justify-items: center;
 }
-@media (max-width: 1200px) {
-  .grid { grid-template-columns: repeat(4, 1fr); }
-}
-@media (max-width: 900px) {
-  .grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 600px) {
-  .grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 400px) {
-  .grid { grid-template-columns: 1fr; }
-}
+@media (max-width: 1200px) { .grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 900px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 400px) { .grid { grid-template-columns: 1fr; } }
 
 .card {
+  width: 100%;
   background: #4d0066;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  transition: transform .2s;
+  transition: transform .2s, background .2s;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 .card:hover { transform: scale(1.05); background: #660099; }
-.thumb {
+
+.thumb-container {
   width: 100%;
   height: var(--thumb-height);
-  object-fit: cover;
-  margin-bottom: 0.5rem;
-  border-radius: 6px;
-  background: #330033;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #220033;
 }
-.card.more {
-  background: rgba(255,255,255,0.1);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 2rem;
-  color: #ffccff;
+.thumb-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px) brightness(0.5);
+  z-index: 0;
+  transition: transform 0.2s ease;
+}
+.thumb {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+.card:hover .thumb { transform: scale(1.05); }
+.card-title { margin: 0.5rem 0 1rem 0; }
+
+/* Blur background sync */
+.card .thumb-container::before {
+  background-image: var(--thumb-url);
 }
 
 /* DMCA */
@@ -268,7 +296,7 @@ button {
   position: fixed;
   bottom: 10px;
   right: 10px;
-  background: #ff66ff;
+  background: var(--accent);
   color: black;
   padding: 0.3rem 0.6rem;
   border-radius: 6px;
@@ -340,6 +368,14 @@ const recentlyPlayedGrid = document.getElementById('recentlyPlayedGrid');
 let currentGameFolder = null;
 const MAX_RECENT = 25;
 
+// Apply blurred background to thumbs dynamically
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll('.thumb-container').forEach(el => {
+    const img = el.querySelector('img.thumb');
+    if (img) el.style.setProperty('--thumb-url', 'url(' + img.src + ')');
+  });
+});
+
 // Utility to check if game exists
 function gameExists(folder) {
   try {
@@ -350,7 +386,7 @@ function gameExists(folder) {
   } catch { return false; }
 }
 
-// Load Recently Played, removing missing games
+// Load Recently Played
 function loadRecentlyPlayed() {
   let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
   list = list.filter(g => gameExists(g.folder));
@@ -383,7 +419,11 @@ function updateRecentlyPlayedUI(list, homeView = false) {
     const card = document.createElement('div');
     card.className = 'card';
     card.onclick = () => prepareGame(encodeURIComponent(g.folder), encodeURIComponent(g.name), g.thumb);
-    card.innerHTML = \`<img class="thumb" src="\${g.thumb}" alt="\${g.name}"><div>\${g.name}</div>\`;
+    card.innerHTML = \`
+      <div class="thumb-container" style="--thumb-url:url(\${g.thumb})">
+        <img class="thumb" src="\${g.thumb}" alt="\${g.name}">
+      </div>
+      <div class="card-title">\${g.name}</div>\`;
     recentlyPlayedGrid.appendChild(card);
   });
 
@@ -437,7 +477,7 @@ function toggleFullscreen() {
   else document.exitFullscreen();
 }
 
-// Filter categories
+// Category filtering
 function filterCategory(cat) {
   const all = document.querySelectorAll('.category');
   all.forEach(c => {
@@ -458,45 +498,27 @@ function filterCategory(cat) {
   document.getElementById('content').scrollTop = 0;
 }
 
-function backToHome() {
-  filterCategory('Home');
-}
+function backToHome() { filterCategory('Home'); }
 
 function handleRouting() {
   const hash = window.location.hash;
   if (hash.startsWith('#/game/')) {
     const folder = decodeURIComponent(hash.replace('#/game/', ''));
-    const card = [...document.querySelectorAll('.card')]
-      .find(el => el.getAttribute('onclick')?.includes(encodeURIComponent(folder)));
-    if (card) {
-      const name = card.querySelector('div').innerText;
-      const thumb = card.querySelector('img').src;
-      prepareGame(encodeURIComponent(folder), encodeURIComponent(name), thumb);
-    }
-  } else if (hash === '#/recent') {
-    filterCategory('Recently Played');
-  } else {
-    closeGame();
-    filterCategory('Home');
-  }
+    const card = [...document.querySelectorAll('.card')].find(c => c.onclick && c.onclick.toString().includes(folder));
+    if (card) card.click();
+  } else filterCategory('Home');
 }
 
-filterCategory('Home');
-loadRecentlyPlayed();
 window.addEventListener('hashchange', handleRouting);
-window.addEventListener('load', handleRouting);
-
-window.addEventListener('keydown', e => {
-  const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
-  if (blocked.includes(e.key)) e.preventDefault();
-});
+loadRecentlyPlayed();
+handleRouting();
 </script>
 </body>
 </html>
 `;
 
+// Write the HTML file
 fs.writeFileSync(outputFile, html);
-console.log("✅ Build complete: index.html generated with Home, All Games, Recently Played and categories.");
 
 // --- Sitemap ---
 const sitemapFile = path.join(outputDir, "sitemap.xml");
