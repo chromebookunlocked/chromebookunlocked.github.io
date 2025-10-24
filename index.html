@@ -98,21 +98,13 @@ button {
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 1280px;
-  margin: 0 auto 2rem auto;
+  aspect-ratio: 16 / 9;
   background: transparent;
   border-radius: 10px;
   overflow: hidden;
-}
-.viewer::before {
-  content: "";
-  display: block;
-  padding-top: 56.25%;
+  margin: 0 auto 2rem auto;
 }
 .viewer iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   border: none;
@@ -168,10 +160,23 @@ button {
 }
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
-  justify-content: center;
+  justify-items: center;
 }
+@media (max-width: 1200px) {
+  .grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 900px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 600px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 400px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
 .card {
   background: #4d0066;
   border-radius: 8px;
@@ -363,10 +368,6 @@ button {
       <img class="thumb" src="games/Coffie Maker/thumbnail.png" alt="Coffie Maker">
       <div>Coffie Maker</div>
     </div>
-    <div class="card" onclick="prepareGame('Color%20Brust%203D','Color%20Brust%203D','games/Color Brust 3D/thumbnail.png')">
-      <img class="thumb" src="games/Color Brust 3D/thumbnail.png" alt="Color Brust 3D">
-      <div>Color Brust 3D</div>
-    </div>
     <div class="card" onclick="prepareGame('Color%20Match','Color%20Match','games/Color Match/thumbnail.jpg')">
       <img class="thumb" src="games/Color Match/thumbnail.jpg" alt="Color Match">
       <div>Color Match</div>
@@ -484,10 +485,6 @@ button {
       <img class="thumb" src="games/Coffie Maker/thumbnail.png" alt="Coffie Maker">
       <div>Coffie Maker</div>
     </div>
-    <div class="card" onclick="prepareGame('Color%20Brust%203D','Color%20Brust%203D','games/Color Brust 3D/thumbnail.png')">
-      <img class="thumb" src="games/Color Brust 3D/thumbnail.png" alt="Color Brust 3D">
-      <div>Color Brust 3D</div>
-    </div>
     <div class="card" onclick="prepareGame('Color%20Match','Color%20Match','games/Color Match/thumbnail.jpg')">
       <img class="thumb" src="games/Color Match/thumbnail.jpg" alt="Color Match">
       <div>Color Match</div>
@@ -544,7 +541,6 @@ button {
     </div>
       </div>
     </div>
-
 </div>
 
 <script>
@@ -606,7 +602,6 @@ function updateRecentlyPlayedUI(list, homeView = false) {
     recentlyPlayedGrid.appendChild(card);
   });
 
-  // Transparent ⋯ box only in home view and only as last item
   if (homeView && list.length > 7) {
     const moreCard = document.createElement('div');
     moreCard.className = 'card more';
@@ -678,12 +673,10 @@ function filterCategory(cat) {
   document.getElementById('content').scrollTop = 0;
 }
 
-// Back to home from Recently Played
 function backToHome() {
   filterCategory('Home');
 }
 
-// Hash routing for direct game or Recently Played
 function handleRouting() {
   const hash = window.location.hash;
   if (hash.startsWith('#/game/')) {
@@ -708,7 +701,6 @@ loadRecentlyPlayed();
 window.addEventListener('hashchange', handleRouting);
 window.addEventListener('load', handleRouting);
 
-// Prevent arrow keys / space scrolling
 window.addEventListener('keydown', e => {
   const blocked = [' ', 'ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
   if (blocked.includes(e.key)) e.preventDefault();
