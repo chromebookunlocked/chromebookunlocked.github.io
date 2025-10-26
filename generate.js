@@ -591,6 +591,7 @@ const html = `<!DOCTYPE html>
     const MAX_RECENT = 25;
     const offsets = {}; // offsets[category] = number of revealed rows - 1
     let gameViewActive = false; // Track if game viewer is open
+    let currentViewMode = 'home'; // Track current view: 'home' or 'category'
     
     // Get all valid game folders
     function getValidGameFolders() {
@@ -661,8 +662,8 @@ const html = `<!DOCTYPE html>
       const cards = Array.from(grid.querySelectorAll('.game-card'));
       const total = cards.length;
       
-      // If game viewer is active, show all cards and no more button
-      if (gameViewActive) {
+      // If game viewer is active OR viewing specific category, show all cards
+      if (gameViewActive || currentViewMode === 'category') {
         cards.forEach(c => c.style.display = '');
         return;
       }
@@ -673,8 +674,8 @@ const html = `<!DOCTYPE html>
       const rowsRevealed = (offsets[cat] || 0) + 1;
       const slots = rowsRevealed * cols;
       
-      // Check if we need a "more" card
-      const showMore = total > slots;
+      // Check if we need a "more" card (only on home page)
+      const showMore = total > slots && currentViewMode === 'home';
       
       // Number of actual game items to show
       const showCount = showMore ? (slots - 1) : Math.min(total, slots);
@@ -752,11 +753,17 @@ const html = `<!DOCTYPE html>
     function searchGames(query) {
       const searchTerm = query.toLowerCase().trim();
       const allCategories = document.querySelectorAll('.category');
+      const searchResultsSection = document.getElementById('searchResultsSection');
       
       if (!searchTerm) {
+        // Hide search results when search bar is empty
+        if (searchResultsSection) searchResultsSection.style.display = 'none';
+        
         // Reset to normal view - show all categories
         allCategories.forEach(cat => {
           const category = cat.getAttribute('data-category');
+          if (cat.id === 'searchResultsSection' || cat.id === 'curatedGamesSection') return;
+          
           if (category === 'Recently Played' && !document.getElementById('recentlyPlayedGrid').children.length) {
             cat.style.display = 'none';
           } else {
@@ -768,20 +775,24 @@ const html = `<!DOCTYPE html>
       }
       
       // During search: hide all categories and show only search results
-      allCategories.forEach(cat => cat.style.display = 'none');
+      allCategories.forEach(cat => {
+        if (cat.id !== 'searchResultsSection') {
+          cat.style.display = 'none';
+        }
+      });
       
       // Create or get search results container
-      let searchResultsSection = document.getElementById('searchResultsSection');
-      if (!searchResultsSection) {
-        searchResultsSection = document.createElement('div');
-        searchResultsSection.id = 'searchResultsSection';
-        searchResultsSection.className = 'category';
-        searchResultsSection.setAttribute('data-category', 'Search Results');
-        searchResultsSection.innerHTML = '<h2>Search Results</h2><div class="grid" id="searchResultsGrid"></div>';
-        document.querySelector('.content-wrapper').insertBefore(searchResultsSection, document.querySelector('.content-wrapper').firstChild.nextSibling);
+      let searchResults = searchResultsSection;
+      if (!searchResults) {
+        searchResults = document.createElement('div');
+        searchResults.id = 'searchResultsSection';
+        searchResults.className = 'category';
+        searchResults.setAttribute('data-category', 'Search Results');
+        searchResults.innerHTML = '<h2>Search Results</h2><div class="grid" id="searchResultsGrid"></div>';
+        document.querySelector('.content-wrapper').insertBefore(searchResults, document.querySelector('.content-wrapper').firstChild.nextSibling);
       }
       
-      searchResultsSection.style.display = 'block';
+      searchResults.style.display = 'block';
       const searchGrid = document.getElementById('searchResultsGrid');
       searchGrid.innerHTML = '';
       
@@ -907,7 +918,7 @@ const html = `<!DOCTYPE html>
       // Shuffle final curated list
       shuffleArray(curatedGames);
       
-      // Hide all categories
+      // Hide all categories including Recently Played
       document.querySelectorAll('.category').forEach(cat => {
         if (cat.id !== 'curatedGamesSection') {
           cat.style.display = 'none';
@@ -1008,13 +1019,14 @@ const html = `<!DOCTYPE html>
       const curatedSection = document.getElementById('curatedGamesSection');
       if (curatedSection) curatedSection.style.display = 'none';
       
-      all.forEach(c => {
-        const category = c.getAttribute('data-category');
-        
-        // Skip special sections
-        if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection') return;
-        
-        if (cat === 'Home') {
+      if (cat === 'Home') {
+        currentViewMode = 'home';
+        all.forEach(c => {
+          const category = c.getAttribute('data-category');
+          
+          // Skip special sections
+          if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection') return;
+          
           // Show recently played and all categories on home
           if (category === 'Recently Played') {
             const recentGrid = document.getElementById('recentlyPlayedGrid');
@@ -1022,11 +1034,20 @@ const html = `<!DOCTYPE html>
           } else {
             c.style.display = 'block';
           }
-        } else {
-          // Show only selected category
+        });
+      } else {
+        currentViewMode = 'category';
+        all.forEach(c => {
+          const category = c.getAttribute('data-category');
+          
+          // Skip special sections
+          if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection') return;
+          
+          // Show only selected category (show all games at once)
           c.style.display = (category === cat) ? 'block' : 'none';
-        }
-      });
+        });
+      }
+      
       document.getElementById('content').scrollTop = 0;
       updateAllCategories();
     }
