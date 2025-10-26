@@ -37,7 +37,7 @@ function chooseThumb(game) {
 // Generate game card string with data-index for JS control
 function generateGameCard(game, idx) {
   const thumb = chooseThumb(game);
-  return `<div class="card game-card" data-index="${idx}" onclick="prepareGame('${encodeURIComponent(game.folder)}','${encodeURIComponent(game.name)}','games/${game.folder}/${thumb}')">
+  return `<div class="card game-card" data-index="${idx}" data-folder="${game.folder}" onclick="prepareGame('${encodeURIComponent(game.folder)}','${encodeURIComponent(game.name)}','games/${game.folder}/${thumb}')">
     <div class="thumb-container" style="--thumb-url: url('games/${game.folder}/${thumb}')">
       <img class="thumb" src="games/${game.folder}/${thumb}" alt="${game.name}">
     </div>
@@ -68,30 +68,50 @@ const html = `<!DOCTYPE html>
   <meta property="og:image" content="https://chromebookunlocked.github.io/assets/logo.png">
   <link rel="icon" type="image/png" href="assets/logo.png">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
     :root {
       --base-font: clamp(12px, 1.2vw, 18px);
       --thumb-height: clamp(140px, 18vw, 200px);
       --sidebar-width: clamp(50px, 6vw, 70px);
       --accent: #ff66ff;
       --accent-dark: #cc33ff;
+      --accent-light: #ff99ff;
       --background-dark: #1c0033;
+      --card-bg: #4d0066;
+      --card-hover: #660099;
       --font-main: 'Orbitron', sans-serif;
     }
+    
     /* basics */
     * { box-sizing: border-box; }
     html,body {
       margin:0; padding:0; height:100%;
-      background:var(--background-dark);
+      background: linear-gradient(135deg, #0d001a 0%, #1c0033 50%, #2d0052 100%);
       font-family:var(--font-main);
       color:#eee;
       font-size:var(--base-font);
       overflow:hidden;
     }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.3);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--accent), var(--accent-dark));
+      border-radius: 5px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-light);
+    }
+    
     /* Sidebar */
     #sidebar {
       width: var(--sidebar-width);
-      background:#330066;
+      background: linear-gradient(180deg, #330066 0%, #1a0033 100%);
       padding:1rem 0;
       height:100vh;
       overflow-y:auto;
@@ -99,8 +119,13 @@ const html = `<!DOCTYPE html>
       left:0; top:0;
       z-index:1000;
       transition: width .3s ease;
+      border-right: 2px solid rgba(255, 102, 255, 0.2);
+      box-shadow: 5px 0 20px rgba(255, 102, 255, 0.1);
     }
-    #sidebar:hover { width:250px; }
+    #sidebar:hover { 
+      width:250px;
+      box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
+    }
     #sidebar header {
       display:flex;
       justify-content:center;
@@ -109,6 +134,11 @@ const html = `<!DOCTYPE html>
     #sidebar header img {
       height:60px;
       width:auto;
+      filter: drop-shadow(0 0 10px var(--accent));
+      transition: transform .3s ease;
+    }
+    #sidebar:hover header img {
+      transform: scale(1.1);
     }
     #sidebar ul {
       list-style:none;
@@ -117,26 +147,32 @@ const html = `<!DOCTYPE html>
     }
     #sidebar li {
       cursor:pointer;
-      padding:.5rem;
-      border-radius:4px;
+      padding:.7rem 1rem;
+      margin: 0.5rem;
+      border-radius:8px;
       transition:.3s ease;
       white-space:nowrap;
       opacity:0;
-      transform:translateY(5px);
+      transform:translateX(-10px);
       font-family:var(--font-main);
+      font-weight: 600;
+      border: 1px solid transparent;
     }
     #sidebar:hover li {
       opacity:1;
-      transform:translateY(0);
+      transform:translateX(0);
     }
     #sidebar li:hover {
-      background:#660099;
-      box-shadow:0 0 10px var(--accent);
+      background: linear-gradient(135deg, #660099, #7700aa);
+      border: 1px solid var(--accent);
+      box-shadow:0 0 15px var(--accent);
       color:#fff;
+      transform: translateX(5px);
     }
+    
     /* Content */
     #content {
-      padding:1rem;
+      padding:1.5rem;
       overflow-y:auto;
       overflow-x:hidden;
       margin-left: var(--sidebar-width);
@@ -144,34 +180,39 @@ const html = `<!DOCTYPE html>
       transition: margin-left .3s;
       height:100vh;
     }
+    
     /* Controls (buttons) */
     #controls {
       display:flex;
       justify-content:space-between;
       align-items:center;
-      max-width:1280px;
-      margin:0 auto .5rem auto;
+      max-width:1400px;
+      margin:0 auto 1rem auto;
       padding:.5rem;
       visibility:hidden;
       font-size:1.1em;
     }
     button {
-      padding:.6rem 1rem;
+      padding:.7rem 1.3rem;
       border:none;
-      border-radius:10px;
+      border-radius:12px;
       cursor:pointer;
       font-size:1em;
       background:linear-gradient(135deg,var(--accent),var(--accent-dark));
-      color:black;
+      color:#fff;
       font-weight:700;
       letter-spacing:.5px;
-      transition:all .2s ease;
-      box-shadow:0 0 10px var(--accent);
+      transition:all .3s ease;
+      box-shadow:0 4px 15px rgba(255, 102, 255, 0.3);
       font-family:var(--font-main);
+      border: 1px solid rgba(255, 102, 255, 0.4);
     }
     button:hover {
-      transform:scale(1.05);
-      box-shadow:0 0 15px var(--accent);
+      transform:translateY(-2px) scale(1.05);
+      box-shadow:0 6px 25px rgba(255, 102, 255, 0.5);
+    }
+    button:active {
+      transform:translateY(0) scale(1);
     }
     #backBtn {
       background:linear-gradient(135deg,#ff99ff,var(--accent));
@@ -179,6 +220,7 @@ const html = `<!DOCTYPE html>
     #fullscreenBtn {
       background:linear-gradient(135deg,var(--accent-dark),#9933ff);
     }
+    
     /* Viewer */
     .viewer {
       position:relative;
@@ -186,11 +228,13 @@ const html = `<!DOCTYPE html>
       justify-content:center;
       align-items:center;
       width:100%;
+      max-width: 1400px;
       aspect-ratio:16 / 9;
       background:transparent;
-      border-radius:10px;
+      border-radius:15px;
       overflow:hidden;
       margin:0 auto 2rem auto;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
     }
     .viewer iframe {
       width:100%;
@@ -199,91 +243,117 @@ const html = `<!DOCTYPE html>
       background:transparent;
       object-fit:contain;
     }
+    
     /* Play overlay */
     #startOverlay {
       position:absolute;
       inset:0;
-      background:linear-gradient(180deg,#330066 0%, #1c0033 100%);
+      background:linear-gradient(135deg,#330066 0%, #1c0033 50%, #0d001a 100%);
       display:flex;
       flex-direction:column;
       justify-content:center;
       align-items:center;
-      gap:1rem;
+      gap:1.5rem;
       z-index:10;
       transition:opacity .5s ease;
     }
     #startOverlay img {
-      width:clamp(200px,40vw,300px);
+      width:clamp(200px,40vw,350px);
       max-width:80%;
-      border-radius:10px;
-      box-shadow:0 0 20px var(--accent);
+      border-radius:15px;
+      box-shadow:0 10px 40px rgba(255, 102, 255, 0.4);
+      border: 2px solid rgba(255, 102, 255, 0.3);
     }
     #startOverlay h1 {
       margin:0;
       font-size:clamp(1.5rem,2.5vw,3rem);
       color:#fff;
       font-family:var(--font-main);
+      text-shadow: 0 0 20px var(--accent);
+      font-weight: 900;
     }
     #startButton {
-      padding:.8rem 2rem;
+      padding:1rem 2.5rem;
       font-size:clamp(1rem,1.5vw,1.5rem);
-      background:var(--accent);
-      color:black;
+      background:linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color:#fff;
       border:none;
-      border-radius:8px;
+      border-radius:12px;
       cursor:pointer;
-      transition:.2s;
-      font-weight:bold;
+      transition:.3s;
+      font-weight:900;
       font-family:var(--font-main);
+      box-shadow:0 5px 25px rgba(255, 102, 255, 0.5);
+      border: 2px solid var(--accent-light);
     }
     #startButton:hover {
-      background:#ff66ff;
-      box-shadow:0 0 15px #ff66ff;
+      background:linear-gradient(135deg, var(--accent-light), var(--accent));
+      box-shadow:0 8px 35px rgba(255, 102, 255, 0.7);
+      transform: translateY(-3px) scale(1.05);
     }
+    
     /* Grid & cards */
     .category {
-      margin-top:2rem;
+      margin-top:3rem;
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .category:first-of-type {
+      margin-top: 1rem;
     }
     .category h2 {
       color:#ffccff;
-      margin-bottom:.5rem;
+      margin-bottom:1rem;
       cursor:pointer;
       font-family:var(--font-main);
+      font-weight: 900;
+      font-size: clamp(1.5rem, 2vw, 2rem);
+      text-shadow: 0 0 15px rgba(255, 102, 255, 0.5);
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid rgba(255, 102, 255, 0.3);
     }
     .grid {
       display:grid;
       grid-template-columns: repeat(5, 1fr);
-      gap:1rem;
+      gap:1.2rem;
       justify-items:center;
     }
+    
     /* responsive columns */
     @media (max-width:1200px){ .grid{ grid-template-columns: repeat(4,1fr);} }
     @media (max-width:900px){ .grid{ grid-template-columns: repeat(3,1fr);} }
     @media (max-width:600px){ .grid{ grid-template-columns: repeat(2,1fr);} }
     @media (max-width:400px){ .grid{ grid-template-columns: 1fr; } }
+    
     .card {
       width:100%;
-      background:#4d0066;
-      border-radius:12px;
+      background: linear-gradient(135deg, var(--card-bg), #5a0077);
+      border-radius:15px;
       overflow:hidden;
       cursor:pointer;
-      transition: transform .2s, background .2s;
+      transition: all .3s ease;
       text-align:center;
       display:flex;
       flex-direction:column;
       align-items:center;
       position:relative;
+      border: 2px solid rgba(255, 102, 255, 0.2);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
     .card:hover {
-      transform:scale(1.05);
-      background:#660099;
+      transform:translateY(-5px) scale(1.03);
+      background: linear-gradient(135deg, var(--card-hover), #7700aa);
+      border: 2px solid var(--accent);
+      box-shadow: 0 8px 30px rgba(255, 102, 255, 0.5);
     }
+    
     .thumb-container {
       width:100%;
       height:var(--thumb-height);
       position:relative;
       overflow:hidden;
-      border-radius:8px;
+      border-radius:12px;
       background:#220033;
     }
     .thumb-container::before {
@@ -294,8 +364,11 @@ const html = `<!DOCTYPE html>
       background-position:center;
       filter: blur(20px) brightness(0.5);
       z-index:0;
-      transition:transform .2s ease;
+      transition:transform .3s ease;
       background-image: var(--thumb-url);
+    }
+    .card:hover .thumb-container::before {
+      transform: scale(1.1);
     }
     .thumb {
       position:relative;
@@ -306,53 +379,92 @@ const html = `<!DOCTYPE html>
       transition:transform .3s ease;
     }
     .card:hover .thumb {
-      transform:scale(1.05);
+      transform:scale(1.08);
     }
+    
     .card-title {
-      margin:.5rem 0 1rem 0;
+      margin:.7rem 0 1rem 0;
       font-family:var(--font-main);
+      font-weight: 700;
+      font-size: clamp(0.85rem, 1vw, 1rem);
     }
-    /* "more" card */
+    
+    /* "more" card - same size as game cards */
     .card.more {
-      background: rgba(255,255,255,0.06);
+      background: linear-gradient(135deg, rgba(102, 0, 153, 0.3), rgba(77, 0, 102, 0.3));
+      backdrop-filter: blur(10px);
       display:flex;
       justify-content:center;
       align-items:center;
-      font-size:2.5rem;
-      color: #ffccff;
-      border: 2px dashed rgba(255,255,255,0.08);
-      height:var(--thumb-height);
       flex-direction:column;
+      color: #ffccff;
+      border: 2px dashed rgba(255, 102, 255, 0.4);
+      min-height: calc(var(--thumb-height) + 3rem);
+      transition: all .3s ease;
+      animation: pulse 2s ease-in-out infinite;
     }
+    
+    @keyframes pulse {
+      0%, 100% {
+        border-color: rgba(255, 102, 255, 0.4);
+        box-shadow: 0 4px 15px rgba(255, 102, 255, 0.2);
+      }
+      50% {
+        border-color: rgba(255, 102, 255, 0.7);
+        box-shadow: 0 4px 25px rgba(255, 102, 255, 0.4);
+      }
+    }
+    
+    .card.more:hover {
+      background: linear-gradient(135deg, rgba(102, 0, 153, 0.5), rgba(77, 0, 102, 0.5));
+      border: 2px dashed var(--accent);
+      transform:translateY(-5px) scale(1.03);
+      box-shadow: 0 8px 30px rgba(255, 102, 255, 0.6);
+      animation: none;
+    }
+    
     .card.more .dots {
-      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-size: clamp(3rem, 5vw, 4rem);
       line-height:1;
-      transform: translateY(-6%);
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
     }
+    
     .card.more .label {
-      font-size: .8rem;
-      margin-top: .25rem;
-      opacity: 0.8;
+      font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+      opacity: 0.9;
       font-family: var(--font-main);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
+    
     /* DMCA */
     #dmcaLink {
       position:fixed;
-      bottom:10px;
-      right:10px;
-      background:var(--accent);
-      color:black;
-      padding:.3rem .6rem;
-      border-radius:6px;
-      font-size:.8rem;
+      bottom:15px;
+      right:15px;
+      background:linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color:#fff;
+      padding:.5rem 1rem;
+      border-radius:10px;
+      font-size:.85rem;
       text-decoration:none;
       z-index:10000;
-      transition:.2s;
+      transition:.3s;
       font-family:var(--font-main);
+      font-weight: 700;
+      box-shadow: 0 4px 15px rgba(255, 102, 255, 0.4);
+      border: 1px solid rgba(255, 102, 255, 0.3);
     }
     #dmcaLink:hover{
-      background:#ff99ff;
-      color:black;
+      background:linear-gradient(135deg, var(--accent-light), var(--accent));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(255, 102, 255, 0.6);
     }
   </style>
 </head>
@@ -407,6 +519,34 @@ const html = `<!DOCTYPE html>
     const MAX_RECENT = 25;
     const offsets = {}; // offsets[category] = number of revealed rows - 1
     
+    // Get all valid game folders
+    function getValidGameFolders() {
+      const folders = new Set();
+      document.querySelectorAll('.game-card[data-folder]').forEach(card => {
+        folders.add(card.getAttribute('data-folder'));
+      });
+      return folders;
+    }
+    
+    // Clean recently played - remove games that no longer exist
+    function cleanRecentlyPlayed() {
+      const validFolders = getValidGameFolders();
+      let list = [];
+      try {
+        list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+      } catch(e) { list = []; }
+      
+      // Filter out games whose folders don't exist anymore
+      const cleaned = list.filter(game => validFolders.has(game.folder));
+      
+      // Only update if something was removed
+      if (cleaned.length !== list.length) {
+        localStorage.setItem('recentlyPlayed', JSON.stringify(cleaned));
+        return cleaned;
+      }
+      return list;
+    }
+    
     // Helper: get grid element for a category
     function gridForCategory(cat) {
       return Array.from(document.querySelectorAll('.category'))
@@ -427,7 +567,7 @@ const html = `<!DOCTYPE html>
     function createMoreCard(cat) {
       const more = document.createElement('div');
       more.className = 'card more';
-      more.innerHTML = '<div class="dots">⋯</div><div class="label">More</div>';
+      more.innerHTML = '<div class="dots">⋯</div><div class="label">Show More</div>';
       more.addEventListener('click', (e) => {
         offsets[cat] = (offsets[cat] || 0) + 1;
         updateCategoryView(cat);
@@ -494,11 +634,7 @@ const html = `<!DOCTYPE html>
     
     // Populate Recently Played grid
     function loadRecentlyPlayed() {
-      const raw = localStorage.getItem('recentlyPlayed') || '[]';
-      let list = [];
-      try {
-        list = JSON.parse(raw);
-      } catch(e){ list = []; }
+      const list = cleanRecentlyPlayed(); // Clean before loading
       
       const recentSection = document.getElementById('recentlyPlayedSection');
       const recentGrid = document.getElementById('recentlyPlayedGrid');
@@ -518,6 +654,7 @@ const html = `<!DOCTYPE html>
         const card = document.createElement('div');
         card.className = 'card game-card';
         card.setAttribute('data-index', i);
+        card.setAttribute('data-folder', g.folder);
         card.onclick = () => prepareGame(encodeURIComponent(g.folder), encodeURIComponent(g.name), g.thumb);
         card.innerHTML = \`<div class="thumb-container" style="--thumb-url: url('\${g.thumb}')">
           <img class="thumb" src="\${g.thumb}" alt="\${g.name}">
@@ -582,10 +719,7 @@ const html = `<!DOCTYPE html>
     
     // Recently played storage helpers
     function saveRecentlyPlayed(game) {
-      let list = [];
-      try {
-        list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
-      } catch(e) { list = []; }
+      let list = cleanRecentlyPlayed(); // Clean before saving
       
       list = list.filter(g => g.folder !== game.folder);
       list.unshift(game);
