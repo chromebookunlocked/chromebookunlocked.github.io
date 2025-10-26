@@ -37,7 +37,7 @@ function chooseThumb(game) {
 // Generate game card string with data-index for JS control
 function generateGameCard(game, idx) {
   const thumb = chooseThumb(game);
-  return `<div class="card game-card" data-index="${idx}" data-folder="${game.folder}" onclick="prepareGame('${encodeURIComponent(game.folder)}','${encodeURIComponent(game.name)}','games/${game.folder}/${thumb}')">
+  return `<div class="card game-card" data-index="${idx}" data-folder="${game.folder}" data-name="${game.name.toLowerCase()}" onclick="prepareGame('${encodeURIComponent(game.folder)}','${encodeURIComponent(game.name)}','games/${game.folder}/${thumb}')">
     <div class="thumb-container" style="--thumb-url: url('games/${game.folder}/${thumb}')">
       <img class="thumb" src="games/${game.folder}/${thumb}" alt="${game.name}">
     </div>
@@ -172,13 +172,74 @@ const html = `<!DOCTYPE html>
     
     /* Content */
     #content {
-      padding:1.5rem;
+      padding:0;
       overflow-y:auto;
       overflow-x:hidden;
       margin-left: var(--sidebar-width);
       width: calc(100% - var(--sidebar-width));
       transition: margin-left .3s;
       height:100vh;
+      padding-bottom: 40px;
+    }
+    
+    /* Top Header Bar */
+    #topHeader {
+      background: linear-gradient(135deg, #330066 0%, #1a0033 100%);
+      padding: 1.5rem 2rem;
+      border-bottom: 2px solid rgba(255, 102, 255, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+    
+    #topHeader h1 {
+      margin: 0;
+      font-size: clamp(1.3rem, 2.5vw, 2.2rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 20px rgba(255, 102, 255, 0.5);
+      white-space: nowrap;
+    }
+    
+    #searchContainer {
+      flex: 1;
+      max-width: 500px;
+      position: relative;
+    }
+    
+    #searchBar {
+      width: 100%;
+      padding: 0.8rem 1.2rem;
+      border: 2px solid rgba(255, 102, 255, 0.3);
+      border-radius: 25px;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 1rem;
+      outline: none;
+      transition: all .3s ease;
+    }
+    
+    #searchBar::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    #searchBar:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(255, 102, 255, 0.4);
+      background: rgba(0, 0, 0, 0.6);
+    }
+    
+    .content-wrapper {
+      padding: 1.5rem;
     }
     
     /* Controls (buttons) */
@@ -445,31 +506,30 @@ const html = `<!DOCTYPE html>
     
     /* DMCA */
     #dmcaLink {
-      position:fixed;
-      bottom:15px;
-      right:15px;
-      background:linear-gradient(135deg, var(--accent), var(--accent-dark));
-      color:#fff;
-      padding:.5rem 1rem;
-      border-radius:10px;
-      font-size:.85rem;
-      text-decoration:none;
-      z-index:10000;
-      transition:.3s;
-      font-family:var(--font-main);
-      font-weight: 700;
-      box-shadow: 0 4px 15px rgba(255, 102, 255, 0.4);
-      border: 1px solid rgba(255, 102, 255, 0.3);
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      color: rgba(255, 255, 255, 0.6);
+      padding: 0.5rem 1.5rem;
+      font-size: 0.75rem;
+      text-decoration: none;
+      z-index: 10000;
+      transition: .3s;
+      font-family: var(--font-main);
+      font-weight: 400;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      width: 100%;
+      text-align: center;
     }
-    #dmcaLink:hover{
-      background:linear-gradient(135deg, var(--accent-light), var(--accent));
-      transform: translateY(-2px);
-      box-shadow: 0 6px 25px rgba(255, 102, 255, 0.6);
+    #dmcaLink:hover {
+      color: var(--accent-light);
+      background: rgba(0, 0, 0, 0.85);
     }
   </style>
 </head>
 <body>
-  <a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
   
   <!-- Sidebar -->
   <div id="sidebar">
@@ -482,42 +542,55 @@ const html = `<!DOCTYPE html>
 
   <!-- Content -->
   <div id="content">
-    <div id="controls">
-      <button id="backBtn" onclick="closeGame()">← Back</button>
-      <span id="gameTitle"></span>
-      <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-    </div>
-    
-    <div class="viewer" id="viewer">
-      <div id="startOverlay">
-        <img id="startThumb" src="" alt="Game Thumbnail">
-        <h1 id="startName"></h1>
-        <button id="startButton" onclick="startGame()">▶ Play</button>
+    <!-- Top Header with Search -->
+    <div id="topHeader">
+      <h1>Chromebook Unlocked Games</h1>
+      <div id="searchContainer">
+        <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
       </div>
-      <iframe id="gameFrame" src=""></iframe>
     </div>
 
-    <!-- Recently Played -->
-    <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
-      <h2>Recently Played</h2>
-      <div class="grid" id="recentlyPlayedGrid"></div>
-    </div>
-
-    <!-- All category sections (including games for home view) -->
-    ${Object.keys(categories).map(cat => {
-      const list = categories[cat];
-      return `<div class="category" data-category="${cat}">
-        <h2>${cat}</h2>
-        <div class="grid">
-          ${list.map((g, i) => generateGameCard(g, i)).join('')}
+    <div class="content-wrapper">
+      <div id="controls">
+        <button id="backBtn" onclick="closeGame()">← Back</button>
+        <span id="gameTitle"></span>
+        <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+      </div>
+      
+      <div class="viewer" id="viewer">
+        <div id="startOverlay">
+          <img id="startThumb" src="" alt="Game Thumbnail">
+          <h1 id="startName"></h1>
+          <button id="startButton" onclick="startGame()">▶ Play</button>
         </div>
-      </div>`;
-    }).join('')}
+        <iframe id="gameFrame" src=""></iframe>
+      </div>
+
+      <!-- Recently Played -->
+      <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
+        <h2>Recently Played</h2>
+        <div class="grid" id="recentlyPlayedGrid"></div>
+      </div>
+
+      <!-- All category sections (including games for home view) -->
+      ${Object.keys(categories).map(cat => {
+        const list = categories[cat];
+        return `<div class="category" data-category="${cat}">
+          <h2>${cat}</h2>
+          <div class="grid">
+            ${list.map((g, i) => generateGameCard(g, i)).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
   </div>
+
+  <a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
 
   <script>
     const MAX_RECENT = 25;
     const offsets = {}; // offsets[category] = number of revealed rows - 1
+    let gameViewActive = false; // Track if game viewer is open
     
     // Get all valid game folders
     function getValidGameFolders() {
@@ -587,6 +660,13 @@ const html = `<!DOCTYPE html>
       // Gather game-card elements
       const cards = Array.from(grid.querySelectorAll('.game-card'));
       const total = cards.length;
+      
+      // If game viewer is active, show all cards and no more button
+      if (gameViewActive) {
+        cards.forEach(c => c.style.display = '');
+        return;
+      }
+      
       const cols = getColumnCount(grid);
       
       // Number of rows currently revealed
@@ -655,6 +735,7 @@ const html = `<!DOCTYPE html>
         card.className = 'card game-card';
         card.setAttribute('data-index', i);
         card.setAttribute('data-folder', g.folder);
+        card.setAttribute('data-name', g.name.toLowerCase());
         card.onclick = () => prepareGame(encodeURIComponent(g.folder), encodeURIComponent(g.name), g.thumb);
         card.innerHTML = \`<div class="thumb-container" style="--thumb-url: url('\${g.thumb}')">
           <img class="thumb" src="\${g.thumb}" alt="\${g.name}">
@@ -665,6 +746,32 @@ const html = `<!DOCTYPE html>
       
       if (offsets['Recently Played'] === undefined) offsets['Recently Played'] = 0;
       updateCategoryView('Recently Played');
+    }
+    
+    // Search functionality
+    function searchGames(query) {
+      const searchTerm = query.toLowerCase().trim();
+      const allCards = document.querySelectorAll('.game-card');
+      
+      if (!searchTerm) {
+        // Reset to normal view
+        allCards.forEach(card => card.style.display = '');
+        updateAllCategories();
+        return;
+      }
+      
+      // Show all matching cards, hide non-matching
+      allCards.forEach(card => {
+        const gameName = card.getAttribute('data-name') || '';
+        if (gameName.includes(searchTerm)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // Hide "more" cards during search
+      document.querySelectorAll('.card.more').forEach(more => more.remove());
     }
     
     // Prepare game (open viewer overlay)
@@ -691,6 +798,11 @@ const html = `<!DOCTYPE html>
       startOverlay.style.pointerEvents = 'auto';
       window.location.hash = '#/game/' + folderEncoded;
       document.getElementById('content').scrollTop = 0;
+      
+      // Set game view active and show all games
+      gameViewActive = true;
+      updateAllCategories();
+      
       saveRecentlyPlayed({ folder, name, thumb: thumbSrc });
     }
     
@@ -710,6 +822,10 @@ const html = `<!DOCTYPE html>
       startOverlay.style.opacity = '1';
       startOverlay.style.pointerEvents = 'auto';
       window.location.hash = '';
+      
+      // Deactivate game view and restore "show more" functionality
+      gameViewActive = false;
+      updateAllCategories();
     }
     
     function toggleFullscreen() {
@@ -731,6 +847,11 @@ const html = `<!DOCTYPE html>
     // Category filtering (clicking sidebar)
     function filterCategory(cat) {
       const all = document.querySelectorAll('.category');
+      const searchBar = document.getElementById('searchBar');
+      
+      // Clear search when changing categories
+      if (searchBar) searchBar.value = '';
+      
       all.forEach(c => {
         const category = c.getAttribute('data-category');
         if (cat === 'Home') {
