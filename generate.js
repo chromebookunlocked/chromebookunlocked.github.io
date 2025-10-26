@@ -751,27 +751,59 @@ const html = `<!DOCTYPE html>
     // Search functionality
     function searchGames(query) {
       const searchTerm = query.toLowerCase().trim();
-      const allCards = document.querySelectorAll('.game-card');
+      const allCategories = document.querySelectorAll('.category');
       
       if (!searchTerm) {
-        // Reset to normal view
-        allCards.forEach(card => card.style.display = '');
+        // Reset to normal view - show all categories
+        allCategories.forEach(cat => {
+          const category = cat.getAttribute('data-category');
+          if (category === 'Recently Played' && !document.getElementById('recentlyPlayedGrid').children.length) {
+            cat.style.display = 'none';
+          } else {
+            cat.style.display = 'block';
+          }
+        });
         updateAllCategories();
         return;
       }
       
-      // Show all matching cards, hide non-matching
-      allCards.forEach(card => {
+      // During search: hide all categories and show only search results
+      allCategories.forEach(cat => cat.style.display = 'none');
+      
+      // Create or get search results container
+      let searchResultsSection = document.getElementById('searchResultsSection');
+      if (!searchResultsSection) {
+        searchResultsSection = document.createElement('div');
+        searchResultsSection.id = 'searchResultsSection';
+        searchResultsSection.className = 'category';
+        searchResultsSection.setAttribute('data-category', 'Search Results');
+        searchResultsSection.innerHTML = '<h2>Search Results</h2><div class="grid" id="searchResultsGrid"></div>';
+        document.querySelector('.content-wrapper').insertBefore(searchResultsSection, document.querySelector('.content-wrapper').firstChild.nextSibling);
+      }
+      
+      searchResultsSection.style.display = 'block';
+      const searchGrid = document.getElementById('searchResultsGrid');
+      searchGrid.innerHTML = '';
+      
+      // Collect unique games (avoid duplicates from different categories)
+      const uniqueGames = new Map();
+      document.querySelectorAll('.game-card').forEach(card => {
         const gameName = card.getAttribute('data-name') || '';
-        if (gameName.includes(searchTerm)) {
-          card.style.display = '';
-        } else {
-          card.style.display = 'none';
+        const gameFolder = card.getAttribute('data-folder');
+        
+        if (gameName.includes(searchTerm) && !uniqueGames.has(gameFolder)) {
+          uniqueGames.set(gameFolder, card.cloneNode(true));
         }
       });
       
-      // Hide "more" cards during search
-      document.querySelectorAll('.card.more').forEach(more => more.remove());
+      // Display unique results
+      if (uniqueGames.size === 0) {
+        searchGrid.innerHTML = '<p style="color: rgba(255,255,255,0.6); grid-column: 1/-1; text-align: center; padding: 2rem;">No games found matching "' + query + '"</p>';
+      } else {
+        uniqueGames.forEach(card => {
+          searchGrid.appendChild(card);
+        });
+      }
     }
     
     // Prepare game (open viewer overlay)
@@ -799,11 +831,108 @@ const html = `<!DOCTYPE html>
       window.location.hash = '#/game/' + folderEncoded;
       document.getElementById('content').scrollTop = 0;
       
-      // Set game view active and show all games
+      // Set game view active and show curated game selection
       gameViewActive = true;
-      updateAllCategories();
+      showCuratedGames(folder);
       
       saveRecentlyPlayed({ folder, name, thumb: thumbSrc });
+    }
+    
+    // Show curated games when game viewer is open
+    function showCuratedGames(currentGameFolder) {
+      // Hide search results if visible
+      const searchResults = document.getElementById('searchResultsSection');
+      if (searchResults) searchResults.style.display = 'none';
+      
+      // Get current game's category
+      let currentCategory = null;
+      document.querySelectorAll('.game-card').forEach(card => {
+        if (card.getAttribute('data-folder') === currentGameFolder) {
+          currentCategory = card.closest('.category')?.getAttribute('data-category');
+        }
+      });
+      
+      // Collect all games
+      const allGames = [];
+      const sameCategory = [];
+      
+      document.querySelectorAll('.category:not(#searchResultsSection)').forEach(cat => {
+        const category = cat.getAttribute('data-category');
+        if (category === 'Recently Played') return;
+        
+        const cards = Array.from(cat.querySelectorAll('.game-card'));
+        cards.forEach(card => {
+          const folder = card.getAttribute('data-folder');
+          if (folder === currentGameFolder) return; // Skip current game
+          
+          const gameData = {
+            card: card.cloneNode(true),
+            folder: folder,
+            category: category
+          };
+          
+          if (category === currentCategory) {
+            sameCategory.push(gameData);
+          }
+          allGames.push(gameData);
+        });
+      });
+      
+      // Shuffle arrays for randomness
+      const shuffleArray = (array) => {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      };
+      
+      shuffleArray(sameCategory);
+      shuffleArray(allGames);
+      
+      // Create curated selection: 60% same category, 40% all games
+      const curatedGames = [];
+      const targetCount = Math.min(20, allGames.length); // Show up to 20 games
+      const sameCategoryCount = Math.min(Math.ceil(targetCount * 0.6), sameCategory.length);
+      const allGamesCount = targetCount - sameCategoryCount;
+      
+      // Add games from same category
+      curatedGames.push(...sameCategory.slice(0, sameCategoryCount));
+      
+      // Add games from all categories (excluding already added)
+      const addedFolders = new Set(curatedGames.map(g => g.folder));
+      const remainingGames = allGames.filter(g => !addedFolders.has(g.folder));
+      curatedGames.push(...remainingGames.slice(0, allGamesCount));
+      
+      // Shuffle final curated list
+      shuffleArray(curatedGames);
+      
+      // Hide all categories
+      document.querySelectorAll('.category').forEach(cat => {
+        if (cat.id !== 'curatedGamesSection') {
+          cat.style.display = 'none';
+        }
+      });
+      
+      // Create or update curated games section
+      let curatedSection = document.getElementById('curatedGamesSection');
+      if (!curatedSection) {
+        curatedSection = document.createElement('div');
+        curatedSection.id = 'curatedGamesSection';
+        curatedSection.className = 'category';
+        curatedSection.setAttribute('data-category', 'Recommended Games');
+        curatedSection.innerHTML = '<h2>You Might Also Like</h2><div class="grid" id="curatedGamesGrid"></div>';
+        document.querySelector('.content-wrapper').appendChild(curatedSection);
+      }
+      
+      curatedSection.style.display = 'block';
+      const curatedGrid = document.getElementById('curatedGamesGrid');
+      curatedGrid.innerHTML = '';
+      
+      // Display curated games
+      curatedGames.forEach(game => {
+        curatedGrid.appendChild(game.card);
+      });
     }
     
     function startGame() {
@@ -823,8 +952,28 @@ const html = `<!DOCTYPE html>
       startOverlay.style.pointerEvents = 'auto';
       window.location.hash = '';
       
-      // Deactivate game view and restore "show more" functionality
+      // Deactivate game view and restore normal category view
       gameViewActive = false;
+      
+      // Hide curated and search results sections
+      const curatedSection = document.getElementById('curatedGamesSection');
+      if (curatedSection) curatedSection.style.display = 'none';
+      
+      const searchResults = document.getElementById('searchResultsSection');
+      if (searchResults) searchResults.style.display = 'none';
+      
+      // Show all normal categories again
+      document.querySelectorAll('.category').forEach(cat => {
+        const category = cat.getAttribute('data-category');
+        if (category === 'Recently Played') {
+          const recentGrid = document.getElementById('recentlyPlayedGrid');
+          cat.style.display = (recentGrid && recentGrid.children.length > 0) ? 'block' : 'none';
+        } else if (cat.id !== 'curatedGamesSection' && cat.id !== 'searchResultsSection') {
+          cat.style.display = 'block';
+        }
+      });
+      
+      // Restore "show more" functionality
       updateAllCategories();
     }
     
@@ -852,11 +1001,27 @@ const html = `<!DOCTYPE html>
       // Clear search when changing categories
       if (searchBar) searchBar.value = '';
       
+      // Hide search and curated sections
+      const searchResults = document.getElementById('searchResultsSection');
+      if (searchResults) searchResults.style.display = 'none';
+      
+      const curatedSection = document.getElementById('curatedGamesSection');
+      if (curatedSection) curatedSection.style.display = 'none';
+      
       all.forEach(c => {
         const category = c.getAttribute('data-category');
+        
+        // Skip special sections
+        if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection') return;
+        
         if (cat === 'Home') {
           // Show recently played and all categories on home
-          c.style.display = 'block';
+          if (category === 'Recently Played') {
+            const recentGrid = document.getElementById('recentlyPlayedGrid');
+            c.style.display = (recentGrid && recentGrid.children.length > 0) ? 'block' : 'none';
+          } else {
+            c.style.display = 'block';
+          }
         } else {
           // Show only selected category
           c.style.display = (category === cat) ? 'block' : 'none';
