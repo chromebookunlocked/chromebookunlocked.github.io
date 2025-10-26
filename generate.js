@@ -904,6 +904,13 @@ const html = `<!DOCTYPE html>
       
       // Set game view active and show curated game selection
       gameViewActive = true;
+      
+      // CRITICAL: Force hide Recently Played section
+      const recentlyPlayedSection = document.getElementById('recentlyPlayedSection');
+      if (recentlyPlayedSection) {
+        recentlyPlayedSection.style.display = 'none';
+      }
+      
       showCuratedGames(folder);
       
       saveRecentlyPlayed({ folder, name, thumb: thumbSrc });
