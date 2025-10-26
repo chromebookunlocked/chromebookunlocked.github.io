@@ -72,10 +72,43 @@
       width:250px;
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
     }
+    
+    /* Sidebar expand indicator */
+    #sidebarIndicator {
+      position: absolute;
+      right: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 60px;
+      background: linear-gradient(90deg, rgba(255, 102, 255, 0.3), rgba(255, 102, 255, 0.6));
+      border-radius: 0 12px 12px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.7;
+      transition: all .3s ease;
+      pointer-events: none;
+    }
+    #sidebar:hover #sidebarIndicator {
+      opacity: 0;
+    }
+    #sidebarIndicator::before {
+      content: '❯';
+      color: white;
+      font-size: 1rem;
+      animation: pulseArrow 1.5s ease-in-out infinite;
+    }
+    @keyframes pulseArrow {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(3px); }
+    }
+    
     #sidebar header {
       display:flex;
       justify-content:center;
       margin-bottom:2rem;
+      cursor: pointer;
     }
     #sidebar header img {
       height:60px;
@@ -153,6 +186,12 @@
       background-clip: text;
       text-shadow: 0 0 20px rgba(255, 102, 255, 0.5);
       white-space: nowrap;
+      cursor: pointer;
+      transition: transform .3s ease;
+    }
+    
+    #topHeader h1:hover {
+      transform: scale(1.05);
     }
     
     #searchContainer {
@@ -161,9 +200,19 @@
       position: relative;
     }
     
+    #searchIcon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.5);
+      pointer-events: none;
+      font-size: 1.1rem;
+    }
+    
     #searchBar {
       width: 100%;
-      padding: 0.8rem 1.2rem;
+      padding: 0.8rem 1.2rem 0.8rem 3rem;
       border: 2px solid rgba(255, 102, 255, 0.3);
       border-radius: 25px;
       background: rgba(0, 0, 0, 0.4);
@@ -479,7 +528,8 @@
   
   <!-- Sidebar -->
   <div id="sidebar">
-    <header><img src="assets/logo.png" alt="Logo"></header>
+    <div id="sidebarIndicator"></div>
+    <header onclick="goToHome()"><img src="assets/logo.png" alt="Logo"></header>
     <ul id="categoryList">
       <li onclick="filterCategory('Home')">Home</li>
       <li onclick="filterCategory('Uncategorized')">Uncategorized</li><li onclick="filterCategory('Shooter')">Shooter</li><li onclick="filterCategory('Horror')">Horror</li><li onclick="filterCategory('Clickers')">Clickers</li>
@@ -490,8 +540,9 @@
   <div id="content">
     <!-- Top Header with Search -->
     <div id="topHeader">
-      <h1>Chromebook Unlocked Games</h1>
+      <h1 onclick="goToHome()">Chromebook Unlocked Games</h1>
       <div id="searchContainer">
+        <span id="searchIcon">🔍</span>
         <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
       </div>
     </div>
@@ -934,9 +985,9 @@
       const searchGrid = document.getElementById('searchResultsGrid');
       searchGrid.innerHTML = '';
       
-      // Collect unique games (avoid duplicates from different categories)
+      // Collect unique games from ALL categories (not just Recently Played)
       const uniqueGames = new Map();
-      document.querySelectorAll('.game-card').forEach(card => {
+      document.querySelectorAll('.category:not(#searchResultsSection):not(#curatedGamesSection) .game-card').forEach(card => {
         const gameName = card.getAttribute('data-name') || '';
         const gameFolder = card.getAttribute('data-folder');
         
@@ -953,6 +1004,15 @@
           searchGrid.appendChild(card);
         });
       }
+    }
+    
+    // Navigate to home page
+    function goToHome() {
+      window.location.hash = '';
+      const searchBar = document.getElementById('searchBar');
+      if (searchBar) searchBar.value = '';
+      closeGame();
+      filterCategory('Home');
     }
     
     // Prepare game (open viewer overlay)
@@ -995,17 +1055,20 @@
       
       // Get current game's category
       let currentCategory = null;
-      document.querySelectorAll('.game-card').forEach(card => {
+      document.querySelectorAll('.category:not(#searchResultsSection):not(#curatedGamesSection) .game-card').forEach(card => {
         if (card.getAttribute('data-folder') === currentGameFolder) {
-          currentCategory = card.closest('.category')?.getAttribute('data-category');
+          const parentCat = card.closest('.category');
+          if (parentCat) {
+            currentCategory = parentCat.getAttribute('data-category');
+          }
         }
       });
       
-      // Collect all games
+      // Collect all games from actual category sections (not Recently Played)
       const allGames = [];
       const sameCategory = [];
       
-      document.querySelectorAll('.category:not(#searchResultsSection)').forEach(cat => {
+      document.querySelectorAll('.category:not(#searchResultsSection):not(#curatedGamesSection):not(#recentlyPlayedSection)').forEach(cat => {
         const category = cat.getAttribute('data-category');
         if (category === 'Recently Played') return;
         
@@ -1040,8 +1103,9 @@
       shuffleArray(allGames);
       
       // Create curated selection: 60% same category, 40% all games
+      // Show approximately 5 rows worth of games (5 cols * 5 rows = 25 games)
       const curatedGames = [];
-      const targetCount = Math.min(20, allGames.length); // Show up to 20 games
+      const targetCount = Math.min(25, allGames.length);
       const sameCategoryCount = Math.min(Math.ceil(targetCount * 0.6), sameCategory.length);
       const allGamesCount = targetCount - sameCategoryCount;
       
@@ -1056,7 +1120,7 @@
       // Shuffle final curated list
       shuffleArray(curatedGames);
       
-      // Hide all categories including Recently Played
+      // Hide ALL categories including Recently Played
       document.querySelectorAll('.category').forEach(cat => {
         if (cat.id !== 'curatedGamesSection') {
           cat.style.display = 'none';
