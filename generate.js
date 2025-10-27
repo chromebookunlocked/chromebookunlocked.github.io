@@ -1016,6 +1016,8 @@ const html = `<!DOCTYPE html>
     
     // Show curated games when game viewer is open
     function showCuratedGames(currentGameFolder) {
+      console.log('=== Starting showCuratedGames for:', currentGameFolder);
+      
       // Hide search results if visible
       const searchResults = document.getElementById('searchResultsSection');
       if (searchResults) searchResults.style.display = 'none';
@@ -1029,152 +1031,162 @@ const html = `<!DOCTYPE html>
         recentSection.style.top = '-9999px';
       }
       
-      // Get current game's category by checking all game cards
+      // First, find current game's category from the original game categories
       let currentCategory = null;
-      const allGameCards = document.querySelectorAll('.game-card[data-folder]');
+      const categorySections = document.querySelectorAll('.category');
       
-      allGameCards.forEach(card => {
-        if (card.getAttribute('data-folder') === currentGameFolder) {
-          const parentCat = card.closest('.category');
-          if (parentCat && 
-              parentCat.id !== 'recentlyPlayedSection' && 
-              parentCat.id !== 'searchResultsSection' &&
-              parentCat.id !== 'curatedGamesSection') {
-            currentCategory = parentCat.getAttribute('data-category');
-          }
+      categorySections.forEach(cat => {
+        const catName = cat.getAttribute('data-category');
+        if (catName === 'Recently Played' || 
+            cat.id === 'recentlyPlayedSection' ||
+            cat.id === 'searchResultsSection' ||
+            cat.id === 'curatedGamesSection') {
+          return;
         }
+        
+        const gameCards = cat.querySelectorAll('.game-card[data-folder]');
+        gameCards.forEach(card => {
+          if (card.getAttribute('data-folder') === currentGameFolder) {
+            currentCategory = catName;
+            console.log('Found current game in category:', catName);
+          }
+        });
       });
       
-      // Collect ALL games from actual game categories
+      // Collect ALL games from ALL real categories
       const allGames = [];
       const sameCategory = [];
-      const processedFolders = new Set();
+      const seenFolders = new Set();
+      seenFolders.add(currentGameFolder); // Don't include current game
       
-      // Use all game cards with data-folder attribute
-      allGameCards.forEach(card => {
-        const folder = card.getAttribute('data-folder');
-        const parentCat = card.closest('.category');
+      categorySections.forEach(cat => {
+        const catName = cat.getAttribute('data-category');
         
-        // Skip if already processed or if it's the current game
-        if (processedFolders.has(folder) || folder === currentGameFolder) {
+        // Skip special sections
+        if (catName === 'Recently Played' || 
+            cat.id === 'recentlyPlayedSection' ||
+            cat.id === 'searchResultsSection' ||
+            cat.id === 'curatedGamesSection') {
+          console.log('Skipping special section:', catName || cat.id);
           return;
         }
         
-        // Skip if from special sections
-        if (!parentCat || 
-            parentCat.id === 'recentlyPlayedSection' || 
-            parentCat.id === 'searchResultsSection' ||
-            parentCat.id === 'curatedGamesSection') {
-          return;
-        }
+        console.log('Processing category:', catName);
         
-        const category = parentCat.getAttribute('data-category');
+        const gameCards = cat.querySelectorAll('.game-card[data-folder]');
+        console.log('  Found', gameCards.length, 'game cards in', catName);
         
-        // Skip Recently Played category
-        if (category === 'Recently Played') {
-          return;
-        }
-        
-        processedFolders.add(folder);
-        
-        const gameData = {
-          card: card.cloneNode(true),
-          folder: folder,
-          category: category
-        };
-        
-        allGames.push(gameData);
-        
-        if (category === currentCategory) {
-          sameCategory.push(gameData);
-        }
+        gameCards.forEach(card => {
+          const folder = card.getAttribute('data-folder');
+          
+          // Skip if already seen
+          if (seenFolders.has(folder)) {
+            return;
+          }
+          
+          seenFolders.add(folder);
+          
+          const gameData = {
+            card: card.cloneNode(true),
+            folder: folder,
+            category: catName
+          };
+          
+          allGames.push(gameData);
+          
+          if (catName === currentCategory) {
+            sameCategory.push(gameData);
+          }
+        });
       });
       
-      console.log('Total games available:', allGames.length);
+      console.log('Total unique games collected:', allGames.length);
       console.log('Same category games:', sameCategory.length);
-      console.log('Current category:', currentCategory);
-      
-      // Shuffle arrays for randomness
-      const shuffleArray = (array) => {
-        for (let i = array.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-      };
-      
-      shuffleArray(sameCategory);
-      shuffleArray(allGames);
-      
-      // ✅ Fill 3 rows (15 games) with smart mixing
-      const curatedGames = [];
-      const targetCount = 15; // Always aim for 15 games (3 rows × 5 cols)
       
       if (allGames.length === 0) {
-        console.log('No games available for recommendations');
+        console.error('ERROR: No games found! This should not happen.');
         return;
       }
       
+      // Shuffle arrays
+      const shuffleArray = (array) => {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      };
+      
+      const shuffledSameCategory = shuffleArray(sameCategory);
+      const shuffledAllGames = shuffleArray(allGames);
+      
+      // Build curated list - target 15 games
+      const curatedGames = [];
+      const targetCount = 15;
+      
       if (sameCategory.length === 0) {
-        // No same category games, use all random
-        console.log('No same category, using all random');
-        curatedGames.push(...allGames.slice(0, Math.min(targetCount, allGames.length)));
+        // No same category - use all random
+        console.log('No same category games, using all random');
+        curatedGames.push(...shuffledAllGames.slice(0, Math.min(targetCount, shuffledAllGames.length)));
       } else {
-        // 60% same category, 40% random
-        const sameCategoryTarget = Math.ceil(targetCount * 0.6); // 9 games
-        const randomTarget = targetCount - sameCategoryTarget; // 6 games
+        // Mix: 60% same category, 40% other
+        const sameCatTarget = Math.min(Math.ceil(targetCount * 0.6), sameCategory.length);
+        console.log('Target same category games:', sameCatTarget);
         
-        // Add same category games (up to 9)
-        const sameCategoryCount = Math.min(sameCategoryTarget, sameCategory.length);
-        curatedGames.push(...sameCategory.slice(0, sameCategoryCount));
+        // Add same category games
+        curatedGames.push(...shuffledSameCategory.slice(0, sameCatTarget));
+        console.log('Added same category games:', curatedGames.length);
         
-        console.log('Added', sameCategoryCount, 'same category games');
-        
-        // Fill remaining with random games from ALL categories
-        const addedFolders = new Set(curatedGames.map(g => g.folder));
-        const remainingGames = allGames.filter(g => !addedFolders.has(g.folder));
-        
+        // Add other games
+        const usedFolders = new Set(curatedGames.map(g => g.folder));
+        const otherGames = shuffledAllGames.filter(g => !usedFolders.has(g.folder));
         const remainingSlots = targetCount - curatedGames.length;
-        const randomCount = Math.min(remainingSlots, remainingGames.length);
-        curatedGames.push(...remainingGames.slice(0, randomCount));
         
-        console.log('Added', randomCount, 'random games');
+        console.log('Other games available:', otherGames.length);
+        console.log('Remaining slots to fill:', remainingSlots);
+        
+        curatedGames.push(...otherGames.slice(0, remainingSlots));
       }
       
-      // Final shuffle for better distribution
-      shuffleArray(curatedGames);
+      console.log('FINAL curated games count:', curatedGames.length);
       
-      console.log('Total curated games:', curatedGames.length);
+      // Final shuffle
+      const finalCurated = shuffleArray(curatedGames);
       
-      // Hide ALL other categories
-      document.querySelectorAll('.category').forEach(cat => {
+      // Hide all other categories
+      categorySections.forEach(cat => {
         if (cat.id !== 'curatedGamesSection') {
           cat.style.display = 'none';
-          if (cat.id === 'recentlyPlayedSection') {
-            cat.style.visibility = 'hidden';
-          }
         }
       });
       
-      // Create/update curated section
+      // Create or update curated section
       let curatedSection = document.getElementById('curatedGamesSection');
       if (!curatedSection) {
         curatedSection = document.createElement('div');
         curatedSection.id = 'curatedGamesSection';
         curatedSection.className = 'category';
-        curatedSection.setAttribute('data-category', 'Recommended Games');
         curatedSection.innerHTML = '<h2>You Might Also Like</h2><div class="grid" id="curatedGamesGrid"></div>';
-        document.querySelector('.viewer').after(curatedSection);
+        const viewer = document.querySelector('.viewer');
+        if (viewer.nextSibling) {
+          viewer.parentNode.insertBefore(curatedSection, viewer.nextSibling);
+        } else {
+          viewer.parentNode.appendChild(curatedSection);
+        }
       }
       
       curatedSection.style.display = 'block';
       const curatedGrid = document.getElementById('curatedGamesGrid');
       curatedGrid.innerHTML = '';
       
-      // Display all curated games
-      curatedGames.forEach(game => {
+      console.log('Appending games to grid...');
+      finalCurated.forEach((game, idx) => {
+        console.log('  Appending game', idx + 1, ':', game.folder);
         curatedGrid.appendChild(game.card);
       });
+      
+      console.log('=== Finished showCuratedGames');
     }
     
     function startGame() {
