@@ -235,16 +235,22 @@ const html = `<!DOCTYPE html>
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      -webkit-box-decoration-break: clone;
-      box-decoration-break: clone;
       white-space: nowrap;
       cursor: pointer;
       transition: transform .3s ease;
-      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
     }
     
     #topHeader h1:hover {
       transform: scale(1.05);
+    }
+    
+    @media (max-width: 600px) {
+      #topHeader h1 {
+        font-size: clamp(1rem, 4vw, 1.3rem);
+      }
     }
     
     #searchContainer {
@@ -425,6 +431,7 @@ const html = `<!DOCTYPE html>
       border:none;
       background:transparent;
       object-fit:contain;
+      loading:lazy;
     }
     
     /* Play overlay */
@@ -560,6 +567,7 @@ const html = `<!DOCTYPE html>
       height:100%;
       object-fit:contain;
       transition:transform .3s ease;
+      loading:lazy;
     }
     .card:hover .thumb {
       transform:scale(1.08);
@@ -983,20 +991,6 @@ const html = `<!DOCTYPE html>
       const folder = decodeURIComponent(folderEncoded);
       const name = decodeURIComponent(nameEncoded);
       currentGameFolder = folder;
-      
-      // Preload the game in a hidden iframe for faster loading
-      const preloadFrame = document.createElement('iframe');
-      preloadFrame.style.display = 'none';
-      preloadFrame.src = 'games/' + folder + '/index.html';
-      document.body.appendChild(preloadFrame);
-      
-      // After 100ms, transfer to main frame when user clicks play
-      setTimeout(() => {
-        if (preloadFrame.parentNode) {
-          preloadFrame.remove();
-        }
-      }, 100);
-      
       frame.src = '';
       viewer.style.display = 'flex';
       controls.style.visibility = 'visible';
@@ -1069,7 +1063,7 @@ const html = `<!DOCTYPE html>
         });
       });
       
-      // Collect ALL games from ALL real categories
+      // Collect ALL games from ALL real categories (including hidden ones)
       const allGames = [];
       const sameCategory = [];
       const seenFolders = new Set();
@@ -1088,6 +1082,7 @@ const html = `<!DOCTYPE html>
         
         console.log('Processing category:', catName);
         
+        // Get ALL game cards regardless of their display state
         const gameCards = cat.querySelectorAll('.game-card[data-folder]');
         console.log('  Found', gameCards.length, 'game cards in', catName);
         
@@ -1101,8 +1096,13 @@ const html = `<!DOCTYPE html>
           
           seenFolders.add(folder);
           
+          // Clone and ensure the card is visible
+          const clonedCard = card.cloneNode(true);
+          clonedCard.style.display = ''; // Force show
+          clonedCard.style.visibility = 'visible';
+          
           const gameData = {
-            card: card.cloneNode(true),
+            card: clonedCard,
             folder: folder,
             category: catName
           };
@@ -1198,9 +1198,6 @@ const html = `<!DOCTYPE html>
       console.log('Appending games to grid...');
       finalCurated.forEach((game, idx) => {
         console.log('  Appending game', idx + 1, ':', game.folder);
-        // ✅ CRITICAL: Force show each card (unhide them)
-        game.card.style.display = '';
-        game.card.style.visibility = 'visible';
         curatedGrid.appendChild(game.card);
       });
       
@@ -1262,8 +1259,12 @@ const html = `<!DOCTYPE html>
     }
     
     function toggleFullscreen() {
-      if (!document.fullscreenElement) frame.requestFullscreen().catch(()=>{});
-      else document.exitFullscreen();
+      const viewerElement = document.querySelector('.viewer');
+      if (!document.fullscreenElement) {
+        viewerElement.requestFullscreen().catch(()=>{});
+      } else {
+        document.exitFullscreen();
+      }
     }
     
     // Recently played storage helpers
@@ -1281,6 +1282,11 @@ const html = `<!DOCTYPE html>
     function filterCategory(cat) {
       const all = document.querySelectorAll('.category');
       const searchBar = document.getElementById('searchBar');
+      
+      // Close game window if it's open
+      if (gameViewActive) {
+        closeGame();
+      }
       
       // Clear search when changing categories
       if (searchBar) searchBar.value = '';
