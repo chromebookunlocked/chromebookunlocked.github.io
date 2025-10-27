@@ -235,10 +235,12 @@ const html = `<!DOCTYPE html>
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-shadow: 0 0 20px rgba(255, 102, 255, 0.5);
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
       white-space: nowrap;
       cursor: pointer;
       transition: transform .3s ease;
+      display: inline-block;
     }
     
     #topHeader h1:hover {
@@ -981,6 +983,20 @@ const html = `<!DOCTYPE html>
       const folder = decodeURIComponent(folderEncoded);
       const name = decodeURIComponent(nameEncoded);
       currentGameFolder = folder;
+      
+      // Preload the game in a hidden iframe for faster loading
+      const preloadFrame = document.createElement('iframe');
+      preloadFrame.style.display = 'none';
+      preloadFrame.src = 'games/' + folder + '/index.html';
+      document.body.appendChild(preloadFrame);
+      
+      // After 100ms, transfer to main frame when user clicks play
+      setTimeout(() => {
+        if (preloadFrame.parentNode) {
+          preloadFrame.remove();
+        }
+      }, 100);
+      
       frame.src = '';
       viewer.style.display = 'flex';
       controls.style.visibility = 'visible';
@@ -1067,7 +1083,6 @@ const html = `<!DOCTYPE html>
             cat.id === 'recentlyPlayedSection' ||
             cat.id === 'searchResultsSection' ||
             cat.id === 'curatedGamesSection') {
-          console.log('Skipping special section:', catName || cat.id);
           return;
         }
         
@@ -1183,6 +1198,9 @@ const html = `<!DOCTYPE html>
       console.log('Appending games to grid...');
       finalCurated.forEach((game, idx) => {
         console.log('  Appending game', idx + 1, ':', game.folder);
+        // ✅ CRITICAL: Force show each card (unhide them)
+        game.card.style.display = '';
+        game.card.style.visibility = 'visible';
         curatedGrid.appendChild(game.card);
       });
       
