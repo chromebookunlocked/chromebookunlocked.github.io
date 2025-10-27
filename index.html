@@ -76,28 +76,29 @@
     /* Sidebar expand indicator */
     #sidebarIndicator {
       position: absolute;
-      right: -8px;
+      right: 2px;
       top: 50%;
       transform: translateY(-50%);
-      width: 16px;
-      height: 40px;
-      background: rgba(255, 102, 255, 0.15);
-      border-radius: 0 8px 8px 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 0.5;
-      transition: opacity .3s ease;
+      opacity: 0.4;
+      transition: all .3s ease;
       pointer-events: none;
+      font-size: 1.5rem;
+      color: rgba(255, 255, 255, 0.6);
     }
     #sidebar:hover #sidebarIndicator {
-      opacity: 0;
+      opacity: 0.6;
+      right: 5px;
     }
     #sidebarIndicator::before {
       content: '›';
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 1rem;
       font-weight: 300;
+      transition: transform .3s ease;
+    }
+    #sidebar:hover #sidebarIndicator::before {
+      transform: rotate(180deg);
     }
     
     #sidebar header {
@@ -1177,7 +1178,7 @@
         }
       });
       
-      // Collect and shuffle all games (excluding Recently Played)
+      // Collect all games (excluding Recently Played and current game)
       const allGames = [];
       const sameCategory = [];
       
@@ -1222,22 +1223,35 @@
       shuffleArray(sameCategory);
       shuffleArray(allGames);
       
-      // ✅ Show 3 rows of games (15 cards: 5 cols × 3 rows)
+      // ✅ Fill 3 rows with smart mixing algorithm
       const curatedGames = [];
       const cols = 5; // Default grid columns
       const rows = 3; // 3 rows as requested
-      const targetCount = Math.min(cols * rows, allGames.length); // 15 games max
+      const targetCount = cols * rows; // Always try to get 15 games
       
-      if (sameCategory.length > 0) {
-        // 60% same category, 40% mixed
-        const sameCategoryCount = Math.min(Math.ceil(targetCount * 0.6), sameCategory.length);
+      // Calculate how many games we can actually get
+      const maxAvailable = allGames.length;
+      const actualTarget = Math.min(targetCount, maxAvailable);
+      
+      if (sameCategory.length === 0) {
+        // No same category games, use all random
+        curatedGames.push(...allGames.slice(0, actualTarget));
+      } else {
+        // Smart mixing: 60% same category, 40% random
+        const sameCategoryTarget = Math.ceil(actualTarget * 0.6);
+        const sameCategoryCount = Math.min(sameCategoryTarget, sameCategory.length);
+        
+        // Add same category games
         curatedGames.push(...sameCategory.slice(0, sameCategoryCount));
+        
+        // Fill remaining slots with random games from other categories
+        const addedFolders = new Set(curatedGames.map(g => g.folder));
+        const remainingGames = allGames.filter(g => !addedFolders.has(g.folder));
+        const remainingSlots = actualTarget - curatedGames.length;
+        curatedGames.push(...remainingGames.slice(0, remainingSlots));
       }
       
-      const addedFolders = new Set(curatedGames.map(g => g.folder));
-      const remainingGames = allGames.filter(g => !addedFolders.has(g.folder));
-      curatedGames.push(...remainingGames.slice(0, targetCount - curatedGames.length));
-      
+      // Final shuffle for better distribution
       shuffleArray(curatedGames);
       
       // Hide ALL other categories including Recently Played
@@ -1266,7 +1280,7 @@
       const curatedGrid = document.getElementById('curatedGamesGrid');
       curatedGrid.innerHTML = '';
       
-      // Display curated games - 3 rows (15 games)
+      // Display curated games - 3 rows (up to 15 games)
       curatedGames.forEach(game => {
         curatedGrid.appendChild(game.card);
       });
