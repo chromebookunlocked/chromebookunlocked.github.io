@@ -130,32 +130,28 @@ const html = `<!DOCTYPE html>
     /* Sidebar expand indicator */
     #sidebarIndicator {
       position: absolute;
-      right: -12px;
+      right: -8px;
       top: 50%;
       transform: translateY(-50%);
-      width: 24px;
-      height: 60px;
-      background: linear-gradient(90deg, rgba(255, 102, 255, 0.3), rgba(255, 102, 255, 0.6));
-      border-radius: 0 12px 12px 0;
+      width: 16px;
+      height: 40px;
+      background: rgba(255, 102, 255, 0.15);
+      border-radius: 0 8px 8px 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      opacity: 0.7;
-      transition: all .3s ease;
+      opacity: 0.5;
+      transition: opacity .3s ease;
       pointer-events: none;
     }
     #sidebar:hover #sidebarIndicator {
       opacity: 0;
     }
     #sidebarIndicator::before {
-      content: '❯';
-      color: white;
+      content: '›';
+      color: rgba(255, 255, 255, 0.6);
       font-size: 1rem;
-      animation: pulseArrow 1.5s ease-in-out infinite;
-    }
-    @keyframes pulseArrow {
-      0%, 100% { transform: translateX(0); }
-      50% { transform: translateX(3px); }
+      font-weight: 300;
     }
     
     #sidebar header {
@@ -995,14 +991,22 @@ const html = `<!DOCTYPE html>
       window.location.hash = '#/game/' + folderEncoded;
       document.getElementById('content').scrollTop = 0;
       
-      // Set game view active and show curated game selection
+      // Set game view active
       gameViewActive = true;
       
-      // CRITICAL: Force hide Recently Played section
+      // CRITICAL: Force hide Recently Played section immediately
       const recentlyPlayedSection = document.getElementById('recentlyPlayedSection');
       if (recentlyPlayedSection) {
         recentlyPlayedSection.style.display = 'none';
+        recentlyPlayedSection.style.visibility = 'hidden';
       }
+      
+      // Hide all other categories
+      document.querySelectorAll('.category').forEach(cat => {
+        if (cat.id !== 'curatedGamesSection') {
+          cat.style.display = 'none';
+        }
+      });
       
       showCuratedGames(folder);
       
@@ -1015,26 +1019,40 @@ const html = `<!DOCTYPE html>
       const searchResults = document.getElementById('searchResultsSection');
       if (searchResults) searchResults.style.display = 'none';
       
-      // ✅ Explicitly hide Recently Played
+      // ✅ CRITICAL: Force hide Recently Played with multiple methods
       const recentSection = document.getElementById('recentlyPlayedSection');
-      if (recentSection) recentSection.style.display = 'none';
+      if (recentSection) {
+        recentSection.style.display = 'none';
+        recentSection.style.visibility = 'hidden';
+        recentSection.style.position = 'absolute';
+        recentSection.style.top = '-9999px';
+      }
       
       // Get current game's category
       let currentCategory = null;
-      document.querySelectorAll('.category:not(#searchResultsSection):not(#curatedGamesSection) .game-card').forEach(card => {
+      document.querySelectorAll('.category:not(#searchResultsSection):not(#curatedGamesSection):not(#recentlyPlayedSection) .game-card').forEach(card => {
         if (card.getAttribute('data-folder') === currentGameFolder) {
           const parentCat = card.closest('.category');
-          if (parentCat) currentCategory = parentCat.getAttribute('data-category');
+          if (parentCat && parentCat.id !== 'recentlyPlayedSection') {
+            currentCategory = parentCat.getAttribute('data-category');
+          }
         }
       });
       
-      // Collect and shuffle all games
+      // Collect and shuffle all games (excluding Recently Played)
       const allGames = [];
       const sameCategory = [];
       
-      document.querySelectorAll('.category:not(#searchResultsSection):not(#curatedGamesSection):not(#recentlyPlayedSection)').forEach(cat => {
+      document.querySelectorAll('.category').forEach(cat => {
         const category = cat.getAttribute('data-category');
-        if (category === 'Recently Played') return;
+        
+        // Skip special sections and Recently Played
+        if (category === 'Recently Played' || 
+            cat.id === 'searchResultsSection' || 
+            cat.id === 'curatedGamesSection' ||
+            cat.id === 'recentlyPlayedSection') {
+          return;
+        }
         
         const cards = Array.from(cat.querySelectorAll('.game-card'));
         cards.forEach(card => {
@@ -1066,11 +1084,11 @@ const html = `<!DOCTYPE html>
       shuffleArray(sameCategory);
       shuffleArray(allGames);
       
-      // ✅ ALWAYS show 5 rows of games (25 cards) - calculate based on grid columns
+      // ✅ Show 3 rows of games (15 cards: 5 cols × 3 rows)
       const curatedGames = [];
       const cols = 5; // Default grid columns
-      const rows = 5; // Always 5 rows
-      const targetCount = Math.min(cols * rows, allGames.length); // 25 games max
+      const rows = 3; // 3 rows as requested
+      const targetCount = Math.min(cols * rows, allGames.length); // 15 games max
       
       if (sameCategory.length > 0) {
         // 60% same category, 40% mixed
@@ -1088,6 +1106,9 @@ const html = `<!DOCTYPE html>
       document.querySelectorAll('.category').forEach(cat => {
         if (cat.id !== 'curatedGamesSection') {
           cat.style.display = 'none';
+          if (cat.id === 'recentlyPlayedSection') {
+            cat.style.visibility = 'hidden';
+          }
         }
       });
       
@@ -1107,7 +1128,7 @@ const html = `<!DOCTYPE html>
       const curatedGrid = document.getElementById('curatedGamesGrid');
       curatedGrid.innerHTML = '';
       
-      // Display curated games - always fill 5 rows
+      // Display curated games - 3 rows (15 games)
       curatedGames.forEach(game => {
         curatedGrid.appendChild(game.card);
       });
@@ -1139,6 +1160,18 @@ const html = `<!DOCTYPE html>
       
       const searchResults = document.getElementById('searchResultsSection');
       if (searchResults) searchResults.style.display = 'none';
+      
+      // Restore Recently Played visibility
+      const recentlyPlayedSection = document.getElementById('recentlyPlayedSection');
+      if (recentlyPlayedSection) {
+        const recentGrid = document.getElementById('recentlyPlayedGrid');
+        if (recentGrid && recentGrid.children.length > 0) {
+          recentlyPlayedSection.style.display = 'block';
+          recentlyPlayedSection.style.visibility = 'visible';
+          recentlyPlayedSection.style.position = 'relative';
+          recentlyPlayedSection.style.top = 'auto';
+        }
+      }
       
       // Show all normal categories again
       document.querySelectorAll('.category').forEach(cat => {
