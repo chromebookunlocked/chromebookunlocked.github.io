@@ -33,7 +33,8 @@ jobs:
           cp -r assets dist/assets
           cp ads.txt dist/ads.txt
           cp dmca.html dist/dmca.html
-          cp sitemap.xml dist/sitemap.xml   # ✅ Added line to include sitemap.xml
+          cp sitemap.xml dist/sitemap.xml
+          cp robots.txt dist/robots.txt   # ✅ Added this line
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
