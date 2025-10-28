@@ -25,14 +25,15 @@ jobs:
       - name: Build site
         run: npm run build
 
-      - name: Copy game, data, asset folders and ads.txt
+      - name: Copy game, data, asset folders, and static files
         run: |
           mkdir -p dist
           cp -r games dist/games
           cp -r data dist/data
           cp -r assets dist/assets
-          cp ads.txt dist/ads.txt   # ✅ This line ensures ads.txt stays
+          cp ads.txt dist/ads.txt
           cp dmca.html dist/dmca.html
+          cp sitemap.xml dist/sitemap.xml   # ✅ Added line to include sitemap.xml
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
