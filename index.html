@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
   <!-- Primary Meta Tags -->
-  <title>Chromebook Unlocked Games - Free Unblocked Games to Play on School Chromebook</title>
-  <meta name="title" content="Chromebook Unlocked Games - Free Unblocked Games to Play on School Chromebook">
+  <title>Chromebook Unlocked Games - Free Unblocked Games for School</title>
+  <meta name="title" content="Chromebook Unlocked Games - Free Unblocked Games for School">
   <meta name="description" content="Play free unblocked games at school on your Chromebook. Access 100+ unlocked online games that work on school computers. No downloads required - play instantly in your browser!">
-  <meta name="keywords" content="chromebook unlocked games, unblocked games, free online games, school games, chromebook games, unblocked games at school, online games unblocked, school computer games, free games, browser games, no download games, undetected games, chromebookunlocked, play games at school">
+  <meta name="keywords" content="chromebook unlocked games, unblocked games, free online games, school games, chromebook games, unblocked games at school, online games unblocked, school computer games, free games, browser games, no download games, undetected games, play games at school">
   <meta name="robots" content="index, follow">
   <meta name="language" content="English">
   <meta name="author" content="Chromebook Unlocked Games">
@@ -16,7 +16,7 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://chromebookunlocked.github.io/">
-  <meta property="og:title" content="Chromebook Unlocked Games - Free Unblocked Games to Play on School Chromebook">
+  <meta property="og:title" content="Chromebook Unlocked Games - Free Unblocked Games for School">
   <meta property="og:description" content="Play free unblocked games at school on your Chromebook. Access 100+ unlocked online games that work on school computers. No downloads required!">
   <meta property="og:image" content="https://chromebookunlocked.github.io/assets/logo.png">
   <meta property="og:site_name" content="Chromebook Unlocked Games">
@@ -24,7 +24,7 @@
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://chromebookunlocked.github.io/">
-  <meta property="twitter:title" content="Chromebook Unlocked Games - Free Unblocked Games for to Play on School Chromebook">
+  <meta property="twitter:title" content="Chromebook Unlocked Games - Free Unblocked Games for School">
   <meta property="twitter:description" content="Play free unblocked games at school on your Chromebook. Access 100+ unlocked online games that work on school computers. No downloads required!">
   <meta property="twitter:image" content="https://chromebookunlocked.github.io/assets/logo.png">
   
@@ -396,14 +396,62 @@
       overflow:hidden;
       margin:0 auto 2rem auto;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease;
     }
+    
+    /* Fullscreen viewer styles */
+    .viewer:fullscreen {
+      max-width: 100vw;
+      width: 100vw;
+      height: 100vh;
+      aspect-ratio: auto;
+      border-radius: 0;
+      margin: 0;
+    }
+    
+    .viewer:-webkit-full-screen {
+      max-width: 100vw;
+      width: 100vw;
+      height: 100vh;
+      aspect-ratio: auto;
+      border-radius: 0;
+      margin: 0;
+    }
+    
+    .viewer:-moz-full-screen {
+      max-width: 100vw;
+      width: 100vw;
+      height: 100vh;
+      aspect-ratio: auto;
+      border-radius: 0;
+      margin: 0;
+    }
+    
+    .viewer:-ms-fullscreen {
+      max-width: 100vw;
+      width: 100vw;
+      height: 100vh;
+      aspect-ratio: auto;
+      border-radius: 0;
+      margin: 0;
+    }
+    
     .viewer iframe {
       width:100%;
       height:100%;
       border:none;
       background:transparent;
-      object-fit:contain;
       loading:lazy;
+    }
+    
+    /* Fullscreen iframe scaling */
+    .viewer:fullscreen iframe,
+    .viewer:-webkit-full-screen iframe,
+    .viewer:-moz-full-screen iframe,
+    .viewer:-ms-fullscreen iframe {
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
     }
     
     /* Play overlay */
@@ -419,6 +467,16 @@
       z-index:10;
       transition:opacity .5s ease;
     }
+    
+    /* Fullscreen overlay adjustments */
+    .viewer:fullscreen #startOverlay,
+    .viewer:-webkit-full-screen #startOverlay,
+    .viewer:-moz-full-screen #startOverlay,
+    .viewer:-ms-fullscreen #startOverlay {
+      width: 100vw;
+      height: 100vh;
+    }
+    
     #startOverlay img {
       width:clamp(200px,40vw,350px);
       max-width:80%;
@@ -517,6 +575,9 @@
       overflow:hidden;
       border-radius:12px;
       background:#220033;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .thumb-container::before {
       content:"";
@@ -537,7 +598,8 @@
       z-index:1;
       width:100%;
       height:100%;
-      object-fit:contain;
+      object-fit:cover;
+      object-position: center;
       transition:transform .3s ease;
       loading:lazy;
     }
@@ -1490,10 +1552,50 @@
     
     function toggleFullscreen() {
       const viewerElement = document.querySelector('.viewer');
-      if (!document.fullscreenElement) {
-        viewerElement.requestFullscreen().catch(()=>{});
+      
+      if (!document.fullscreenElement && !document.webkitFullscreenElement && 
+          !document.mozFullScreenElement && !document.msFullscreenElement) {
+        // Enter fullscreen
+        if (viewerElement.requestFullscreen) {
+          viewerElement.requestFullscreen();
+        } else if (viewerElement.webkitRequestFullscreen) {
+          viewerElement.webkitRequestFullscreen();
+        } else if (viewerElement.mozRequestFullScreen) {
+          viewerElement.mozRequestFullScreen();
+        } else if (viewerElement.msRequestFullscreen) {
+          viewerElement.msRequestFullscreen();
+        }
       } else {
-        document.exitFullscreen();
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      }
+    }
+    
+    // Listen for fullscreen changes to adjust iframe
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    
+    function handleFullscreenChange() {
+      const viewer = document.querySelector('.viewer');
+      const iframe = document.getElementById('gameFrame');
+      
+      if (document.fullscreenElement || document.webkitFullscreenElement || 
+          document.mozFullScreenElement || document.msFullscreenElement) {
+        // Entering fullscreen
+        console.log('Entered fullscreen mode');
+      } else {
+        // Exiting fullscreen
+        console.log('Exited fullscreen mode');
       }
     }
     
