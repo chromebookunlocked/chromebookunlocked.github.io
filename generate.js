@@ -56,17 +56,41 @@ const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Chromebook Unblocked Games – Free Online Games for School / Chrome</title>
-  <meta name="description" content="Play free Chromebook unblocked games and school-friendly online games. Explore, browse, and launch unlocked games right from your browser.">
-  <meta name="keywords" content="Chromebook unblocked, Chromebook unlocked, school unblocked games, online games, Chromebook games, unblocked games">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Open Graph -->
-  <meta property="og:title" content="Chromebook Unblocked Games">
-  <meta property="og:description" content="Play free online games unlocked for Chromebook / school. Browse a large library of unblocked games directly in your browser.">
+  
+  <!-- Primary Meta Tags -->
+  <title>Chromebook Unlocked Games - Free Unblocked Games for School</title>
+  <meta name="title" content="Chromebook Unlocked Games - Free Unblocked Games for School">
+  <meta name="description" content="Play free unblocked games at school on your Chromebook. Access 100+ unlocked online games that work on school computers. No downloads required - play instantly in your browser!">
+  <meta name="keywords" content="chromebook unlocked games, unblocked games, free online games, school games, chromebook games, unblocked games at school, online games unblocked, school computer games, free games, browser games, no download games, undetected games, play games at school">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+  <meta name="author" content="Chromebook Unlocked Games">
+  
+  <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://chromebookunlocked.github.io/">
+  <meta property="og:title" content="Chromebook Unlocked Games - Free Unblocked Games for School">
+  <meta property="og:description" content="Play free unblocked games at school on your Chromebook. Access 100+ unlocked online games that work on school computers. No downloads required!">
   <meta property="og:image" content="https://chromebookunlocked.github.io/assets/logo.png">
+  <meta property="og:site_name" content="Chromebook Unlocked Games">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://chromebookunlocked.github.io/">
+  <meta property="twitter:title" content="Chromebook Unlocked Games - Free Unblocked Games for School">
+  <meta property="twitter:description" content="Play free unblocked games at school on your Chromebook. Access 100+ unlocked online games that work on school computers. No downloads required!">
+  <meta property="twitter:image" content="https://chromebookunlocked.github.io/assets/logo.png">
+  
+  <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="apple-touch-icon" href="assets/logo.png">
+  <link rel="shortcut icon" type="image/png" href="assets/logo.png">
+  
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#ff66ff">
+  <link rel="canonical" href="https://chromebookunlocked.github.io/">
+  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
     :root {
