@@ -1,6 +1,4 @@
-<!-- Ultimate Game Stash file--> 
-<!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ -->
-
+<!-- Ultimate Game Stash file -->
 <!DOCTYPE html>
 <html lang="en-us">
 
@@ -11,6 +9,7 @@
     <title>Unity WebGL Player | Slope Plus</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
+
     <style>
         html,
         body {
@@ -19,23 +18,37 @@
             overflow: hidden;
             height: 100%;
             width: 100%;
+            background-color: #000;
         }
 
-        #unity-container {
-            width: 100%;
-            height: 100%;
-            position: absolute;
+        #unity-container,
+        #gameContainer {
+            position: fixed;
             top: 0;
             left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
         }
     </style>
+
     <script src="TemplateData/UnityProgress.js"></script>
     <script src="Build/UnityLoader.js"></script>
+
     <script>
         function mergeFiles(fileParts) {
             return new Promise((resolve, reject) => {
                 let buffers = [];
-
                 function fetchPart(index) {
                     if (index >= fileParts.length) {
                         let mergedBlob = new Blob(buffers);
@@ -43,10 +56,13 @@
                         resolve(mergedFileUrl);
                         return;
                     }
-                    fetch(fileParts[index]).then((response) => response.arrayBuffer()).then((data) => {
-                        buffers.push(data);
-                        fetchPart(index + 1);
-                    }).catch(reject);
+                    fetch(fileParts[index])
+                        .then((response) => response.arrayBuffer())
+                        .then((data) => {
+                            buffers.push(data);
+                            fetchPart(index + 1);
+                        })
+                        .catch(reject);
                 }
                 fetchPart(0);
             });
@@ -60,8 +76,7 @@
             return parts;
         }
 
-        window.addEventListener('resize', resizeGameContainer);
-
+        // Resize handler
         function resizeGameContainer() {
             const container = document.getElementById('gameContainer');
             if (container) {
@@ -70,7 +85,18 @@
                 container.style.width = `${width}px`;
                 container.style.height = `${height}px`;
             }
+
+            const canvas = document.querySelector('#gameContainer canvas');
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                canvas.style.width = `${window.innerWidth}px`;
+                canvas.style.height = `${window.innerHeight}px`;
+            }
         }
+
+        window.addEventListener('resize', resizeGameContainer);
+        document.addEventListener('fullscreenchange', resizeGameContainer);
 
         window.onload = function () {
             resizeGameContainer();
@@ -86,16 +112,14 @@
                     wasmFrameworkUrl: "https://cdn.jsdelivr.net/gh/gn-math/assets@51462750d29b68ac1e33887c1bf13d9c478d5ead/198/Build/WEB1.2.1.wasm.framework.unityweb",
                     TOTAL_MEMORY: 268435456,
                     graphicsAPI: ["WebGL 2.0", "WebGL 1.0"],
-                    webglContextAttributes: {
-                        preserveDrawingBuffer: false
-                    },
+                    webglContextAttributes: { preserveDrawingBuffer: false },
                     splashScreenStyle: "Dark",
                     backgroundColor: "#000000"
-                }
-                let blob = new Blob([JSON.stringify(json)], {
-                    type: 'application/json'
-                });
+                };
+
+                let blob = new Blob([JSON.stringify(json)], { type: 'application/json' });
                 let blobUrl = URL.createObjectURL(blob);
+
                 UnityLoader.instantiate("gameContainer", json, {
                     onProgress: UnityProgress,
                     url: blobUrl
@@ -106,7 +130,7 @@
 </head>
 
 <body>
-    <div class="webgl-content">
+    <div id="unity-container">
         <div id="gameContainer"></div>
     </div>
 </body>
