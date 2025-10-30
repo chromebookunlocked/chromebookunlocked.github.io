@@ -87,9 +87,31 @@ const html = `<!DOCTYPE html>
   <link rel="apple-touch-icon" href="assets/logo.png">
   <link rel="shortcut icon" type="image/png" href="assets/logo.png">
   
+  <!-- Structured Data for Search Results -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Chromebook Unlocked Games",
+    "url": "https://chromebookunlocked.github.io/",
+    "description": "Play free unblocked games at school on your Chromebook. Access 100+ unlocked online games that work on school computers.",
+    "image": "https://chromebookunlocked.github.io/assets/logo.png",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Chromebook Unlocked Games",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://chromebookunlocked.github.io/assets/logo.png"
+      }
+    }
+  }
+  </script>
+  
   <!-- Additional SEO -->
   <meta name="theme-color" content="#ff66ff">
   <link rel="canonical" href="https://chromebookunlocked.github.io/">
+  <meta name="msapplication-TileImage" content="assets/logo.png">
+  <meta name="msapplication-TileColor" content="#ff66ff">
   
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
