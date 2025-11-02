@@ -349,6 +349,35 @@ const html = `<!DOCTYPE html>
       transform: scale(1.05);
     }
     
+    #addToHomeBtn {
+      padding: 0.5rem 1rem;
+      background: rgba(255, 102, 255, 0.15);
+      border: 1px solid rgba(255, 102, 255, 0.3);
+      border-radius: 8px;
+      color: var(--accent-light);
+      font-family: var(--font-main);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .3s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    
+    #addToHomeBtn:hover {
+      background: rgba(255, 102, 255, 0.25);
+      border-color: var(--accent);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 102, 255, 0.3);
+    }
+    
+    #addToHomeBtn:active {
+      transform: translateY(0);
+    }
+    
     @media (max-width: 768px) {
       #topHeader {
         flex-direction: column;
@@ -359,6 +388,10 @@ const html = `<!DOCTYPE html>
         font-size: clamp(1rem, 4vw, 1.5rem);
         width: 100%;
         text-align: center;
+      }
+      #addToHomeBtn {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
       }
     }
     
@@ -845,23 +878,27 @@ const html = `<!DOCTYPE html>
     }
     
     /* DMCA */
-    #dmcaLink {
-      display: block;
+    #dmcaFooter {
+      margin-top: 4rem;
+      padding: 2rem 1rem 1.5rem;
       text-align: center;
-      background: rgba(0, 0, 0, 0.7);
-      color: rgba(255, 255, 255, 0.6);
-      padding: 1rem 1.5rem;
-      font-size: 0.75rem;
-      text-decoration: none;
-      transition: .3s;
-      font-family: var(--font-main);
-      font-weight: 400;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 3rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
     }
+    
+    #dmcaLink {
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.7rem;
+      text-decoration: none;
+      transition: color .3s;
+      font-family: var(--font-main);
+      font-weight: 300;
+      letter-spacing: 0.5px;
+    }
+    
     #dmcaLink:hover {
-      color: var(--accent-light);
-      background: rgba(0, 0, 0, 0.85);
+      color: rgba(255, 255, 255, 0.6);
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -887,6 +924,10 @@ const html = `<!DOCTYPE html>
         <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
         <div id="searchDropdown"></div>
       </div>
+      <button id="addToHomeBtn" onclick="addToHome()">
+        <span>⭐</span>
+        <span>Add to Home</span>
+      </button>
     </div>
 
     <div class="content-wrapper">
@@ -922,7 +963,10 @@ const html = `<!DOCTYPE html>
         </div>`;
       }).join('')}
       
-      <a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
+      <!-- DMCA Footer -->
+      <div id="dmcaFooter">
+        <a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
+      </div>
     </div>
   </div>
 
@@ -955,9 +999,16 @@ const html = `<!DOCTYPE html>
       // Only update if something was removed
       if (cleaned.length !== list.length) {
         localStorage.setItem('recentlyPlayed', JSON.stringify(cleaned));
+        console.log('Cleaned recently played:', list.length - cleaned.length, 'games removed');
         return cleaned;
       }
       return list;
+    }
+    
+    // Validate game exists before showing
+    function gameExists(folder) {
+      const validFolders = getValidGameFolders();
+      return validFolders.has(folder);
     }
     
     // Helper: get grid element for a category
@@ -1070,15 +1121,37 @@ const html = `<!DOCTYPE html>
       if (recentSection) recentSection.style.display = 'block';
       
       const displayList = list.slice(0, MAX_RECENT);
+      
+      // Double-check each game exists before displaying
       displayList.forEach((g, i) => {
+        // Verify game still exists
+        if (!gameExists(g.folder)) {
+          console.log('Skipping deleted game:', g.folder);
+          return;
+        }
+        
         const card = document.createElement('div');
         card.className = 'card game-card';
         card.setAttribute('data-index', i);
         card.setAttribute('data-folder', g.folder);
         card.setAttribute('data-name', g.name.toLowerCase());
-        card.onclick = () => prepareGame(encodeURIComponent(g.folder), encodeURIComponent(g.name), g.thumb);
-        card.innerHTML = \`<div class="thumb-container" style="--thumb-url: url('\${g.thumb}')">
-          <img class="thumb" src="\${g.thumb}" alt="\${g.name}">
+        
+        // Add error handling for broken images
+        const thumbUrl = g.thumb || 'assets/logo.png';
+        
+        card.onclick = () => {
+          // Verify game exists before opening
+          if (!gameExists(g.folder)) {
+            alert('This game is no longer available.');
+            cleanRecentlyPlayed();
+            loadRecentlyPlayed();
+            return;
+          }
+          prepareGame(encodeURIComponent(g.folder), encodeURIComponent(g.name), thumbUrl);
+        };
+        
+        card.innerHTML = \`<div class="thumb-container" style="--thumb-url: url('\${thumbUrl}')">
+          <img class="thumb" src="\${thumbUrl}" alt="\${g.name}" onerror="this.src='assets/logo.png'">
         </div>
         <div class="card-title">\${g.name}</div>\`;
         recentGrid.appendChild(card);
@@ -1086,6 +1159,11 @@ const html = `<!DOCTYPE html>
       
       if (offsets['Recently Played'] === undefined) offsets['Recently Played'] = 0;
       updateCategoryView('Recently Played');
+      
+      // If grid is empty after cleanup, hide section
+      if (recentGrid.children.length === 0) {
+        recentSection.style.display = 'none';
+      }
     }
     
     // Search functionality with dropdown
@@ -1183,6 +1261,54 @@ const html = `<!DOCTYPE html>
       filterCategory('Home');
     }
     
+    // Add to Home functionality
+    function addToHome() {
+      // Check if browser supports PWA installation
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        alert('Already added to home screen!');
+        return;
+      }
+      
+      // Try different methods for different browsers
+      if (navigator.standalone !== undefined) {
+        // iOS Safari
+        alert('To add to home screen:\n\n1. Tap the Share button\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"');
+      } else if (window.chrome) {
+        // Chrome/Edge - check for install prompt
+        if (window.deferredPrompt) {
+          window.deferredPrompt.prompt();
+          window.deferredPrompt.userChoice.then((choiceResult) => {
+            window.deferredPrompt = null;
+          });
+        } else {
+          // Fallback instructions
+          alert('To add to home screen:\n\n1. Click the menu (⋮) in the top right\n2. Select "Install" or "Add to Home screen"\n3. Click "Install"');
+        }
+      } else {
+        // Generic instructions
+        alert('To add to home screen:\n\nDesktop: Use your browser\'s "Install" or "Add to Home screen" option in the menu.\n\nMobile: Use your browser\'s "Add to Home screen" option in the share menu.');
+      }
+      
+      // Try to add bookmark as fallback
+      try {
+        if (window.sidebar && window.sidebar.addPanel) {
+          // Firefox
+          window.sidebar.addPanel(document.title, window.location.href, '');
+        } else if (window.external && ('AddFavorite' in window.external)) {
+          // IE
+          window.external.AddFavorite(window.location.href, document.title);
+        }
+      } catch(e) {
+        // Silently fail
+      }
+    }
+    
+    // Capture PWA install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.deferredPrompt = e;
+    });
+    
     // Prepare game (open viewer overlay)
     let currentGameFolder = null;
     const viewer = document.getElementById('viewer');
@@ -1196,12 +1322,27 @@ const html = `<!DOCTYPE html>
     function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
       const folder = decodeURIComponent(folderEncoded);
       const name = decodeURIComponent(nameEncoded);
+      
+      // Verify game exists before opening
+      if (!gameExists(folder)) {
+        alert('This game is no longer available.');
+        cleanRecentlyPlayed();
+        loadRecentlyPlayed();
+        return;
+      }
+      
       currentGameFolder = folder;
       frame.src = '';
       viewer.style.display = 'flex';
       controls.classList.add('active');
       gameTitle.textContent = name;
-      startThumb.src = thumbSrc;
+      startThumb.src = thumbSrc || 'assets/logo.png';
+      
+      // Add error handler for thumbnail
+      startThumb.onerror = () => {
+        startThumb.src = 'assets/logo.png';
+      };
+      
       startName.textContent = name;
       startOverlay.style.opacity = '1';
       startOverlay.style.pointerEvents = 'auto';
@@ -1227,7 +1368,7 @@ const html = `<!DOCTYPE html>
       
       showCuratedGames(folder);
       
-      saveRecentlyPlayed({ folder, name, thumb: thumbSrc });
+      saveRecentlyPlayed({ folder, name, thumb: thumbSrc || 'assets/logo.png' });
     }
     
     // Show curated games when game viewer is open
@@ -1583,6 +1724,15 @@ const html = `<!DOCTYPE html>
       const hash = window.location.hash;
       if (hash.startsWith('#/game/')) {
         const folder = decodeURIComponent(hash.replace('#/game/', ''));
+        
+        // Check if game exists before trying to open
+        if (!gameExists(folder)) {
+          console.log('Game not found:', folder);
+          alert('This game is no longer available.');
+          window.location.hash = '';
+          return;
+        }
+        
         const cards = Array.from(document.querySelectorAll('.game-card'));
         const card = cards.find(c => c.getAttribute('onclick')?.includes(encodeURIComponent(folder)));
         if (card) card.click();
@@ -1613,6 +1763,18 @@ const html = `<!DOCTYPE html>
         if (img && (!tc.style.getPropertyValue('--thumb-url') || tc.style.getPropertyValue('--thumb-url') === '')) {
           tc.style.setProperty('--thumb-url', "url('" + img.src + "')");
         }
+      });
+      
+      // Add error handlers to all thumbnails
+      document.querySelectorAll('img.thumb').forEach(img => {
+        img.onerror = function() {
+          this.onerror = null; // Prevent infinite loop
+          this.src = 'assets/logo.png';
+          const container = this.closest('.thumb-container');
+          if (container) {
+            container.style.setProperty('--thumb-url', "url('assets/logo.png')");
+          }
+        };
       });
       
       loadRecentlyPlayed();
