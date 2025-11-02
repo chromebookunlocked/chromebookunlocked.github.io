@@ -13,20 +13,38 @@ const games = fs.readdirSync(dataDir)
   .filter(f => f.endsWith(".json"))
   .map(f => {
     const json = JSON.parse(fs.readFileSync(path.join(dataDir, f)));
+    // Support multiple categories (comma-separated string or array)
+    let gameCategories = json.category || json.categories || "Uncategorized";
+    if (typeof gameCategories === 'string') {
+      gameCategories = gameCategories.split(',').map(c => c.trim());
+    }
+    if (!Array.isArray(gameCategories)) {
+      gameCategories = [gameCategories];
+    }
+    
     return {
       folder: json.folder || f.replace(".json", ""),
       name: json.name || f.replace(".json", ""),
-      category: json.category || "Uncategorized",
-      thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.png", "thumbnail.jpg"]
+      categories: gameCategories, // Array of categories
+      thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.png", "thumbnail.jpg"],
+      dateAdded: json.dateAdded || null // Support for "Newly Added" sorting
     };
   });
 
-// Group into categories
+// Group into categories (games can appear in multiple categories)
 const categories = {};
 games.forEach(g => {
-  if (!categories[g.category]) categories[g.category] = [];
-  categories[g.category].push(g);
+  g.categories.forEach(cat => {
+    if (!categories[cat]) categories[cat] = [];
+    categories[cat].push(g);
+  });
 });
+
+// Add "Newly Added" category if games have dateAdded
+const gamesWithDates = games.filter(g => g.dateAdded).sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+if (gamesWithDates.length > 0) {
+  categories['Newly Added'] = gamesWithDates.slice(0, 20); // Show latest 20 games
+}
 
 // Utility to find the actual thumb file (existing)
 function chooseThumb(game) {
@@ -45,11 +63,17 @@ function generateGameCard(game, idx) {
   </div>`;
 }
 
-// Sidebar categories
+// Sidebar categories - exclude "Newly Added" and "Recently Played"
 const sidebarCategories = Object.keys(categories)
-  .filter(cat => cat !== "Recently Played")
+  .filter(cat => cat !== "Recently Played" && cat !== "Newly Added")
   .map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`)
   .join("");
+
+// Add "Newly Added" at the top if it exists
+const newlyAddedItem = categories['Newly Added'] ? 
+  `<li onclick="filterCategory('Newly Added')" style="border-bottom: 1px solid rgba(255,102,255,0.3); padding-bottom: 0.8rem; margin-bottom: 0.8rem;">✨ Newly Added</li>` : '';
+
+const finalSidebarCategories = newlyAddedItem + sidebarCategories;
 
 // Full HTML template
 const html = `<!DOCTYPE html>
@@ -87,7 +111,11 @@ const html = `<!DOCTYPE html>
   <link rel="apple-touch-icon" href="assets/logo.png">
   <link rel="shortcut icon" type="image/png" href="assets/logo.png">
   
-  <!-- Structured Data for Search Results -->
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#ff66ff">
+  <link rel="canonical" href="https://chromebookunlocked.github.io/">
+  
+  <!-- Structured Data for Search Engines -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -107,18 +135,12 @@ const html = `<!DOCTYPE html>
   }
   </script>
   
-  <!-- Additional SEO -->
-  <meta name="theme-color" content="#ff66ff">
-  <link rel="canonical" href="https://chromebookunlocked.github.io/">
-  <meta name="msapplication-TileImage" content="assets/logo.png">
-  <meta name="msapplication-TileColor" content="#ff66ff">
-  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
     :root {
       --base-font: clamp(12px, 1.2vw, 18px);
-      --thumb-height: clamp(140px, 18vw, 200px);
-      --sidebar-width: clamp(50px, 6vw, 70px);
+      --thumb-height: clamp(120px, 15vw, 200px);
+      --sidebar-width: clamp(45px, 5vw, 70px);
       --accent: #ff66ff;
       --accent-dark: #cc33ff;
       --accent-light: #ff99ff;
@@ -126,6 +148,8 @@ const html = `<!DOCTYPE html>
       --card-bg: #4d0066;
       --card-hover: #660099;
       --font-main: 'Orbitron', sans-serif;
+      --content-max-width: 1400px;
+      --grid-gap: clamp(0.8rem, 1.5vw, 1.2rem);
     }
     
     /* basics */
@@ -255,13 +279,43 @@ const html = `<!DOCTYPE html>
       width: calc(100% - var(--sidebar-width));
       transition: margin-left .3s;
       height:100vh;
-      padding-bottom: 40px;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Optimize for Chromebook 11.6" screens (1366x768) */
+    @media (max-width: 1366px) and (max-height: 768px) {
+      :root {
+        --thumb-height: clamp(100px, 12vw, 140px);
+        --grid-gap: 0.9rem;
+      }
+    }
+    
+    /* Small laptops and tablets */
+    @media (max-width: 1024px) {
+      #content {
+        margin-left: 0;
+        width: 100%;
+        padding-top: env(safe-area-inset-top);
+      }
+      #sidebar {
+        transform: translateX(-100%);
+        width: 250px;
+        z-index: 2000;
+      }
+      #sidebar:hover,
+      #sidebar:focus-within {
+        transform: translateX(0);
+      }
+      #sidebarIndicator {
+        right: -35px;
+        opacity: 0.8;
+      }
     }
     
     /* Top Header Bar */
     #topHeader {
       background: linear-gradient(135deg, #330066 0%, #1a0033 100%);
-      padding: 1.5rem 2rem;
+      padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 3vw, 2rem);
       border-bottom: 2px solid rgba(255, 102, 255, 0.3);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       position: sticky;
@@ -270,12 +324,13 @@ const html = `<!DOCTYPE html>
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 2rem;
+      gap: clamp(1rem, 2vw, 2rem);
+      flex-wrap: wrap;
     }
     
     #topHeader h1 {
       margin: 0;
-      font-size: clamp(1.3rem, 2.5vw, 2.2rem);
+      font-size: clamp(1.1rem, 2.2vw, 2.2rem);
       font-weight: 900;
       background: linear-gradient(135deg, var(--accent), var(--accent-light));
       -webkit-background-clip: text;
@@ -286,23 +341,39 @@ const html = `<!DOCTYPE html>
       transition: transform .3s ease;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 100%;
+      flex-shrink: 1;
+      min-width: 0;
     }
     
     #topHeader h1:hover {
       transform: scale(1.05);
     }
     
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
+      #topHeader {
+        flex-direction: column;
+        gap: 0.8rem;
+        padding: 0.8rem 1rem;
+      }
       #topHeader h1 {
-        font-size: clamp(1rem, 4vw, 1.3rem);
+        font-size: clamp(1rem, 4vw, 1.5rem);
+        width: 100%;
+        text-align: center;
       }
     }
     
     #searchContainer {
       flex: 1;
       max-width: 500px;
+      min-width: 200px;
       position: relative;
+    }
+    
+    @media (max-width: 768px) {
+      #searchContainer {
+        max-width: 100%;
+        width: 100%;
+      }
     }
     
     #searchIcon {
@@ -591,9 +662,10 @@ const html = `<!DOCTYPE html>
     /* Grid & cards */
     .category {
       margin-top:3rem;
-      max-width: 1400px;
+      max-width: var(--content-max-width);
       margin-left: auto;
       margin-right: auto;
+      padding: 0 clamp(0.5rem, 2vw, 1rem);
     }
     .category:first-of-type {
       margin-top: 1rem;
@@ -604,23 +676,43 @@ const html = `<!DOCTYPE html>
       cursor:pointer;
       font-family:var(--font-main);
       font-weight: 900;
-      font-size: clamp(1.5rem, 2vw, 2rem);
+      font-size: clamp(1.3rem, 2vw, 2rem);
       text-shadow: 0 0 15px rgba(255, 102, 255, 0.5);
       padding-bottom: 0.5rem;
       border-bottom: 2px solid rgba(255, 102, 255, 0.3);
     }
     .grid {
       display:grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap:1.2rem;
+      grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr));
+      gap: var(--grid-gap);
       justify-items:center;
+      width: 100%;
     }
     
-    /* responsive columns */
-    @media (max-width:1200px){ .grid{ grid-template-columns: repeat(4,1fr);} }
-    @media (max-width:900px){ .grid{ grid-template-columns: repeat(3,1fr);} }
-    @media (max-width:600px){ .grid{ grid-template-columns: repeat(2,1fr);} }
-    @media (max-width:400px){ .grid{ grid-template-columns: 1fr; } }
+    /* Optimized grid for different screen sizes */
+    @media (min-width: 1400px) {
+      .grid { grid-template-columns: repeat(6, 1fr); }
+    }
+    @media (min-width: 1200px) and (max-width: 1399px) {
+      .grid { grid-template-columns: repeat(5, 1fr); }
+    }
+    @media (min-width: 900px) and (max-width: 1199px) {
+      .grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (min-width: 600px) and (max-width: 899px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (min-width: 400px) and (max-width: 599px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 399px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    
+    /* Chromebook 11.6" optimization */
+    @media (width: 1366px) and (height: 768px) {
+      .grid { grid-template-columns: repeat(5, 1fr); }
+    }
     
     .card {
       width:100%;
@@ -636,12 +728,20 @@ const html = `<!DOCTYPE html>
       position:relative;
       border: 2px solid rgba(255, 102, 255, 0.2);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
     .card:hover {
       transform:translateY(-5px) scale(1.03);
       background: linear-gradient(135deg, var(--card-hover), #7700aa);
       border: 2px solid var(--accent);
       box-shadow: 0 8px 30px rgba(255, 102, 255, 0.5);
+    }
+    
+    @media (hover: none) and (pointer: coarse) {
+      .card:active {
+        transform:scale(0.98);
+      }
     }
     
     .thumb-container {
@@ -773,7 +873,7 @@ const html = `<!DOCTYPE html>
     <header onclick="goToHome()"><img src="assets/logo.png" alt="Logo"></header>
     <ul id="categoryList">
       <li onclick="filterCategory('Home')">Home</li>
-      ${sidebarCategories}
+      ${finalSidebarCategories}
     </ul>
   </div>
 
