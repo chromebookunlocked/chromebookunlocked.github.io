@@ -25,7 +25,7 @@
     function showBookmarkInstructions() {
       const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
       const shortcut = isMac ? 'Cmd+D' : 'Ctrl+D';
-      alert(\`Press \${shortcut} to bookmark this page!\n\nOn mobile, tap the menu button and select "Add to Home Screen"\`);
+      alert('Press ' + shortcut + ' to bookmark this page!\\n\\nOn mobile, tap the menu button and select "Add to Home Screen"');
     }    /* Bookmark Button */
     #bookmarkBtn {
       padding: 0.5rem 1rem;
@@ -396,8 +396,7 @@ const html = `<!DOCTYPE html>
       z-index: 100;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: clamp(1rem, 2vw, 2rem);
+      gap: clamp(0.8rem, 1.5vw, 1.5rem);
       flex-wrap: wrap;
     }
     
@@ -416,22 +415,41 @@ const html = `<!DOCTYPE html>
       text-overflow: ellipsis;
       flex-shrink: 1;
       min-width: 0;
+      order: 1;
     }
     
     #topHeader h1:hover {
       transform: scale(1.05);
     }
     
+    #bookmarkBtn {
+      order: 2;
+      flex-shrink: 0;
+    }
+    
+    #searchContainer {
+      order: 3;
+      flex: 1;
+    }
+    
     @media (max-width: 768px) {
       #topHeader {
-        flex-direction: column;
+        flex-direction: row;
         gap: 0.8rem;
         padding: 0.8rem 1rem;
       }
       #topHeader h1 {
         font-size: clamp(1rem, 4vw, 1.5rem);
+        order: 1;
+        flex: 1;
+      }
+      #bookmarkBtn {
+        order: 2;
+      }
+      #searchContainer {
+        order: 3;
         width: 100%;
-        text-align: center;
+        flex-basis: 100%;
       }
     }
     
@@ -440,12 +458,15 @@ const html = `<!DOCTYPE html>
       max-width: 500px;
       min-width: 200px;
       position: relative;
+      order: 3;
     }
     
     @media (max-width: 768px) {
       #searchContainer {
         max-width: 100%;
         width: 100%;
+        order: 3;
+        flex-basis: 100%;
       }
     }
     
@@ -957,15 +978,15 @@ const html = `<!DOCTYPE html>
     <!-- Top Header with Search -->
     <div id="topHeader">
       <h1 onclick="goToHome()">Chromebook Unlocked Games</h1>
+      <button id="bookmarkBtn" onclick="addToBookmarks()">
+        <span>⭐</span>
+        <span class="bookmark-text">Bookmark</span>
+      </button>
       <div id="searchContainer">
         <span id="searchIcon">🔍</span>
         <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
         <div id="searchDropdown"></div>
       </div>
-      <button id="bookmarkBtn" onclick="addToBookmarks()">
-        <span>⭐</span>
-        <span class="bookmark-text">Bookmark</span>
-      </button>
     </div>
 
     <div class="content-wrapper">
