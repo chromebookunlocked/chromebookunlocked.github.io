@@ -1,63 +1,4 @@
-// Add to bookmarks functionality
-    function addToBookmarks() {
-      const pageTitle = 'Chromebook Unlocked Games';
-      const pageUrl = window.location.href.split('#')[0]; // Remove hash
-      
-      // Try modern API first (Chrome, Edge)
-      if (window.chrome && window.chrome.runtime) {
-        // Show instructions for Chrome
-        showBookmarkInstructions();
-      }
-      // Try Firefox bookmark API
-      else if (window.sidebar && window.sidebar.addPanel) {
-        window.sidebar.addPanel(pageTitle, pageUrl, '');
-      }
-      // Try old IE/Edge method
-      else if (window.external && window.external.AddFavorite) {
-        window.external.AddFavorite(pageUrl, pageTitle);
-      }
-      // Fallback: Show keyboard shortcut
-
-    }
-    
-    /* Bookmark Button */
-    #bookmarkBtn {
-      padding: 0.5rem 1rem;
-      background: rgba(255, 102, 255, 0.15);
-      border: 1px solid rgba(255, 102, 255, 0.3);
-      border-radius: 8px;
-      color: var(--accent-light);
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all .3s ease;
-      font-family: var(--font-main);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      white-space: nowrap;
-    }
-    
-    #bookmarkBtn:hover {
-      background: rgba(255, 102, 255, 0.25);
-      border-color: var(--accent);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(255, 102, 255, 0.3);
-    }
-    
-    #bookmarkBtn:active {
-      transform: translateY(0);
-    }
-    
-    @media (max-width: 768px) {
-      #bookmarkBtn {
-        font-size: 0.75rem;
-        padding: 0.4rem 0.8rem;
-      }
-      #bookmarkBtn .bookmark-text {
-        display: none;
-      }
-    }const fs = require("fs");
+const fs = require("fs");
 const path = require("path");
 
 const dataDir = path.join(__dirname, "data");
@@ -648,7 +589,6 @@ const html = `<!DOCTYPE html>
       border:none;
       background:transparent;
       loading:lazy;
-      sandbox: allow-same-origin allow-scripts allow-forms allow-pointer-lock;
     }
     
     /* Fullscreen iframe scaling */
@@ -947,10 +887,6 @@ const html = `<!DOCTYPE html>
         <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
         <div id="searchDropdown"></div>
       </div>
-      <button id="bookmarkBtn" onclick="addToBookmarks()">
-        <span>⭐</span>
-        <span class="bookmark-text">Bookmark</span>
-      </button>
     </div>
 
     <div class="content-wrapper">
