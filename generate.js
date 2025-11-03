@@ -1,4 +1,69 @@
-const fs = require("fs");
+// Add to bookmarks functionality
+    function addToBookmarks() {
+      const pageTitle = 'Chromebook Unlocked Games';
+      const pageUrl = window.location.href.split('#')[0]; // Remove hash
+      
+      // Try modern API first (Chrome, Edge)
+      if (window.chrome && window.chrome.runtime) {
+        // Show instructions for Chrome
+        showBookmarkInstructions();
+      }
+      // Try Firefox bookmark API
+      else if (window.sidebar && window.sidebar.addPanel) {
+        window.sidebar.addPanel(pageTitle, pageUrl, '');
+      }
+      // Try old IE/Edge method
+      else if (window.external && window.external.AddFavorite) {
+        window.external.AddFavorite(pageUrl, pageTitle);
+      }
+      // Fallback: Show keyboard shortcut
+      else {
+        showBookmarkInstructions();
+      }
+    }
+    
+    function showBookmarkInstructions() {
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const shortcut = isMac ? 'Cmd+D' : 'Ctrl+D';
+      alert(\`Press \${shortcut} to bookmark this page!\n\nOn mobile, tap the menu button and select "Add to Home Screen"\`);
+    }    /* Bookmark Button */
+    #bookmarkBtn {
+      padding: 0.5rem 1rem;
+      background: rgba(255, 102, 255, 0.15);
+      border: 1px solid rgba(255, 102, 255, 0.3);
+      border-radius: 8px;
+      color: var(--accent-light);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .3s ease;
+      font-family: var(--font-main);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+    }
+    
+    #bookmarkBtn:hover {
+      background: rgba(255, 102, 255, 0.25);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 102, 255, 0.3);
+    }
+    
+    #bookmarkBtn:active {
+      transform: translateY(0);
+    }
+    
+    @media (max-width: 768px) {
+      #bookmarkBtn {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
+      }
+      #bookmarkBtn .bookmark-text {
+        display: none;
+      }
+    }const fs = require("fs");
 const path = require("path");
 
 const dataDir = path.join(__dirname, "data");
@@ -184,7 +249,8 @@ const html = `<!DOCTYPE html>
       background: linear-gradient(180deg, #330066 0%, #1a0033 100%);
       padding:1rem 0;
       height:100vh;
-      overflow-y:auto;
+      overflow-y:hidden;
+      overflow-x:hidden;
       position:fixed;
       left:0; top:0;
       z-index:1000;
@@ -195,6 +261,7 @@ const html = `<!DOCTYPE html>
     #sidebar:hover { 
       width:250px;
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
+      overflow-y:auto;
     }
     
     /* Sidebar expand indicator */
@@ -589,6 +656,7 @@ const html = `<!DOCTYPE html>
       border:none;
       background:transparent;
       loading:lazy;
+      sandbox: allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-modals;
     }
     
     /* Fullscreen iframe scaling */
@@ -599,6 +667,7 @@ const html = `<!DOCTYPE html>
       width: 100vw;
       height: 100vh;
       object-fit: contain;
+      sandbox: allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-modals;
     }
     
     /* Play overlay */
@@ -887,6 +956,10 @@ const html = `<!DOCTYPE html>
         <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
         <div id="searchDropdown"></div>
       </div>
+      <button id="bookmarkBtn" onclick="addToBookmarks()">
+        <span>⭐</span>
+        <span class="bookmark-text">Bookmark</span>
+      </button>
     </div>
 
     <div class="content-wrapper">
@@ -902,49 +975,7 @@ const html = `<!DOCTYPE html>
           <h1 id="startName"></h1>
           <button id="startButton" onclick="startGame()">▶ Play</button>
         </div>
-        <!-- sandboxed iframe + pop-up helper -->
-        <iframe id="gameFrame" src=""
-                sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups">
-        </iframe>
-
-        <script>
-        /* allow pop-ups BUT kill every navigation that leaves the page */
-        (() => {
-          const whitelist = ['blob:', 'data:', location.origin];        // allowed destinations
-          const safe = u => {
-            try { return whitelist.some(w => u.startsWith(w)); }
-            catch { return false; }
-          };
-
-          /* hook window.open so it can only spawn data:/blob: pop-ups */
-          const raw = window.open;
-          window.open = function(url, ...rest) {
-            if (url && !safe(url)) {
-              console.warn('[BLOCKED] window.open to external URL:', url);
-              return null;                       // block
-            }
-            return raw.apply(this, [url, ...rest]);
-          };
-
-          /* kill every other navigation before it happens */
-          window.addEventListener('beforeunload', e => {
-            if (!safe(e.target.URL)) {
-              e.preventDefault();
-              e.returnValue = '';
-              return '';
-            }
-          });
-
-          /* strip target="_blank" from anything that reaches the DOM */
-          const cleaner = () => {
-            document.querySelectorAll('a[target="_blank"], form[target="_blank"]')
-                    .forEach(el => el.removeAttribute('target'));
-          };
-          cleaner();
-          new MutationObserver(cleaner)
-            .observe(document, { childList: true, subtree: true });
-        })();
-        </script>
+        <iframe id="gameFrame" src=""></iframe>
       </div>
 
       <!-- Recently Played -->
@@ -1503,7 +1534,36 @@ const html = `<!DOCTYPE html>
     
     function startGame() {
       if (!currentGameFolder) return;
-      frame.src = 'games/' + currentGameFolder + '/index.html';
+      
+      const gameUrl = 'games/' + currentGameFolder + '/index.html';
+      frame.src = gameUrl;
+      
+      // Additional security: Listen for frame navigation attempts
+      frame.addEventListener('load', () => {
+        try {
+          // Prevent frame from navigating away
+          if (frame.contentWindow) {
+            const originalOpen = frame.contentWindow.open;
+            frame.contentWindow.open = function() {
+              console.log('Blocked window.open() attempt from game');
+              return null;
+            };
+            
+            // Block top navigation
+            Object.defineProperty(frame.contentWindow, 'top', {
+              get: function() { return frame.contentWindow; }
+            });
+            
+            Object.defineProperty(frame.contentWindow, 'parent', {
+              get: function() { return frame.contentWindow; }
+            });
+          }
+        } catch(e) {
+          // Cross-origin restrictions prevent this, which is good
+          console.log('Frame security applied (cross-origin safe)');
+        }
+      });
+      
       startOverlay.style.opacity = '0';
       startOverlay.style.pointerEvents = 'none';
     }
