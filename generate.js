@@ -25,8 +25,7 @@
     function showBookmarkInstructions() {
       const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
       const shortcut = isMac ? 'Cmd+D' : 'Ctrl+D';
-      alert(\`Press \${shortcut} to bookmark this page!\n\nOn mobile, tap the menu button and select "Add to Home Screen"\`);
-    }    /* Bookmark Button */
+    /* Bookmark Button */
     #bookmarkBtn {
       padding: 0.5rem 1rem;
       background: rgba(255, 102, 255, 0.15);
