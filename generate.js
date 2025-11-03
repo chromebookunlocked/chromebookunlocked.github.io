@@ -1,4 +1,69 @@
-const fs = require("fs");
+// Add to bookmarks functionality
+    function addToBookmarks() {
+      const pageTitle = 'Chromebook Unlocked Games';
+      const pageUrl = window.location.href.split('#')[0]; // Remove hash
+      
+      // Try modern API first (Chrome, Edge)
+      if (window.chrome && window.chrome.runtime) {
+        // Show instructions for Chrome
+        showBookmarkInstructions();
+      }
+      // Try Firefox bookmark API
+      else if (window.sidebar && window.sidebar.addPanel) {
+        window.sidebar.addPanel(pageTitle, pageUrl, '');
+      }
+      // Try old IE/Edge method
+      else if (window.external && window.external.AddFavorite) {
+        window.external.AddFavorite(pageUrl, pageTitle);
+      }
+      // Fallback: Show keyboard shortcut
+      else {
+        showBookmarkInstructions();
+      }
+    }
+    
+    function showBookmarkInstructions() {
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const shortcut = isMac ? 'Cmd+D' : 'Ctrl+D';
+      alert(\`Press \${shortcut} to bookmark this page!\n\nOn mobile, tap the menu button and select "Add to Home Screen"\`);
+    }    /* Bookmark Button */
+    #bookmarkBtn {
+      padding: 0.5rem 1rem;
+      background: rgba(255, 102, 255, 0.15);
+      border: 1px solid rgba(255, 102, 255, 0.3);
+      border-radius: 8px;
+      color: var(--accent-light);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .3s ease;
+      font-family: var(--font-main);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+    }
+    
+    #bookmarkBtn:hover {
+      background: rgba(255, 102, 255, 0.25);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 102, 255, 0.3);
+    }
+    
+    #bookmarkBtn:active {
+      transform: translateY(0);
+    }
+    
+    @media (max-width: 768px) {
+      #bookmarkBtn {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
+      }
+      #bookmarkBtn .bookmark-text {
+        display: none;
+      }
+    }const fs = require("fs");
 const path = require("path");
 
 const dataDir = path.join(__dirname, "data");
@@ -589,6 +654,7 @@ const html = `<!DOCTYPE html>
       border:none;
       background:transparent;
       loading:lazy;
+      sandbox: allow-same-origin allow-scripts allow-forms allow-pointer-lock;
     }
     
     /* Fullscreen iframe scaling */
@@ -848,20 +914,20 @@ const html = `<!DOCTYPE html>
     #dmcaLink {
       display: block;
       text-align: center;
-      background: rgba(0, 0, 0, 0.7);
-      color: rgba(255, 255, 255, 0.6);
-      padding: 1rem 1.5rem;
-      font-size: 0.75rem;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.4);
+      padding: 0.8rem 1rem;
+      font-size: 0.7rem;
       text-decoration: none;
-      transition: .3s;
+      transition: color .3s;
       font-family: var(--font-main);
-      font-weight: 400;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 3rem;
+      font-weight: 300;
+      margin-top: 4rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
     }
     #dmcaLink:hover {
-      color: var(--accent-light);
-      background: rgba(0, 0, 0, 0.85);
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -887,6 +953,10 @@ const html = `<!DOCTYPE html>
         <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
         <div id="searchDropdown"></div>
       </div>
+      <button id="bookmarkBtn" onclick="addToBookmarks()">
+        <span>⭐</span>
+        <span class="bookmark-text">Bookmark</span>
+      </button>
     </div>
 
     <div class="content-wrapper">
@@ -1077,15 +1147,37 @@ const html = `<!DOCTYPE html>
       if (recentSection) recentSection.style.display = 'block';
       
       const displayList = list.slice(0, MAX_RECENT);
+      
+      // Double-check each game exists before displaying
       displayList.forEach((g, i) => {
+        // Verify game still exists
+        if (!gameExists(g.folder)) {
+          console.log('Skipping deleted game:', g.folder);
+          return;
+        }
+        
         const card = document.createElement('div');
         card.className = 'card game-card';
         card.setAttribute('data-index', i);
         card.setAttribute('data-folder', g.folder);
         card.setAttribute('data-name', g.name.toLowerCase());
-        card.onclick = () => prepareGame(encodeURIComponent(g.folder), encodeURIComponent(g.name), g.thumb);
-        card.innerHTML = \`<div class="thumb-container" style="--thumb-url: url('\${g.thumb}')">
-          <img class="thumb" src="\${g.thumb}" alt="\${g.name}">
+        
+        // Add error handling for broken images
+        const thumbUrl = g.thumb || 'assets/logo.png';
+        
+        card.onclick = () => {
+          // Verify game exists before opening
+          if (!gameExists(g.folder)) {
+            alert('This game is no longer available.');
+            cleanRecentlyPlayed();
+            loadRecentlyPlayed();
+            return;
+          }
+          prepareGame(encodeURIComponent(g.folder), encodeURIComponent(g.name), thumbUrl);
+        };
+        
+        card.innerHTML = \`<div class="thumb-container" style="--thumb-url: url('\${thumbUrl}')">
+          <img class="thumb" src="\${thumbUrl}" alt="\${g.name}" onerror="this.src='assets/logo.png'">
         </div>
         <div class="card-title">\${g.name}</div>\`;
         recentGrid.appendChild(card);
@@ -1093,6 +1185,11 @@ const html = `<!DOCTYPE html>
       
       if (offsets['Recently Played'] === undefined) offsets['Recently Played'] = 0;
       updateCategoryView('Recently Played');
+      
+      // If grid is empty after cleanup, hide section
+      if (recentGrid.children.length === 0) {
+        recentSection.style.display = 'none';
+      }
     }
     
     // Search functionality with dropdown
@@ -1203,12 +1300,27 @@ const html = `<!DOCTYPE html>
     function prepareGame(folderEncoded, nameEncoded, thumbSrc) {
       const folder = decodeURIComponent(folderEncoded);
       const name = decodeURIComponent(nameEncoded);
+      
+      // Verify game exists before opening
+      if (!gameExists(folder)) {
+        alert('This game is no longer available.');
+        cleanRecentlyPlayed();
+        loadRecentlyPlayed();
+        return;
+      }
+      
       currentGameFolder = folder;
       frame.src = '';
       viewer.style.display = 'flex';
       controls.classList.add('active');
       gameTitle.textContent = name;
-      startThumb.src = thumbSrc;
+      startThumb.src = thumbSrc || 'assets/logo.png';
+      
+      // Add error handler for thumbnail
+      startThumb.onerror = () => {
+        startThumb.src = 'assets/logo.png';
+      };
+      
       startName.textContent = name;
       startOverlay.style.opacity = '1';
       startOverlay.style.pointerEvents = 'auto';
@@ -1234,7 +1346,7 @@ const html = `<!DOCTYPE html>
       
       showCuratedGames(folder);
       
-      saveRecentlyPlayed({ folder, name, thumb: thumbSrc });
+      saveRecentlyPlayed({ folder, name, thumb: thumbSrc || 'assets/logo.png' });
     }
     
     // Show curated games when game viewer is open
@@ -1590,6 +1702,15 @@ const html = `<!DOCTYPE html>
       const hash = window.location.hash;
       if (hash.startsWith('#/game/')) {
         const folder = decodeURIComponent(hash.replace('#/game/', ''));
+        
+        // Check if game exists before trying to open
+        if (!gameExists(folder)) {
+          console.log('Game not found:', folder);
+          alert('This game is no longer available.');
+          window.location.hash = '';
+          return;
+        }
+        
         const cards = Array.from(document.querySelectorAll('.game-card'));
         const card = cards.find(c => c.getAttribute('onclick')?.includes(encodeURIComponent(folder)));
         if (card) card.click();
@@ -1620,6 +1741,18 @@ const html = `<!DOCTYPE html>
         if (img && (!tc.style.getPropertyValue('--thumb-url') || tc.style.getPropertyValue('--thumb-url') === '')) {
           tc.style.setProperty('--thumb-url', "url('" + img.src + "')");
         }
+      });
+      
+      // Add error handlers to all thumbnails
+      document.querySelectorAll('img.thumb').forEach(img => {
+        img.onerror = function() {
+          this.onerror = null; // Prevent infinite loop
+          this.src = 'assets/logo.png';
+          const container = this.closest('.thumb-container');
+          if (container) {
+            container.style.setProperty('--thumb-url', "url('assets/logo.png')");
+          }
+        };
       });
       
       loadRecentlyPlayed();
