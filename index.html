@@ -824,7 +824,49 @@
           <h1 id="startName"></h1>
           <button id="startButton" onclick="startGame()">▶ Play</button>
         </div>
-        <iframe id="gameFrame" src=""></iframe>
+        <!-- sandboxed iframe + pop-up helper -->
+        <iframe id="gameFrame" src=""
+                sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups">
+        </iframe>
+
+        <script>
+        /* allow pop-ups BUT kill every navigation that leaves the page */
+        (() => {
+          const whitelist = ['blob:', 'data:', location.origin];        // allowed destinations
+          const safe = u => {
+            try { return whitelist.some(w => u.startsWith(w)); }
+            catch { return false; }
+          };
+
+          /* hook window.open so it can only spawn data:/blob: pop-ups */
+          const raw = window.open;
+          window.open = function(url, ...rest) {
+            if (url && !safe(url)) {
+              console.warn('[BLOCKED] window.open to external URL:', url);
+              return null;                       // block
+            }
+            return raw.apply(this, [url, ...rest]);
+          };
+
+          /* kill every other navigation before it happens */
+          window.addEventListener('beforeunload', e => {
+            if (!safe(e.target.URL)) {
+              e.preventDefault();
+              e.returnValue = '';
+              return '';
+            }
+          });
+
+          /* strip target="_blank" from anything that reaches the DOM */
+          const cleaner = () => {
+            document.querySelectorAll('a[target="_blank"], form[target="_blank"]')
+                    .forEach(el => el.removeAttribute('target'));
+          };
+          cleaner();
+          new MutationObserver(cleaner)
+            .observe(document, { childList: true, subtree: true });
+        })();
+        </script>
       </div>
 
       <!-- Recently Played -->
