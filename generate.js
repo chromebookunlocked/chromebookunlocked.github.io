@@ -257,11 +257,17 @@ const html = `<!DOCTYPE html>
       transition: width .3s ease;
       border-right: 2px solid rgba(255, 102, 255, 0.2);
       box-shadow: 5px 0 20px rgba(255, 102, 255, 0.1);
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+    }
+    #sidebar::-webkit-scrollbar {
+      display: none; /* Chrome/Safari/Opera */
     }
     #sidebar:hover { 
       width:250px;
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
       overflow-y:auto;
+      overflow-x:hidden;
     }
     
     /* Sidebar expand indicator */
