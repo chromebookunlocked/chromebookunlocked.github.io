@@ -17,14 +17,9 @@
         window.external.AddFavorite(pageUrl, pageTitle);
       }
       // Fallback: Show keyboard shortcut
-      else {
-        showBookmarkInstructions();
-      }
+
     }
     
-    function showBookmarkInstructions() {
-      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-      const shortcut = isMac ? 'Cmd+D' : 'Ctrl+D';
     /* Bookmark Button */
     #bookmarkBtn {
       padding: 0.5rem 1rem;
