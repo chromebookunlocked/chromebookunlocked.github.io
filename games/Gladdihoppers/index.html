@@ -1,46 +1,36 @@
-<!-- Safe Gladihoppers Loader -->
+<!-- Safe Gladihoppers Loader (working + no redirects) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Gladihoppers (Sandboxed)</title>
+  <title>Gladihoppers (Secure Loader)</title>
 
-  <!-- Content Security Policy -->
+  <!-- Relaxed but safe CSP for Unity -->
   <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    script-src 'self' https://cdn.jsdelivr.net;
+    default-src 'self' https://cdn.jsdelivr.net;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net;
     connect-src 'self' https://cdn.jsdelivr.net;
     img-src 'self' https://cdn.jsdelivr.net data:;
     style-src 'self' 'unsafe-inline';
     frame-ancestors 'none';
-    navigate-to 'none';
   ">
 
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      width: 100%;
       height: 100%;
-      background: #111;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #eee;
-      font-family: sans-serif;
+      background: #000;
     }
     iframe {
-      border: none;
       width: 100%;
-      height: 100vh;
+      height: 100%;
+      border: none;
+      display: block;
     }
   </style>
 </head>
-
 <body>
-  <noscript>Please enable JavaScript to load the game.</noscript>
-
-  <!-- Sandboxed iframe to isolate the game -->
   <iframe
     sandbox="allow-scripts allow-same-origin"
     srcdoc="
@@ -50,16 +40,15 @@
         <meta charset='utf-8'>
         <title>Gladihoppers</title>
         <script>
-          // Anti-redirect protection
+          // Prevent redirects or tab openings
           window.open = () => null;
           window.location.assign = () => null;
           window.location.replace = () => null;
-          Object.defineProperty(window, 'location', {
-            configurable: false,
-            writable: false,
-            value: window.location
-          });
+          window.addEventListener('beforeunload', e => e.preventDefault());
+          const origSet = window.location.href;
+          Object.defineProperty(window, 'location', { configurable:false, writable:false, value:window.location });
 
+          // Game config
           window.config = {
             loader: 'unity',
             debug: false,
