@@ -1,123 +1,96 @@
-<!-- Ultimate Game Stash file--> 
-<!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ -->
-
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta charset="utf-8" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <title>Created with GameMaker Studio 2</title>
 
-    <base href="https://cdn.jsdelivr.net/gh/genizy/biologyexams@main/generic-fighter-maybe/">
-    <!-- Custom PreHead code is injected here -->
-    
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        background: #000;
+        overflow: hidden;
+      }
 
-    <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name ="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta charset="utf-8"/>
+      #gm4html5_div_id {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
 
-        <!-- Builtin injector for disabling cache -->
-        <meta http-equiv="pragma" content="no-cache"/>
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        -ms-touch-action: none;
+        touch-action: none;
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
 
-        <!-- Set the title bar of the page -->
-        <title>Created with GameMaker Studio 2</title>
+      /* Fullscreen fix for Safari/Chrome */
+      :-webkit-full-screen canvas {
+        width: 100%;
+        height: 100%;
+      }
+      :-moz-full-screen canvas {
+        width: 100%;
+        height: 100%;
+      }
+      :-ms-fullscreen canvas {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
 
-        <!-- Custom PreStyle code is injected here -->
-        
+  <body>
+    <div class="gm4html5_div_class" id="gm4html5_div_id">
+      <canvas id="canvas" width="960" height="540">
+        <p>Your browser doesn't support HTML5 canvas.</p>
+      </canvas>
+    </div>
 
-        <!-- Set the background colour of the document -->
-        <style>
-            body {
-                background: #0;
-                color: #cccccc;
-                margin: 0px;
-                padding: 0px;
-                border: 0px;
-            }
+    <script src="html5game/GenericFighterMaybe.js?cachebust=71215398"></script>
+    <script>
+      window.onload = function () {
+        if (typeof GameMaker_Init === "function") GameMaker_Init();
 
-            canvas {
-                image-rendering: optimizeSpeed;
-                -webkit-interpolation-mode: nearest-neighbor;
-                -ms-touch-action: none;
-                touch-action: none;
-                margin: 0px;
-                padding: 0px;
-                border: 0px;
-            }
-            :-webkit-full-screen #canvas {
-                width: 100%;
-                height: 100%;
-            }
-            :-webkit-full-screen {
-                width: 100%;
-                height: 100%;
-            }
-            
-            /* Custom Runner Styles */
-            div.gm4html5_div_class {
-                margin: 0px;
-                padding: 0px;
-                border: 0px;
-            }
-            div.gm4html5_login {
-                padding: 20px;
-                position: absolute;
-                border: solid 2px #000000;
-                background-color: #404040;
-                color:#00ff00;
-                border-radius: 15px;
-                box-shadow: #101010 20px 20px 40px;
-            }
-            div.gm4html5_cancel_button {
-                float: right;
-            }
-            div.gm4html5_login_button {
-                float: left;
-            }
-            div.gm4html5_login_header {
-                text-align: center;
-            }
-            /* END - Custom Runner Styles */
-            
-        </style>
+        // Auto-resize canvas to fit window
+        function resizeCanvas() {
+          const canvas = document.getElementById("canvas");
+          const aspect = 960 / 540;
+          let width = window.innerWidth;
+          let height = window.innerHeight;
 
-        <!-- Custom PostStyle code is injected here -->
-        
+          if (width / height > aspect) {
+            width = height * aspect;
+          } else {
+            height = width / aspect;
+          }
 
-        <!-- Builtin injector for injecting flurry analytics code -->
-        
-    </head>
+          canvas.style.width = width + "px";
+          canvas.style.height = height + "px";
+          canvas.style.marginLeft = (window.innerWidth - width) / 2 + "px";
+          canvas.style.marginTop = (window.innerHeight - height) / 2 + "px";
+        }
 
-    <!-- Custom PostHead code is injected here -->
-    
-
-    <!-- Custom PreBody code is injected here -->
-    
-
-    <body>
-        <div class="gm4html5_div_class" id="gm4html5_div_id">
-            
-            <!-- Builtin injector for splash screen -->
-            
-
-            <!-- Create the canvas element the game draws to -->
-            <canvas id="canvas" width="960" height="540" >
-                <p>Your browser doesn't support HTML5 canvas.</p>
-            </canvas>
-        </div>
-
-        <!-- Run the game code -->
-        <script type="text/javascript" src="html5game/GenericFighterMaybe.js?cachebust=71215398"></script>
-
-        <!-- Builtin injector for injecting runner path -->
-        
-
-        <script>window.onload = GameMaker_Init;</script>
-
-        <!-- Builtin injector for injecting google analytics code -->
-        
-
-    </body>
-
-    <!-- Custom PostBody code is injected here -->
-    
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+      };
+    </script>
+  </body>
 </html>
