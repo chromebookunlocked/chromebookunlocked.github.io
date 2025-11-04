@@ -184,7 +184,8 @@ const html = `<!DOCTYPE html>
       background: linear-gradient(180deg, #330066 0%, #1a0033 100%);
       padding:1rem 0;
       height:100vh;
-      overflow-y:auto;
+      overflow-x:hidden;
+      overflow-y:hidden;
       position:fixed;
       left:0; top:0;
       z-index:1000;
@@ -195,6 +196,22 @@ const html = `<!DOCTYPE html>
     #sidebar:hover { 
       width:250px;
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
+      overflow-y:auto;
+    }
+    
+    /* Sidebar scrollbar - only visible when open */
+    #sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    #sidebar::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.2);
+    }
+    #sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255, 102, 255, 0.5);
+      border-radius: 3px;
+    }
+    #sidebar::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
     }
     
     /* Sidebar expand indicator */
