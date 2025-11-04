@@ -470,6 +470,45 @@ const html = `<!DOCTYPE html>
       }
     }
     
+    /* Bookmark Button */
+    #bookmarkBtn {
+      padding: 0.5rem 1rem;
+      background: rgba(255, 102, 255, 0.15);
+      border: 1px solid rgba(255, 102, 255, 0.3);
+      border-radius: 8px;
+      color: var(--accent-light);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .3s ease;
+      font-family: var(--font-main);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      white-space: nowrap;
+    }
+    
+    #bookmarkBtn:hover {
+      background: rgba(255, 102, 255, 0.25);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 102, 255, 0.3);
+    }
+    
+    #bookmarkBtn:active {
+      transform: translateY(0);
+    }
+    
+    @media (max-width: 768px) {
+      #bookmarkBtn {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
+      }
+      #bookmarkBtn .bookmark-text {
+        display: none;
+      }
+    }
+    
     #searchIcon {
       position: absolute;
       left: 1rem;
