@@ -106,8 +106,7 @@
       background: linear-gradient(180deg, #330066 0%, #1a0033 100%);
       padding:1rem 0;
       height:100vh;
-      overflow-x:hidden;
-      overflow-y:hidden;
+      overflow-y:auto;
       position:fixed;
       left:0; top:0;
       z-index:1000;
@@ -118,22 +117,6 @@
     #sidebar:hover { 
       width:250px;
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
-      overflow-y:auto;
-    }
-    
-    /* Sidebar scrollbar - only visible when open */
-    #sidebar::-webkit-scrollbar {
-      width: 6px;
-    }
-    #sidebar::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.2);
-    }
-    #sidebar::-webkit-scrollbar-thumb {
-      background: rgba(255, 102, 255, 0.5);
-      border-radius: 3px;
-    }
-    #sidebar::-webkit-scrollbar-thumb:hover {
-      background: var(--accent);
     }
     
     /* Sidebar expand indicator */
@@ -263,7 +246,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: clamp(0.5rem, 1.5vw, 1.5rem);
+      gap: clamp(1rem, 2vw, 2rem);
       flex-wrap: wrap;
     }
     
@@ -288,35 +271,6 @@
       transform: scale(1.05);
     }
     
-    /* Bookmark button */
-    #bookmarkBtn {
-      padding: 0.6rem 0.9rem;
-      background: linear-gradient(135deg, rgba(255, 102, 255, 0.2), rgba(204, 51, 255, 0.2));
-      border: 2px solid rgba(255, 102, 255, 0.4);
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all .3s ease;
-      font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: #fff;
-      font-family: var(--font-main);
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    
-    #bookmarkBtn:hover {
-      background: linear-gradient(135deg, rgba(255, 102, 255, 0.4), rgba(204, 51, 255, 0.4));
-      border-color: var(--accent);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(255, 102, 255, 0.3);
-    }
-    
-    #bookmarkBtn .icon {
-      font-size: 1.1rem;
-    }
-    
     @media (max-width: 768px) {
       #topHeader {
         flex-direction: column;
@@ -327,15 +281,6 @@
         font-size: clamp(1rem, 4vw, 1.5rem);
         width: 100%;
         text-align: center;
-      }
-      #bookmarkBtn {
-        order: -1;
-        align-self: flex-end;
-        padding: 0.5rem 0.7rem;
-        font-size: 1rem;
-      }
-      #bookmarkBtn .text {
-        display: none;
       }
     }
     
@@ -566,7 +511,6 @@
       border:none;
       background:transparent;
       loading:lazy;
-      sandbox: allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-orientation-lock;
     }
     
     /* Fullscreen iframe scaling */
@@ -823,27 +767,22 @@
     }
     
     /* DMCA */
-    #dmcaFooter {
+    #dmcaLink {
       display: block;
       text-align: center;
-      background: rgba(0, 0, 0, 0.5);
+      background: transparent;
       color: rgba(255, 255, 255, 0.4);
-      padding: 1.5rem 1rem;
+      padding: 0.8rem 1rem;
       font-size: 0.7rem;
-      font-family: var(--font-main);
-      font-weight: 300;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-      margin-top: 4rem;
-    }
-    
-    #dmcaFooter a {
-      color: rgba(255, 255, 255, 0.5);
       text-decoration: none;
       transition: color .3s;
+      font-family: var(--font-main);
+      font-weight: 300;
+      margin-top: 4rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
     }
-    
-    #dmcaFooter a:hover {
-      color: var(--accent-light);
+    #dmcaLink:hover {
+      color: rgba(255, 255, 255, 0.7);
       text-decoration: underline;
     }
   </style>
@@ -865,10 +804,6 @@
     <!-- Top Header with Search -->
     <div id="topHeader">
       <h1 onclick="goToHome()">Chromebook Unlocked Games</h1>
-      <button id="bookmarkBtn" onclick="addToFavorites()">
-        <span class="icon">⭐</span>
-        <span class="text">Bookmark</span>
-      </button>
       <div id="searchContainer">
         <span id="searchIcon">🔍</span>
         <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
@@ -889,7 +824,49 @@
           <h1 id="startName"></h1>
           <button id="startButton" onclick="startGame()">▶ Play</button>
         </div>
-        <iframe id="gameFrame" src=""></iframe>
+        <!-- sandboxed iframe + pop-up helper -->
+        <iframe id="gameFrame" src=""
+                sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups">
+        </iframe>
+
+        <script>
+        /* allow pop-ups BUT kill every navigation that leaves the page */
+        (() => {
+          const whitelist = ['blob:', 'data:', location.origin];        // allowed destinations
+          const safe = u => {
+            try { return whitelist.some(w => u.startsWith(w)); }
+            catch { return false; }
+          };
+
+          /* hook window.open so it can only spawn data:/blob: pop-ups */
+          const raw = window.open;
+          window.open = function(url, ...rest) {
+            if (url && !safe(url)) {
+              console.warn('[BLOCKED] window.open to external URL:', url);
+              return null;                       // block
+            }
+            return raw.apply(this, [url, ...rest]);
+          };
+
+          /* kill every other navigation before it happens */
+          window.addEventListener('beforeunload', e => {
+            if (!safe(e.target.URL)) {
+              e.preventDefault();
+              e.returnValue = '';
+              return '';
+            }
+          });
+
+          /* strip target="_blank" from anything that reaches the DOM */
+          const cleaner = () => {
+            document.querySelectorAll('a[target="_blank"], form[target="_blank"]')
+                    .forEach(el => el.removeAttribute('target'));
+          };
+          cleaner();
+          new MutationObserver(cleaner)
+            .observe(document, { childList: true, subtree: true });
+        })();
+        </script>
       </div>
 
       <!-- Recently Played -->
@@ -1426,10 +1403,7 @@
           </div>
         </div>
       
-      <div id="dmcaFooter">
-        <a href="dmca.html" target="_blank">DMCA</a> • 
-        © 2025 Chromebook Unlocked Games
-      </div>
+      <a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
     </div>
   </div>
 
@@ -1714,26 +1688,8 @@
       }
     });
     
-    // Add to favorites/bookmarks
-    function addToFavorites() {
-      const pageTitle = 'Chromebook Unlocked Games';
-      const pageUrl = window.location.href;
-      
-      // Try modern Bookmark API
-      if (typeof window.external !== 'undefined' && window.external.AddFavorite) {
-        window.external.AddFavorite(pageUrl, pageTitle);
-      } 
-      // Try Chrome/Firefox methods
-      else if (window.sidebar && window.sidebar.addPanel) {
-        window.sidebar.addPanel(pageTitle, pageUrl, '');
-      }
-      // For modern browsers, show keyboard shortcut hint
-      else {
-        const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-        const shortcut = isMac ? '⌘+D' : 'Ctrl+D';
-        alert(`To bookmark this page, press ${shortcut}`);
-      }
-    }
+    // Navigate to home page
+    function goToHome() {
       window.location.hash = '';
       const searchBar = document.getElementById('searchBar');
       if (searchBar) searchBar.value = '';
@@ -1916,9 +1872,9 @@
       const shuffledSameCategory = shuffleArray(sameCategory);
       const shuffledAllGames = shuffleArray(allGames);
       
-      // Build curated list - target 35 games (7 rows × 5 columns)
+      // Build curated list - target 15 games
       const curatedGames = [];
-      const targetCount = 35; // 7 rows
+      const targetCount = 15;
       
       if (sameCategory.length === 0) {
         // No same category - use all random
