@@ -1,69 +1,4 @@
-// Add to bookmarks functionality
-    function addToBookmarks() {
-      const pageTitle = 'Chromebook Unlocked Games';
-      const pageUrl = window.location.href.split('#')[0]; // Remove hash
-      
-      // Try modern API first (Chrome, Edge)
-      if (window.chrome && window.chrome.runtime) {
-        // Show instructions for Chrome
-        showBookmarkInstructions();
-      }
-      // Try Firefox bookmark API
-      else if (window.sidebar && window.sidebar.addPanel) {
-        window.sidebar.addPanel(pageTitle, pageUrl, '');
-      }
-      // Try old IE/Edge method
-      else if (window.external && window.external.AddFavorite) {
-        window.external.AddFavorite(pageUrl, pageTitle);
-      }
-      // Fallback: Show keyboard shortcut
-      else {
-        showBookmarkInstructions();
-      }
-    }
-    
-    function showBookmarkInstructions() {
-      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-      const shortcut = isMac ? 'Cmd+D' : 'Ctrl+D';
-      alert('Press ' + shortcut + ' to bookmark this page!\\n\\nOn mobile, tap the menu button and select "Add to Home Screen"');
-    }    /* Bookmark Button */
-    #bookmarkBtn {
-      padding: 0.5rem 1rem;
-      background: rgba(255, 102, 255, 0.15);
-      border: 1px solid rgba(255, 102, 255, 0.3);
-      border-radius: 8px;
-      color: var(--accent-light);
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all .3s ease;
-      font-family: var(--font-main);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      white-space: nowrap;
-    }
-    
-    #bookmarkBtn:hover {
-      background: rgba(255, 102, 255, 0.25);
-      border-color: var(--accent);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(255, 102, 255, 0.3);
-    }
-    
-    #bookmarkBtn:active {
-      transform: translateY(0);
-    }
-    
-    @media (max-width: 768px) {
-      #bookmarkBtn {
-        font-size: 0.75rem;
-        padding: 0.4rem 0.8rem;
-      }
-      #bookmarkBtn .bookmark-text {
-        display: none;
-      }
-    }const fs = require("fs");
+const fs = require("fs");
 const path = require("path");
 
 const dataDir = path.join(__dirname, "data");
@@ -198,8 +133,8 @@ const html = `<!DOCTYPE html>
       }
     }
   }
-  </` + `script>
-` + `
+  </script>
+  
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
     :root {
@@ -249,25 +184,34 @@ const html = `<!DOCTYPE html>
       background: linear-gradient(180deg, #330066 0%, #1a0033 100%);
       padding:1rem 0;
       height:100vh;
-      overflow-y:hidden;
       overflow-x:hidden;
+      overflow-y:hidden;
       position:fixed;
       left:0; top:0;
       z-index:1000;
       transition: width .3s ease;
       border-right: 2px solid rgba(255, 102, 255, 0.2);
       box-shadow: 5px 0 20px rgba(255, 102, 255, 0.1);
-      scrollbar-width: none; /* Firefox */
-      -ms-overflow-style: none; /* IE/Edge */
-    }
-    #sidebar::-webkit-scrollbar {
-      display: none; /* Chrome/Safari/Opera */
     }
     #sidebar:hover { 
       width:250px;
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
       overflow-y:auto;
-      overflow-x:hidden;
+    }
+    
+    /* Sidebar scrollbar - only visible when open */
+    #sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    #sidebar::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.2);
+    }
+    #sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255, 102, 255, 0.5);
+      border-radius: 3px;
+    }
+    #sidebar::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
     }
     
     /* Sidebar expand indicator */
@@ -396,7 +340,8 @@ const html = `<!DOCTYPE html>
       z-index: 100;
       display: flex;
       align-items: center;
-      gap: clamp(0.8rem, 1.5vw, 1.5rem);
+      justify-content: space-between;
+      gap: clamp(0.5rem, 1.5vw, 1.5rem);
       flex-wrap: wrap;
     }
     
@@ -415,41 +360,60 @@ const html = `<!DOCTYPE html>
       text-overflow: ellipsis;
       flex-shrink: 1;
       min-width: 0;
-      order: 1;
     }
     
     #topHeader h1:hover {
       transform: scale(1.05);
     }
     
+    /* Bookmark button */
     #bookmarkBtn {
-      order: 2;
-      flex-shrink: 0;
+      padding: 0.6rem 0.9rem;
+      background: linear-gradient(135deg, rgba(255, 102, 255, 0.2), rgba(204, 51, 255, 0.2));
+      border: 2px solid rgba(255, 102, 255, 0.4);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all .3s ease;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #fff;
+      font-family: var(--font-main);
+      font-weight: 600;
+      white-space: nowrap;
     }
     
-    #searchContainer {
-      order: 3;
-      flex: 1;
+    #bookmarkBtn:hover {
+      background: linear-gradient(135deg, rgba(255, 102, 255, 0.4), rgba(204, 51, 255, 0.4));
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 102, 255, 0.3);
+    }
+    
+    #bookmarkBtn .icon {
+      font-size: 1.1rem;
     }
     
     @media (max-width: 768px) {
       #topHeader {
-        flex-direction: row;
+        flex-direction: column;
         gap: 0.8rem;
         padding: 0.8rem 1rem;
       }
       #topHeader h1 {
         font-size: clamp(1rem, 4vw, 1.5rem);
-        order: 1;
-        flex: 1;
+        width: 100%;
+        text-align: center;
       }
       #bookmarkBtn {
-        order: 2;
+        order: -1;
+        align-self: flex-end;
+        padding: 0.5rem 0.7rem;
+        font-size: 1rem;
       }
-      #searchContainer {
-        order: 3;
-        width: 100%;
-        flex-basis: 100%;
+      #bookmarkBtn .text {
+        display: none;
       }
     }
     
@@ -458,54 +422,12 @@ const html = `<!DOCTYPE html>
       max-width: 500px;
       min-width: 200px;
       position: relative;
-      order: 3;
     }
     
     @media (max-width: 768px) {
       #searchContainer {
         max-width: 100%;
         width: 100%;
-        order: 3;
-        flex-basis: 100%;
-      }
-    }
-    
-    /* Bookmark Button */
-    #bookmarkBtn {
-      padding: 0.5rem 1rem;
-      background: rgba(255, 102, 255, 0.15);
-      border: 1px solid rgba(255, 102, 255, 0.3);
-      border-radius: 8px;
-      color: var(--accent-light);
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all .3s ease;
-      font-family: var(--font-main);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      white-space: nowrap;
-    }
-    
-    #bookmarkBtn:hover {
-      background: rgba(255, 102, 255, 0.25);
-      border-color: var(--accent);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(255, 102, 255, 0.3);
-    }
-    
-    #bookmarkBtn:active {
-      transform: translateY(0);
-    }
-    
-    @media (max-width: 768px) {
-      #bookmarkBtn {
-        font-size: 0.75rem;
-        padding: 0.4rem 0.8rem;
-      }
-      #bookmarkBtn .bookmark-text {
-        display: none;
       }
     }
     
@@ -722,7 +644,7 @@ const html = `<!DOCTYPE html>
       border:none;
       background:transparent;
       loading:lazy;
-      sandbox: allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-modals;
+      sandbox: allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-orientation-lock;
     }
     
     /* Fullscreen iframe scaling */
@@ -733,7 +655,6 @@ const html = `<!DOCTYPE html>
       width: 100vw;
       height: 100vh;
       object-fit: contain;
-      sandbox: allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-modals;
     }
     
     /* Play overlay */
@@ -980,22 +901,27 @@ const html = `<!DOCTYPE html>
     }
     
     /* DMCA */
-    #dmcaLink {
+    #dmcaFooter {
       display: block;
       text-align: center;
-      background: transparent;
+      background: rgba(0, 0, 0, 0.5);
       color: rgba(255, 255, 255, 0.4);
-      padding: 0.8rem 1rem;
+      padding: 1.5rem 1rem;
       font-size: 0.7rem;
-      text-decoration: none;
-      transition: color .3s;
       font-family: var(--font-main);
       font-weight: 300;
-      margin-top: 4rem;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 4rem;
     }
-    #dmcaLink:hover {
-      color: rgba(255, 255, 255, 0.7);
+    
+    #dmcaFooter a {
+      color: rgba(255, 255, 255, 0.5);
+      text-decoration: none;
+      transition: color .3s;
+    }
+    
+    #dmcaFooter a:hover {
+      color: var(--accent-light);
       text-decoration: underline;
     }
   </style>
@@ -1017,9 +943,9 @@ const html = `<!DOCTYPE html>
     <!-- Top Header with Search -->
     <div id="topHeader">
       <h1 onclick="goToHome()">Chromebook Unlocked Games</h1>
-      <button id="bookmarkBtn" onclick="addToBookmarks()">
-        <span>⭐</span>
-        <span class="bookmark-text">Bookmark</span>
+      <button id="bookmarkBtn" onclick="addToFavorites()">
+        <span class="icon">⭐</span>
+        <span class="text">Bookmark</span>
       </button>
       <div id="searchContainer">
         <span id="searchIcon">🔍</span>
@@ -1061,7 +987,10 @@ const html = `<!DOCTYPE html>
         </div>`;
       }).join('')}
       
-      <a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
+      <div id="dmcaFooter">
+        <a href="dmca.html" target="_blank">DMCA</a> • 
+        © 2025 Chromebook Unlocked Games
+      </div>
     </div>
   </div>
 
@@ -1346,8 +1275,26 @@ const html = `<!DOCTYPE html>
       }
     });
     
-    // Navigate to home page
-    function goToHome() {
+    // Add to favorites/bookmarks
+    function addToFavorites() {
+      const pageTitle = 'Chromebook Unlocked Games';
+      const pageUrl = window.location.href;
+      
+      // Try modern Bookmark API
+      if (typeof window.external !== 'undefined' && window.external.AddFavorite) {
+        window.external.AddFavorite(pageUrl, pageTitle);
+      } 
+      // Try Chrome/Firefox methods
+      else if (window.sidebar && window.sidebar.addPanel) {
+        window.sidebar.addPanel(pageTitle, pageUrl, '');
+      }
+      // For modern browsers, show keyboard shortcut hint
+      else {
+        const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+        const shortcut = isMac ? '⌘+D' : 'Ctrl+D';
+        alert(\`To bookmark this page, press \${shortcut}\`);
+      }
+    }
       window.location.hash = '';
       const searchBar = document.getElementById('searchBar');
       if (searchBar) searchBar.value = '';
@@ -1530,9 +1477,9 @@ const html = `<!DOCTYPE html>
       const shuffledSameCategory = shuffleArray(sameCategory);
       const shuffledAllGames = shuffleArray(allGames);
       
-      // Build curated list - target 15 games
+      // Build curated list - target 35 games (7 rows × 5 columns)
       const curatedGames = [];
-      const targetCount = 15;
+      const targetCount = 35; // 7 rows
       
       if (sameCategory.length === 0) {
         // No same category - use all random
@@ -1600,36 +1547,7 @@ const html = `<!DOCTYPE html>
     
     function startGame() {
       if (!currentGameFolder) return;
-      
-      const gameUrl = 'games/' + currentGameFolder + '/index.html';
-      frame.src = gameUrl;
-      
-      // Additional security: Listen for frame navigation attempts
-      frame.addEventListener('load', () => {
-        try {
-          // Prevent frame from navigating away
-          if (frame.contentWindow) {
-            const originalOpen = frame.contentWindow.open;
-            frame.contentWindow.open = function() {
-              console.log('Blocked window.open() attempt from game');
-              return null;
-            };
-            
-            // Block top navigation
-            Object.defineProperty(frame.contentWindow, 'top', {
-              get: function() { return frame.contentWindow; }
-            });
-            
-            Object.defineProperty(frame.contentWindow, 'parent', {
-              get: function() { return frame.contentWindow; }
-            });
-          }
-        } catch(e) {
-          // Cross-origin restrictions prevent this, which is good
-          console.log('Frame security applied (cross-origin safe)');
-        }
-      });
-      
+      frame.src = 'games/' + currentGameFolder + '/index.html';
       startOverlay.style.opacity = '0';
       startOverlay.style.pointerEvents = 'none';
     }
