@@ -1,40 +1,89 @@
-<!-- Ultimate Game Stash file--> 
-<!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ -->
-<!-- Made by Genizy--> 
-
-
-
-
+<!-- Safe Gladihoppers Loader -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Gladihoppers</title>
-	<script>
-	window.config = {
-		loader: 'unity',
-		debug: false,
-		maxRatio: 16 / 9,
-		minRatio: 9 / 16,
+  <meta charset="utf-8">
+  <title>Gladihoppers (Sandboxed)</title>
 
-		title: 'Gladihoppers',
-		thumbnail: 'https://cdn.jsdelivr.net/gh/genizy/gh/patch/png/null.png',
-		numScreenshots:  5 ,
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' https://cdn.jsdelivr.net;
+    connect-src 'self' https://cdn.jsdelivr.net;
+    img-src 'self' https://cdn.jsdelivr.net data:;
+    style-src 'self' 'unsafe-inline';
+    frame-ancestors 'none';
+    navigate-to 'none';
+  ">
 
-		unityVersion: '2019.3.13f1',
-		unityWebglBuildUrl: 'https://cdn.jsdelivr.net/gh/genizy/gh/Build/Gladihoppers.json',
-
-		fileSize:  23 ,
-		cachedDecompressedFileSizes: {
-			'Gladihoppers.data.unityweb':  17409938 ,
-			'Gladihoppers.wasm.code.unityweb':  6410659 ,
-			'Gladihoppers.wasm.framework.unityweb':  91463 ,
-		},
-	};
-	</script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #eee;
+      font-family: sans-serif;
+    }
+    iframe {
+      border: none;
+      width: 100%;
+      height: 100vh;
+    }
+  </style>
 </head>
+
 <body>
-	<script src="https://cdn.jsdelivr.net/gh/genizy/gh/patch/js/poki-master-loader.js"></script>
+  <noscript>Please enable JavaScript to load the game.</noscript>
+
+  <!-- Sandboxed iframe to isolate the game -->
+  <iframe
+    sandbox="allow-scripts allow-same-origin"
+    srcdoc="
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset='utf-8'>
+        <title>Gladihoppers</title>
+        <script>
+          // Anti-redirect protection
+          window.open = () => null;
+          window.location.assign = () => null;
+          window.location.replace = () => null;
+          Object.defineProperty(window, 'location', {
+            configurable: false,
+            writable: false,
+            value: window.location
+          });
+
+          window.config = {
+            loader: 'unity',
+            debug: false,
+            maxRatio: 16 / 9,
+            minRatio: 9 / 16,
+            title: 'Gladihoppers',
+            thumbnail: 'https://cdn.jsdelivr.net/gh/genizy/gh/patch/png/null.png',
+            numScreenshots: 5,
+            unityVersion: '2019.3.13f1',
+            unityWebglBuildUrl: 'https://cdn.jsdelivr.net/gh/genizy/gh/Build/Gladihoppers.json',
+            fileSize: 23,
+            cachedDecompressedFileSizes: {
+              'Gladihoppers.data.unityweb': 17409938,
+              'Gladihoppers.wasm.code.unityweb': 6410659,
+              'Gladihoppers.wasm.framework.unityweb': 91463
+            }
+          };
+        </script>
+      </head>
+      <body style='margin:0;background:#000;'>
+        <script src='https://cdn.jsdelivr.net/gh/genizy/gh/patch/js/poki-master-loader.js'></script>
+      </body>
+      </html>
+    ">
+  </iframe>
 </body>
 </html>
