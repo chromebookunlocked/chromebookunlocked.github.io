@@ -106,34 +106,35 @@
       background: linear-gradient(180deg, #330066 0%, #1a0033 100%);
       padding:1rem 0;
       height:100vh;
+      overflow-y:auto;
       overflow-x:hidden;
-      overflow-y:hidden;
       position:fixed;
       left:0; top:0;
       z-index:1000;
       transition: width .3s ease;
       border-right: 2px solid rgba(255, 102, 255, 0.2);
       box-shadow: 5px 0 20px rgba(255, 102, 255, 0.1);
+      scrollbar-width: none; /* Firefox */
     }
-    #sidebar:hover { 
+    #sidebar::-webkit-scrollbar {
+      width: 0;
+      display: none;
+    }
+    #sidebar:hover {
       width:250px;
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
-      overflow-y:auto;
+      scrollbar-width: thin; /* Firefox */
     }
-    
-    /* Sidebar scrollbar - only visible when open */
-    #sidebar::-webkit-scrollbar {
-      width: 6px;
+    #sidebar:hover::-webkit-scrollbar {
+      width: 8px;
+      display: block;
     }
-    #sidebar::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.2);
+    #sidebar:hover::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.3);
     }
-    #sidebar::-webkit-scrollbar-thumb {
-      background: rgba(255, 102, 255, 0.5);
-      border-radius: 3px;
-    }
-    #sidebar::-webkit-scrollbar-thumb:hover {
-      background: var(--accent);
+    #sidebar:hover::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--accent), var(--accent-dark));
+      border-radius: 4px;
     }
     
     /* Sidebar expand indicator */
@@ -263,8 +264,36 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: clamp(1rem, 2vw, 2rem);
+      gap: clamp(0.5rem, 1.5vw, 1rem);
       flex-wrap: wrap;
+    }
+    
+    #bookmarkBtn {
+      padding: 0.6rem 1rem;
+      background: linear-gradient(135deg, rgba(255, 102, 255, 0.2), rgba(204, 51, 255, 0.2));
+      border: 1px solid rgba(255, 102, 255, 0.4);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: var(--accent-light);
+      transition: all .3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+    }
+    
+    #bookmarkBtn:hover {
+      background: linear-gradient(135deg, rgba(255, 102, 255, 0.4), rgba(204, 51, 255, 0.4));
+      border-color: var(--accent);
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(255, 102, 255, 0.5);
+    }
+    
+    #bookmarkBtn:active {
+      transform: scale(0.95);
     }
     
     #topHeader h1 {
@@ -789,18 +818,17 @@
       text-align: center;
       background: transparent;
       color: rgba(255, 255, 255, 0.4);
-      padding: 0.8rem 1rem;
+      padding: 2rem 1rem;
       font-size: 0.7rem;
       text-decoration: none;
-      transition: color .3s;
+      transition: .3s;
       font-family: var(--font-main);
       font-weight: 300;
       margin-top: 4rem;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
     }
     #dmcaLink:hover {
-      color: rgba(255, 255, 255, 0.7);
-      text-decoration: underline;
+      color: rgba(255, 255, 255, 0.6);
     }
   </style>
 </head>
@@ -821,6 +849,7 @@
     <!-- Top Header with Search -->
     <div id="topHeader">
       <h1 onclick="goToHome()">Chromebook Unlocked Games</h1>
+      <button id="bookmarkBtn" onclick="bookmarkPage()" title="Bookmark this page">⭐</button>
       <div id="searchContainer">
         <span id="searchIcon">🔍</span>
         <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
@@ -841,49 +870,7 @@
           <h1 id="startName"></h1>
           <button id="startButton" onclick="startGame()">▶ Play</button>
         </div>
-        <!-- sandboxed iframe + pop-up helper -->
-        <iframe id="gameFrame" src=""
-                sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-popups">
-        </iframe>
-
-        <script>
-        /* allow pop-ups BUT kill every navigation that leaves the page */
-        (() => {
-          const whitelist = ['blob:', 'data:', location.origin];        // allowed destinations
-          const safe = u => {
-            try { return whitelist.some(w => u.startsWith(w)); }
-            catch { return false; }
-          };
-
-          /* hook window.open so it can only spawn data:/blob: pop-ups */
-          const raw = window.open;
-          window.open = function(url, ...rest) {
-            if (url && !safe(url)) {
-              console.warn('[BLOCKED] window.open to external URL:', url);
-              return null;                       // block
-            }
-            return raw.apply(this, [url, ...rest]);
-          };
-
-          /* kill every other navigation before it happens */
-          window.addEventListener('beforeunload', e => {
-            if (!safe(e.target.URL)) {
-              e.preventDefault();
-              e.returnValue = '';
-              return '';
-            }
-          });
-
-          /* strip target="_blank" from anything that reaches the DOM */
-          const cleaner = () => {
-            document.querySelectorAll('a[target="_blank"], form[target="_blank"]')
-                    .forEach(el => el.removeAttribute('target'));
-          };
-          cleaner();
-          new MutationObserver(cleaner)
-            .observe(document, { childList: true, subtree: true });
-        })();
-        </script>
+        <iframe id="gameFrame" src=""></iframe>
       </div>
 
       <!-- Recently Played -->
@@ -1705,6 +1692,28 @@
       }
     });
     
+    // Bookmark page function
+    function bookmarkPage() {
+      const pageTitle = document.title;
+      const pageUrl = window.location.href;
+      
+      if (window.sidebar && window.sidebar.addPanel) { 
+        // Firefox
+        window.sidebar.addPanel(pageTitle, pageUrl, "");
+      } else if (window.external && ('AddFavorite' in window.external)) { 
+        // IE/Edge Legacy
+        window.external.AddFavorite(pageUrl, pageTitle);
+      } else if (window.opera && window.print) { 
+        // Opera
+        return true;
+      } else { 
+        // Chrome, Safari, modern Edge
+        const isMac = navigator.userAgent.toLowerCase().indexOf('mac') !== -1;
+        const key = isMac ? 'Cmd' : 'Ctrl';
+        alert(`Press ${key} + D to bookmark this page.`);
+      }
+    }
+    
     // Navigate to home page
     function goToHome() {
       window.location.hash = '';
@@ -1955,6 +1964,7 @@
       });
       
       console.log('=== Finished showCuratedGames');
+      console.log('Total games displayed in "You Might Also Like":', finalCurated.length);
     }
     
     function startGame() {
