@@ -73,7 +73,10 @@ const sidebarCategories = Object.keys(categories)
 const newlyAddedItem = categories['Newly Added'] ? 
   `<li onclick="filterCategory('Newly Added')" style="border-bottom: 1px solid rgba(255,102,255,0.3); padding-bottom: 0.8rem; margin-bottom: 0.8rem;">✨ Newly Added</li>` : '';
 
-const finalSidebarCategories = newlyAddedItem + sidebarCategories;
+// Add "All Games" after Home
+const allGamesItem = `<li onclick="filterCategory('All Games')">All Games</li>`;
+
+const finalSidebarCategories = newlyAddedItem + allGamesItem + sidebarCategories;
 
 // Full HTML template
 const html = `<!DOCTYPE html>
@@ -341,15 +344,14 @@ const html = `<!DOCTYPE html>
       z-index: 100;
       display: flex;
       align-items: center;
-      justify-content: space-between;
       gap: clamp(0.5rem, 1.5vw, 1rem);
       flex-wrap: wrap;
     }
     
     #bookmarkBtn {
       padding: 0.6rem 1rem;
-      background: linear-gradient(135deg, rgba(255, 102, 255, 0.2), rgba(204, 51, 255, 0.2));
-      border: 1px solid rgba(255, 102, 255, 0.4);
+      background: linear-gradient(135deg, rgba(255, 102, 255, 0.15), rgba(204, 51, 255, 0.15));
+      border: 1px solid rgba(255, 102, 255, 0.3);
       border-radius: 10px;
       cursor: pointer;
       font-size: 1.2rem;
@@ -361,17 +363,26 @@ const html = `<!DOCTYPE html>
       min-width: 40px;
       height: 40px;
       flex-shrink: 0;
+      order: 3;
+      margin-left: auto;
     }
     
     #bookmarkBtn:hover {
-      background: linear-gradient(135deg, rgba(255, 102, 255, 0.4), rgba(204, 51, 255, 0.4));
+      background: linear-gradient(135deg, rgba(255, 102, 255, 0.3), rgba(204, 51, 255, 0.3));
       border-color: var(--accent);
       transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(255, 102, 255, 0.5);
     }
     
     #bookmarkBtn:active {
       transform: scale(0.95);
+    }
+    
+    #topHeader h1 {
+      order: 1;
+    }
+    
+    #searchContainer {
+      order: 2;
     }
     
     #topHeader h1 {
@@ -830,10 +841,30 @@ const html = `<!DOCTYPE html>
     }
     
     .card-title {
-      margin:.7rem 0 1rem 0;
-      font-family:var(--font-main);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: 0;
+      padding: 0.6rem 0.5rem;
+      font-family: var(--font-main);
       font-weight: 700;
-      font-size: clamp(0.85rem, 1vw, 1rem);
+      font-size: clamp(0.75rem, 0.9vw, 0.9rem);
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.4), transparent);
+      color: #fff;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all .3s ease;
+      z-index: 2;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .card:hover .card-title {
+      opacity: 1;
+      transform: translateY(0);
     }
     
     /* "more" card - same size as game cards */
@@ -927,12 +958,12 @@ const html = `<!DOCTYPE html>
     <!-- Top Header with Search -->
     <div id="topHeader">
       <h1 onclick="goToHome()">Chromebook Unlocked Games</h1>
-      <button id="bookmarkBtn" onclick="bookmarkPage()" title="Bookmark this page">⭐</button>
       <div id="searchContainer">
         <span id="searchIcon">🔍</span>
         <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
         <div id="searchDropdown"></div>
       </div>
+      <button id="bookmarkBtn" onclick="bookmarkPage()" title="Bookmark this page">⭐</button>
     </div>
 
     <div class="content-wrapper">
@@ -955,6 +986,14 @@ const html = `<!DOCTYPE html>
       <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
         <h2>Recently Played</h2>
         <div class="grid" id="recentlyPlayedGrid"></div>
+      </div>
+
+      <!-- All Games -->
+      <div class="category all-games-section" data-category="All Games" style="display:none;">
+        <h2>All Games</h2>
+        <div class="grid">
+          ${games.map((g, i) => generateGameCard(g, i)).join('')}
+        </div>
       </div>
 
       <!-- All category sections (including games for home view) -->
