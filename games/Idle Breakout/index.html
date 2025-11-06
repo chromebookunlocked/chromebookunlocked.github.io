@@ -1,96 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <title>Made by Kodiqi</title>
-    <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        background: #000;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Made by Kodiqi</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #gm4html5_div_id {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      width: 100%;
+      height: 100%;
+    }
+
+    canvas {
+      display: block;
+      background: #000;
+      cursor: auto;
+      image-rendering: pixelated;
+      -ms-touch-action: none;
+    }
+
+    :fullscreen #gm4html5_div_id,
+    :-webkit-full-screen #gm4html5_div_id {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      background: #000;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="gm4html5_div_class" id="gm4html5_div_id">
+    <canvas id="canvas" width="768" height="768">
+      <p>Your browser doesn't support HTML5 canvas.</p>
+    </canvas>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/gh/bobydob/JSEngine@9b6eab8976a7acc4aee72479af65647693633abc/build/id-br/ibo.js"></script>
+
+  <script>
+    window.onload = function () {
+      GameMaker_Init();
+
+      const canvas = document.getElementById("canvas");
+      const container = document.getElementById("gm4html5_div_id");
+
+      function resizeGame() {
+        // Keep square aspect ratio
+        const minSide = Math.min(window.innerWidth, window.innerHeight);
+        const scale = minSide / 768; // 768 = base size of game
+
+        // Physically resize the render buffer to keep input aligned
+        canvas.width = 768;
+        canvas.height = 768;
+
+        // Resize CSS for visual scaling
+        canvas.style.width = minSide + "px";
+        canvas.style.height = minSide + "px";
+
+        // Center it in case of rectangular window
+        container.style.justifyContent = "center";
+        container.style.alignItems = "center";
+
+        // Ensure clicks map correctly by updating internal offset
+        const rect = canvas.getBoundingClientRect();
+        window._canvasOffsetX = rect.left;
+        window._canvasOffsetY = rect.top;
+        window._canvasScale = scale;
       }
 
-      #gm4html5_div_id {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #000;
-        width: 100%;
-        height: 100%;
+      // Fix mouse click offsets by patching GameMaker input mapping
+      window.addEventListener("mousedown", fixInput);
+      window.addEventListener("mousemove", fixInput);
+      window.addEventListener("mouseup", fixInput);
+
+      function fixInput(e) {
+        if (!window._canvasScale) return;
+        e.offsetX = (e.clientX - window._canvasOffsetX) / window._canvasScale;
+        e.offsetY = (e.clientY - window._canvasOffsetY) / window._canvasScale;
       }
 
-      canvas {
-        display: block;
-        background: #000;
-        cursor: auto;
-        image-rendering: pixelated;
-      }
+      window.addEventListener("resize", resizeGame);
+      document.addEventListener("fullscreenchange", resizeGame);
+      document.addEventListener("webkitfullscreenchange", resizeGame);
 
-      /* Fullscreen centering */
-      :fullscreen #gm4html5_div_id,
-      :-webkit-full-screen #gm4html5_div_id {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        background: #000;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="gm4html5_div_class" id="gm4html5_div_id">
-      <canvas id="canvas" width="768" height="768">
-        <p>Your browser doesn't support HTML5 canvas.</p>
-      </canvas>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/gh/bobydob/JSEngine@9b6eab8976a7acc4aee72479af65647693633abc/build/id-br/ibo.js"></script>
-
-    <script>
-      window.onload = function () {
-        GameMaker_Init();
-
-        const canvas = document.getElementById("canvas");
-        const container = document.getElementById("gm4html5_div_id");
-
-        // Dynamically resize canvas including actual drawing buffer
-        function resizeGame() {
-          const size = Math.min(window.innerWidth, window.innerHeight);
-          const scale = size / 768; // 768 = original canvas size
-
-          // Resize both canvas *element* and its *drawing buffer*
-          canvas.width = 768;
-          canvas.height = 768;
-          canvas.style.width = size + "px";
-          canvas.style.height = size + "px";
-
-          // Adjust GameMaker mouse position scaling (optional)
-          if (typeof window.devicePixelRatio !== "undefined") {
-            const ctx = canvas.getContext("2d");
-            ctx.setTransform(scale, 0, 0, scale, 0, 0);
-          }
-        }
-
-        window.addEventListener("resize", resizeGame);
-        resizeGame();
-
-        // Recalculate on fullscreen change
-        document.addEventListener("fullscreenchange", resizeGame);
-        document.addEventListener("webkitfullscreenchange", resizeGame);
-      };
-    </script>
-  </body>
+      resizeGame();
+    };
+  </script>
+</body>
 </html>
