@@ -392,8 +392,8 @@ const html = `<!DOCTYPE html>
   color: var(--accent-light);
   transition: all .3s ease;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: right;
+  justify-content: right;
   min-width: 40px;
   height: 40px;
   flex-shrink: 0;
