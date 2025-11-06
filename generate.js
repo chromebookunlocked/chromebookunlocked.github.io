@@ -867,59 +867,67 @@ const html = `<!DOCTYPE html>
       transform: translateY(0);
     }
     
-    /* "more" card - same size as game cards */
-    .card.more {
-      background: linear-gradient(135deg, rgba(102, 0, 153, 0.3), rgba(77, 0, 102, 0.3));
-      backdrop-filter: blur(10px);
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      flex-direction:column;
-      color: #ffccff;
-      border: 2px dashed rgba(255, 102, 255, 0.4);
-      min-height: calc(var(--thumb-height) + 3rem);
-      transition: all .3s ease;
-      animation: pulse 2s ease-in-out infinite;
-    }
-    
-    @keyframes pulse {
-      0%, 100% {
-        border-color: rgba(255, 102, 255, 0.4);
-        box-shadow: 0 4px 15px rgba(255, 102, 255, 0.2);
-      }
-      50% {
-        border-color: rgba(255, 102, 255, 0.7);
-        box-shadow: 0 4px 25px rgba(255, 102, 255, 0.4);
-      }
-    }
-    
-    .card.more:hover {
-      background: linear-gradient(135deg, rgba(102, 0, 153, 0.5), rgba(77, 0, 102, 0.5));
-      border: 2px dashed var(--accent);
-      transform:translateY(-5px) scale(1.03);
-      box-shadow: 0 8px 30px rgba(255, 102, 255, 0.6);
-      animation: none;
-    }
-    
-    .card.more .dots {
-      font-size: clamp(3rem, 5vw, 4rem);
-      line-height:1;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 0.5rem;
-    }
-    
-    .card.more .label {
-      font-size: clamp(0.9rem, 1.2vw, 1.1rem);
-      opacity: 0.9;
-      font-family: var(--font-main);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
+  /* "more" card - now perfectly square like other game thumbnails */
+.card.more {
+  background: linear-gradient(135deg, rgba(102, 0, 153, 0.3), rgba(77, 0, 102, 0.3));
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: #ffccff;
+  border: 2px dashed rgba(255, 102, 255, 0.4);
+  aspect-ratio: 1 / 1;          /* keeps it square */
+  height: auto;                 /* allow flexible sizing */
+  min-height: unset;            /* remove previous fixed height */
+  width: 100%;                  /* fills grid cell width */
+  transition: all .3s ease;
+  animation: pulse 2s ease-in-out infinite;
+  border-radius: 15px;          /* match other cards’ rounded corners */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    border-color: rgba(255, 102, 255, 0.4);
+    box-shadow: 0 4px 15px rgba(255, 102, 255, 0.2);
+  }
+  50% {
+    border-color: rgba(255, 102, 255, 0.7);
+    box-shadow: 0 4px 25px rgba(255, 102, 255, 0.4);
+  }
+}
+
+.card.more:hover {
+  background: linear-gradient(135deg, rgba(102, 0, 153, 0.5), rgba(77, 0, 102, 0.5));
+  border: 2px dashed var(--accent);
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 8px 30px rgba(255, 102, 255, 0.6);
+  animation: none;
+}
+
+/* inner text + icon */
+.card.more .dots {
+  font-size: clamp(3rem, 5vw, 4rem);
+  line-height: 1;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.card.more .label {
+  font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+  opacity: 0.9;
+  font-family: var(--font-main);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
     
     /* DMCA */
     #dmcaLink {
