@@ -3,7 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Made by Kodiqi</title>
     <style>
       html, body {
@@ -22,29 +25,41 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 100%;
-        height: 100%;
+        background: #000;
       }
 
       canvas {
         display: block;
-        width: 100%;
+        background: #000;
+        width: auto;
         height: auto;
         max-width: 100%;
         max-height: 100%;
-        aspect-ratio: 1000 / 768; /* Maintain original aspect ratio */
+        aspect-ratio: 1 / 1; /* square window */
         image-rendering: pixelated;
+        cursor: auto;
+      }
+
+      /* Fullscreen behavior */
+      :fullscreen #gm4html5_div_id,
+      :-webkit-full-screen #gm4html5_div_id {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
         background: #000;
       }
 
-      /* Handle fullscreen mode */
       :fullscreen canvas,
       :-webkit-full-screen canvas {
-        width: 100%;
-        height: 100%;
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 100%;
       }
 
-      /* GameMaker’s login dialog styling kept */
+      /* Optional GameMaker login box styles preserved */
       div.gm4html5_login {
         padding: 20px;
         position: absolute;
@@ -62,32 +77,27 @@
 
   <body>
     <div class="gm4html5_div_class" id="gm4html5_div_id">
-      <canvas id="canvas" width="1000" height="768">
+      <canvas id="canvas" width="768" height="768">
         <p>Your browser doesn't support HTML5 canvas.</p>
       </canvas>
     </div>
 
     <script src="https://cdn.jsdelivr.net/gh/bobydob/JSEngine@9b6eab8976a7acc4aee72479af65647693633abc/build/id-br/ibo.js"></script>
     <script>
-      window.onload = function() {
+      window.onload = function () {
         GameMaker_Init();
 
-        // Handle window resizing for scaling & centering
-        const canvas = document.getElementById('canvas');
-        const container = document.getElementById('gm4html5_div_id');
+        const canvas = document.getElementById("canvas");
+        const container = document.getElementById("gm4html5_div_id");
+
+        // Function to resize and center canvas with preserved square shape
         function resizeGame() {
-          const aspect = 1000 / 768;
-          let width = window.innerWidth;
-          let height = window.innerHeight;
-          if (width / height > aspect) {
-            width = height * aspect;
-          } else {
-            height = width / aspect;
-          }
-          canvas.style.width = width + "px";
-          canvas.style.height = height + "px";
+          let size = Math.min(window.innerWidth, window.innerHeight);
+          canvas.style.width = size + "px";
+          canvas.style.height = size + "px";
         }
-        window.addEventListener('resize', resizeGame);
+
+        window.addEventListener("resize", resizeGame);
         resizeGame();
       };
     </script>
