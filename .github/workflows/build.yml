@@ -34,11 +34,29 @@ jobs:
           cp ads.txt dist/ads.txt
           cp dmca.html dist/dmca.html
           cp sitemap.xml dist/sitemap.xml
-          cp robots.txt dist/robots.txt   # ✅ Added this line
+          cp robots.txt dist/robots.txt
+
+      # 🧹 Clean "data" folder on gh-pages branch before deploying
+      - name: Delete old data files from gh-pages
+        run: |
+          git fetch origin gh-pages || true
+          git checkout origin/gh-pages -- . || true
+          mkdir -p dist
+          if [ -d dist/data ]; then
+            echo "Cleaning old data files..."
+            # Delete any file in gh-pages:data that’s not in current data
+            for file in $(find dist/data -type f); do
+              rel_path="${file#dist/}"
+              if [ ! -f "$rel_path" ]; then
+                echo "Removing outdated file: $rel_path"
+                rm "$file"
+              fi
+            done
+          fi
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          clean: true
+          clean: false  # ⚠️ Don't clean everything, we already handled data cleanup
