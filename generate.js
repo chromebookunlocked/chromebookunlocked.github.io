@@ -376,7 +376,7 @@ const html = `<!DOCTYPE html>
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.5rem;          /* small space between bookmark and search bar */
+  gap: 0.1rem;          /* small space between bookmark and search bar */
   margin-left: auto;    /* pushes group to right side */
 }
 
@@ -392,8 +392,8 @@ const html = `<!DOCTYPE html>
   color: var(--accent-light);
   transition: all .3s ease;
   display: flex;
-  align-items: right;
-  justify-content: right;
+  align-items: center;
+  justify-content: center;
   min-width: 40px;
   height: 40px;
   flex-shrink: 0;
