@@ -877,9 +877,10 @@ const html = `<!DOCTYPE html>
       flex-direction:column;
       color: #ffccff;
       border: 2px dashed rgba(255, 102, 255, 0.4);
-      min-height: calc(var(--thumb-height) + 3rem);
+      min-height: calc(var(--thumb-height) + 0.5rem);
       transition: all .3s ease;
       animation: pulse 2s ease-in-out infinite;
+      padding: 0;
     }
     
     @keyframes pulse {
@@ -901,6 +902,15 @@ const html = `<!DOCTYPE html>
       animation: none;
     }
     
+    .card.more .more-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: var(--thumb-height);
+      width: 100%;
+    }
+    
     .card.more .dots {
       font-size: clamp(3rem, 5vw, 4rem);
       line-height:1;
@@ -919,6 +929,8 @@ const html = `<!DOCTYPE html>
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
+      color: #ffccff;
+      margin-top: 0.5rem;
     }
     
     /* DMCA */
@@ -958,12 +970,14 @@ const html = `<!DOCTYPE html>
     <!-- Top Header with Search -->
     <div id="topHeader">
       <h1 onclick="goToHome()">Chromebook Unlocked Games</h1>
-      <div id="searchContainer">
-        <span id="searchIcon">🔍</span>
-        <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
-        <div id="searchDropdown"></div>
+      <div class="header-right">
+        <button id="bookmarkBtn" onclick="bookmarkPage()" title="Bookmark this page">⭐</button>
+        <div id="searchContainer">
+          <span id="searchIcon">🔍</span>
+          <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
+          <div id="searchDropdown"></div>
+        </div>
       </div>
-      <button id="bookmarkBtn" onclick="bookmarkPage()" title="Bookmark this page">⭐</button>
     </div>
 
     <div class="content-wrapper">
@@ -1072,7 +1086,7 @@ const html = `<!DOCTYPE html>
     function createMoreCard(cat) {
       const more = document.createElement('div');
       more.className = 'card more';
-      more.innerHTML = '<div class="dots">⋯</div><div class="label">Show More</div>';
+      more.innerHTML = '<div class="more-content"><div class="dots">⋯</div></div><div class="label">Show More</div>';
       more.addEventListener('click', (e) => {
         offsets[cat] = (offsets[cat] || 0) + 1;
         updateCategoryView(cat);
@@ -1710,6 +1724,12 @@ const html = `<!DOCTYPE html>
           // Skip special sections
           if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection') return;
           
+          // Hide "All Games" on home
+          if (category === 'All Games') {
+            c.style.display = 'none';
+            return;
+          }
+          
           // Show recently played and all categories on home
           if (category === 'Recently Played') {
             const recentGrid = document.getElementById('recentlyPlayedGrid');
@@ -1717,6 +1737,14 @@ const html = `<!DOCTYPE html>
           } else {
             c.style.display = 'block';
           }
+        });
+      } else if (cat === 'All Games') {
+        // Show only All Games section
+        currentViewMode = 'category';
+        all.forEach(c => {
+          const category = c.getAttribute('data-category');
+          if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection') return;
+          c.style.display = (category === 'All Games') ? 'block' : 'none';
         });
       } else {
         currentViewMode = 'category';
