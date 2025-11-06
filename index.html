@@ -252,7 +252,7 @@
       }
     }
     
-    /* Top Header Bar */
+     /* Top Header Bar */
     #topHeader {
       background: linear-gradient(135deg, #330066 0%, #1a0033 100%);
       padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 3vw, 2rem);
@@ -263,14 +263,15 @@
       z-index: 100;
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: clamp(0.5rem, 1.5vw, 1rem);
       flex-wrap: wrap;
     }
     
     #bookmarkBtn {
       padding: 0.6rem 1rem;
-      background: linear-gradient(135deg, rgba(255, 102, 255, 0.15), rgba(204, 51, 255, 0.15));
-      border: 1px solid rgba(255, 102, 255, 0.3);
+      background: linear-gradient(135deg, rgba(255, 102, 255, 0.2), rgba(204, 51, 255, 0.2));
+      border: 1px solid rgba(255, 102, 255, 0.4);
       border-radius: 10px;
       cursor: pointer;
       font-size: 1.2rem;
@@ -282,26 +283,17 @@
       min-width: 40px;
       height: 40px;
       flex-shrink: 0;
-      order: 3;
-      margin-left: auto;
     }
     
     #bookmarkBtn:hover {
-      background: linear-gradient(135deg, rgba(255, 102, 255, 0.3), rgba(204, 51, 255, 0.3));
+      background: linear-gradient(135deg, rgba(255, 102, 255, 0.4), rgba(204, 51, 255, 0.4));
       border-color: var(--accent);
       transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(255, 102, 255, 0.5);
     }
     
     #bookmarkBtn:active {
       transform: scale(0.95);
-    }
-    
-    #topHeader h1 {
-      order: 1;
-    }
-    
-    #searchContainer {
-      order: 2;
     }
     
     #topHeader h1 {
