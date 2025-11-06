@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Made by Kodiqi</title>
   <style>
     html, body {
@@ -33,7 +32,6 @@
       background: #000;
       cursor: auto;
       image-rendering: pixelated;
-      -ms-touch-action: none;
     }
 
     :fullscreen #gm4html5_div_id,
@@ -56,6 +54,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/gh/bobydob/JSEngine@9b6eab8976a7acc4aee72479af65647693633abc/build/id-br/ibo.js"></script>
+
 <script>
 window.onload = function() {
   GameMaker_Init();
@@ -64,33 +63,29 @@ window.onload = function() {
   const container = document.getElementById("gm4html5_div_id");
 
   function resizeGame() {
-    // Keep square aspect ratio
     const minSide = Math.min(window.innerWidth, window.innerHeight);
-    const scale = minSide / 768;
-
-    // Set visual size
+    const scale = minSide / 768; // 768 = base size
     canvas.style.width = (768 * scale) + "px";
     canvas.style.height = (768 * scale) + "px";
 
-    // Update canvas bounding info for mouse correction
+    // Store canvas position and scale for mouse correction
     const rect = canvas.getBoundingClientRect();
     canvas._offsetX = rect.left;
     canvas._offsetY = rect.top;
     canvas._scale = scale;
   }
 
-  // Correct mouse events relative to canvas
-  function fixMouse(e) {
+  // Fix mouse input by reversing the offset
+  function correctMouse(e) {
     if (!canvas._scale) return;
-    const rect = canvas.getBoundingClientRect();
-    // Correct coordinates relative to scaled & centered canvas
-    e.offsetX = (e.clientX - rect.left) * (768 / (rect.width));
-    e.offsetY = (e.clientY - rect.top) * (768 / (rect.height));
+    // Offset relative to canvas and divide by scale to get original game coordinates
+    e.offsetX = (e.clientX - canvas._offsetX) / canvas._scale;
+    e.offsetY = (e.clientY - canvas._offsetY) / canvas._scale;
   }
 
-  ["mousedown", "mouseup", "mousemove", "click"].forEach(eventType => {
-    canvas.addEventListener(eventType, fixMouse, true);
-  });
+  ["mousedown","mouseup","mousemove","click"].forEach(evt =>
+    canvas.addEventListener(evt, correctMouse, true)
+  );
 
   window.addEventListener("resize", resizeGame);
   document.addEventListener("fullscreenchange", resizeGame);
