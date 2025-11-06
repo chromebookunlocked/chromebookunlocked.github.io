@@ -26,21 +26,18 @@
         justify-content: center;
         align-items: center;
         background: #000;
+        width: 100%;
+        height: 100%;
       }
 
       canvas {
         display: block;
         background: #000;
-        width: auto;
-        height: auto;
-        max-width: 100%;
-        max-height: 100%;
-        aspect-ratio: 1 / 1; /* square window */
-        image-rendering: pixelated;
         cursor: auto;
+        image-rendering: pixelated;
       }
 
-      /* Fullscreen behavior */
+      /* Fullscreen centering */
       :fullscreen #gm4html5_div_id,
       :-webkit-full-screen #gm4html5_div_id {
         display: flex;
@@ -50,28 +47,6 @@
         height: 100%;
         background: #000;
       }
-
-      :fullscreen canvas,
-      :-webkit-full-screen canvas {
-        width: auto;
-        height: auto;
-        max-width: 100%;
-        max-height: 100%;
-      }
-
-      /* Optional GameMaker login box styles preserved */
-      div.gm4html5_login {
-        padding: 20px;
-        position: absolute;
-        border: solid 2px #000;
-        background-color: #404040;
-        color: #00ff00;
-        border-radius: 15px;
-        box-shadow: #101010 20px 20px 40px;
-      }
-      div.gm4html5_cancel_button { float: right; }
-      div.gm4html5_login_button { float: left; }
-      div.gm4html5_login_header { text-align: center; }
     </style>
   </head>
 
@@ -83,6 +58,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/gh/bobydob/JSEngine@9b6eab8976a7acc4aee72479af65647693633abc/build/id-br/ibo.js"></script>
+
     <script>
       window.onload = function () {
         GameMaker_Init();
@@ -90,15 +66,30 @@
         const canvas = document.getElementById("canvas");
         const container = document.getElementById("gm4html5_div_id");
 
-        // Function to resize and center canvas with preserved square shape
+        // Dynamically resize canvas including actual drawing buffer
         function resizeGame() {
-          let size = Math.min(window.innerWidth, window.innerHeight);
+          const size = Math.min(window.innerWidth, window.innerHeight);
+          const scale = size / 768; // 768 = original canvas size
+
+          // Resize both canvas *element* and its *drawing buffer*
+          canvas.width = 768;
+          canvas.height = 768;
           canvas.style.width = size + "px";
           canvas.style.height = size + "px";
+
+          // Adjust GameMaker mouse position scaling (optional)
+          if (typeof window.devicePixelRatio !== "undefined") {
+            const ctx = canvas.getContext("2d");
+            ctx.setTransform(scale, 0, 0, scale, 0, 0);
+          }
         }
 
         window.addEventListener("resize", resizeGame);
         resizeGame();
+
+        // Recalculate on fullscreen change
+        document.addEventListener("fullscreenchange", resizeGame);
+        document.addEventListener("webkitfullscreenchange", resizeGame);
       };
     </script>
   </body>
