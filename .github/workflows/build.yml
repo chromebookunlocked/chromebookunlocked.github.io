@@ -25,38 +25,26 @@ jobs:
       - name: Build site
         run: npm run build
 
+      # 🧹 Copy files with cleanup for data folder
       - name: Copy game, data, asset folders, and static files
         run: |
           mkdir -p dist
           cp -r games dist/games
-          cp -r data dist/data
           cp -r assets dist/assets
+
+          # Use rsync so dist/data matches repo/data exactly (deletes removed files)
+          rsync -av --delete data/ dist/data/
+
+          # Copy static files
           cp ads.txt dist/ads.txt
           cp dmca.html dist/dmca.html
           cp sitemap.xml dist/sitemap.xml
           cp robots.txt dist/robots.txt
 
-      # 🧹 Clean "data" folder on gh-pages branch before deploying
-      - name: Delete old data files from gh-pages
-        run: |
-          git fetch origin gh-pages || true
-          git checkout origin/gh-pages -- . || true
-          mkdir -p dist
-          if [ -d dist/data ]; then
-            echo "Cleaning old data files..."
-            # Delete any file in gh-pages:data that’s not in current data
-            for file in $(find dist/data -type f); do
-              rel_path="${file#dist/}"
-              if [ ! -f "$rel_path" ]; then
-                echo "Removing outdated file: $rel_path"
-                rm "$file"
-              fi
-            done
-          fi
-
+      # 🚀 Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          clean: false  # ⚠️ Don't clean everything, we already handled data cleanup
+          clean: false  # Don't wipe everything, rsync handled data cleanup
