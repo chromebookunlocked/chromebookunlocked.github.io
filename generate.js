@@ -869,16 +869,15 @@ const html = `<!DOCTYPE html>
   flex-direction: column;
   color: #ffccff;
   border: 2px dashed rgba(255, 102, 255, 0.4);
-  aspect-ratio: 1 / 1;          /* keeps it square */
-  height: auto;                 /* allow flexible sizing */
-  min-height: unset;            /* remove previous fixed height */
-  width: 100%;                  /* fills grid cell width */
+  width: 100%;
+  height: var(--thumb-height);  /* 👈 match thumbnail height */
   transition: all .3s ease;
   animation: pulse 2s ease-in-out infinite;
-  border-radius: 15px;          /* match other cards’ rounded corners */
+  border-radius: 15px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   cursor: pointer;
 }
+
 
 @keyframes pulse {
   0%, 100% {
