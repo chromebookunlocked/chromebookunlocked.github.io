@@ -73,10 +73,7 @@ const sidebarCategories = Object.keys(categories)
 const newlyAddedItem = categories['Newly Added'] ? 
   `<li onclick="filterCategory('Newly Added')" style="border-bottom: 1px solid rgba(255,102,255,0.3); padding-bottom: 0.8rem; margin-bottom: 0.8rem;">✨ Newly Added</li>` : '';
 
-// Add "All Games" after Home
-const allGamesItem = `<li onclick="filterCategory('All Games')">All Games</li>`;
-
-const finalSidebarCategories = newlyAddedItem + allGamesItem + sidebarCategories;
+const finalSidebarCategories = newlyAddedItem + sidebarCategories;
 
 // Full HTML template
 const html = `<!DOCTYPE html>
@@ -841,30 +838,10 @@ const html = `<!DOCTYPE html>
     }
     
     .card-title {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: 0;
-      padding: 0.6rem 0.5rem;
-      font-family: var(--font-main);
+      margin:.7rem 0 1rem 0;
+      font-family:var(--font-main);
       font-weight: 700;
-      font-size: clamp(0.75rem, 0.9vw, 0.9rem);
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.4), transparent);
-      color: #fff;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all .3s ease;
-      z-index: 2;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .card:hover .card-title {
-      opacity: 1;
-      transform: translateY(0);
+      font-size: clamp(0.85rem, 1vw, 1rem);
     }
     
     /* "more" card - same size as game cards */
@@ -877,10 +854,9 @@ const html = `<!DOCTYPE html>
       flex-direction:column;
       color: #ffccff;
       border: 2px dashed rgba(255, 102, 255, 0.4);
-      min-height: calc(var(--thumb-height) + 0.5rem);
+      min-height: calc(var(--thumb-height) + 3rem);
       transition: all .3s ease;
       animation: pulse 2s ease-in-out infinite;
-      padding: 0;
     }
     
     @keyframes pulse {
@@ -902,15 +878,6 @@ const html = `<!DOCTYPE html>
       animation: none;
     }
     
-    .card.more .more-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: var(--thumb-height);
-      width: 100%;
-    }
-    
     .card.more .dots {
       font-size: clamp(3rem, 5vw, 4rem);
       line-height:1;
@@ -929,8 +896,6 @@ const html = `<!DOCTYPE html>
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: #ffccff;
-      margin-top: 0.5rem;
     }
     
     /* DMCA */
@@ -970,13 +935,11 @@ const html = `<!DOCTYPE html>
     <!-- Top Header with Search -->
     <div id="topHeader">
       <h1 onclick="goToHome()">Chromebook Unlocked Games</h1>
-      <div class="header-right">
-        <button id="bookmarkBtn" onclick="bookmarkPage()" title="Bookmark this page">⭐</button>
-        <div id="searchContainer">
-          <span id="searchIcon">🔍</span>
-          <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
-          <div id="searchDropdown"></div>
-        </div>
+      <button id="bookmarkBtn" onclick="bookmarkPage()" title="Bookmark this page">⭐</button>
+      <div id="searchContainer">
+        <span id="searchIcon">🔍</span>
+        <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
+        <div id="searchDropdown"></div>
       </div>
     </div>
 
@@ -1000,14 +963,6 @@ const html = `<!DOCTYPE html>
       <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
         <h2>Recently Played</h2>
         <div class="grid" id="recentlyPlayedGrid"></div>
-      </div>
-
-      <!-- All Games -->
-      <div class="category all-games-section" data-category="All Games" style="display:none;">
-        <h2>All Games</h2>
-        <div class="grid">
-          ${games.map((g, i) => generateGameCard(g, i)).join('')}
-        </div>
       </div>
 
       <!-- All category sections (including games for home view) -->
@@ -1086,7 +1041,7 @@ const html = `<!DOCTYPE html>
     function createMoreCard(cat) {
       const more = document.createElement('div');
       more.className = 'card more';
-      more.innerHTML = '<div class="more-content"><div class="dots">⋯</div></div><div class="label">Show More</div>';
+      more.innerHTML = '<div class="dots">⋯</div><div class="label">Show More</div>';
       more.addEventListener('click', (e) => {
         offsets[cat] = (offsets[cat] || 0) + 1;
         updateCategoryView(cat);
@@ -1724,12 +1679,6 @@ const html = `<!DOCTYPE html>
           // Skip special sections
           if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection') return;
           
-          // Hide "All Games" on home
-          if (category === 'All Games') {
-            c.style.display = 'none';
-            return;
-          }
-          
           // Show recently played and all categories on home
           if (category === 'Recently Played') {
             const recentGrid = document.getElementById('recentlyPlayedGrid');
@@ -1737,14 +1686,6 @@ const html = `<!DOCTYPE html>
           } else {
             c.style.display = 'block';
           }
-        });
-      } else if (cat === 'All Games') {
-        // Show only All Games section
-        currentViewMode = 'category';
-        all.forEach(c => {
-          const category = c.getAttribute('data-category');
-          if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection') return;
-          c.style.display = (category === 'All Games') ? 'block' : 'none';
         });
       } else {
         currentViewMode = 'category';
