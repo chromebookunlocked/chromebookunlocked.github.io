@@ -1,38 +1,67 @@
-<!-- Ultimate Game Stash file--> 
-<!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ -->
-<!-- Made by genizy --> 
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<base href="https://cdn.jsdelivr.net/gh/genizy/fnaf@latest/3/">
-    <link rel="stylesheet" type="text/css" href="style.css"/>
-    <link rel="icon" type="image/x-icon" href="favicon.ico" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=device-dpi" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <meta name="HandheldFriendly" content="true" />
-    <title>Five Nights at Freddy's 3</title>
+  <base href="https://cdn.jsdelivr.net/gh/genizy/fnaf@latest/3/">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Five Nights at Freddy's 3</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="style.css"/>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+    #MMFCanvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+    }
+    #progress-container {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      max-width: 600px;
+      color: #fff;
+      font-family: monospace;
+    }
+    #progress-container div {
+      margin-bottom: 6px;
+    }
+    #download-bar, #extract-bar {
+      height: 10px;
+      transition: width 0.2s;
+    }
+    #download-bar { background: #3b82f6; }
+    #extract-bar { background: #10b981; }
+  </style>
 </head>
-
 <body>
-    <div style="display: inline-block; -webkit-user-select: none; text-align: left">
-        <canvas id="MMFCanvas" width="1280" height="720"> Your browser does not support Canvas, Please try again. </canvas>
-    </div>
-    <div id="progress-container">
-        <div style="margin-bottom: 6px;">Downloading... <span id="download-text">0%</span></div>
-        <div style="width: 100%; background: #444; border-radius: 6px; overflow: hidden;">
-            <div id="download-bar" style="height: 10px; background: #3b82f6; width: 0%; transition: width 0.2s;"></div>
-        </div>
-        <div style="margin: 12px 0 6px;">Extracting... <span id="extract-text">0%</span></div>
-        <div style="width: 100%; background: #444; border-radius: 6px; overflow: hidden;">
-            <div id="extract-bar" style="height: 10px; background: #10b981; width: 0%; transition: width 0.2s;"></div>
-        </div>
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="main.js"></script>
-</body>
+  <canvas id="MMFCanvas" width="1280" height="720">
+    Your browser does not support Canvas, Please try again.
+  </canvas>
 
+  <div id="progress-container">
+    <div>Downloading... <span id="download-text">0%</span></div>
+    <div style="width: 100%; background: #444; border-radius: 6px; overflow: hidden;">
+      <div id="download-bar" style="width: 0%;"></div>
+    </div>
+    <div style="margin: 12px 0 6px;">Extracting... <span id="extract-text">0%</span></div>
+    <div style="width: 100%; background: #444; border-radius: 6px; overflow: hidden;">
+      <div id="extract-bar" style="width: 0%;"></div>
+    </div>
+  </div>
+
+  <!-- JSZip for archive handling -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- Game runtime loader -->
+  <script src="main.js"></script>
+</body>
 </html>
