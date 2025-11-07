@@ -2,24 +2,23 @@
 <html lang="en">
 <head>
   <base href="https://cdn.jsdelivr.net/gh/genizy/fnaf@latest/3/">
-  <link rel="stylesheet" type="text/css" href="style.css"/>
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Five Nights at Freddy's 3</title>
+  <link rel="icon" href="favicon.ico" />
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
-      background: black; /* fills gaps */
+      background: black;
       overflow: hidden;
     }
     #MMFCanvas {
-      display: block;
-      background: black;
+      display: none; /* hidden until game starts */
       margin: 0 auto;
+      background: black;
     }
     #progress-container {
       position: absolute;
@@ -28,7 +27,7 @@
       transform: translateX(-50%);
       width: 80%;
       color: white;
-      font-family: sans-serif;
+      font-family: monospace;
     }
   </style>
 </head>
@@ -59,7 +58,6 @@
       let w = window.innerWidth;
       let h = window.innerHeight;
 
-      // Fit inside window while preserving aspect ratio
       if (w / h > aspect) {
         w = h * aspect;
       } else {
@@ -71,7 +69,17 @@
     }
 
     window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
+
+    // Example: when loading finishes, show canvas
+    function startGame() {
+      document.getElementById("progress-container").style.display = "none";
+      canvas.style.display = "block";
+      resizeCanvas();
+      // then your runtime/game init code runs here
+    }
+
+    // Simulate load complete after 3s
+    setTimeout(startGame, 3000);
   </script>
 </body>
 </html>
