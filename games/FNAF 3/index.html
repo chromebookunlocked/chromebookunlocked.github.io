@@ -13,15 +13,13 @@
       padding: 0;
       height: 100%;
       width: 100%;
-      background: black; /* avoids gaps */
+      background: black; /* fills gaps */
       overflow: hidden;
     }
     #MMFCanvas {
       display: block;
-      width: 100vw;
-      height: 100vh;
-      object-fit: contain; /* keeps aspect ratio */
       background: black;
+      margin: 0 auto;
     }
     #progress-container {
       position: absolute;
@@ -52,5 +50,28 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="main.js"></script>
+
+  <script>
+    const canvas = document.getElementById("MMFCanvas");
+
+    function resizeCanvas() {
+      const aspect = 16 / 9;
+      let w = window.innerWidth;
+      let h = window.innerHeight;
+
+      // Fit inside window while preserving aspect ratio
+      if (w / h > aspect) {
+        w = h * aspect;
+      } else {
+        h = w / aspect;
+      }
+
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+  </script>
 </body>
 </html>
