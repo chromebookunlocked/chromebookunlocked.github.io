@@ -3,69 +3,52 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Embed FNAF 3</title>
+  <title>FNAF 3 Embed</title>
   <style>
+    :root {
+      --bg: #0f0f12;
+    }
     html, body {
       height: 100%;
       margin: 0;
-      background: #0f0f12;
-      color: #fff;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+    }
+    /* Center the game */
+    .stage {
+      height: 100vh;
+      width: 100vw;
       display: grid;
       place-items: center;
     }
-    .container {
-      width: 90vw;
-      max-width: 1100px;
-      height: 80vh;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
-      border-radius: 12px;
-      overflow: hidden;
-      background: #111;
-      border: 1px solid #222;
-    }
-    .header {
-      padding: 10px 14px;
-      background: #1a1a1f;
-      border-bottom: 1px solid #24242a;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .dot {
-      width: 10px; height: 10px; border-radius: 50%;
-    }
-    .dot.red { background: #ff5f56; }
-    .dot.yellow { background: #ffbd2e; }
-    .dot.green { background: #27c93f; }
-    .title {
-      font-weight: 600;
-      opacity: 0.9;
-    }
-    iframe {
-      width: 100%;
-      height: calc(100% - 42px);
+    /* Game area with rounded corners and subtle shadow */
+    .game {
+      width: min(90vw, 1100px);
+      height: min(85vh, 700px);
       border: 0;
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.45);
       background: #000;
+      overflow: hidden;
+    }
+    /* Optional: make it fully responsive if you prefer full-screen */
+    @media (max-width: 768px) {
+      .game {
+        width: 95vw;
+        height: 80vh;
+        border-radius: 10px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <span class="dot red"></span>
-      <span class="dot yellow"></span>
-      <span class="dot green"></span>
-      <span class="title">FNAF 3 — embedded from run3.io</span>
-    </div>
-
-    <!-- If the site allows embedding, this iframe will load the game -->
+  <main class="stage">
     <iframe
+      class="game"
       src="https://run3.io/popgame/fnaf/fnaf3.html"
       allowfullscreen
       referrerpolicy="no-referrer"
       sandbox="allow-scripts allow-same-origin allow-popups allow-pointer-lock"
     ></iframe>
-  </div>
+  </main>
 </body>
 </html>
