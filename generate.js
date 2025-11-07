@@ -1312,13 +1312,13 @@ const html = `<!DOCTYPE html>
       } else {
         searchDropdown.innerHTML = topResults.map(game => {
           // Extract the onclick function parameters
-          const onclickMatch = game.onclick.match(/prepareGame\('([^']+)','([^']+)','([^']+)'\)/);
+          const onclickMatch = game.onclick.match(/prepareGame\\('([^']+)','([^']+)','([^']+)'\\)/);
           if (onclickMatch) {
             const [, folderEncoded, nameEncoded, thumb] = onclickMatch;
-            return `<div class="search-result-item" onclick="prepareGame('${folderEncoded}','${nameEncoded}','${thumb}'); hideSearchDropdown();">
-              <img class="search-result-thumb" src="${game.thumb}" alt="${game.name}" onerror="this.src='assets/logo.png'">
-              <div class="search-result-name">${game.name}</div>
-            </div>`;
+            return '<div class="search-result-item" onclick="prepareGame(\'' + folderEncoded + '\',\'' + nameEncoded + '\',\'' + thumb + '\'); hideSearchDropdown();">' +
+              '<img class="search-result-thumb" src="' + game.thumb + '" alt="' + game.name + '" onerror="this.src=\'assets/logo.png\'">' +
+              '<div class="search-result-name">' + game.name + '</div>' +
+            '</div>';
           }
           return '';
         }).filter(Boolean).join('');
