@@ -1,55 +1,73 @@
+<!-- Ultimate Game Stash file-->
+<!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ -->
+<!-- Made by genizy -->
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <base href="https://cdn.jsdelivr.net/gh/genizy/fnaf@latest/3/">
   <link rel="stylesheet" type="text/css" href="style.css" />
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="HandheldFriendly" content="true" />
   <title>Five Nights at Freddy's 3</title>
 
   <style>
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
-      overflow: hidden;
-      background: black;
+      overflow: hidden; /* 🔥 No scrollbars */
+      background-color: black;
     }
 
     body {
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
     }
 
     #MMFCanvas {
       display: block;
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain; /* maintains aspect ratio */
       background: black;
-      width: 100%;
-      height: 100%;
-      object-fit: contain; /* preserve aspect ratio */
     }
 
     #progress-container {
       position: absolute;
-      bottom: 30px;
+      bottom: 5%;
       left: 50%;
       transform: translateX(-50%);
       width: 80%;
+      max-width: 500px;
       color: white;
       font-family: sans-serif;
+      font-size: 14px;
       text-align: center;
-      pointer-events: none;
+      z-index: 10;
+    }
+
+    #progress-container div {
+      user-select: none;
     }
   </style>
 </head>
 
 <body>
-  <canvas id="MMFCanvas" width="1280" height="720">
-    Your browser does not support Canvas, Please try again.
-  </canvas>
+  <div style="-webkit-user-select: none; text-align: left;">
+    <canvas id="MMFCanvas" width="1280" height="720">
+      Your browser does not support Canvas. Please try again.
+    </canvas>
+  </div>
 
   <div id="progress-container">
     <div style="margin-bottom: 6px;">Downloading... <span id="download-text">0%</span></div>
@@ -66,32 +84,26 @@
   <script src="main.js"></script>
 
   <script>
-    // Maintain 16:9 aspect ratio, fill window without gaps
+    // 🔥 Keep the canvas scaled correctly on resize
     const canvas = document.getElementById('MMFCanvas');
-
     function resizeCanvas() {
       const aspect = 1280 / 720;
-      let windowWidth = window.innerWidth;
-      let windowHeight = window.innerHeight;
+      let width = window.innerWidth;
+      let height = window.innerHeight;
 
-      // Determine scaling that completely fills screen in one direction
-      let scale = Math.max(windowWidth / 1280, windowHeight / 720);
+      if (width / height > aspect) {
+        width = height * aspect;
+      } else {
+        height = width / aspect;
+      }
 
-      // Compute displayed size
-      const displayWidth = 1280 * scale;
-      const displayHeight = 720 * scale;
-
-      canvas.style.width = displayWidth + 'px';
-      canvas.style.height = displayHeight + 'px';
-
-      // Center the canvas
-      canvas.style.position = 'absolute';
-      canvas.style.left = (windowWidth - displayWidth) / 2 + 'px';
-      canvas.style.top = (windowHeight - displayHeight) / 2 + 'px';
+      canvas.style.width = width + 'px';
+      canvas.style.height = height + 'px';
     }
 
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
   </script>
 </body>
+
 </html>
