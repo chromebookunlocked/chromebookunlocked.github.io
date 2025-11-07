@@ -232,8 +232,8 @@ const html = `<!DOCTYPE html>
     
     /* Sidebar expand indicator */
     #sidebarIndicator {
-      position: fixed;
-      left: calc(var(--sidebar-width) + 2px);
+      position: absolute;
+      right: 2px;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
@@ -244,18 +244,17 @@ const html = `<!DOCTYPE html>
       pointer-events: none;
       font-size: 1.5rem;
       color: rgba(255, 255, 255, 0.6);
-      z-index: 999;
     }
-    #sidebar:hover ~ #sidebarIndicator {
+    #sidebar:hover #sidebarIndicator {
       opacity: 0.6;
-      left: 255px;
+      right: 5px;
     }
     #sidebarIndicator::before {
       content: '›';
       font-weight: 300;
       transition: transform .3s ease;
     }
-    #sidebar:hover ~ #sidebarIndicator::before {
+    #sidebar:hover #sidebarIndicator::before {
       transform: rotate(180deg);
     }
     
@@ -275,9 +274,11 @@ const html = `<!DOCTYPE html>
       width:auto;
       filter: drop-shadow(0 0 10px var(--accent));
       transition: transform .3s ease;
+      background: transparent;
     }
     #sidebar:hover header img {
       transform: scale(1.1);
+      filter: drop-shadow(0 0 15px var(--accent));
     }
     #sidebar ul {
       list-style:none;
@@ -466,6 +467,63 @@ const html = `<!DOCTYPE html>
       display: none;
       z-index: 1000;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 102, 255, 0.3);
+    }
+    
+    #searchDropdown.show {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.8rem 1rem;
+      cursor: pointer;
+      transition: all .2s ease;
+      border-bottom: 1px solid rgba(255, 102, 255, 0.1);
+    }
+    
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+    
+    .search-result-item:hover {
+      background: rgba(102, 0, 153, 0.5);
+      padding-left: 1.5rem;
+    }
+    
+    .search-result-thumb {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid rgba(255, 102, 255, 0.3);
+    }
+    
+    .search-result-name {
+      font-family: var(--font-main);
+      font-weight: 600;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+    
+    .search-no-results {
+      padding: 1.5rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      font-family: var(--font-main);
     }
     
     #searchDropdown.show {
@@ -830,20 +888,21 @@ const html = `<!DOCTYPE html>
       left: 0;
       right: 0;
       margin: 0;
-      padding: 0.6rem 0.5rem;
+      padding: 0.8rem 0.6rem;
       font-family: var(--font-main);
       font-weight: 700;
-      font-size: clamp(0.75rem, 0.9vw, 0.9rem);
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.4), transparent);
+      font-size: clamp(0.75rem, 0.9vw, 0.95rem);
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 70%, transparent 100%);
       color: #fff;
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(100%);
       transition: all .3s ease;
-      z-index: 2;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+      z-index: 3;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 1);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      pointer-events: none;
     }
     
     .card:hover .card-title {
@@ -940,13 +999,13 @@ const html = `<!DOCTYPE html>
   
   <!-- Sidebar -->
   <div id="sidebar">
+    <div id="sidebarIndicator"></div>
     <header onclick="goToHome()"><img src="assets/logo.png" alt="Logo"></header>
     <ul id="categoryList">
       <li onclick="filterCategory('Home')">Home</li>
       ${finalSidebarCategories}
     </ul>
   </div>
-  <div id="sidebarIndicator"></div>
 
   <!-- Content -->
   <div id="content">
@@ -1252,11 +1311,17 @@ const html = `<!DOCTYPE html>
         searchDropdown.innerHTML = '<div class="search-no-results">No games found</div>';
       } else {
         searchDropdown.innerHTML = topResults.map(game => {
-          return \`<div class="search-result-item" onclick="\${game.onclick}; hideSearchDropdown();">
-            <img class="search-result-thumb" src="\${game.thumb}" alt="\${game.name}">
-            <div class="search-result-name">\${game.name}</div>
-          </div>\`;
-        }).join('');
+          // Extract the onclick function parameters
+          const onclickMatch = game.onclick.match(/prepareGame\('([^']+)','([^']+)','([^']+)'\)/);
+          if (onclickMatch) {
+            const [, folderEncoded, nameEncoded, thumb] = onclickMatch;
+            return `<div class="search-result-item" onclick="prepareGame('${folderEncoded}','${nameEncoded}','${thumb}'); hideSearchDropdown();">
+              <img class="search-result-thumb" src="${game.thumb}" alt="${game.name}" onerror="this.src='assets/logo.png'">
+              <div class="search-result-name">${game.name}</div>
+            </div>`;
+          }
+          return '';
+        }).filter(Boolean).join('');
       }
       
       searchDropdown.classList.add('show');
