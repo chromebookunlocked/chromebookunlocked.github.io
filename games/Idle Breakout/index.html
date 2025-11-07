@@ -22,8 +22,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 100%;
-        height: 100%;
       }
 
       canvas {
@@ -31,32 +29,19 @@
         -webkit-interpolation-mode: nearest-neighbor;
         -ms-touch-action: none;
         border: none;
-        margin: auto;
-        display: block;
+        margin: 0;
+        padding: 0;
         background: black;
         width: 1000px;
         height: 768px;
       }
 
       /* Fullscreen behavior */
-      :fullscreen #gm4html5_div_id,
-      :-webkit-full-screen #gm4html5_div_id {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100vw;
-        height: 100vh;
-        background: #000;
-      }
-
       :fullscreen canvas,
       :-webkit-full-screen canvas {
-        width: 100%;
-        height: 100%;
-        max-width: 100vw;
-        max-height: 100vh;
-        object-fit: contain;
-        background: #000;
+        width: 100vw !important;
+        height: 100vh !important;
+        object-fit: contain; /* Maintain aspect ratio, center, black bars */
       }
     </style>
   </head>
@@ -69,14 +54,21 @@
 
     <script src="https://cdn.jsdelivr.net/gh/bobydob/JSEngine@9b6eab8976a7acc4aee72479af65647693633abc/build/id-br/ibo.js"></script>
     <script>
+      // Initialize GameMaker game
       window.onload = GameMaker_Init;
 
-      const canvas = document.getElementById("canvas");
-      const container = document.getElementById("gm4html5_div_id");
-      const aspect = 1000 / 768;
+      // Optional: Automatically adjust scale when entering fullscreen
+      document.addEventListener("fullscreenchange", adjustCanvasScaling);
+      document.addEventListener("webkitfullscreenchange", adjustCanvasScaling);
+      window.addEventListener("resize", adjustCanvasScaling);
 
-      function resizeCanvas() {
+      function adjustCanvasScaling() {
+        const canvas = document.getElementById("canvas");
+        const container = document.getElementById("gm4html5_div_id");
+
+        const aspect = 1000 / 768;
         const windowAspect = window.innerWidth / window.innerHeight;
+
         let width, height;
 
         if (windowAspect > aspect) {
@@ -87,22 +79,13 @@
           height = width / aspect;
         }
 
-        // Set both CSS and internal size to prevent mouse offset
         canvas.style.width = width + "px";
         canvas.style.height = height + "px";
-        canvas.width = 1000;
-        canvas.height = 768;
-
-        // Center the container perfectly
-        container.style.display = "flex";
-        container.style.alignItems = "center";
-        container.style.justifyContent = "center";
+        container.style.width = "100%";
+        container.style.height = "100%";
       }
 
-      window.addEventListener("resize", resizeCanvas);
-      document.addEventListener("fullscreenchange", resizeCanvas);
-      document.addEventListener("webkitfullscreenchange", resizeCanvas);
-      resizeCanvas();
+      adjustCanvasScaling();
     </script>
   </body>
 </html>
