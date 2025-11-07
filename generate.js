@@ -8,7 +8,7 @@ const outputFile = path.join(outputDir, "index.html");
 
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
 
-// Load games
+// Load games with validation
 const games = fs.readdirSync(dataDir)
   .filter(f => f.endsWith(".json"))
   .map(f => {
@@ -22,14 +22,26 @@ const games = fs.readdirSync(dataDir)
       gameCategories = [gameCategories];
     }
     
+    const folder = json.folder || f.replace(".json", "");
+    
+    // Validate game folder and index.html exist
+    const gamePath = path.join(gamesDir, folder);
+    const indexPath = path.join(gamePath, "index.html");
+    
+    if (!fs.existsSync(gamePath) || !fs.existsSync(indexPath)) {
+      console.log(`⚠️  Skipping game "${json.name || folder}" - missing folder or index.html`);
+      return null;
+    }
+    
     return {
-      folder: json.folder || f.replace(".json", ""),
+      folder: folder,
       name: json.name || f.replace(".json", ""),
       categories: gameCategories, // Array of categories
       thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.png", "thumbnail.jpg"],
       dateAdded: json.dateAdded || null // Support for "Newly Added" sorting
     };
-  });
+  })
+  .filter(game => game !== null); // Remove invalid games
 
 // Group into categories (games can appear in multiple categories)
 const categories = {};
@@ -73,10 +85,7 @@ const sidebarCategories = Object.keys(categories)
 const newlyAddedItem = categories['Newly Added'] ? 
   `<li onclick="filterCategory('Newly Added')" style="border-bottom: 1px solid rgba(255,102,255,0.3); padding-bottom: 0.8rem; margin-bottom: 0.8rem;">✨ Newly Added</li>` : '';
 
-// Add "All Games" after Home
-const allGamesItem = `<li onclick="filterCategory('All Games')">All Games</li>`;
-
-const finalSidebarCategories = newlyAddedItem + allGamesItem + sidebarCategories;
+const finalSidebarCategories = newlyAddedItem + sidebarCategories;
 
 // Full HTML template
 const html = `<!DOCTYPE html>
@@ -185,9 +194,9 @@ const html = `<!DOCTYPE html>
     #sidebar {
       width: var(--sidebar-width);
       background: linear-gradient(180deg, #330066 0%, #1a0033 100%);
-      padding:1rem 0;
+      padding:0;
       height:100vh;
-      overflow-y:auto;
+      overflow-y:hidden;
       overflow-x:hidden;
       position:fixed;
       left:0; top:0;
@@ -195,33 +204,19 @@ const html = `<!DOCTYPE html>
       transition: width .3s ease;
       border-right: 2px solid rgba(255, 102, 255, 0.2);
       box-shadow: 5px 0 20px rgba(255, 102, 255, 0.1);
-      scrollbar-width: none; /* Firefox */
+      display: flex;
+      flex-direction: column;
     }
-    #sidebar::-webkit-scrollbar {
-      width: 0;
-      display: none;
-    }
-    #sidebar:hover {
+    #sidebar:hover { 
       width:250px;
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
-      scrollbar-width: thin; /* Firefox */
-    }
-    #sidebar:hover::-webkit-scrollbar {
-      width: 8px;
-      display: block;
-    }
-    #sidebar:hover::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.3);
-    }
-    #sidebar:hover::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--accent), var(--accent-dark));
-      border-radius: 4px;
+      overflow-y:auto;
     }
     
     /* Sidebar expand indicator */
     #sidebarIndicator {
-      position: absolute;
-      right: 2px;
+      position: fixed;
+      left: calc(var(--sidebar-width) + 2px);
       top: 50%;
       transform: translateY(-50%);
       display: flex;
@@ -232,25 +227,31 @@ const html = `<!DOCTYPE html>
       pointer-events: none;
       font-size: 1.5rem;
       color: rgba(255, 255, 255, 0.6);
+      z-index: 999;
     }
-    #sidebar:hover #sidebarIndicator {
+    #sidebar:hover + #sidebarIndicator {
       opacity: 0.6;
-      right: 5px;
+      left: 255px;
     }
     #sidebarIndicator::before {
       content: '›';
       font-weight: 300;
       transition: transform .3s ease;
     }
-    #sidebar:hover #sidebarIndicator::before {
+    #sidebar:hover + #sidebarIndicator::before {
       transform: rotate(180deg);
     }
     
     #sidebar header {
       display:flex;
       justify-content:center;
-      margin-bottom:2rem;
+      padding: 1rem 0;
       cursor: pointer;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      background: linear-gradient(180deg, #330066 0%, #1a0033 100%);
+      z-index: 10;
     }
     #sidebar header img {
       height:60px;
@@ -263,8 +264,24 @@ const html = `<!DOCTYPE html>
     }
     #sidebar ul {
       list-style:none;
-      padding:0;
+      padding:1rem 0;
       margin:0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      flex: 1;
+    }
+    #sidebar::-webkit-scrollbar,
+    #sidebar ul::-webkit-scrollbar {
+      width: 8px;
+    }
+    #sidebar::-webkit-scrollbar-track,
+    #sidebar ul::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.3);
+    }
+    #sidebar::-webkit-scrollbar-thumb,
+    #sidebar ul::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 4px;
     }
     #sidebar li {
       cursor:pointer;
@@ -333,148 +350,181 @@ const html = `<!DOCTYPE html>
       }
     }
     
-/* Top Header Bar */
-#topHeader {
-  background: linear-gradient(135deg, #330066 0%, #1a0033 100%);
-  padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 3vw, 2rem);
-  border-bottom: 2px solid rgba(255, 102, 255, 0.3);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: clamp(0.5rem, 1.5vw, 1rem);
-  flex-wrap: nowrap;
-}
-
-/* Title stays left */
-#topHeader h1 {
-  margin: 0;
-  font-size: clamp(1.1rem, 2.2vw, 2.2rem);
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--accent), var(--accent-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: transform .3s ease;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex-shrink: 1;
-  min-width: 0;
-}
-
-#topHeader h1:hover {
-  transform: scale(1.05);
-}
-
-/* Right group: bookmark + search bar */
-#rightHeaderGroup {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.1rem;          /* small space between bookmark and search bar */
-  margin-left: auto;    /* pushes group to right side */
-}
-
-/* Bookmark button - stays left of search bar */
-#bookmarkBtn {
-  order: 1;
-  padding: 0.6rem 1rem;
-  background: linear-gradient(135deg, rgba(255, 102, 255, 0.2), rgba(204, 51, 255, 0.2));
-  border: 1px solid rgba(255, 102, 255, 0.4);
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  color: var(--accent-light);
-  transition: all .3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-}
-
-#bookmarkBtn:hover {
-  background: linear-gradient(135deg, rgba(255, 102, 255, 0.4), rgba(204, 51, 255, 0.4));
-  border-color: var(--accent);
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(255, 102, 255, 0.5);
-}
-
-#bookmarkBtn:active {
-  transform: scale(0.95);
-}
-
-/* Search container - stays at far right */
-#searchContainer {
-  order: 2;
-  flex: 0 1 350px;
-  max-width: 500px;
-  min-width: 200px;
-  position: relative;
-}
-
-/* Search icon & bar styles (unchanged) */
-#searchIcon {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.5);
-  pointer-events: none;
-  font-size: 1.1rem;
-}
-
-#searchBar {
-  width: 100%;
-  padding: 0.8rem 1.2rem 0.8rem 3rem;
-  border: 2px solid rgba(255, 102, 255, 0.3);
-  border-radius: 25px;
-  background: rgba(0, 0, 0, 0.4);
-  color: #fff;
-  font-family: var(--font-main);
-  font-size: 1rem;
-  outline: none;
-  transition: all .3s ease;
-}
-
-#searchBar::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-#searchBar:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 20px rgba(255, 102, 255, 0.4);
-  background: rgba(0, 0, 0, 0.6);
-}
-
-/* Responsive layout */
-@media (max-width: 768px) {
-  #topHeader {
-    flex-direction: column;
-    gap: 0.8rem;
-    padding: 0.8rem 1rem;
-  }
-  #topHeader h1 {
-    font-size: clamp(1rem, 4vw, 1.5rem);
-    width: 100%;
-    text-align: center;
-  }
-  #rightHeaderGroup {
-    width: 100%;
-    justify-content: center;
-  }
-  #searchContainer {
-    flex: 1;
-    max-width: 100%;
-  }
-}
-
+    /* Top Header Bar */
+    #topHeader {
+      background: linear-gradient(135deg, #330066 0%, #1a0033 100%);
+      padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 3vw, 2rem);
+      border-bottom: 2px solid rgba(255, 102, 255, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: clamp(1rem, 2vw, 2rem);
+      flex-wrap: wrap;
+    }
+    
+    #topHeader h1 {
+      margin: 0;
+      font-size: clamp(1.1rem, 2.2vw, 2.2rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: transform .3s ease;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 1;
+      min-width: 0;
+    }
+    
+    #topHeader h1:hover {
+      transform: scale(1.05);
+    }
+    
+    @media (max-width: 768px) {
+      #topHeader {
+        flex-direction: column;
+        gap: 0.8rem;
+        padding: 0.8rem 1rem;
+      }
+      #topHeader h1 {
+        font-size: clamp(1rem, 4vw, 1.5rem);
+        width: 100%;
+        text-align: center;
+      }
+    }
+    
+    #searchContainer {
+      flex: 1;
+      max-width: 500px;
+      min-width: 200px;
+      position: relative;
+    }
+    
+    @media (max-width: 768px) {
+      #searchContainer {
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+    
+    #searchIcon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.5);
+      pointer-events: none;
+      font-size: 1.1rem;
+    }
+    
+    #searchBar {
+      width: 100%;
+      padding: 0.8rem 1.2rem 0.8rem 3rem;
+      border: 2px solid rgba(255, 102, 255, 0.3);
+      border-radius: 25px;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 1rem;
+      outline: none;
+      transition: all .3s ease;
+    }
+    
+    #searchBar::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    #searchBar:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(255, 102, 255, 0.4);
+      background: rgba(0, 0, 0, 0.6);
+    }
+    
+    /* Search Results Dropdown */
+    #searchDropdown {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      left: 0;
+      right: 0;
+      background: rgba(26, 0, 51, 0.98);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 102, 255, 0.4);
+      border-radius: 15px;
+      max-height: 400px;
+      overflow-y: auto;
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 102, 255, 0.3);
+    }
+    
+    #searchDropdown.show {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.8rem 1rem;
+      cursor: pointer;
+      transition: all .2s ease;
+      border-bottom: 1px solid rgba(255, 102, 255, 0.1);
+    }
+    
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+    
+    .search-result-item:hover {
+      background: rgba(102, 0, 153, 0.5);
+      padding-left: 1.5rem;
+    }
+    
+    .search-result-thumb {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid rgba(255, 102, 255, 0.3);
+    }
+    
+    .search-result-name {
+      font-family: var(--font-main);
+      font-weight: 600;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+    
+    .search-no-results {
+      padding: 1.5rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      font-family: var(--font-main);
+    }
+    
+    .content-wrapper {
+      padding: 1.5rem;
+    }
+    
     /* Controls (buttons) */
     #controls {
       display:none;
@@ -734,14 +784,11 @@ const html = `<!DOCTYPE html>
     
     .thumb-container {
       width:100%;
-      height:var(--thumb-height);
+      padding-bottom: 100%;
       position:relative;
       overflow:hidden;
       border-radius:12px;
       background:#220033;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
     .thumb-container::before {
       content:"";
@@ -758,7 +805,9 @@ const html = `<!DOCTYPE html>
       transform: scale(1.1);
     }
     .thumb {
-      position:relative;
+      position:absolute;
+      top: 0;
+      left: 0;
       z-index:1;
       width:100%;
       height:100%;
@@ -772,92 +821,65 @@ const html = `<!DOCTYPE html>
     }
     
     .card-title {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: 0;
-      padding: 0.6rem 0.5rem;
+      margin:.7rem 0 1rem 0;
+      font-family:var(--font-main);
+      font-weight: 700;
+      font-size: clamp(0.85rem, 1vw, 1rem);
+    }
+    
+    /* "more" card - same size as game cards */
+    .card.more {
+      background: linear-gradient(135deg, rgba(102, 0, 153, 0.3), rgba(77, 0, 102, 0.3));
+      backdrop-filter: blur(10px);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      flex-direction:column;
+      color: #ffccff;
+      border: 2px dashed rgba(255, 102, 255, 0.4);
+      min-height: calc(var(--thumb-height) + 3rem);
+      transition: all .3s ease;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        border-color: rgba(255, 102, 255, 0.4);
+        box-shadow: 0 4px 15px rgba(255, 102, 255, 0.2);
+      }
+      50% {
+        border-color: rgba(255, 102, 255, 0.7);
+        box-shadow: 0 4px 25px rgba(255, 102, 255, 0.4);
+      }
+    }
+    
+    .card.more:hover {
+      background: linear-gradient(135deg, rgba(102, 0, 153, 0.5), rgba(77, 0, 102, 0.5));
+      border: 2px dashed var(--accent);
+      transform:translateY(-5px) scale(1.03);
+      box-shadow: 0 8px 30px rgba(255, 102, 255, 0.6);
+      animation: none;
+    }
+    
+    .card.more .dots {
+      font-size: clamp(3rem, 5vw, 4rem);
+      line-height:1;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+    
+    .card.more .label {
+      font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+      opacity: 0.9;
       font-family: var(--font-main);
       font-weight: 700;
-      font-size: clamp(0.75rem, 0.9vw, 0.9rem);
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.4), transparent);
-      color: #fff;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all .3s ease;
-      z-index: 2;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
-    
-    .card:hover .card-title {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    
-  /* "more" card - now perfectly square like other game thumbnails */
-.card.more {
-  background: linear-gradient(135deg, rgba(102, 0, 153, 0.3), rgba(77, 0, 102, 0.3));
-  backdrop-filter: blur(10px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  color: #ffccff;
-  border: 2px dashed rgba(255, 102, 255, 0.4);
-  width: 100%;
-  height: var(--thumb-height);  /* 👈 match thumbnail height */
-  transition: all .3s ease;
-  animation: pulse 2s ease-in-out infinite;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
-}
-
-
-@keyframes pulse {
-  0%, 100% {
-    border-color: rgba(255, 102, 255, 0.4);
-    box-shadow: 0 4px 15px rgba(255, 102, 255, 0.2);
-  }
-  50% {
-    border-color: rgba(255, 102, 255, 0.7);
-    box-shadow: 0 4px 25px rgba(255, 102, 255, 0.4);
-  }
-}
-
-.card.more:hover {
-  background: linear-gradient(135deg, rgba(102, 0, 153, 0.5), rgba(77, 0, 102, 0.5));
-  border: 2px dashed var(--accent);
-  transform: translateY(-5px) scale(1.03);
-  box-shadow: 0 8px 30px rgba(255, 102, 255, 0.6);
-  animation: none;
-}
-
-/* inner text + icon */
-.card.more .dots {
-  font-size: clamp(3rem, 5vw, 4rem);
-  line-height: 1;
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--accent), var(--accent-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 0.5rem;
-}
-
-.card.more .label {
-  font-size: clamp(0.9rem, 1.2vw, 1.1rem);
-  opacity: 0.9;
-  font-family: var(--font-main);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
     
     /* DMCA */
     #dmcaLink {
@@ -883,13 +905,13 @@ const html = `<!DOCTYPE html>
   
   <!-- Sidebar -->
   <div id="sidebar">
-    <div id="sidebarIndicator"></div>
     <header onclick="goToHome()"><img src="assets/logo.png" alt="Logo"></header>
     <ul id="categoryList">
       <li onclick="filterCategory('Home')">Home</li>
       ${finalSidebarCategories}
     </ul>
   </div>
+  <div id="sidebarIndicator"></div>
 
   <!-- Content -->
   <div id="content">
@@ -901,7 +923,6 @@ const html = `<!DOCTYPE html>
         <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
         <div id="searchDropdown"></div>
       </div>
-      <button id="bookmarkBtn" onclick="bookmarkPage()" title="Bookmark this page">⭐</button>
     </div>
 
     <div class="content-wrapper">
@@ -924,14 +945,6 @@ const html = `<!DOCTYPE html>
       <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
         <h2>Recently Played</h2>
         <div class="grid" id="recentlyPlayedGrid"></div>
-      </div>
-
-      <!-- All Games -->
-      <div class="category all-games-section" data-category="All Games" style="display:none;">
-        <h2>All Games</h2>
-        <div class="grid">
-          ${games.map((g, i) => generateGameCard(g, i)).join('')}
-        </div>
       </div>
 
       <!-- All category sections (including games for home view) -->
@@ -1230,28 +1243,6 @@ const html = `<!DOCTYPE html>
       }
     });
     
-    // Bookmark page function
-    function bookmarkPage() {
-      const pageTitle = document.title;
-      const pageUrl = window.location.href;
-      
-      if (window.sidebar && window.sidebar.addPanel) { 
-        // Firefox
-        window.sidebar.addPanel(pageTitle, pageUrl, "");
-      } else if (window.external && ('AddFavorite' in window.external)) { 
-        // IE/Edge Legacy
-        window.external.AddFavorite(pageUrl, pageTitle);
-      } else if (window.opera && window.print) { 
-        // Opera
-        return true;
-      } else { 
-        // Chrome, Safari, modern Edge
-        const isMac = navigator.userAgent.toLowerCase().indexOf('mac') !== -1;
-        const key = isMac ? 'Cmd' : 'Ctrl';
-        alert(\`Press \${key} + D to bookmark this page.\`);
-      }
-    }
-    
     // Navigate to home page
     function goToHome() {
       window.location.hash = '';
@@ -1324,7 +1315,7 @@ const html = `<!DOCTYPE html>
       saveRecentlyPlayed({ folder, name, thumb: thumbSrc || 'assets/logo.png' });
     }
     
-    // Show curated games when game viewer is open
+    // Show curated games when game viewer is open - ALWAYS 7 ROWS
     function showCuratedGames(currentGameFolder) {
       console.log('=== Starting showCuratedGames for:', currentGameFolder);
       
@@ -1380,11 +1371,7 @@ const html = `<!DOCTYPE html>
           return;
         }
         
-        console.log('Processing category:', catName);
-        
-        // Get ALL game cards regardless of their display state
         const gameCards = cat.querySelectorAll('.game-card[data-folder]');
-        console.log('  Found', gameCards.length, 'game cards in', catName);
         
         gameCards.forEach(card => {
           const folder = card.getAttribute('data-folder');
@@ -1419,7 +1406,7 @@ const html = `<!DOCTYPE html>
       console.log('Same category games:', sameCategory.length);
       
       if (allGames.length === 0) {
-        console.error('ERROR: No games found! This should not happen.');
+        console.error('ERROR: No games found!');
         return;
       }
       
@@ -1436,30 +1423,30 @@ const html = `<!DOCTYPE html>
       const shuffledSameCategory = shuffleArray(sameCategory);
       const shuffledAllGames = shuffleArray(allGames);
       
-      // Build curated list - target 15 games
+      // ✅ ALWAYS fill exactly 7 rows - calculate columns dynamically
+      const grid = document.getElementById('curatedGamesGrid') || document.createElement('div');
+      const cols = getColumnCount(grid) || 5; // Get actual column count or default to 5
+      const rows = 7; // Always 7 rows
+      const targetCount = cols * rows; // Dynamic total based on screen size
+      
+      console.log('Grid columns:', cols, 'Target games:', targetCount);
+      
       const curatedGames = [];
-      const targetCount = 15;
       
       if (sameCategory.length === 0) {
         // No same category - use all random
-        console.log('No same category games, using all random');
         curatedGames.push(...shuffledAllGames.slice(0, Math.min(targetCount, shuffledAllGames.length)));
       } else {
         // Mix: 60% same category, 40% other
         const sameCatTarget = Math.min(Math.ceil(targetCount * 0.6), sameCategory.length);
-        console.log('Target same category games:', sameCatTarget);
         
         // Add same category games
         curatedGames.push(...shuffledSameCategory.slice(0, sameCatTarget));
-        console.log('Added same category games:', curatedGames.length);
         
         // Add other games
         const usedFolders = new Set(curatedGames.map(g => g.folder));
         const otherGames = shuffledAllGames.filter(g => !usedFolders.has(g.folder));
         const remainingSlots = targetCount - curatedGames.length;
-        
-        console.log('Other games available:', otherGames.length);
-        console.log('Remaining slots to fill:', remainingSlots);
         
         curatedGames.push(...otherGames.slice(0, remainingSlots));
       }
@@ -1495,14 +1482,12 @@ const html = `<!DOCTYPE html>
       const curatedGrid = document.getElementById('curatedGamesGrid');
       curatedGrid.innerHTML = '';
       
-      console.log('Appending games to grid...');
+      // Display curated games
       finalCurated.forEach((game, idx) => {
-        console.log('  Appending game', idx + 1, ':', game.folder);
         curatedGrid.appendChild(game.card);
       });
       
       console.log('=== Finished showCuratedGames');
-      console.log('Total games displayed in "You Might Also Like":', finalCurated.length);
     }
     
     function startGame() {
