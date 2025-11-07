@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <base href="https://cdn.jsdelivr.net/gh/genizy/fnaf@latest/3/">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Five Nights at Freddy's 3</title>
@@ -14,11 +13,13 @@
       width: 100%;
       background: black;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     #MMFCanvas {
-      display: none; /* hidden until game starts */
-      margin: 0 auto;
       background: black;
+      display: none; /* hidden until game starts */
     }
     #progress-container {
       position: absolute;
@@ -52,6 +53,7 @@
 
   <script>
     const canvas = document.getElementById("MMFCanvas");
+    const ctx = canvas.getContext("2d");
 
     function resizeCanvas() {
       const aspect = 16 / 9;
@@ -70,12 +72,25 @@
 
     window.addEventListener("resize", resizeCanvas);
 
+    // Map mouse input to internal resolution
+    canvas.addEventListener("mousemove", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
+
+      // Example: log scaled coordinates
+      console.log("Mouse:", x.toFixed(0), y.toFixed(0));
+      // Pass x,y to your game input handler here
+    });
+
     // Example: when loading finishes, show canvas
     function startGame() {
       document.getElementById("progress-container").style.display = "none";
       canvas.style.display = "block";
       resizeCanvas();
-      // then your runtime/game init code runs here
+      // Initialize your runtime/game here
     }
 
     // Simulate load complete after 3s
