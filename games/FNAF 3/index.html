@@ -5,50 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>FNAF 3 Embed</title>
   <style>
-    :root {
-      --bg: #0f0f12;
-    }
     html, body {
       height: 100%;
       margin: 0;
-      background: var(--bg);
-    }
-    /* Center the game */
-    .stage {
-      height: 100vh;
-      width: 100vw;
-      display: grid;
-      place-items: center;
-    }
-    /* Game area with rounded corners and subtle shadow */
-    .game {
-      width: min(90vw, 1100px);
-      height: min(85vh, 700px);
-      border: 0;
-      border-radius: 12px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.45);
       background: #000;
-      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-    /* Optional: make it fully responsive if you prefer full-screen */
-    @media (max-width: 768px) {
-      .game {
-        width: 95vw;
-        height: 80vh;
-        border-radius: 10px;
-      }
+    iframe {
+      width: 100vw;
+      height: 100vh;
+      border: none;       /* removes border */
+      outline: none;      /* removes focus outline */
     }
   </style>
 </head>
 <body>
-  <main class="stage">
-    <iframe
-      class="game"
-      src="https://run3.io/popgame/fnaf/fnaf3.html"
-      allowfullscreen
-      referrerpolicy="no-referrer"
-      sandbox="allow-scripts allow-same-origin allow-popups allow-pointer-lock"
-    ></iframe>
-  </main>
+  <iframe
+    src="https://run3.io/popgame/fnaf/fnaf3.html"
+    allowfullscreen
+    sandbox="allow-scripts allow-same-origin allow-popups allow-pointer-lock"
+  ></iframe>
 </body>
 </html>
