@@ -104,9 +104,9 @@
     #sidebar {
       width: var(--sidebar-width);
       background: linear-gradient(180deg, #330066 0%, #1a0033 100%);
-      padding:1rem 0;
+      padding:0;
       height:100vh;
-      overflow-y:auto;
+      overflow-y:hidden;
       overflow-x:hidden;
       position:fixed;
       left:0; top:0;
@@ -114,33 +114,19 @@
       transition: width .3s ease;
       border-right: 2px solid rgba(255, 102, 255, 0.2);
       box-shadow: 5px 0 20px rgba(255, 102, 255, 0.1);
-      scrollbar-width: none; /* Firefox */
+      display: flex;
+      flex-direction: column;
     }
-    #sidebar::-webkit-scrollbar {
-      width: 0;
-      display: none;
-    }
-    #sidebar:hover {
+    #sidebar:hover { 
       width:250px;
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
-      scrollbar-width: thin; /* Firefox */
-    }
-    #sidebar:hover::-webkit-scrollbar {
-      width: 8px;
-      display: block;
-    }
-    #sidebar:hover::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.3);
-    }
-    #sidebar:hover::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--accent), var(--accent-dark));
-      border-radius: 4px;
+      overflow-y:auto;
     }
     
     /* Sidebar expand indicator */
     #sidebarIndicator {
-      position: absolute;
-      right: 2px;
+      position: fixed;
+      left: calc(var(--sidebar-width) + 2px);
       top: 50%;
       transform: translateY(-50%);
       display: flex;
@@ -151,25 +137,31 @@
       pointer-events: none;
       font-size: 1.5rem;
       color: rgba(255, 255, 255, 0.6);
+      z-index: 999;
     }
-    #sidebar:hover #sidebarIndicator {
+    #sidebar:hover + #sidebarIndicator {
       opacity: 0.6;
-      right: 5px;
+      left: 255px;
     }
     #sidebarIndicator::before {
       content: '›';
       font-weight: 300;
       transition: transform .3s ease;
     }
-    #sidebar:hover #sidebarIndicator::before {
+    #sidebar:hover + #sidebarIndicator::before {
       transform: rotate(180deg);
     }
     
     #sidebar header {
       display:flex;
       justify-content:center;
-      margin-bottom:2rem;
+      padding: 1rem 0;
       cursor: pointer;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      background: linear-gradient(180deg, #330066 0%, #1a0033 100%);
+      z-index: 10;
     }
     #sidebar header img {
       height:60px;
@@ -182,8 +174,24 @@
     }
     #sidebar ul {
       list-style:none;
-      padding:0;
+      padding:1rem 0;
       margin:0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      flex: 1;
+    }
+    #sidebar::-webkit-scrollbar,
+    #sidebar ul::-webkit-scrollbar {
+      width: 8px;
+    }
+    #sidebar::-webkit-scrollbar-track,
+    #sidebar ul::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.3);
+    }
+    #sidebar::-webkit-scrollbar-thumb,
+    #sidebar ul::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 4px;
     }
     #sidebar li {
       cursor:pointer;
@@ -252,148 +260,181 @@
       }
     }
     
-/* Top Header Bar */
-#topHeader {
-  background: linear-gradient(135deg, #330066 0%, #1a0033 100%);
-  padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 3vw, 2rem);
-  border-bottom: 2px solid rgba(255, 102, 255, 0.3);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: clamp(0.5rem, 1.5vw, 1rem);
-  flex-wrap: nowrap;
-}
-
-/* Title stays left */
-#topHeader h1 {
-  margin: 0;
-  font-size: clamp(1.1rem, 2.2vw, 2.2rem);
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--accent), var(--accent-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: transform .3s ease;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex-shrink: 1;
-  min-width: 0;
-}
-
-#topHeader h1:hover {
-  transform: scale(1.05);
-}
-
-/* Right group: bookmark + search bar */
-#rightHeaderGroup {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.1rem;          /* small space between bookmark and search bar */
-  margin-left: auto;    /* pushes group to right side */
-}
-
-/* Bookmark button - stays left of search bar */
-#bookmarkBtn {
-  order: 1;
-  padding: 0.6rem 1rem;
-  background: linear-gradient(135deg, rgba(255, 102, 255, 0.2), rgba(204, 51, 255, 0.2));
-  border: 1px solid rgba(255, 102, 255, 0.4);
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  color: var(--accent-light);
-  transition: all .3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-}
-
-#bookmarkBtn:hover {
-  background: linear-gradient(135deg, rgba(255, 102, 255, 0.4), rgba(204, 51, 255, 0.4));
-  border-color: var(--accent);
-  transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(255, 102, 255, 0.5);
-}
-
-#bookmarkBtn:active {
-  transform: scale(0.95);
-}
-
-/* Search container - stays at far right */
-#searchContainer {
-  order: 2;
-  flex: 0 1 350px;
-  max-width: 500px;
-  min-width: 200px;
-  position: relative;
-}
-
-/* Search icon & bar styles (unchanged) */
-#searchIcon {
-  position: absolute;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.5);
-  pointer-events: none;
-  font-size: 1.1rem;
-}
-
-#searchBar {
-  width: 100%;
-  padding: 0.8rem 1.2rem 0.8rem 3rem;
-  border: 2px solid rgba(255, 102, 255, 0.3);
-  border-radius: 25px;
-  background: rgba(0, 0, 0, 0.4);
-  color: #fff;
-  font-family: var(--font-main);
-  font-size: 1rem;
-  outline: none;
-  transition: all .3s ease;
-}
-
-#searchBar::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
-
-#searchBar:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 20px rgba(255, 102, 255, 0.4);
-  background: rgba(0, 0, 0, 0.6);
-}
-
-/* Responsive layout */
-@media (max-width: 768px) {
-  #topHeader {
-    flex-direction: column;
-    gap: 0.8rem;
-    padding: 0.8rem 1rem;
-  }
-  #topHeader h1 {
-    font-size: clamp(1rem, 4vw, 1.5rem);
-    width: 100%;
-    text-align: center;
-  }
-  #rightHeaderGroup {
-    width: 100%;
-    justify-content: center;
-  }
-  #searchContainer {
-    flex: 1;
-    max-width: 100%;
-  }
-}
-
+    /* Top Header Bar */
+    #topHeader {
+      background: linear-gradient(135deg, #330066 0%, #1a0033 100%);
+      padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 3vw, 2rem);
+      border-bottom: 2px solid rgba(255, 102, 255, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: clamp(1rem, 2vw, 2rem);
+      flex-wrap: wrap;
+    }
+    
+    #topHeader h1 {
+      margin: 0;
+      font-size: clamp(1.1rem, 2.2vw, 2.2rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: transform .3s ease;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 1;
+      min-width: 0;
+    }
+    
+    #topHeader h1:hover {
+      transform: scale(1.05);
+    }
+    
+    @media (max-width: 768px) {
+      #topHeader {
+        flex-direction: column;
+        gap: 0.8rem;
+        padding: 0.8rem 1rem;
+      }
+      #topHeader h1 {
+        font-size: clamp(1rem, 4vw, 1.5rem);
+        width: 100%;
+        text-align: center;
+      }
+    }
+    
+    #searchContainer {
+      flex: 1;
+      max-width: 500px;
+      min-width: 200px;
+      position: relative;
+    }
+    
+    @media (max-width: 768px) {
+      #searchContainer {
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+    
+    #searchIcon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.5);
+      pointer-events: none;
+      font-size: 1.1rem;
+    }
+    
+    #searchBar {
+      width: 100%;
+      padding: 0.8rem 1.2rem 0.8rem 3rem;
+      border: 2px solid rgba(255, 102, 255, 0.3);
+      border-radius: 25px;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      font-family: var(--font-main);
+      font-size: 1rem;
+      outline: none;
+      transition: all .3s ease;
+    }
+    
+    #searchBar::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    #searchBar:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(255, 102, 255, 0.4);
+      background: rgba(0, 0, 0, 0.6);
+    }
+    
+    /* Search Results Dropdown */
+    #searchDropdown {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      left: 0;
+      right: 0;
+      background: rgba(26, 0, 51, 0.98);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 102, 255, 0.4);
+      border-radius: 15px;
+      max-height: 400px;
+      overflow-y: auto;
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 102, 255, 0.3);
+    }
+    
+    #searchDropdown.show {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.8rem 1rem;
+      cursor: pointer;
+      transition: all .2s ease;
+      border-bottom: 1px solid rgba(255, 102, 255, 0.1);
+    }
+    
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+    
+    .search-result-item:hover {
+      background: rgba(102, 0, 153, 0.5);
+      padding-left: 1.5rem;
+    }
+    
+    .search-result-thumb {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid rgba(255, 102, 255, 0.3);
+    }
+    
+    .search-result-name {
+      font-family: var(--font-main);
+      font-weight: 600;
+      color: #fff;
+      font-size: 0.95rem;
+    }
+    
+    .search-no-results {
+      padding: 1.5rem;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      font-family: var(--font-main);
+    }
+    
+    .content-wrapper {
+      padding: 1.5rem;
+    }
+    
     /* Controls (buttons) */
     #controls {
       display:none;
@@ -653,14 +694,11 @@
     
     .thumb-container {
       width:100%;
-      height:var(--thumb-height);
+      padding-bottom: 100%;
       position:relative;
       overflow:hidden;
       border-radius:12px;
       background:#220033;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
     .thumb-container::before {
       content:"";
@@ -677,7 +715,9 @@
       transform: scale(1.1);
     }
     .thumb {
-      position:relative;
+      position:absolute;
+      top: 0;
+      left: 0;
       z-index:1;
       width:100%;
       height:100%;
@@ -691,92 +731,65 @@
     }
     
     .card-title {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: 0;
-      padding: 0.6rem 0.5rem;
+      margin:.7rem 0 1rem 0;
+      font-family:var(--font-main);
+      font-weight: 700;
+      font-size: clamp(0.85rem, 1vw, 1rem);
+    }
+    
+    /* "more" card - same size as game cards */
+    .card.more {
+      background: linear-gradient(135deg, rgba(102, 0, 153, 0.3), rgba(77, 0, 102, 0.3));
+      backdrop-filter: blur(10px);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      flex-direction:column;
+      color: #ffccff;
+      border: 2px dashed rgba(255, 102, 255, 0.4);
+      min-height: calc(var(--thumb-height) + 3rem);
+      transition: all .3s ease;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        border-color: rgba(255, 102, 255, 0.4);
+        box-shadow: 0 4px 15px rgba(255, 102, 255, 0.2);
+      }
+      50% {
+        border-color: rgba(255, 102, 255, 0.7);
+        box-shadow: 0 4px 25px rgba(255, 102, 255, 0.4);
+      }
+    }
+    
+    .card.more:hover {
+      background: linear-gradient(135deg, rgba(102, 0, 153, 0.5), rgba(77, 0, 102, 0.5));
+      border: 2px dashed var(--accent);
+      transform:translateY(-5px) scale(1.03);
+      box-shadow: 0 8px 30px rgba(255, 102, 255, 0.6);
+      animation: none;
+    }
+    
+    .card.more .dots {
+      font-size: clamp(3rem, 5vw, 4rem);
+      line-height:1;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
+    }
+    
+    .card.more .label {
+      font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+      opacity: 0.9;
       font-family: var(--font-main);
       font-weight: 700;
-      font-size: clamp(0.75rem, 0.9vw, 0.9rem);
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.4), transparent);
-      color: #fff;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: all .3s ease;
-      z-index: 2;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
-    
-    .card:hover .card-title {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    
-  /* "more" card - now perfectly square like other game thumbnails */
-.card.more {
-  background: linear-gradient(135deg, rgba(102, 0, 153, 0.3), rgba(77, 0, 102, 0.3));
-  backdrop-filter: blur(10px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  color: #ffccff;
-  border: 2px dashed rgba(255, 102, 255, 0.4);
-  width: 100%;
-  height: var(--thumb-height);  /* 👈 match thumbnail height */
-  transition: all .3s ease;
-  animation: pulse 2s ease-in-out infinite;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
-}
-
-
-@keyframes pulse {
-  0%, 100% {
-    border-color: rgba(255, 102, 255, 0.4);
-    box-shadow: 0 4px 15px rgba(255, 102, 255, 0.2);
-  }
-  50% {
-    border-color: rgba(255, 102, 255, 0.7);
-    box-shadow: 0 4px 25px rgba(255, 102, 255, 0.4);
-  }
-}
-
-.card.more:hover {
-  background: linear-gradient(135deg, rgba(102, 0, 153, 0.5), rgba(77, 0, 102, 0.5));
-  border: 2px dashed var(--accent);
-  transform: translateY(-5px) scale(1.03);
-  box-shadow: 0 8px 30px rgba(255, 102, 255, 0.6);
-  animation: none;
-}
-
-/* inner text + icon */
-.card.more .dots {
-  font-size: clamp(3rem, 5vw, 4rem);
-  line-height: 1;
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--accent), var(--accent-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 0.5rem;
-}
-
-.card.more .label {
-  font-size: clamp(0.9rem, 1.2vw, 1.1rem);
-  opacity: 0.9;
-  font-family: var(--font-main);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
     
     /* DMCA */
     #dmcaLink {
@@ -802,13 +815,13 @@
   
   <!-- Sidebar -->
   <div id="sidebar">
-    <div id="sidebarIndicator"></div>
     <header onclick="goToHome()"><img src="assets/logo.png" alt="Logo"></header>
     <ul id="categoryList">
       <li onclick="filterCategory('Home')">Home</li>
-      <li onclick="filterCategory('All Games')">All Games</li><li onclick="filterCategory('Uncategorized')">Uncategorized</li><li onclick="filterCategory('Shooter')">Shooter</li><li onclick="filterCategory('Tower Defence')">Tower Defence</li><li onclick="filterCategory('Horror')">Horror</li><li onclick="filterCategory('Basketball')">Basketball</li><li onclick="filterCategory('Clickers')">Clickers</li><li onclick="filterCategory('Sniper')">Sniper</li><li onclick="filterCategory('2 Player')">2 Player</li><li onclick="filterCategory('Platformer')">Platformer</li>
+      <li onclick="filterCategory('Uncategorized')">Uncategorized</li><li onclick="filterCategory('Shooter')">Shooter</li><li onclick="filterCategory('Tower Defence')">Tower Defence</li><li onclick="filterCategory('Horror')">Horror</li><li onclick="filterCategory('Basketball')">Basketball</li><li onclick="filterCategory('Clickers')">Clickers</li><li onclick="filterCategory('Sniper')">Sniper</li><li onclick="filterCategory('2 Player')">2 Player</li><li onclick="filterCategory('Platformer')">Platformer</li>
     </ul>
   </div>
+  <div id="sidebarIndicator"></div>
 
   <!-- Content -->
   <div id="content">
@@ -820,7 +833,6 @@
         <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
         <div id="searchDropdown"></div>
       </div>
-      <button id="bookmarkBtn" onclick="bookmarkPage()" title="Bookmark this page">⭐</button>
     </div>
 
     <div class="content-wrapper">
@@ -843,469 +855,6 @@
       <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
         <h2>Recently Played</h2>
         <div class="grid" id="recentlyPlayedGrid"></div>
-      </div>
-
-      <!-- All Games -->
-      <div class="category all-games-section" data-category="All Games" style="display:none;">
-        <h2>All Games</h2>
-        <div class="grid">
-          <div class="card game-card" data-index="0" data-folder="10 Minutes Till Dawn" data-name="10 minutes till dawn" onclick="prepareGame('10%20Minutes%20Till%20Dawn','10%20Minutes%20Till%20Dawn','games/10 Minutes Till Dawn/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/10 Minutes Till Dawn/thumbnail.png')">
-      <img class="thumb" src="games/10 Minutes Till Dawn/thumbnail.png" alt="10 Minutes Till Dawn">
-    </div>
-    <div class="card-title">10 Minutes Till Dawn</div>
-  </div><div class="card game-card" data-index="1" data-folder="1v1.lol" data-name="1v1.lol" onclick="prepareGame('1v1.lol','1v1.lol','games/1v1.lol/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/1v1.lol/thumbnail.png')">
-      <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol">
-    </div>
-    <div class="card-title">1v1.lol</div>
-  </div><div class="card game-card" data-index="2" data-folder="Age Of War" data-name="age of war" onclick="prepareGame('Age%20Of%20War','Age%20Of%20War','games/Age Of War/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Age Of War/thumbnail.png')">
-      <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War">
-    </div>
-    <div class="card-title">Age Of War</div>
-  </div><div class="card game-card" data-index="3" data-folder="Ages of Conflict" data-name="ages of conflict" onclick="prepareGame('Ages%20of%20Conflict','Ages%20of%20Conflict','games/Ages of Conflict/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Ages of Conflict/thumbnail.png')">
-      <img class="thumb" src="games/Ages of Conflict/thumbnail.png" alt="Ages of Conflict">
-    </div>
-    <div class="card-title">Ages of Conflict</div>
-  </div><div class="card game-card" data-index="4" data-folder="BTD5" data-name="btd5" onclick="prepareGame('BTD5','BTD5','games/BTD5/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/BTD5/thumbnail.jpg')">
-      <img class="thumb" src="games/BTD5/thumbnail.jpg" alt="BTD5">
-    </div>
-    <div class="card-title">BTD5</div>
-  </div><div class="card game-card" data-index="5" data-folder="Bad Parenting" data-name="bad parenting" onclick="prepareGame('Bad%20Parenting','Bad%20Parenting','games/Bad Parenting/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Bad Parenting/thumbnail.jpg')">
-      <img class="thumb" src="games/Bad Parenting/thumbnail.jpg" alt="Bad Parenting">
-    </div>
-    <div class="card-title">Bad Parenting</div>
-  </div><div class="card game-card" data-index="6" data-folder="Bad Piggies" data-name="bad piggies" onclick="prepareGame('Bad%20Piggies','Bad%20Piggies','games/Bad Piggies/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Bad Piggies/thumbnail.jpg')">
-      <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies">
-    </div>
-    <div class="card-title">Bad Piggies</div>
-  </div><div class="card game-card" data-index="7" data-folder="Bad Time Simulator" data-name="bad time simulator" onclick="prepareGame('Bad%20Time%20Simulator','Bad%20Time%20Simulator','games/Bad Time Simulator/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Bad Time Simulator/thumbnail.jpg')">
-      <img class="thumb" src="games/Bad Time Simulator/thumbnail.jpg" alt="Bad Time Simulator">
-    </div>
-    <div class="card-title">Bad Time Simulator</div>
-  </div><div class="card game-card" data-index="8" data-folder="Baldi’s Basics" data-name="baldi’s basics" onclick="prepareGame('Baldi%E2%80%99s%20Basics','Baldi%E2%80%99s%20Basics','games/Baldi’s Basics/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Baldi’s Basics/thumbnail.png')">
-      <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics">
-    </div>
-    <div class="card-title">Baldi’s Basics</div>
-  </div><div class="card game-card" data-index="9" data-folder="Basketball FRVR" data-name="basketball frvr" onclick="prepareGame('Basketball%20FRVR','Basketball%20FRVR','games/Basketball FRVR/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Basketball FRVR/thumbnail.jpg')">
-      <img class="thumb" src="games/Basketball FRVR/thumbnail.jpg" alt="Basketball FRVR">
-    </div>
-    <div class="card-title">Basketball FRVR</div>
-  </div><div class="card game-card" data-index="10" data-folder="Bit Planes" data-name="bit planes" onclick="prepareGame('Bit%20Planes','Bit%20Planes','games/Bit Planes/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Bit Planes/thumbnail.jpg')">
-      <img class="thumb" src="games/Bit Planes/thumbnail.jpg" alt="Bit Planes">
-    </div>
-    <div class="card-title">Bit Planes</div>
-  </div><div class="card game-card" data-index="11" data-folder="Bitlife" data-name="bitlife" onclick="prepareGame('Bitlife','Bitlife','games/Bitlife/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Bitlife/thumbnail.jpg')">
-      <img class="thumb" src="games/Bitlife/thumbnail.jpg" alt="Bitlife">
-    </div>
-    <div class="card-title">Bitlife</div>
-  </div><div class="card game-card" data-index="12" data-folder="Blackjack" data-name="blackjack" onclick="prepareGame('Blackjack','Blackjack','games/Blackjack/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Blackjack/thumbnail.png')">
-      <img class="thumb" src="games/Blackjack/thumbnail.png" alt="Blackjack">
-    </div>
-    <div class="card-title">Blackjack</div>
-  </div><div class="card game-card" data-index="13" data-folder="Blaze Drifter" data-name="blaze drifter" onclick="prepareGame('Blaze%20Drifter','Blaze%20Drifter','games/Blaze Drifter/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Blaze Drifter/thumbnail.jpg')">
-      <img class="thumb" src="games/Blaze Drifter/thumbnail.jpg" alt="Blaze Drifter">
-    </div>
-    <div class="card-title">Blaze Drifter</div>
-  </div><div class="card game-card" data-index="14" data-folder="Block Blast" data-name="block blast" onclick="prepareGame('Block%20Blast','Block%20Blast','games/Block Blast/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Block Blast/thumbnail.jpg')">
-      <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast">
-    </div>
-    <div class="card-title">Block Blast</div>
-  </div><div class="card game-card" data-index="15" data-folder="Bloodmoney " data-name="bloodmoney " onclick="prepareGame('Bloodmoney%20','Bloodmoney%20','games/Bloodmoney /thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Bloodmoney /thumbnail.jpg')">
-      <img class="thumb" src="games/Bloodmoney /thumbnail.jpg" alt="Bloodmoney ">
-    </div>
-    <div class="card-title">Bloodmoney </div>
-  </div><div class="card game-card" data-index="16" data-folder="Bloodmoney 2" data-name="bloodmoney 2" onclick="prepareGame('Bloodmoney%202','Bloodmoney%202','games/Bloodmoney 2/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Bloodmoney 2/thumbnail.jpg')">
-      <img class="thumb" src="games/Bloodmoney 2/thumbnail.jpg" alt="Bloodmoney 2">
-    </div>
-    <div class="card-title">Bloodmoney 2</div>
-  </div><div class="card game-card" data-index="17" data-folder="Bloxorz" data-name="bloxorz" onclick="prepareGame('Bloxorz','Bloxorz','games/Bloxorz/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Bloxorz/thumbnail.png')">
-      <img class="thumb" src="games/Bloxorz/thumbnail.png" alt="Bloxorz">
-    </div>
-    <div class="card-title">Bloxorz</div>
-  </div><div class="card game-card" data-index="18" data-folder="Bob The Robber " data-name="bob the robber " onclick="prepareGame('Bob%20The%20Robber%20','Bob%20The%20Robber%20','games/Bob The Robber /thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber /thumbnail.jpg')">
-      <img class="thumb" src="games/Bob The Robber /thumbnail.jpg" alt="Bob The Robber ">
-    </div>
-    <div class="card-title">Bob The Robber </div>
-  </div><div class="card game-card" data-index="19" data-folder="Bob The Robber 2" data-name="bob the robber 2" onclick="prepareGame('Bob%20The%20Robber%202','Bob%20The%20Robber%202','games/Bob The Robber 2/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber 2/thumbnail.jpg')">
-      <img class="thumb" src="games/Bob The Robber 2/thumbnail.jpg" alt="Bob The Robber 2">
-    </div>
-    <div class="card-title">Bob The Robber 2</div>
-  </div><div class="card game-card" data-index="20" data-folder="Bob The Robber 5" data-name="bob the robber 5" onclick="prepareGame('Bob%20The%20Robber%205','Bob%20The%20Robber%205','games/Bob The Robber 5/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber 5/thumbnail.jpg')">
-      <img class="thumb" src="games/Bob The Robber 5/thumbnail.jpg" alt="Bob The Robber 5">
-    </div>
-    <div class="card-title">Bob The Robber 5</div>
-  </div><div class="card game-card" data-index="21" data-folder="Bouncemasters" data-name="bouncemasters" onclick="prepareGame('Bouncemasters','Bouncemasters','games/Bouncemasters/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Bouncemasters/thumbnail.jpg')">
-      <img class="thumb" src="games/Bouncemasters/thumbnail.jpg" alt="Bouncemasters">
-    </div>
-    <div class="card-title">Bouncemasters</div>
-  </div><div class="card game-card" data-index="22" data-folder="Bouncy Motors" data-name="bouncy motors" onclick="prepareGame('Bouncy%20Motors','Bouncy%20Motors','games/Bouncy Motors/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Bouncy Motors/thumbnail.jpg')">
-      <img class="thumb" src="games/Bouncy Motors/thumbnail.jpg" alt="Bouncy Motors">
-    </div>
-    <div class="card-title">Bouncy Motors</div>
-  </div><div class="card game-card" data-index="23" data-folder="Bounty of One" data-name="bounty of one" onclick="prepareGame('Bounty%20of%20One','Bounty%20of%20One','games/Bounty of One/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Bounty of One/thumbnail.png')">
-      <img class="thumb" src="games/Bounty of One/thumbnail.png" alt="Bounty of One">
-    </div>
-    <div class="card-title">Bounty of One</div>
-  </div><div class="card game-card" data-index="24" data-folder="Burger and Frights" data-name="burger and frights" onclick="prepareGame('Burger%20and%20Frights','Burger%20and%20Frights','games/Burger and Frights/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Burger and Frights/thumbnail.jpg')">
-      <img class="thumb" src="games/Burger and Frights/thumbnail.jpg" alt="Burger and Frights">
-    </div>
-    <div class="card-title">Burger and Frights</div>
-  </div><div class="card game-card" data-index="25" data-folder="Burrito Bison Launcha Libre" data-name="burrito bison launcha libre" onclick="prepareGame('Burrito%20Bison%20Launcha%20Libre','Burrito%20Bison%20Launcha%20Libre','games/Burrito Bison Launcha Libre/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Burrito Bison Launcha Libre/thumbnail.jpg')">
-      <img class="thumb" src="games/Burrito Bison Launcha Libre/thumbnail.jpg" alt="Burrito Bison Launcha Libre">
-    </div>
-    <div class="card-title">Burrito Bison Launcha Libre</div>
-  </div><div class="card game-card" data-index="26" data-folder="CS Go Clicker" data-name="cs go clicker" onclick="prepareGame('CS%20Go%20Clicker','CS%20Go%20Clicker','games/CS Go Clicker/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/CS Go Clicker/thumbnail.png')">
-      <img class="thumb" src="games/CS Go Clicker/thumbnail.png" alt="CS Go Clicker">
-    </div>
-    <div class="card-title">CS Go Clicker</div>
-  </div><div class="card game-card" data-index="27" data-folder="Capybara Clicker" data-name="capybara clicker" onclick="prepareGame('Capybara%20Clicker','Capybara%20Clicker','games/Capybara Clicker/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Capybara Clicker/thumbnail.png')">
-      <img class="thumb" src="games/Capybara Clicker/thumbnail.png" alt="Capybara Clicker">
-    </div>
-    <div class="card-title">Capybara Clicker</div>
-  </div><div class="card game-card" data-index="28" data-folder="Clear Vision 1" data-name="clear vision 1" onclick="prepareGame('Clear%20Vision%201','Clear%20Vision%201','games/Clear Vision 1/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 1/thumbnail.jpg')">
-      <img class="thumb" src="games/Clear Vision 1/thumbnail.jpg" alt="Clear Vision 1">
-    </div>
-    <div class="card-title">Clear Vision 1</div>
-  </div><div class="card game-card" data-index="29" data-folder="Clear Vision 2" data-name="clear vision 2" onclick="prepareGame('Clear%20Vision%202','Clear%20Vision%202','games/Clear Vision 2/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 2/thumbnail.jpg')">
-      <img class="thumb" src="games/Clear Vision 2/thumbnail.jpg" alt="Clear Vision 2">
-    </div>
-    <div class="card-title">Clear Vision 2</div>
-  </div><div class="card game-card" data-index="30" data-folder="Clear Vision 3" data-name="clear vision 3" onclick="prepareGame('Clear%20Vision%203','Clear%20Vision%203','games/Clear Vision 3/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 3/thumbnail.png')">
-      <img class="thumb" src="games/Clear Vision 3/thumbnail.png" alt="Clear Vision 3">
-    </div>
-    <div class="card-title">Clear Vision 3</div>
-  </div><div class="card game-card" data-index="31" data-folder="Clear Vision 4" data-name="clear vision 4" onclick="prepareGame('Clear%20Vision%204','Clear%20Vision%204','games/Clear Vision 4/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 4/thumbnail.jpg')">
-      <img class="thumb" src="games/Clear Vision 4/thumbnail.jpg" alt="Clear Vision 4">
-    </div>
-    <div class="card-title">Clear Vision 4</div>
-  </div><div class="card game-card" data-index="32" data-folder="Clear Vision 5" data-name="clear vision 5" onclick="prepareGame('Clear%20Vision%205','Clear%20Vision%205','games/Clear Vision 5/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 5/thumbnail.png')">
-      <img class="thumb" src="games/Clear Vision 5/thumbnail.png" alt="Clear Vision 5">
-    </div>
-    <div class="card-title">Clear Vision 5</div>
-  </div><div class="card game-card" data-index="33" data-folder="Cluster Rush" data-name="cluster rush" onclick="prepareGame('Cluster%20Rush','Cluster%20Rush','games/Cluster Rush/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Cluster Rush/thumbnail.png')">
-      <img class="thumb" src="games/Cluster Rush/thumbnail.png" alt="Cluster Rush">
-    </div>
-    <div class="card-title">Cluster Rush</div>
-  </div><div class="card game-card" data-index="34" data-folder="Cookie Clicker" data-name="cookie clicker" onclick="prepareGame('Cookie%20Clicker','Cookie%20Clicker','games/Cookie Clicker/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Cookie Clicker/thumbnail.png')">
-      <img class="thumb" src="games/Cookie Clicker/thumbnail.png" alt="Cookie Clicker">
-    </div>
-    <div class="card-title">Cookie Clicker</div>
-  </div><div class="card game-card" data-index="35" data-folder="Crank It!" data-name="crank it!" onclick="prepareGame('Crank%20It!','Crank%20It!','games/Crank It!/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Crank It!/thumbnail.jpg')">
-      <img class="thumb" src="games/Crank It!/thumbnail.jpg" alt="Crank It!">
-    </div>
-    <div class="card-title">Crank It!</div>
-  </div><div class="card game-card" data-index="36" data-folder="Crazy Cars" data-name="crazy cars" onclick="prepareGame('Crazy%20Cars','Crazy%20Cars','games/Crazy Cars/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Crazy Cars/thumbnail.jpg')">
-      <img class="thumb" src="games/Crazy Cars/thumbnail.jpg" alt="Crazy Cars">
-    </div>
-    <div class="card-title">Crazy Cars</div>
-  </div><div class="card game-card" data-index="37" data-folder="Crazy Cattle 3D" data-name="crazy cattle 3d" onclick="prepareGame('Crazy%20Cattle%203D','Crazy%20Cattle%203D','games/Crazy Cattle 3D/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Crazy Cattle 3D/thumbnail.png')">
-      <img class="thumb" src="games/Crazy Cattle 3D/thumbnail.png" alt="Crazy Cattle 3D">
-    </div>
-    <div class="card-title">Crazy Cattle 3D</div>
-  </div><div class="card game-card" data-index="38" data-folder="Crazy Motorcycle" data-name="crazy motorcycle" onclick="prepareGame('Crazy%20Motorcycle','Crazy%20Motorcycle','games/Crazy Motorcycle/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Crazy Motorcycle/thumbnail.jpg')">
-      <img class="thumb" src="games/Crazy Motorcycle/thumbnail.jpg" alt="Crazy Motorcycle">
-    </div>
-    <div class="card-title">Crazy Motorcycle</div>
-  </div><div class="card game-card" data-index="39" data-folder="Crossy Road" data-name="crossy road" onclick="prepareGame('Crossy%20Road','Crossy%20Road','games/Crossy Road/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Crossy Road/thumbnail.jpg')">
-      <img class="thumb" src="games/Crossy Road/thumbnail.jpg" alt="Crossy Road">
-    </div>
-    <div class="card-title">Crossy Road</div>
-  </div><div class="card game-card" data-index="40" data-folder="Cut the Rope" data-name="cut the rope" onclick="prepareGame('Cut%20the%20Rope','Cut%20the%20Rope','games/Cut the Rope/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Cut the Rope/thumbnail.png')">
-      <img class="thumb" src="games/Cut the Rope/thumbnail.png" alt="Cut the Rope">
-    </div>
-    <div class="card-title">Cut the Rope</div>
-  </div><div class="card game-card" data-index="41" data-folder="Dead Zed 2" data-name="dead zed 2" onclick="prepareGame('Dead%20Zed%202','Dead%20Zed%202','games/Dead Zed 2/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Dead Zed 2/thumbnail.jpg')">
-      <img class="thumb" src="games/Dead Zed 2/thumbnail.jpg" alt="Dead Zed 2">
-    </div>
-    <div class="card-title">Dead Zed 2</div>
-  </div><div class="card game-card" data-index="42" data-folder="Deadly Descent" data-name="deadly descent" onclick="prepareGame('Deadly%20Descent','Deadly%20Descent','games/Deadly Descent/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Deadly Descent/thumbnail.png')">
-      <img class="thumb" src="games/Deadly Descent/thumbnail.png" alt="Deadly Descent">
-    </div>
-    <div class="card-title">Deadly Descent</div>
-  </div><div class="card game-card" data-index="43" data-folder="Deepest Sword" data-name="deepest sword" onclick="prepareGame('Deepest%20Sword','Deepest%20Sword','games/Deepest Sword/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Deepest Sword/thumbnail.jpg')">
-      <img class="thumb" src="games/Deepest Sword/thumbnail.jpg" alt="Deepest Sword">
-    </div>
-    <div class="card-title">Deepest Sword</div>
-  </div><div class="card game-card" data-index="44" data-folder="Deltarune" data-name="deltarune" onclick="prepareGame('Deltarune','Deltarune','games/Deltarune/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Deltarune/thumbnail.jpg')">
-      <img class="thumb" src="games/Deltarune/thumbnail.jpg" alt="Deltarune">
-    </div>
-    <div class="card-title">Deltarune</div>
-  </div><div class="card game-card" data-index="45" data-folder="Doki Doki Literature Club" data-name="doki doki literature club" onclick="prepareGame('Doki%20Doki%20Literature%20Club','Doki%20Doki%20Literature%20Club','games/Doki Doki Literature Club/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Doki Doki Literature Club/thumbnail.jpg')">
-      <img class="thumb" src="games/Doki Doki Literature Club/thumbnail.jpg" alt="Doki Doki Literature Club">
-    </div>
-    <div class="card-title">Doki Doki Literature Club</div>
-  </div><div class="card game-card" data-index="46" data-folder="Douchebag Life" data-name="douchebag life" onclick="prepareGame('Douchebag%20Life','Douchebag%20Life','games/Douchebag Life/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Douchebag Life/thumbnail.jpg')">
-      <img class="thumb" src="games/Douchebag Life/thumbnail.jpg" alt="Douchebag Life">
-    </div>
-    <div class="card-title">Douchebag Life</div>
-  </div><div class="card game-card" data-index="47" data-folder="Dreader" data-name="dreader" onclick="prepareGame('Dreader','Dreader','games/Dreader/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Dreader/thumbnail.png')">
-      <img class="thumb" src="games/Dreader/thumbnail.png" alt="Dreader">
-    </div>
-    <div class="card-title">Dreader</div>
-  </div><div class="card game-card" data-index="48" data-folder="Drift Boss" data-name="drift boss" onclick="prepareGame('Drift%20Boss','Drift%20Boss','games/Drift Boss/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Drift Boss/thumbnail.png')">
-      <img class="thumb" src="games/Drift Boss/thumbnail.png" alt="Drift Boss">
-    </div>
-    <div class="card-title">Drift Boss</div>
-  </div><div class="card game-card" data-index="49" data-folder="Drift Hunters" data-name="drift hunters" onclick="prepareGame('Drift%20Hunters','Drift%20Hunters','games/Drift Hunters/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Drift Hunters/thumbnail.jpg')">
-      <img class="thumb" src="games/Drift Hunters/thumbnail.jpg" alt="Drift Hunters">
-    </div>
-    <div class="card-title">Drift Hunters</div>
-  </div><div class="card game-card" data-index="50" data-folder="Drive Mad" data-name="drive mad" onclick="prepareGame('Drive%20Mad','Drive%20Mad','games/Drive Mad/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Drive Mad/thumbnail.png')">
-      <img class="thumb" src="games/Drive Mad/thumbnail.png" alt="Drive Mad">
-    </div>
-    <div class="card-title">Drive Mad</div>
-  </div><div class="card game-card" data-index="51" data-folder="Dunk Shot" data-name="dunk shot" onclick="prepareGame('Dunk%20Shot','Dunk%20Shot','games/Dunk Shot/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Dunk Shot/thumbnail.png')">
-      <img class="thumb" src="games/Dunk Shot/thumbnail.png" alt="Dunk Shot">
-    </div>
-    <div class="card-title">Dunk Shot</div>
-  </div><div class="card game-card" data-index="52" data-folder="Earth Taken" data-name="earth taken" onclick="prepareGame('Earth%20Taken','Earth%20Taken','games/Earth Taken/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Earth Taken/thumbnail.jpg')">
-      <img class="thumb" src="games/Earth Taken/thumbnail.jpg" alt="Earth Taken">
-    </div>
-    <div class="card-title">Earth Taken</div>
-  </div><div class="card game-card" data-index="53" data-folder="Effing Worms" data-name="effing worms" onclick="prepareGame('Effing%20Worms','Effing%20Worms','games/Effing Worms/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Effing Worms/thumbnail.jpg')">
-      <img class="thumb" src="games/Effing Worms/thumbnail.jpg" alt="Effing Worms">
-    </div>
-    <div class="card-title">Effing Worms</div>
-  </div><div class="card game-card" data-index="54" data-folder="Elastic Face" data-name="elastic face" onclick="prepareGame('Elastic%20Face','Elastic%20Face','games/Elastic Face/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Elastic Face/thumbnail.png')">
-      <img class="thumb" src="games/Elastic Face/thumbnail.png" alt="Elastic Face">
-    </div>
-    <div class="card-title">Elastic Face</div>
-  </div><div class="card game-card" data-index="55" data-folder="Escape Road " data-name="escape road " onclick="prepareGame('Escape%20Road%20','Escape%20Road%20','games/Escape Road /thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Escape Road /thumbnail.png')">
-      <img class="thumb" src="games/Escape Road /thumbnail.png" alt="Escape Road ">
-    </div>
-    <div class="card-title">Escape Road </div>
-  </div><div class="card game-card" data-index="56" data-folder="Escape Road 2" data-name="escape road 2" onclick="prepareGame('Escape%20Road%202','Escape%20Road%202','games/Escape Road 2/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Escape Road 2/thumbnail.png')">
-      <img class="thumb" src="games/Escape Road 2/thumbnail.png" alt="Escape Road 2">
-    </div>
-    <div class="card-title">Escape Road 2</div>
-  </div><div class="card game-card" data-index="57" data-folder="Extreme Run 3D" data-name="extreme run 3d" onclick="prepareGame('Extreme%20Run%203D','Extreme%20Run%203D','games/Extreme Run 3D/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Extreme Run 3D/thumbnail.jpg')">
-      <img class="thumb" src="games/Extreme Run 3D/thumbnail.jpg" alt="Extreme Run 3D">
-    </div>
-    <div class="card-title">Extreme Run 3D</div>
-  </div><div class="card game-card" data-index="58" data-folder="FNAF 1" data-name="fnaf 1" onclick="prepareGame('FNAF%201','FNAF%201','games/FNAF 1/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/FNAF 1/thumbnail.png')">
-      <img class="thumb" src="games/FNAF 1/thumbnail.png" alt="FNAF 1">
-    </div>
-    <div class="card-title">FNAF 1</div>
-  </div><div class="card game-card" data-index="59" data-folder="FNAF 2" data-name="fnaf 2" onclick="prepareGame('FNAF%202','FNAF%202','games/FNAF 2/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/FNAF 2/thumbnail.png')">
-      <img class="thumb" src="games/FNAF 2/thumbnail.png" alt="FNAF 2">
-    </div>
-    <div class="card-title">FNAF 2</div>
-  </div><div class="card game-card" data-index="60" data-folder="FNAF 3" data-name="fnaf 3" onclick="prepareGame('FNAF%203','FNAF%203','games/FNAF 3/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/FNAF 3/thumbnail.png')">
-      <img class="thumb" src="games/FNAF 3/thumbnail.png" alt="FNAF 3">
-    </div>
-    <div class="card-title">FNAF 3</div>
-  </div><div class="card game-card" data-index="61" data-folder="FNAF 4" data-name="fnaf 4" onclick="prepareGame('FNAF%204','FNAF%204','games/FNAF 4/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/FNAF 4/thumbnail.png')">
-      <img class="thumb" src="games/FNAF 4/thumbnail.png" alt="FNAF 4">
-    </div>
-    <div class="card-title">FNAF 4</div>
-  </div><div class="card game-card" data-index="62" data-folder="FNAF Pizzeria Simulator" data-name="fnaf pizzeria simulator" onclick="prepareGame('FNAF%20Pizzeria%20Simulator','FNAF%20Pizzeria%20Simulator','games/FNAF Pizzeria Simulator/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/FNAF Pizzeria Simulator/thumbnail.jpg')">
-      <img class="thumb" src="games/FNAF Pizzeria Simulator/thumbnail.jpg" alt="FNAF Pizzeria Simulator">
-    </div>
-    <div class="card-title">FNAF Pizzeria Simulator</div>
-  </div><div class="card game-card" data-index="63" data-folder="FNAF Sister Location" data-name="fnaf sister location" onclick="prepareGame('FNAF%20Sister%20Location','FNAF%20Sister%20Location','games/FNAF Sister Location/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/FNAF Sister Location/thumbnail.jpg')">
-      <img class="thumb" src="games/FNAF Sister Location/thumbnail.jpg" alt="FNAF Sister Location">
-    </div>
-    <div class="card-title">FNAF Sister Location</div>
-  </div><div class="card game-card" data-index="64" data-folder="Fireboy and Watergirl 1" data-name="fireboy and watergirl 1" onclick="prepareGame('Fireboy%20and%20Watergirl%201','Fireboy%20and%20Watergirl%201','games/Fireboy and Watergirl 1/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Fireboy and Watergirl 1/thumbnail.jpg')">
-      <img class="thumb" src="games/Fireboy and Watergirl 1/thumbnail.jpg" alt="Fireboy and Watergirl 1">
-    </div>
-    <div class="card-title">Fireboy and Watergirl 1</div>
-  </div><div class="card game-card" data-index="65" data-folder="Friday Night Funkin" data-name="friday night funkin" onclick="prepareGame('Friday%20Night%20Funkin','Friday%20Night%20Funkin','games/Friday Night Funkin/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Friday Night Funkin/thumbnail.png')">
-      <img class="thumb" src="games/Friday Night Funkin/thumbnail.png" alt="Friday Night Funkin">
-    </div>
-    <div class="card-title">Friday Night Funkin</div>
-  </div><div class="card game-card" data-index="66" data-folder="Fruit Ninja" data-name="fruit ninja" onclick="prepareGame('Fruit%20Ninja','Fruit%20Ninja','games/Fruit Ninja/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Fruit Ninja/thumbnail.jpg')">
-      <img class="thumb" src="games/Fruit Ninja/thumbnail.jpg" alt="Fruit Ninja">
-    </div>
-    <div class="card-title">Fruit Ninja</div>
-  </div><div class="card game-card" data-index="67" data-folder="Geometry Dash Lite" data-name="geometry dash lite" onclick="prepareGame('Geometry%20Dash%20Lite','Geometry%20Dash%20Lite','games/Geometry Dash Lite/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Geometry Dash Lite/thumbnail.png')">
-      <img class="thumb" src="games/Geometry Dash Lite/thumbnail.png" alt="Geometry Dash Lite">
-    </div>
-    <div class="card-title">Geometry Dash Lite</div>
-  </div><div class="card game-card" data-index="68" data-folder="Get Yoked" data-name="get yoked" onclick="prepareGame('Get%20Yoked','Get%20Yoked','games/Get Yoked/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Get Yoked/thumbnail.jpg')">
-      <img class="thumb" src="games/Get Yoked/thumbnail.jpg" alt="Get Yoked">
-    </div>
-    <div class="card-title">Get Yoked</div>
-  </div><div class="card game-card" data-index="69" data-folder="Gobble" data-name="gobble" onclick="prepareGame('Gobble','Gobble','games/Gobble/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Gobble/thumbnail.jpg')">
-      <img class="thumb" src="games/Gobble/thumbnail.jpg" alt="Gobble">
-    </div>
-    <div class="card-title">Gobble</div>
-  </div><div class="card game-card" data-index="70" data-folder="Going Balls" data-name="going balls" onclick="prepareGame('Going%20Balls','Going%20Balls','games/Going Balls/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Going Balls/thumbnail.png')">
-      <img class="thumb" src="games/Going Balls/thumbnail.png" alt="Going Balls">
-    </div>
-    <div class="card-title">Going Balls</div>
-  </div><div class="card game-card" data-index="71" data-folder="Gold Digger FRVR" data-name="gold digger frvr" onclick="prepareGame('Gold%20Digger%20FRVR','Gold%20Digger%20FRVR','games/Gold Digger FRVR/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Gold Digger FRVR/thumbnail.png')">
-      <img class="thumb" src="games/Gold Digger FRVR/thumbnail.png" alt="Gold Digger FRVR">
-    </div>
-    <div class="card-title">Gold Digger FRVR</div>
-  </div><div class="card game-card" data-index="72" data-folder="Granny" data-name="granny" onclick="prepareGame('Granny','Granny','games/Granny/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Granny/thumbnail.png')">
-      <img class="thumb" src="games/Granny/thumbnail.png" alt="Granny">
-    </div>
-    <div class="card-title">Granny</div>
-  </div><div class="card game-card" data-index="73" data-folder="Grindcraft" data-name="grindcraft" onclick="prepareGame('Grindcraft','Grindcraft','games/Grindcraft/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Grindcraft/thumbnail.jpg')">
-      <img class="thumb" src="games/Grindcraft/thumbnail.jpg" alt="Grindcraft">
-    </div>
-    <div class="card-title">Grindcraft</div>
-  </div><div class="card game-card" data-index="74" data-folder="Gun Spin" data-name="gun spin" onclick="prepareGame('Gun%20Spin','Gun%20Spin','games/Gun Spin/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Gun Spin/thumbnail.png')">
-      <img class="thumb" src="games/Gun Spin/thumbnail.png" alt="Gun Spin">
-    </div>
-    <div class="card-title">Gun Spin</div>
-  </div><div class="card game-card" data-index="75" data-folder="Hanger 2" data-name="hanger 2" onclick="prepareGame('Hanger%202','Hanger%202','games/Hanger 2/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Hanger 2/thumbnail.jpg')">
-      <img class="thumb" src="games/Hanger 2/thumbnail.jpg" alt="Hanger 2">
-    </div>
-    <div class="card-title">Hanger 2</div>
-  </div><div class="card game-card" data-index="76" data-folder="Happy Room" data-name="happy room" onclick="prepareGame('Happy%20Room','Happy%20Room','games/Happy Room/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Happy Room/thumbnail.png')">
-      <img class="thumb" src="games/Happy Room/thumbnail.png" alt="Happy Room">
-    </div>
-    <div class="card-title">Happy Room</div>
-  </div><div class="card game-card" data-index="77" data-folder="Happy Wheels" data-name="happy wheels" onclick="prepareGame('Happy%20Wheels','Happy%20Wheels','games/Happy Wheels/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Happy Wheels/thumbnail.jpg')">
-      <img class="thumb" src="games/Happy Wheels/thumbnail.jpg" alt="Happy Wheels">
-    </div>
-    <div class="card-title">Happy Wheels</div>
-  </div><div class="card game-card" data-index="78" data-folder="Helix Jump" data-name="helix jump" onclick="prepareGame('Helix%20Jump','Helix%20Jump','games/Helix Jump/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Helix Jump/thumbnail.jpg')">
-      <img class="thumb" src="games/Helix Jump/thumbnail.jpg" alt="Helix Jump">
-    </div>
-    <div class="card-title">Helix Jump</div>
-  </div><div class="card game-card" data-index="79" data-folder="Henry Stickmin Escaping The Prison" data-name="henry stickmin escaping the prison" onclick="prepareGame('Henry%20Stickmin%20Escaping%20The%20Prison','Henry%20Stickmin%20Escaping%20The%20Prison','games/Henry Stickmin Escaping The Prison/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Henry Stickmin Escaping The Prison/thumbnail.jpg')">
-      <img class="thumb" src="games/Henry Stickmin Escaping The Prison/thumbnail.jpg" alt="Henry Stickmin Escaping The Prison">
-    </div>
-    <div class="card-title">Henry Stickmin Escaping The Prison</div>
-  </div><div class="card game-card" data-index="80" data-folder="Henry Stickmin Fleeing The Complex" data-name="henry stickmin fleeing the complex" onclick="prepareGame('Henry%20Stickmin%20Fleeing%20The%20Complex','Henry%20Stickmin%20Fleeing%20The%20Complex','games/Henry Stickmin Fleeing The Complex/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Henry Stickmin Fleeing The Complex/thumbnail.png')">
-      <img class="thumb" src="games/Henry Stickmin Fleeing The Complex/thumbnail.png" alt="Henry Stickmin Fleeing The Complex">
-    </div>
-    <div class="card-title">Henry Stickmin Fleeing The Complex</div>
-  </div><div class="card game-card" data-index="81" data-folder="Henry Stickmin Infiltrating The Airship" data-name="henry stickmin infiltrating the airship" onclick="prepareGame('Henry%20Stickmin%20Infiltrating%20The%20Airship','Henry%20Stickmin%20Infiltrating%20The%20Airship','games/Henry Stickmin Infiltrating The Airship/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Henry Stickmin Infiltrating The Airship/thumbnail.jpg')">
-      <img class="thumb" src="games/Henry Stickmin Infiltrating The Airship/thumbnail.jpg" alt="Henry Stickmin Infiltrating The Airship">
-    </div>
-    <div class="card-title">Henry Stickmin Infiltrating The Airship</div>
-  </div><div class="card game-card" data-index="82" data-folder="Henry Stickmin Stealing The Diamond" data-name="henry stickmin stealing the diamond" onclick="prepareGame('Henry%20Stickmin%20Stealing%20The%20Diamond','Henry%20Stickmin%20Stealing%20The%20Diamond','games/Henry Stickmin Stealing The Diamond/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Henry Stickmin Stealing The Diamond/thumbnail.jpg')">
-      <img class="thumb" src="games/Henry Stickmin Stealing The Diamond/thumbnail.jpg" alt="Henry Stickmin Stealing The Diamond">
-    </div>
-    <div class="card-title">Henry Stickmin Stealing The Diamond</div>
-  </div><div class="card game-card" data-index="83" data-folder="Highway Racer" data-name="highway racer" onclick="prepareGame('Highway%20Racer','Highway%20Racer','games/Highway Racer/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Highway Racer/thumbnail.jpg')">
-      <img class="thumb" src="games/Highway Racer/thumbnail.jpg" alt="Highway Racer">
-    </div>
-    <div class="card-title">Highway Racer</div>
-  </div><div class="card game-card" data-index="84" data-folder="Hover Race Drive" data-name="hover race drive" onclick="prepareGame('Hover%20Race%20Drive','Hover%20Race%20Drive','games/Hover Race Drive/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Hover Race Drive/thumbnail.jpg')">
-      <img class="thumb" src="games/Hover Race Drive/thumbnail.jpg" alt="Hover Race Drive">
-    </div>
-    <div class="card-title">Hover Race Drive</div>
-  </div><div class="card game-card" data-index="85" data-folder="Hungry Lamu" data-name="hungry lamu" onclick="prepareGame('Hungry%20Lamu','Hungry%20Lamu','games/Hungry Lamu/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Hungry Lamu/thumbnail.jpg')">
-      <img class="thumb" src="games/Hungry Lamu/thumbnail.jpg" alt="Hungry Lamu">
-    </div>
-    <div class="card-title">Hungry Lamu</div>
-  </div><div class="card game-card" data-index="86" data-folder="Idle Breakout" data-name="idle breakout" onclick="prepareGame('Idle%20Breakout','Idle%20Breakout','games/Idle Breakout/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Idle Breakout/thumbnail.png')">
-      <img class="thumb" src="games/Idle Breakout/thumbnail.png" alt="Idle Breakout">
-    </div>
-    <div class="card-title">Idle Breakout</div>
-  </div><div class="card game-card" data-index="87" data-folder="Infinite Craft" data-name="infinite craft" onclick="prepareGame('Infinite%20Craft','Infinite%20Craft','games/Infinite Craft/thumbnail.png')">
-    <div class="thumb-container" style="--thumb-url: url('games/Infinite Craft/thumbnail.png')">
-      <img class="thumb" src="games/Infinite Craft/thumbnail.png" alt="Infinite Craft">
-    </div>
-    <div class="card-title">Infinite Craft</div>
-  </div><div class="card game-card" data-index="88" data-folder="Ink Game" data-name="ink game" onclick="prepareGame('Ink%20Game','Ink%20Game','games/Ink Game/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Ink Game/thumbnail.jpg')">
-      <img class="thumb" src="games/Ink Game/thumbnail.jpg" alt="Ink Game">
-    </div>
-    <div class="card-title">Ink Game</div>
-  </div><div class="card game-card" data-index="89" data-folder="Slope" data-name="slope" onclick="prepareGame('Slope','Slope','games/Slope/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/Slope/thumbnail.jpg')">
-      <img class="thumb" src="games/Slope/thumbnail.jpg" alt="Slope">
-    </div>
-    <div class="card-title">Slope</div>
-  </div><div class="card game-card" data-index="90" data-folder="The Binding of Isaac - Wrath of the Lamb" data-name="the binding of isaac - wrath of the lamb" onclick="prepareGame('The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb','The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb','games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg')">
-    <div class="thumb-container" style="--thumb-url: url('games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg')">
-      <img class="thumb" src="games/The Binding of Isaac - Wrath of the Lamb/thumbnail.jpg" alt="The Binding of Isaac - Wrath of the Lamb">
-    </div>
-    <div class="card-title">The Binding of Isaac - Wrath of the Lamb</div>
-  </div>
-        </div>
       </div>
 
       <!-- All category sections (including games for home view) -->
@@ -2101,28 +1650,6 @@
       }
     });
     
-    // Bookmark page function
-    function bookmarkPage() {
-      const pageTitle = document.title;
-      const pageUrl = window.location.href;
-      
-      if (window.sidebar && window.sidebar.addPanel) { 
-        // Firefox
-        window.sidebar.addPanel(pageTitle, pageUrl, "");
-      } else if (window.external && ('AddFavorite' in window.external)) { 
-        // IE/Edge Legacy
-        window.external.AddFavorite(pageUrl, pageTitle);
-      } else if (window.opera && window.print) { 
-        // Opera
-        return true;
-      } else { 
-        // Chrome, Safari, modern Edge
-        const isMac = navigator.userAgent.toLowerCase().indexOf('mac') !== -1;
-        const key = isMac ? 'Cmd' : 'Ctrl';
-        alert(`Press ${key} + D to bookmark this page.`);
-      }
-    }
-    
     // Navigate to home page
     function goToHome() {
       window.location.hash = '';
@@ -2195,7 +1722,7 @@
       saveRecentlyPlayed({ folder, name, thumb: thumbSrc || 'assets/logo.png' });
     }
     
-    // Show curated games when game viewer is open
+    // Show curated games when game viewer is open - ALWAYS 7 ROWS
     function showCuratedGames(currentGameFolder) {
       console.log('=== Starting showCuratedGames for:', currentGameFolder);
       
@@ -2251,11 +1778,7 @@
           return;
         }
         
-        console.log('Processing category:', catName);
-        
-        // Get ALL game cards regardless of their display state
         const gameCards = cat.querySelectorAll('.game-card[data-folder]');
-        console.log('  Found', gameCards.length, 'game cards in', catName);
         
         gameCards.forEach(card => {
           const folder = card.getAttribute('data-folder');
@@ -2290,7 +1813,7 @@
       console.log('Same category games:', sameCategory.length);
       
       if (allGames.length === 0) {
-        console.error('ERROR: No games found! This should not happen.');
+        console.error('ERROR: No games found!');
         return;
       }
       
@@ -2307,30 +1830,30 @@
       const shuffledSameCategory = shuffleArray(sameCategory);
       const shuffledAllGames = shuffleArray(allGames);
       
-      // Build curated list - target 15 games
+      // ✅ ALWAYS fill exactly 7 rows - calculate columns dynamically
+      const grid = document.getElementById('curatedGamesGrid') || document.createElement('div');
+      const cols = getColumnCount(grid) || 5; // Get actual column count or default to 5
+      const rows = 7; // Always 7 rows
+      const targetCount = cols * rows; // Dynamic total based on screen size
+      
+      console.log('Grid columns:', cols, 'Target games:', targetCount);
+      
       const curatedGames = [];
-      const targetCount = 15;
       
       if (sameCategory.length === 0) {
         // No same category - use all random
-        console.log('No same category games, using all random');
         curatedGames.push(...shuffledAllGames.slice(0, Math.min(targetCount, shuffledAllGames.length)));
       } else {
         // Mix: 60% same category, 40% other
         const sameCatTarget = Math.min(Math.ceil(targetCount * 0.6), sameCategory.length);
-        console.log('Target same category games:', sameCatTarget);
         
         // Add same category games
         curatedGames.push(...shuffledSameCategory.slice(0, sameCatTarget));
-        console.log('Added same category games:', curatedGames.length);
         
         // Add other games
         const usedFolders = new Set(curatedGames.map(g => g.folder));
         const otherGames = shuffledAllGames.filter(g => !usedFolders.has(g.folder));
         const remainingSlots = targetCount - curatedGames.length;
-        
-        console.log('Other games available:', otherGames.length);
-        console.log('Remaining slots to fill:', remainingSlots);
         
         curatedGames.push(...otherGames.slice(0, remainingSlots));
       }
@@ -2366,14 +1889,12 @@
       const curatedGrid = document.getElementById('curatedGamesGrid');
       curatedGrid.innerHTML = '';
       
-      console.log('Appending games to grid...');
+      // Display curated games
       finalCurated.forEach((game, idx) => {
-        console.log('  Appending game', idx + 1, ':', game.folder);
         curatedGrid.appendChild(game.card);
       });
       
       console.log('=== Finished showCuratedGames');
-      console.log('Total games displayed in "You Might Also Like":', finalCurated.length);
     }
     
     function startGame() {
