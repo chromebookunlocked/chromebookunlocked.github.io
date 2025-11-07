@@ -2,99 +2,205 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Five Nights at Freddy's 3</title>
-  <link rel="icon" href="favicon.ico" />
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
       height: 100%;
-      width: 100%;
-      background: black;
+      margin: 0;
       overflow: hidden;
+      user-select: none;
+      background: #000; /* Black background */
       display: flex;
       align-items: center;
       justify-content: center;
+      color: #fff;
+      font-family: monospace;
     }
-    #MMFCanvas {
-      background: black;
-      display: none; /* hidden until game starts */
+
+    /* Loader */
+    .selection {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
     }
-    #progress-container {
+
+    .loader {
       position: absolute;
-      bottom: 20px;
+      bottom: 12vh;
       left: 50%;
       transform: translateX(-50%);
-      width: 80%;
-      color: white;
-      font-family: monospace;
+      text-align: center;
+      width: 85vw;
+      max-width: 900px;
+    }
+
+    .loader h1 {
+      margin: 0;
+      font-size: 5vw;
+      max-font-size: 72px;
+    }
+    .loader hr {
+      margin: 1vh auto 0;
+      border: white solid 0.2vw;
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+    .loader h2 {
+      margin: 1vh 0;
+      font-size: 1.6vw;
+    }
+
+    /* Canvas */
+    canvas {
+      display: none;
+      width: 90vw;
+      height: 65vh;
+      max-width: 1200px;
+      max-height: 800px;
+      border: 1px solid #444;
+      background: #000;
+    }
+
+    /* Optional subtle vignette purely via CSS (no image) */
+    .vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 0 200px 80px rgba(0,0,0,0.85);
+    }
+
+    /* Disable text selection for key elements */
+    .loader, canvas {
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
   </style>
 </head>
 <body>
-  <canvas id="MMFCanvas" width="1280" height="720">
-    Your browser does not support Canvas, Please try again.
+  <canvas id="MMFCanvas" width="1024" height="768">
+    Your browser does not support Canvas. Please try a modern browser.
   </canvas>
 
-  <div id="progress-container">
-    <div style="margin-bottom: 6px;">Downloading... <span id="download-text">0%</span></div>
-    <div style="width: 100%; background: #444; border-radius: 6px; overflow: hidden;">
-      <div id="download-bar" style="height: 10px; background: #3b82f6; width: 0%; transition: width 0.2s;"></div>
-    </div>
-    <div style="margin: 12px 0 6px;">Extracting... <span id="extract-text">0%</span></div>
-    <div style="width: 100%; background: #444; border-radius: 6px; overflow: hidden;">
-      <div id="extract-bar" style="height: 10px; background: #10b981; width: 0%; transition: width 0.2s;"></div>
+  <div class="selection" id="selection">
+    <div class="loader">
+      <h1 id="percentage">0%</h1>
+      <hr id="bar">
+      <h2 id="stage">STARTING UP...</h2>
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="main.js"></script>
+  <div class="vignette" aria-hidden="true"></div>
 
   <script>
-    const canvas = document.getElementById("MMFCanvas");
-    const ctx = canvas.getContext("2d");
-
-    function resizeCanvas() {
-      const aspect = 16 / 9;
-      let w = window.innerWidth;
-      let h = window.innerHeight;
-
-      if (w / h > aspect) {
-        w = h * aspect;
-      } else {
-        h = w / aspect;
-      }
-
-      canvas.style.width = w + "px";
-      canvas.style.height = h + "px";
+    // Prevent touch scrolling
+    function preventMotion(event) {
+      window.scrollTo(0, 0);
+      event.preventDefault();
+      event.stopPropagation();
     }
+    window.addEventListener("scroll", preventMotion, { passive: false });
+    window.addEventListener("touchmove", preventMotion, { passive: false });
 
-    window.addEventListener("resize", resizeCanvas);
-
-    // Map mouse input to internal resolution
-    canvas.addEventListener("mousemove", (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const x = (e.clientX - rect.left) * scaleX;
-      const y = (e.clientY - rect.top) * scaleY;
-
-      // Example: log scaled coordinates
-      console.log("Mouse:", x.toFixed(0), y.toFixed(0));
-      // Pass x,y to your game input handler here
+    // Fullscreen shortcut: press "-" and "=" together
+    const pressedKeys = {};
+    document.addEventListener("keydown", (event) => {
+      pressedKeys[event.key] = true;
+      if (pressedKeys["-"] && pressedKeys["="]) {
+        const c = document.querySelector("canvas");
+        if (c && c.requestFullscreen) c.requestFullscreen();
+        delete pressedKeys[event.key];
+      }
+    });
+    document.addEventListener("keyup", (event) => {
+      delete pressedKeys[event.key];
     });
 
-    // Example: when loading finishes, show canvas
-    function startGame() {
-      document.getElementById("progress-container").style.display = "none";
-      canvas.style.display = "block";
-      resizeCanvas();
-      // Initialize your runtime/game here
+    // Self-contained progress + simple canvas message (no external files)
+    const gametitle = document.title;
+    const percentageEl = document.getElementById("percentage");
+    const barEl = document.getElementById("bar");
+    const stageEl = document.getElementById("stage");
+    const canvas = document.getElementById("MMFCanvas");
+    const selection = document.getElementById("selection");
+
+    function updateProgress(text, percent) {
+      document.title = percent + "% " + gametitle;
+      percentageEl.textContent = percent + "%";
+      barEl.style.width = percent + "%";
+      stageEl.textContent = text;
     }
 
-    // Simulate load complete after 3s
-    setTimeout(startGame, 3000);
+    // Fake staged loader to mimic original feel
+    const steps = [
+      { text: "RETURNING GEARS...", duration: 900 },
+      { text: "BOOTING UP ARCHIVE...", duration: 1200 },
+      { text: "INITIALIZING RUNTIME...", duration: 800 },
+      { text: "FINALIZING...", duration: 500 }
+    ];
+
+    async function runLoader() {
+      let progress = 0;
+      for (const step of steps) {
+        const start = progress;
+        const end = Math.min(100, start + 25);
+        const frames = Math.ceil(step.duration / 50);
+        for (let i = 1; i <= frames; i++) {
+          progress = Math.min(100, Math.floor(start + (i / frames) * (end - start)));
+          updateProgress(step.text, progress);
+          await new Promise(r => setTimeout(r, 50));
+        }
+      }
+      // Done: show canvas, hide loader
+      selection.style.display = "none";
+      canvas.style.display = "block";
+      document.title = gametitle;
+      drawIntro();
+    }
+
+    // Minimal self-contained "runtime": draw a message and pulse
+    function drawIntro() {
+      const ctx = canvas.getContext("2d");
+      let t = 0;
+      function frame() {
+        const w = canvas.width, h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        // Background gradient pulse (still black dominant)
+        const g = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w, h)/2);
+        const alpha = 0.08 + 0.06 * Math.sin(t / 20);
+        g.addColorStop(0, "rgba(0,0,0,1)");
+        g.addColorStop(1, "rgba(32,32,32," + alpha + ")");
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, w, h);
+
+        // Title text
+        ctx.fillStyle = "#10ff80";
+        ctx.font = "bold 48px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("Five Nights at Freddy's 3", w/2, h/2 - 20);
+
+        // Subtext
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "20px monospace";
+        ctx.fillText("Standalone demo canvas — no external files required.", w/2, h/2 + 20);
+
+        // Hint
+        ctx.fillStyle = "#bbbbbb";
+        ctx.font = "16px monospace";
+        ctx.fillText('Press "-" and "=" together to toggle fullscreen.', w/2, h - 40);
+
+        t++;
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    runLoader();
   </script>
 </body>
 </html>
