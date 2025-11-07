@@ -15,12 +15,18 @@
       width: 100%;
       background: #000;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     #MMFCanvas {
-      display: block;
-      width: 100vw;
-      height: 100vh;
       background: #000;
+      /* Keep internal resolution */
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
     }
     #progress-container {
       position: absolute;
@@ -31,9 +37,6 @@
       max-width: 600px;
       color: #fff;
       font-family: monospace;
-    }
-    #progress-container div {
-      margin-bottom: 6px;
     }
     #download-bar, #extract-bar {
       height: 10px;
@@ -59,9 +62,28 @@
     </div>
   </div>
 
-  <!-- JSZip for archive handling -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <!-- Game runtime loader -->
   <script src="main.js"></script>
+
+  <script>
+    // Fix mouse offset: translate window coords to canvas coords
+    const canvas = document.getElementById('MMFCanvas');
+    function getCanvasCoords(evt) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      return {
+        x: (evt.clientX - rect.left) * scaleX,
+        y: (evt.clientY - rect.top) * scaleY
+      };
+    }
+
+    // Example: override click handler
+    canvas.addEventListener('click', e => {
+      const pos = getCanvasCoords(e);
+      console.log('Canvas click at', pos.x, pos.y);
+      // Pass pos.x, pos.y to your game logic instead of raw event coords
+    });
+  </script>
 </body>
 </html>
