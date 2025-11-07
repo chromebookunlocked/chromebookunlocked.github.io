@@ -21,7 +21,9 @@ const games = fs.readdirSync(dataDir)
     if (!Array.isArray(gameCategories)) {
       gameCategories = [gameCategories];
     }
-    
+    if (!fs.existsSync(path.join(gamesDir, folder)) || !fs.existsSync(gamePath)) {
+  return null;
+}
     return {
       folder: json.folder || f.replace(".json", ""),
       name: json.name || f.replace(".json", ""),
@@ -30,6 +32,7 @@ const games = fs.readdirSync(dataDir)
       dateAdded: json.dateAdded || null // Support for "Newly Added" sorting
     };
   });
+.filter(Boolean); // remove nulls
 
 // Group into categories (games can appear in multiple categories)
 const categories = {};
@@ -732,16 +735,17 @@ const html = `<!DOCTYPE html>
       }
     }
     
-    .thumb-container {
-      width:100%;
-      height:var(--thumb-height);
-      position:relative;
-      overflow:hidden;
-      border-radius:12px;
-      background:#220033;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+.thumb-container {
+  width: 100%;
+  aspect-ratio: 1 / 1;   /* 👈 always square */
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #220033;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}stify-content: center;
     }
     .thumb-container::before {
       content:"";
