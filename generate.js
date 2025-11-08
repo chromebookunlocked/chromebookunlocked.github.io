@@ -177,17 +177,23 @@ const html = `<!DOCTYPE html>
     
     /* Custom scrollbar */
     ::-webkit-scrollbar {
-      width: 10px;
+      width: 8px;
     }
     ::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.3);
+      background: rgba(0, 0, 0, 0.3);
     }
     ::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--accent), var(--accent-dark));
-      border-radius: 5px;
+      background: rgba(102, 0, 153, 0.8);
+      border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: var(--accent-light);
+      background: rgba(128, 0, 192, 0.9);
+    }
+    
+    /* Firefox scrollbar */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(102, 0, 153, 0.8) rgba(0, 0, 0, 0.3);
     }
     
     /* Sidebar */
@@ -217,17 +223,21 @@ const html = `<!DOCTYPE html>
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
       overflow-y:auto;
       scrollbar-width: thin; /* Firefox */
+      scrollbar-color: rgba(102, 0, 153, 0.8) rgba(0, 0, 0, 0.3); /* Firefox */
     }
     #sidebar:hover::-webkit-scrollbar {
-      width: 8px;
+      width: 6px;
       display: block;
     }
     #sidebar:hover::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.3);
+      background: rgba(0, 0, 0, 0.3);
     }
     #sidebar:hover::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--accent), var(--accent-dark));
-      border-radius: 4px;
+      background: rgba(102, 0, 153, 0.8);
+      border-radius: 3px;
+    }
+    #sidebar:hover::-webkit-scrollbar-thumb:hover {
+      background: rgba(128, 0, 192, 0.9);
     }
     
     /* Sidebar expand indicator */
@@ -932,6 +942,7 @@ const html = `<!DOCTYPE html>
     <header onclick="goToHome()"><img src="assets/logo.png" alt="Logo"></header>
     <ul id="categoryList">
       <li onclick="filterCategory('Home')">Home</li>
+      <li onclick="filterCategory('All Games')">All Games</li>
       ${finalSidebarCategories}
     </ul>
   </div>
@@ -972,7 +983,14 @@ const html = `<!DOCTYPE html>
       </div>
 
       <!-- All category sections (including games for home view) -->
-      ${Object.keys(categories).map(cat => {
+      ${Object.keys(categories)
+        .sort((a, b) => {
+          // Keep "Newly Added" at top, sort rest by game count
+          if (a === "Newly Added") return -1;
+          if (b === "Newly Added") return 1;
+          return categories[b].length - categories[a].length;
+        })
+        .map(cat => {
         const list = categories[cat];
         return `<div class="category" data-category="${cat}">
           <h2>${cat}</h2>
@@ -1674,6 +1692,20 @@ const html = `<!DOCTYPE html>
           } else {
             c.style.display = 'block';
           }
+        });
+      } else if (cat === 'All Games') {
+        currentViewMode = 'category';
+        all.forEach(c => {
+          const category = c.getAttribute('data-category');
+          
+          // Skip special sections and Recently Played
+          if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection' || category === 'Recently Played') {
+            c.style.display = 'none';
+            return;
+          }
+          
+          // Show all game categories
+          c.style.display = 'block';
         });
       } else {
         currentViewMode = 'category';
