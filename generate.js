@@ -212,7 +212,6 @@ const html = `<!DOCTYPE html>
       box-shadow: 5px 0 20px rgba(255, 102, 255, 0.1);
       display: flex;
       flex-direction: column;
-      scrollbar-width: none; /* Firefox */
     }
     #sidebar::-webkit-scrollbar {
       width: 0;
@@ -222,8 +221,6 @@ const html = `<!DOCTYPE html>
       width:250px;
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
       overflow-y:auto;
-      scrollbar-width: thin; /* Firefox */
-      scrollbar-color: rgba(102, 0, 153, 0.8) rgba(0, 0, 0, 0.3); /* Firefox */
     }
     #sidebar:hover::-webkit-scrollbar {
       width: 6px;
@@ -976,6 +973,14 @@ const html = `<!DOCTYPE html>
         <iframe id="gameFrame" src=""></iframe>
       </div>
 
+      <!-- All Games section (all games without categories) -->
+      <div class="category" data-category="All Games" style="display:none;">
+        <h2>All Games</h2>
+        <div class="grid">
+          ${games.map((g, i) => generateGameCard(g, i)).join('')}
+        </div>
+      </div>
+
       <!-- Recently Played -->
       <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
         <h2>Recently Played</h2>
@@ -1683,7 +1688,7 @@ const html = `<!DOCTYPE html>
           const category = c.getAttribute('data-category');
           
           // Skip special sections
-          if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection') return;
+          if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection' || category === 'All Games') return;
           
           // Show recently played and all categories on home
           if (category === 'Recently Played') {
@@ -1698,14 +1703,12 @@ const html = `<!DOCTYPE html>
         all.forEach(c => {
           const category = c.getAttribute('data-category');
           
-          // Skip special sections and Recently Played
-          if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection' || category === 'Recently Played') {
+          // Show only the All Games section
+          if (category === 'All Games') {
+            c.style.display = 'block';
+          } else {
             c.style.display = 'none';
-            return;
           }
-          
-          // Show all game categories
-          c.style.display = 'block';
         });
       } else {
         currentViewMode = 'category';
@@ -1713,7 +1716,7 @@ const html = `<!DOCTYPE html>
           const category = c.getAttribute('data-category');
           
           // Skip special sections
-          if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection') return;
+          if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection' || category === 'All Games') return;
           
           // Show only selected category (show all games at once)
           c.style.display = (category === cat) ? 'block' : 'none';
