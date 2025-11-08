@@ -267,7 +267,7 @@ const html = `<!DOCTYPE html>
       flex-shrink: 0;
       position: sticky;
       top: 0;
-      background: linear-gradient(180deg, #330066 0%, #1a0033 100%);
+      background: transparent;
       z-index: 10;
     }
     #sidebar header img {
@@ -790,7 +790,7 @@ const html = `<!DOCTYPE html>
       padding-bottom: 100%;
       position:relative;
       overflow:hidden;
-      border-radius:12px 12px 0 0;
+      border-radius:15px;
       background:#220033;
     }
     .thumb-container::before {
@@ -824,13 +824,28 @@ const html = `<!DOCTYPE html>
     }
     
     .card-title {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
       padding: 0.8rem 0.5rem;
       font-family:var(--font-main);
       font-weight: 700;
       font-size: clamp(0.85rem, 1vw, 1rem);
-      background: linear-gradient(135deg, var(--card-bg), #5a0077);
+      background: rgba(0, 0, 0, 0);
       width: 100%;
       line-height: 1.3;
+      z-index: 2;
+      transition: all .3s ease;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    
+    .card:hover .card-title {
+      opacity: 1;
+      transform: translateY(0);
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
     }
     
     /* "more" card - same size as game cards */
