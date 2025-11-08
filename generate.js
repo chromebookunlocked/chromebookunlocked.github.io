@@ -232,8 +232,8 @@ const html = `<!DOCTYPE html>
     
     /* Sidebar expand indicator */
     #sidebarIndicator {
-      position: absolute;
-      right: 2px;
+      position: fixed;
+      left: calc(var(--sidebar-width) - 10px);
       top: 50%;
       transform: translateY(-50%);
       display: flex;
@@ -244,17 +244,18 @@ const html = `<!DOCTYPE html>
       pointer-events: none;
       font-size: 1.5rem;
       color: rgba(255, 255, 255, 0.6);
+      z-index: 999;
     }
-    #sidebar:hover #sidebarIndicator {
+    #sidebar:hover ~ #sidebarIndicator {
       opacity: 0.6;
-      right: 5px;
+      left: 245px;
     }
     #sidebarIndicator::before {
       content: '›';
       font-weight: 300;
       transition: transform .3s ease;
     }
-    #sidebar:hover #sidebarIndicator::before {
+    #sidebar:hover ~ #sidebarIndicator::before {
       transform: rotate(180deg);
     }
     
@@ -274,11 +275,9 @@ const html = `<!DOCTYPE html>
       width:auto;
       filter: drop-shadow(0 0 10px var(--accent));
       transition: transform .3s ease;
-      background: transparent;
     }
     #sidebar:hover header img {
       transform: scale(1.1);
-      filter: drop-shadow(0 0 15px var(--accent));
     }
     #sidebar ul {
       list-style:none;
@@ -467,63 +466,6 @@ const html = `<!DOCTYPE html>
       display: none;
       z-index: 1000;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 102, 255, 0.3);
-    }
-    
-    #searchDropdown.show {
-      display: block;
-      animation: slideDown 0.3s ease;
-    }
-    
-    @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .search-result-item {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 0.8rem 1rem;
-      cursor: pointer;
-      transition: all .2s ease;
-      border-bottom: 1px solid rgba(255, 102, 255, 0.1);
-    }
-    
-    .search-result-item:last-child {
-      border-bottom: none;
-    }
-    
-    .search-result-item:hover {
-      background: rgba(102, 0, 153, 0.5);
-      padding-left: 1.5rem;
-    }
-    
-    .search-result-thumb {
-      width: 50px;
-      height: 50px;
-      border-radius: 8px;
-      object-fit: cover;
-      border: 2px solid rgba(255, 102, 255, 0.3);
-    }
-    
-    .search-result-name {
-      font-family: var(--font-main);
-      font-weight: 600;
-      color: #fff;
-      font-size: 0.95rem;
-    }
-    
-    .search-no-results {
-      padding: 1.5rem;
-      text-align: center;
-      color: rgba(255, 255, 255, 0.6);
-      font-family: var(--font-main);
     }
     
     #searchDropdown.show {
@@ -824,7 +766,6 @@ const html = `<!DOCTYPE html>
       text-align:center;
       display:flex;
       flex-direction:column;
-      align-items:center;
       position:relative;
       border: 2px solid rgba(255, 102, 255, 0.2);
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
@@ -846,10 +787,10 @@ const html = `<!DOCTYPE html>
     
     .thumb-container {
       width:100%;
-      padding-bottom: 100%; /* Square aspect ratio */
+      padding-bottom: 100%;
       position:relative;
       overflow:hidden;
-      border-radius:12px;
+      border-radius:12px 12px 0 0;
       background:#220033;
     }
     .thumb-container::before {
@@ -883,57 +824,28 @@ const html = `<!DOCTYPE html>
     }
     
     .card-title {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: 0;
-      padding: 0.8rem 0.6rem;
-      font-family: var(--font-main);
-      font-weight: 700;
-      font-size: clamp(0.75rem, 0.9vw, 0.95rem);
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.7) 70%, transparent 100%);
-      color: #fff;
-      opacity: 0;
-      transform: translateY(100%);
-      transition: all .3s ease;
-      z-index: 3;
-      text-shadow: 0 2px 6px rgba(0, 0, 0, 1);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      pointer-events: none;
-    }
-    
-    .card:hover .card-title {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    
-    .card-title {
-      margin:.7rem 0 1rem 0;
+      padding: 0.8rem 0.5rem;
       font-family:var(--font-main);
       font-weight: 700;
       font-size: clamp(0.85rem, 1vw, 1rem);
+      background: linear-gradient(135deg, var(--card-bg), #5a0077);
+      width: 100%;
+      line-height: 1.3;
     }
     
-    /* "more" card - perfect square like thumbnails */
+    /* "more" card - same size as game cards */
     .card.more {
       background: linear-gradient(135deg, rgba(102, 0, 153, 0.3), rgba(77, 0, 102, 0.3));
       backdrop-filter: blur(10px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      flex-direction:column;
       color: #ffccff;
       border: 2px dashed rgba(255, 102, 255, 0.4);
-      width: 100%;
-      aspect-ratio: 1 / 1; /* Square ratio */
+      min-height: calc(var(--thumb-height) + 3rem);
       transition: all .3s ease;
       animation: pulse 2s ease-in-out infinite;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      cursor: pointer;
     }
     
     @keyframes pulse {
@@ -950,14 +862,14 @@ const html = `<!DOCTYPE html>
     .card.more:hover {
       background: linear-gradient(135deg, rgba(102, 0, 153, 0.5), rgba(77, 0, 102, 0.5));
       border: 2px dashed var(--accent);
-      transform: translateY(-5px) scale(1.03);
+      transform:translateY(-5px) scale(1.03);
       box-shadow: 0 8px 30px rgba(255, 102, 255, 0.6);
       animation: none;
     }
     
     .card.more .dots {
       font-size: clamp(3rem, 5vw, 4rem);
-      line-height: 1;
+      line-height:1;
       font-weight: 900;
       background: linear-gradient(135deg, var(--accent), var(--accent-light));
       -webkit-background-clip: text;
@@ -999,13 +911,13 @@ const html = `<!DOCTYPE html>
   
   <!-- Sidebar -->
   <div id="sidebar">
-    <div id="sidebarIndicator"></div>
     <header onclick="goToHome()"><img src="assets/logo.png" alt="Logo"></header>
     <ul id="categoryList">
       <li onclick="filterCategory('Home')">Home</li>
       ${finalSidebarCategories}
     </ul>
   </div>
+  <div id="sidebarIndicator"></div>
 
   <!-- Content -->
   <div id="content">
@@ -1280,8 +1192,7 @@ const html = `<!DOCTYPE html>
           matchingGames.push({
             folder: gameFolder,
             name: gameTitle,
-            thumb: thumbSrc,
-            onclick: card.getAttribute('onclick')
+            thumb: thumbSrc
           });
         }
       });
@@ -1311,17 +1222,22 @@ const html = `<!DOCTYPE html>
         searchDropdown.innerHTML = '<div class="search-no-results">No games found</div>';
       } else {
         searchDropdown.innerHTML = topResults.map(game => {
-          // Extract the onclick function parameters
-          const onclickMatch = game.onclick.match(/prepareGame\\('([^']+)','([^']+)','([^']+)'\\)/);
-          if (onclickMatch) {
-            const [, folderEncoded, nameEncoded, thumb] = onclickMatch;
-            return '<div class="search-result-item" onclick="prepareGame(\'' + folderEncoded + '\',\'' + nameEncoded + '\',\'' + thumb + '\'); hideSearchDropdown();">' +
-              '<img class="search-result-thumb" src="' + game.thumb + '" alt="' + game.name + '" onerror="this.src=\'assets/logo.png\'">' +
-              '<div class="search-result-name">' + game.name + '</div>' +
-            '</div>';
-          }
-          return '';
-        }).filter(Boolean).join('');
+          return \`<div class="search-result-item" data-folder="\${game.folder}" data-name="\${game.name}" data-thumb="\${game.thumb}">
+            <img class="search-result-thumb" src="\${game.thumb}" alt="\${game.name}">
+            <div class="search-result-name">\${game.name}</div>
+          </div>\`;
+        }).join('');
+        
+        // Add click handlers to search results
+        searchDropdown.querySelectorAll('.search-result-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const folder = item.getAttribute('data-folder');
+            const name = item.getAttribute('data-name');
+            const thumb = item.getAttribute('data-thumb');
+            prepareGame(encodeURIComponent(folder), encodeURIComponent(name), thumb);
+            hideSearchDropdown();
+          });
+        });
       }
       
       searchDropdown.classList.add('show');
