@@ -758,6 +758,7 @@ const html = `<!DOCTYPE html>
     
     .card {
       width:100%;
+      aspect-ratio: 1 / 1;
       background: linear-gradient(135deg, var(--card-bg), #5a0077);
       border-radius:15px;
       overflow:hidden;
@@ -787,7 +788,7 @@ const html = `<!DOCTYPE html>
     
     .thumb-container {
       width:100%;
-      padding-bottom: 100%;
+      height:100%;
       position:relative;
       overflow:hidden;
       border-radius:15px;
@@ -828,24 +829,26 @@ const html = `<!DOCTYPE html>
       bottom: 0;
       left: 0;
       right: 0;
-      padding: 0.8rem 0.5rem;
+      padding: 0.6rem 0.4rem;
       font-family:var(--font-main);
-      font-weight: 700;
-      font-size: clamp(0.85rem, 1vw, 1rem);
+      font-weight: 600;
+      font-size: clamp(0.7rem, 0.85vw, 0.85rem);
+      color: rgba(255, 255, 255, 0.9);
       background: rgba(0, 0, 0, 0);
       width: 100%;
-      line-height: 1.3;
+      line-height: 1.2;
       z-index: 2;
       transition: all .3s ease;
       opacity: 0;
       transform: translateY(10px);
+      text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
     }
     
     .card:hover .card-title {
       opacity: 1;
       transform: translateY(0);
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(5px);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
     }
     
     /* "more" card - same size as game cards */
@@ -858,7 +861,7 @@ const html = `<!DOCTYPE html>
       flex-direction:column;
       color: #ffccff;
       border: 2px dashed rgba(255, 102, 255, 0.4);
-      min-height: calc(var(--thumb-height) + 3rem);
+      aspect-ratio: 1 / 1;
       transition: all .3s ease;
       animation: pulse 2s ease-in-out infinite;
     }
