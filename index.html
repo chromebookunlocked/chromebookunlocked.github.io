@@ -122,19 +122,23 @@
       box-shadow: 5px 0 20px rgba(255, 102, 255, 0.1);
       display: flex;
       flex-direction: column;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
     #sidebar::-webkit-scrollbar {
-      width: 0;
-      display: none;
+      width: 0 !important;
+      display: none !important;
     }
     #sidebar:hover { 
       width:250px;
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
       overflow-y:auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(102, 0, 153, 0.8) rgba(0, 0, 0, 0.3);
     }
     #sidebar:hover::-webkit-scrollbar {
-      width: 6px;
-      display: block;
+      width: 6px !important;
+      display: block !important;
     }
     #sidebar:hover::-webkit-scrollbar-track {
       background: rgba(0, 0, 0, 0.3);
@@ -845,7 +849,7 @@
 <body>
   
   <!-- Sidebar -->
-  <div id="sidebar">
+  <div id="sidebar" style="scrollbar-width: none;">
     <header onclick="goToHome()"><img src="assets/logo.png" alt="Logo"></header>
     <ul id="categoryList">
       <li onclick="filterCategory('Home')">Home</li>
@@ -2317,7 +2321,7 @@
       
       // Hide all other categories
       document.querySelectorAll('.category').forEach(cat => {
-        if (cat.id !== 'curatedGamesSection') {
+        if (cat.id !== 'curatedGamesSection' && cat.getAttribute('data-category') !== 'All Games') {
           cat.style.display = 'none';
         }
       });
@@ -2541,13 +2545,13 @@
         }
       }
       
-      // Show all normal categories again
+      // Show all normal categories again (exclude All Games)
       document.querySelectorAll('.category').forEach(cat => {
         const category = cat.getAttribute('data-category');
         if (category === 'Recently Played') {
           const recentGrid = document.getElementById('recentlyPlayedGrid');
           cat.style.display = (recentGrid && recentGrid.children.length > 0) ? 'block' : 'none';
-        } else if (cat.id !== 'curatedGamesSection' && cat.id !== 'searchResultsSection') {
+        } else if (cat.id !== 'curatedGamesSection' && cat.id !== 'searchResultsSection' && category !== 'All Games') {
           cat.style.display = 'block';
         }
       });
@@ -2716,6 +2720,19 @@
     
     // Initial load
     document.addEventListener('DOMContentLoaded', () => {
+      // Handle sidebar scrollbar visibility
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar) {
+        sidebar.addEventListener('mouseenter', () => {
+          sidebar.style.scrollbarWidth = 'thin';
+          sidebar.style.scrollbarColor = 'rgba(102, 0, 153, 0.8) rgba(0, 0, 0, 0.3)';
+        });
+        sidebar.addEventListener('mouseleave', () => {
+          sidebar.style.scrollbarWidth = 'none';
+          sidebar.style.scrollbarColor = 'transparent transparent';
+        });
+      }
+      
       document.querySelectorAll('.category').forEach(c => {
         const cat = c.getAttribute('data-category');
         if (offsets[cat] === undefined) offsets[cat] = 0;
