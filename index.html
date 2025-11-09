@@ -29,8 +29,10 @@
   <meta property="twitter:image" content="https://chromebookunlocked.github.io/assets/logo.png">
   
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/logo.png">
-  <link rel="apple-touch-icon" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="144x144" href="assets/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/logo.png">
   <link rel="shortcut icon" type="image/png" href="assets/logo.png">
   
   <!-- Additional SEO -->
@@ -126,29 +128,33 @@
       scrollbar-width: none;
     }
     #sidebar::-webkit-scrollbar {
-      width: 0 !important;
-      display: none !important;
+      width: 0;
+      height: 0;
+      display: none;
+      opacity: 0;
     }
     #sidebar:hover { 
       width:250px;
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
       overflow-y:auto;
+      overflow-x:hidden;
       scrollbar-width: thin;
-      scrollbar-color: rgba(102, 0, 153, 0.8) rgba(0, 0, 0, 0.3);
+      scrollbar-color: rgba(77, 0, 102, 0.6) transparent;
     }
     #sidebar:hover::-webkit-scrollbar {
-      width: 6px !important;
-      display: block !important;
+      width: 4px;
+      display: block;
+      opacity: 1;
     }
     #sidebar:hover::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.3);
+      background: transparent;
     }
     #sidebar:hover::-webkit-scrollbar-thumb {
-      background: rgba(102, 0, 153, 0.8);
-      border-radius: 3px;
+      background: rgba(77, 0, 102, 0.6);
+      border-radius: 2px;
     }
     #sidebar:hover::-webkit-scrollbar-thumb:hover {
-      background: rgba(128, 0, 192, 0.9);
+      background: rgba(102, 0, 153, 0.8);
     }
     
     /* Sidebar expand indicator */
@@ -2725,7 +2731,7 @@
       if (sidebar) {
         sidebar.addEventListener('mouseenter', () => {
           sidebar.style.scrollbarWidth = 'thin';
-          sidebar.style.scrollbarColor = 'rgba(102, 0, 153, 0.8) rgba(0, 0, 0, 0.3)';
+          sidebar.style.scrollbarColor = 'rgba(77, 0, 102, 0.6) transparent';
         });
         sidebar.addEventListener('mouseleave', () => {
           sidebar.style.scrollbarWidth = 'none';
