@@ -214,10 +214,13 @@ const html = `<!DOCTYPE html>
       box-shadow: 5px 0 20px rgba(255, 102, 255, 0.1);
       display: flex;
       flex-direction: column;
+      scrollbar-width: none; /* Firefox - hidden by default */
     }
     
+    /* Hide scrollbar when sidebar is minimized */
     #sidebar::-webkit-scrollbar {
-      width: 8px;
+      width: 0;
+      display: none;
     }
     
     #sidebar::-webkit-scrollbar-track {
@@ -229,18 +232,24 @@ const html = `<!DOCTYPE html>
       border-radius: 4px;
     }
     
-    /* Scrollbar visible when sidebar is hovered AND scrolling */
-    #sidebar:hover.is-scrolling::-webkit-scrollbar-track {
+    /* Show scrollbar only when sidebar is hovered/expanded */
+    #sidebar:hover {
+      width:250px;
+      box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
+      scrollbar-width: thin; /* Firefox - show on hover */
+    }
+    
+    #sidebar:hover::-webkit-scrollbar {
+      width: 8px;
+      display: block;
+    }
+    
+    #sidebar:hover::-webkit-scrollbar-track {
       background: rgba(0,0,0,0.3);
     }
     
-    #sidebar:hover.is-scrolling::-webkit-scrollbar-thumb {
+    #sidebar:hover::-webkit-scrollbar-thumb {
       background: linear-gradient(180deg, var(--accent), var(--accent-dark));
-    }
-    
-    #sidebar:hover { 
-      width:250px;
-      box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
     }
     
     /* Sidebar expand indicator */
@@ -1768,23 +1777,6 @@ const html = `<!DOCTYPE html>
     
     // Initial load
     document.addEventListener('DOMContentLoaded', () => {
-      // Sidebar scrollbar auto-hide logic
-      const showScrollbars = (evt) => {
-        const el = evt.currentTarget;
-        clearTimeout(el._scrolling); // Cancel pending class removal
-        
-        el.classList.add("is-scrolling"); // Add class 
-        
-        el._scrolling = setTimeout(() => { // remove the scrolling class after 2500ms
-          el.classList.remove("is-scrolling");
-        }, 2500);
-      };
-
-      const sidebar = document.getElementById('sidebar');
-      if (sidebar) {
-        sidebar.addEventListener("scroll", showScrollbars);
-      }
-      
       document.querySelectorAll('.category').forEach(c => {
         const cat = c.getAttribute('data-category');
         if (offsets[cat] === undefined) offsets[cat] = 0;
