@@ -152,9 +152,9 @@ const html = `<!DOCTYPE html>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
     :root {
-      --base-font: clamp(12px, 1.2vw, 18px);
-      --thumb-height: clamp(120px, 15vw, 200px);
-      --sidebar-width: clamp(45px, 5vw, 70px);
+      --base-font: clamp(11px, 1vw, 16px);
+      --thumb-height: clamp(100px, 12vw, 200px);
+      --sidebar-width: clamp(40px, 4vw, 70px);
       --accent: #ff66ff;
       --accent-dark: #cc33ff;
       --accent-light: #ff99ff;
@@ -162,8 +162,8 @@ const html = `<!DOCTYPE html>
       --card-bg: #4d0066;
       --card-hover: #660099;
       --font-main: 'Orbitron', sans-serif;
-      --content-max-width: 1400px;
-      --grid-gap: clamp(0.8rem, 1.5vw, 1.2rem);
+      --content-max-width: min(1400px, 95vw);
+      --grid-gap: clamp(0.6rem, 1.2vw, 1rem);
     }
     
     /* basics */
@@ -379,7 +379,7 @@ const html = `<!DOCTYPE html>
     /* Top Header Bar */
     #topHeader {
       background: linear-gradient(135deg, #330066 0%, #1a0033 100%);
-      padding: clamp(1rem, 2vw, 1.5rem) clamp(1rem, 3vw, 2rem);
+      padding: clamp(0.8rem, 1.5vw, 1.5rem) clamp(0.8rem, 2vw, 2rem);
       border-bottom: 2px solid rgba(255, 102, 255, 0.3);
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       position: sticky;
@@ -388,13 +388,13 @@ const html = `<!DOCTYPE html>
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: clamp(1rem, 2vw, 2rem);
+      gap: clamp(0.8rem, 1.5vw, 2rem);
       flex-wrap: wrap;
     }
     
     #topHeader h1 {
       margin: 0;
-      font-size: clamp(1.1rem, 2.2vw, 2.2rem);
+      font-size: clamp(1rem, 1.8vw, 2rem);
       font-weight: 900;
       background: linear-gradient(135deg, var(--accent), var(--accent-light));
       -webkit-background-clip: text;
@@ -560,6 +560,7 @@ const html = `<!DOCTYPE html>
       margin:0 auto 1rem auto;
       padding:.5rem;
       font-size:1.1em;
+      gap: 1rem;
     }
     #controls.active {
       display: flex;
@@ -578,6 +579,8 @@ const html = `<!DOCTYPE html>
       box-shadow:0 4px 15px rgba(255, 102, 255, 0.3);
       font-family:var(--font-main);
       border: 1px solid rgba(255, 102, 255, 0.4);
+      min-width: 140px;
+      white-space: nowrap;
     }
     button:hover {
       transform:translateY(-2px) scale(1.05);
@@ -592,15 +595,85 @@ const html = `<!DOCTYPE html>
     #fullscreenBtn {
       background:linear-gradient(135deg,var(--accent-dark),#9933ff);
     }
+    #gameTitle {
+      flex: 1;
+      text-align: center;
+      font-weight: 700;
+      font-size: clamp(1rem, 2vw, 1.3rem);
+    }
     
-    /* Viewer */
+    @media (max-width: 768px) {
+      #controls {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      button {
+        font-size: 0.9em;
+        padding: 0.6rem 1rem;
+        min-width: 100px;
+      }
+      #gameTitle {
+        width: 100%;
+        order: -1;
+        margin-bottom: 0.5rem;
+      }
+    }
+    
+    /* Banner Ad Containers */
+    .ad-banner-container {
+      display: none;
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 160px;
+      height: 600px;
+      z-index: 50;
+      background: rgba(26, 0, 51, 0.3);
+      border: 1px solid rgba(255, 102, 255, 0.2);
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+      overflow: hidden;
+    }
+    
+    .ad-banner-left {
+      left: 10px;
+    }
+    
+    .ad-banner-right {
+      right: 10px;
+    }
+    
+    /* Show banners only on large screens and when game is active */
+    @media (min-width: 1800px) {
+      #controls.active ~ .viewer-wrapper .ad-banner-container {
+        display: block;
+      }
+    }
+    
+    .ad-banner-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: rgba(255, 255, 255, 0.3);
+      font-family: var(--font-main);
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 1rem;
+    }
+    
+    /* Viewer wrapper for banner positioning */
+    .viewer-wrapper {
+      position: relative;
+      width: 100%;
+    }
     .viewer {
       position:relative;
       display:none;
       justify-content:center;
       align-items:center;
       width:100%;
-      max-width: 1400px;
+      max-width: min(1400px, 90vw);
       aspect-ratio:16 / 9;
       background:transparent;
       border-radius:15px;
@@ -608,6 +681,24 @@ const html = `<!DOCTYPE html>
       margin:0 auto 2rem auto;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
       transition: all 0.3s ease;
+    }
+    
+    @media (max-width: 1600px) {
+      .viewer {
+        max-width: 85vw;
+      }
+    }
+    
+    @media (max-width: 1200px) {
+      .viewer {
+        max-width: 90vw;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .viewer {
+        max-width: 95vw;
+      }
     }
     
     /* Fullscreen viewer styles */
@@ -730,7 +821,7 @@ const html = `<!DOCTYPE html>
       max-width: var(--content-max-width);
       margin-left: auto;
       margin-right: auto;
-      padding: 0 clamp(0.5rem, 2vw, 1rem);
+      padding: 0 clamp(0.5rem, 1.5vw, 1rem);
     }
     .category:first-of-type {
       margin-top: 1rem;
@@ -741,7 +832,7 @@ const html = `<!DOCTYPE html>
       cursor:pointer;
       font-family:var(--font-main);
       font-weight: 900;
-      font-size: clamp(1.3rem, 2vw, 2rem);
+      font-size: clamp(1.2rem, 1.8vw, 1.8rem);
       text-shadow: 0 0 15px rgba(255, 102, 255, 0.5);
       padding-bottom: 0.5rem;
       border-bottom: 2px solid rgba(255, 102, 255, 0.3);
@@ -980,13 +1071,30 @@ const html = `<!DOCTYPE html>
         <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
       </div>
       
-      <div class="viewer" id="viewer">
-        <div id="startOverlay">
-          <img id="startThumb" src="" alt="Game Thumbnail">
-          <h1 id="startName"></h1>
-          <button id="startButton" onclick="startGame()">▶ Play</button>
+      <div class="viewer-wrapper">
+        <!-- Left Banner Ad -->
+        <div class="ad-banner-container ad-banner-left">
+          <div class="ad-banner-placeholder">
+            Advertisement
+          </div>
         </div>
-        <iframe id="gameFrame" src="" scrolling="no"></iframe>
+        
+        <!-- Game Viewer -->
+        <div class="viewer" id="viewer">
+          <div id="startOverlay">
+            <img id="startThumb" src="" alt="Game Thumbnail">
+            <h1 id="startName"></h1>
+            <button id="startButton" onclick="startGame()">▶ Play</button>
+          </div>
+          <iframe id="gameFrame" src="" scrolling="no"></iframe>
+        </div>
+        
+        <!-- Right Banner Ad -->
+        <div class="ad-banner-container ad-banner-right">
+          <div class="ad-banner-placeholder">
+            Advertisement
+          </div>
+        </div>
       </div>
 
       <!-- All Games section (all games without categories) -->
