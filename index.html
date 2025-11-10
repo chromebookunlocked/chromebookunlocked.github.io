@@ -124,27 +124,33 @@
       box-shadow: 5px 0 20px rgba(255, 102, 255, 0.1);
       display: flex;
       flex-direction: column;
-      scrollbar-width: none; /* Firefox */
     }
+    
     #sidebar::-webkit-scrollbar {
-      width: 0;
-      display: none;
+      width: 8px;
     }
+    
+    #sidebar::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+    
+    #sidebar::-webkit-scrollbar-thumb {
+      background-color: transparent;
+      border-radius: 4px;
+    }
+    
+    /* Scrollbar visible when sidebar is hovered AND scrolling */
+    #sidebar:hover.is-scrolling::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.3);
+    }
+    
+    #sidebar:hover.is-scrolling::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--accent), var(--accent-dark));
+    }
+    
     #sidebar:hover { 
       width:250px;
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
-      scrollbar-width: thin; /* Firefox */
-    }
-    #sidebar:hover::-webkit-scrollbar {
-      width: 8px;
-      display: block;
-    }
-    #sidebar:hover::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.3);
-    }
-    #sidebar:hover::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--accent), var(--accent-dark));
-      border-radius: 4px;
     }
     
     /* Sidebar expand indicator */
@@ -2722,6 +2728,23 @@
     
     // Initial load
     document.addEventListener('DOMContentLoaded', () => {
+      // Sidebar scrollbar auto-hide logic
+      const showScrollbars = (evt) => {
+        const el = evt.currentTarget;
+        clearTimeout(el._scrolling); // Cancel pending class removal
+        
+        el.classList.add("is-scrolling"); // Add class 
+        
+        el._scrolling = setTimeout(() => { // remove the scrolling class after 2500ms
+          el.classList.remove("is-scrolling");
+        }, 2500);
+      };
+
+      const sidebar = document.getElementById('sidebar');
+      if (sidebar) {
+        sidebar.addEventListener("scroll", showScrollbars);
+      }
+      
       document.querySelectorAll('.category').forEach(c => {
         const cat = c.getAttribute('data-category');
         if (offsets[cat] === undefined) offsets[cat] = 0;
