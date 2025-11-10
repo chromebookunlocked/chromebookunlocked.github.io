@@ -1,56 +1,51 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <base href="https://cdn.jsdelivr.net/gh/genizy/fnaf@latest/3/">
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Five Nights at Freddy's 3</title>
-  <link rel="stylesheet" type="text/css" href="style.css"/>
-  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Embedded: hd_fnaf</title>
   <style>
+    /* remove page margins and make iframe fill the whole viewport */
     html, body {
-      margin: 0;
       height: 100%;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* prevents body scrollbars */
+      background: black; /* fallback background while iframe loads */
     }
-    #MMFCanvas {
-      width: 100vw;
-      height: 100vh;
+
+    /* the iframe itself — no borders, full screen */
+    .full-embed {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;      /* full viewport width */
+      height: 100vh;     /* full viewport height */
+      border: 0;         /* remove borders */
+      margin: 0;
+      padding: 0;
       display: block;
-      background: #000;
     }
-    #progress-container {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 80%;
-      max-width: 600px;
-      color: #fff;
-      font-family: sans-serif;
-    }
+
+    /* optional: hides iframe focus outline for a cleaner look */
+    .full-embed:focus { outline: none; }
   </style>
 </head>
 <body>
-  <canvas id="MMFCanvas" width="1280" height="720">
-    Your browser does not support Canvas, Please try again.
-  </canvas>
+  <iframe
+    class="full-embed"
+    src="https://irv77.github.io/hd_fnaf/3/"
+    allowfullscreen
+    referrerpolicy="no-referrer"
+    sandbox="allow-scripts allow-same-origin allow-forms allow-modals"
+    title="hd_fnaf embed">
+  </iframe>
 
-  <div id="progress-container">
-    <div style="margin-bottom: 6px;">Downloading... <span id="download-text">0%</span></div>
-    <div style="width: 100%; background: #444; border-radius: 6px; overflow: hidden;">
-      <div id="download-bar" style="height: 10px; background: #3b82f6; width: 0%; transition: width 0.2s;"></div>
-    </div>
-    <div style="margin: 12px 0 6px;">Extracting... <span id="extract-text">0%</span></div>
-    <div style="width: 100%; background: #444; border-radius: 6px; overflow: hidden;">
-      <div id="extract-bar" style="height: 10px; background: #10b981; width: 0%; transition: width 0.2s;"></div>
-    </div>
-  </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <script src="main.js"></script>
+  <!-- Fallback link in case embedding is blocked by the target site -->
+  <noscript>
+    <p style="color: white; text-align:center; margin-top: 20px;">
+      Open content: <a href="https://irv77.github.io/hd_fnaf/3/" target="_blank" rel="noopener noreferrer">https://irv77.github.io/hd_fnaf/3/</a>
+    </p>
+  </noscript>
 </body>
 </html>
