@@ -114,7 +114,7 @@
       background: linear-gradient(180deg, #330066 0%, #1a0033 100%);
       padding:0;
       height:100vh;
-      overflow-y:hidden;
+      overflow-y:auto;
       overflow-x:hidden;
       position:fixed;
       left:0; top:0;
@@ -124,37 +124,27 @@
       box-shadow: 5px 0 20px rgba(255, 102, 255, 0.1);
       display: flex;
       flex-direction: column;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
+      scrollbar-width: none; /* Firefox */
     }
     #sidebar::-webkit-scrollbar {
       width: 0;
-      height: 0;
       display: none;
-      opacity: 0;
     }
     #sidebar:hover { 
       width:250px;
       box-shadow: 5px 0 30px rgba(255, 102, 255, 0.3);
-      overflow-y:auto;
-      overflow-x:hidden;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(77, 0, 102, 0.6) transparent;
+      scrollbar-width: thin; /* Firefox */
     }
     #sidebar:hover::-webkit-scrollbar {
-      width: 4px;
+      width: 8px;
       display: block;
-      opacity: 1;
     }
     #sidebar:hover::-webkit-scrollbar-track {
-      background: transparent;
+      background: rgba(0,0,0,0.3);
     }
     #sidebar:hover::-webkit-scrollbar-thumb {
-      background: rgba(77, 0, 102, 0.6);
-      border-radius: 2px;
-    }
-    #sidebar:hover::-webkit-scrollbar-thumb:hover {
-      background: rgba(102, 0, 153, 0.8);
+      background: linear-gradient(180deg, var(--accent), var(--accent-dark));
+      border-radius: 4px;
     }
     
     /* Sidebar expand indicator */
@@ -558,6 +548,7 @@
       border:none;
       background:transparent;
       loading:lazy;
+      overflow:hidden;
     }
     
     /* Fullscreen iframe scaling */
@@ -855,7 +846,7 @@
 <body>
   
   <!-- Sidebar -->
-  <div id="sidebar" style="scrollbar-width: none;">
+  <div id="sidebar">
     <header onclick="goToHome()"><img src="assets/logo.png" alt="Logo"></header>
     <ul id="categoryList">
       <li onclick="filterCategory('Home')">Home</li>
@@ -890,7 +881,7 @@
           <h1 id="startName"></h1>
           <button id="startButton" onclick="startGame()">▶ Play</button>
         </div>
-        <iframe id="gameFrame" src=""></iframe>
+        <iframe id="gameFrame" src="" scrolling="no"></iframe>
       </div>
 
       <!-- All Games section (all games without categories) -->
@@ -2726,19 +2717,6 @@
     
     // Initial load
     document.addEventListener('DOMContentLoaded', () => {
-      // Handle sidebar scrollbar visibility
-      const sidebar = document.getElementById('sidebar');
-      if (sidebar) {
-        sidebar.addEventListener('mouseenter', () => {
-          sidebar.style.scrollbarWidth = 'thin';
-          sidebar.style.scrollbarColor = 'rgba(77, 0, 102, 0.6) transparent';
-        });
-        sidebar.addEventListener('mouseleave', () => {
-          sidebar.style.scrollbarWidth = 'none';
-          sidebar.style.scrollbarColor = 'transparent transparent';
-        });
-      }
-      
       document.querySelectorAll('.category').forEach(c => {
         const cat = c.getAttribute('data-category');
         if (offsets[cat] === undefined) offsets[cat] = 0;
