@@ -499,13 +499,29 @@
       justify-content:space-between;
       align-items:center;
       max-width:1400px;
-      margin:0 auto 0.5rem auto;
-      padding:.5rem;
+      margin:0 auto 1.2rem auto;
+      padding:1rem 1.5rem;
       font-size:1.1em;
-      gap: 1rem;
+      gap: 1.5rem;
+      background: linear-gradient(135deg, rgba(51, 0, 102, 0.4), rgba(26, 0, 51, 0.4));
+      border-radius: 15px;
+      border: 2px solid rgba(255, 102, 255, 0.25);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
     #controls.active {
       display: flex;
+      animation: slideDown 0.4s ease;
+    }
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     button {
       padding:.7rem 1.3rem;
@@ -2778,34 +2794,43 @@
     }
     
     // Category filtering (clicking sidebar)
-    function filterCategory(cat) {
+    function filterCategory(cat, updateURL = true) {
       const all = document.querySelectorAll('.category');
       const searchBar = document.getElementById('searchBar');
-      
+
       // Close game window if it's open
       if (gameViewActive) {
         closeGame();
       }
-      
+
+      // Update URL if requested
+      if (updateURL) {
+        if (cat === 'Home') {
+          window.history.pushState(null, '', '#/');
+        } else {
+          window.history.pushState(null, '', '#/category/' + encodeURIComponent(cat));
+        }
+      }
+
       // Clear search when changing categories
       if (searchBar) searchBar.value = '';
       hideSearchDropdown();
-      
+
       // Hide search and curated sections
       const searchResults = document.getElementById('searchResultsSection');
       if (searchResults) searchResults.style.display = 'none';
-      
+
       const curatedSection = document.getElementById('curatedGamesSection');
       if (curatedSection) curatedSection.style.display = 'none';
-      
+
       if (cat === 'Home') {
         currentViewMode = 'home';
         all.forEach(c => {
           const category = c.getAttribute('data-category');
-          
+
           // Skip special sections
           if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection' || category === 'All Games') return;
-          
+
           // Show recently played and all categories on home
           if (category === 'Recently Played') {
             const recentGrid = document.getElementById('recentlyPlayedGrid');
@@ -2818,7 +2843,7 @@
         currentViewMode = 'category';
         all.forEach(c => {
           const category = c.getAttribute('data-category');
-          
+
           // Show only the All Games section
           if (category === 'All Games') {
             c.style.display = 'block';
@@ -2830,15 +2855,15 @@
         currentViewMode = 'category';
         all.forEach(c => {
           const category = c.getAttribute('data-category');
-          
+
           // Skip special sections
           if (c.id === 'searchResultsSection' || c.id === 'curatedGamesSection' || category === 'All Games') return;
-          
+
           // Show only selected category (show all games at once)
           c.style.display = (category === cat) ? 'block' : 'none';
         });
       }
-      
+
       document.getElementById('content').scrollTop = 0;
       updateAllCategories();
     }
@@ -2846,9 +2871,10 @@
     // Routing & deep links
     function handleRouting() {
       const hash = window.location.hash;
+
       if (hash.startsWith('#/game/')) {
         const folder = decodeURIComponent(hash.replace('#/game/', ''));
-        
+
         // Check if game exists before trying to open
         if (!gameExists(folder)) {
           console.log('Game not found:', folder);
@@ -2856,7 +2882,7 @@
           window.location.hash = '';
           return;
         }
-        
+
         const cards = Array.from(document.querySelectorAll('.game-card'));
         const card = cards.find(c => c.getAttribute('data-folder') === folder);
         if (card) {
@@ -2865,9 +2891,13 @@
           const thumbSrc = thumbImg ? thumbImg.src : 'assets/logo.png';
           prepareGame(encodeURIComponent(folder), encodeURIComponent(gameName), thumbSrc);
         }
+      } else if (hash.startsWith('#/category/')) {
+        const category = decodeURIComponent(hash.replace('#/category/', ''));
+        closeGame();
+        filterCategory(category, false); // Don't update URL since we're already routing
       } else {
         closeGame();
-        filterCategory('Home');
+        filterCategory('Home', false); // Don't update URL since we're already routing
       }
     }
     
