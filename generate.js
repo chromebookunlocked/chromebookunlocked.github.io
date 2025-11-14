@@ -2246,44 +2246,73 @@ function generateGamePage(game) {
 
     /* Controls Bar */
     .controls {
-      max-width: 1400px;
-      margin: 1.5rem auto;
-      padding: 1rem 2rem;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
-      gap: 1.5rem;
-      background: linear-gradient(135deg, rgba(51, 0, 102, 0.4), rgba(26, 0, 51, 0.4));
-      border-radius: 15px;
-      border: 2px solid rgba(255, 102, 255, 0.25);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
     }
 
-    .game-title {
-      flex: 1;
-      text-align: center;
-      font-weight: 900;
-      font-size: clamp(1.2rem, 2.5vw, 1.6rem);
-      background: linear-gradient(135deg, #ff66ff, #ff99ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .category-badges {
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      padding: 0;
       display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      background: rgba(51, 0, 102, 0.6);
+      border: 1px solid rgba(255, 102, 255, 0.3);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      color: #fff;
     }
 
-    .category-badge {
-      background: rgba(255, 102, 255, 0.2);
+    .icon-btn:hover {
+      background: rgba(102, 0, 153, 0.8);
+      border-color: #ff66ff;
+      box-shadow: 0 4px 15px rgba(255, 102, 255, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .icon-btn:active {
+      transform: translateY(0);
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Category Tags */
+    .category-tags {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+      justify-content: center;
+    }
+
+    .category-tag {
+      background: rgba(255, 102, 255, 0.15);
       border: 1px solid rgba(255, 102, 255, 0.4);
-      padding: 0.3rem 0.8rem;
-      border-radius: 15px;
-      font-size: 0.85rem;
-      font-weight: 500;
+      padding: 0.5rem 1.2rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #ff99ff;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .category-tag:hover {
+      background: rgba(255, 102, 255, 0.3);
+      border-color: #ff66ff;
+      box-shadow: 0 4px 15px rgba(255, 102, 255, 0.3);
+      transform: translateY(-2px);
+      color: #fff;
     }
 
     button {
@@ -2533,13 +2562,22 @@ function generateGamePage(game) {
         padding: 1rem;
       }
 
-      .controls {
-        flex-wrap: wrap;
-        padding: 0.8rem 1rem;
+      .icon-btn {
+        width: 40px;
+        height: 40px;
       }
 
       .game-frame-wrapper {
         aspect-ratio: 4 / 3;
+      }
+
+      .category-tags {
+        gap: 0.5rem;
+      }
+
+      .category-tag {
+        font-size: 0.85rem;
+        padding: 0.4rem 1rem;
       }
     }
   </style>
@@ -2557,20 +2595,18 @@ function generateGamePage(game) {
     </div>
   </header>
 
-  <!-- Controls Bar -->
-  <div class="controls">
-    <button onclick="window.location.href='index.html'">← Browse Games</button>
-    <div style="flex: 1; text-align: center;">
-      <div class="game-title">${game.name}</div>
-      <div class="category-badges">
-        ${game.categories.map(cat => `<span class="category-badge">${cat}</span>`).join('')}
-      </div>
-    </div>
-    <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
-  </div>
-
   <!-- Game Viewer -->
   <div class="game-container">
+    <!-- Controls Bar -->
+    <div class="controls">
+      <button class="icon-btn" onclick="window.location.href='index.html'" title="Browse Games" aria-label="Browse Games">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+      </button>
+      <button class="icon-btn" onclick="toggleFullscreen()" title="Fullscreen" aria-label="Toggle Fullscreen">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+      </button>
+    </div>
+
     <div class="game-frame-wrapper" id="gameWrapper">
       <div class="play-overlay" id="playOverlay">
         <img src="games/${game.folder}/${thumb}" alt="${game.name}">
@@ -2584,6 +2620,11 @@ function generateGamePage(game) {
         allow="fullscreen; autoplay; encrypted-media"
         allowfullscreen>
       </iframe>
+    </div>
+
+    <!-- Category Tags -->
+    <div class="category-tags">
+      ${game.categories.map(cat => `<a href="index.html#/category/${encodeURIComponent(cat)}" class="category-tag">${cat}</a>`).join('')}
     </div>
   </div>
 
