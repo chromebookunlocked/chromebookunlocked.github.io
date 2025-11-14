@@ -107,6 +107,36 @@
       scrollbar-width: thin;
       scrollbar-color: rgba(102, 0, 153, 0.8) rgba(0, 0, 0, 0.3);
     }
+
+    /* Accessibility: Skip link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      text-decoration: none;
+      font-weight: bold;
+      z-index: 10000;
+      border-radius: 0 0 4px 0;
+    }
+    .skip-link:focus {
+      top: 0;
+    }
+
+    /* Screen reader only text */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
     
     /* Sidebar */
     #sidebar {
@@ -954,34 +984,40 @@
 </head>
 <body>
   
+  <!-- Skip to main content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
   <!-- Sidebar -->
-  <div id="sidebar">
-    <header onclick="goToHome()"><img src="assets/logo.png" alt="Logo"></header>
-    <ul id="categoryList">
-      <li onclick="filterCategory('Home')">Home</li>
-      <li onclick="filterCategory('All Games')">All Games</li>
-      <li onclick="filterCategory('Action')">Action</li><li onclick="filterCategory('Shooter')">Shooter</li><li onclick="filterCategory('Strategy')">Strategy</li><li onclick="filterCategory('Simulation')">Simulation</li><li onclick="filterCategory('Tower Defence')">Tower Defence</li><li onclick="filterCategory('Horror')">Horror</li><li onclick="filterCategory('Puzzle')">Puzzle</li><li onclick="filterCategory('Uncategorized')">Uncategorized</li><li onclick="filterCategory('Basketball')">Basketball</li><li onclick="filterCategory('Casual')">Casual</li><li onclick="filterCategory('Driving')">Driving</li><li onclick="filterCategory('Clicker')">Clicker</li><li onclick="filterCategory('Psychological')">Psychological</li><li onclick="filterCategory('Arcade')">Arcade</li><li onclick="filterCategory('Clickers')">Clickers</li><li onclick="filterCategory('Sniper')">Sniper</li><li onclick="filterCategory('Adventure')">Adventure</li><li onclick="filterCategory('Psyhological')">Psyhological</li><li onclick="filterCategory('2 Player')">2 Player</li><li onclick="filterCategory('Platformer')">Platformer</li>
+  <nav id="sidebar" role="navigation" aria-label="Game categories">
+    <header onclick="goToHome()" role="button" tabindex="0" onkeypress="if(event.key==='Enter')goToHome()" aria-label="Go to home page">
+      <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo">
+    </header>
+    <ul id="categoryList" role="menu">
+      <li role="menuitem" tabindex="0" onclick="filterCategory('Home')" onkeypress="if(event.key==='Enter')filterCategory('Home')">Home</li>
+      <li role="menuitem" tabindex="0" onclick="filterCategory('All Games')" onkeypress="if(event.key==='Enter')filterCategory('All Games')">All Games</li>
+      <li role="menuitem" tabindex="0" onclick="filterCategory('Action')" onkeypress="if(event.key==='Enter')filterCategory('Action')">Action</li><li role="menuitem" tabindex="0" onclick="filterCategory('Shooter')" onkeypress="if(event.key==='Enter')filterCategory('Shooter')">Shooter</li><li role="menuitem" tabindex="0" onclick="filterCategory('Strategy')" onkeypress="if(event.key==='Enter')filterCategory('Strategy')">Strategy</li><li role="menuitem" tabindex="0" onclick="filterCategory('Simulation')" onkeypress="if(event.key==='Enter')filterCategory('Simulation')">Simulation</li><li role="menuitem" tabindex="0" onclick="filterCategory('Tower Defence')" onkeypress="if(event.key==='Enter')filterCategory('Tower Defence')">Tower Defence</li><li role="menuitem" tabindex="0" onclick="filterCategory('Horror')" onkeypress="if(event.key==='Enter')filterCategory('Horror')">Horror</li><li role="menuitem" tabindex="0" onclick="filterCategory('Puzzle')" onkeypress="if(event.key==='Enter')filterCategory('Puzzle')">Puzzle</li><li role="menuitem" tabindex="0" onclick="filterCategory('Uncategorized')" onkeypress="if(event.key==='Enter')filterCategory('Uncategorized')">Uncategorized</li><li role="menuitem" tabindex="0" onclick="filterCategory('Basketball')" onkeypress="if(event.key==='Enter')filterCategory('Basketball')">Basketball</li><li role="menuitem" tabindex="0" onclick="filterCategory('Casual')" onkeypress="if(event.key==='Enter')filterCategory('Casual')">Casual</li><li role="menuitem" tabindex="0" onclick="filterCategory('Driving')" onkeypress="if(event.key==='Enter')filterCategory('Driving')">Driving</li><li role="menuitem" tabindex="0" onclick="filterCategory('Clicker')" onkeypress="if(event.key==='Enter')filterCategory('Clicker')">Clicker</li><li role="menuitem" tabindex="0" onclick="filterCategory('Psychological')" onkeypress="if(event.key==='Enter')filterCategory('Psychological')">Psychological</li><li role="menuitem" tabindex="0" onclick="filterCategory('Arcade')" onkeypress="if(event.key==='Enter')filterCategory('Arcade')">Arcade</li><li role="menuitem" tabindex="0" onclick="filterCategory('Clickers')" onkeypress="if(event.key==='Enter')filterCategory('Clickers')">Clickers</li><li role="menuitem" tabindex="0" onclick="filterCategory('Sniper')" onkeypress="if(event.key==='Enter')filterCategory('Sniper')">Sniper</li><li role="menuitem" tabindex="0" onclick="filterCategory('Adventure')" onkeypress="if(event.key==='Enter')filterCategory('Adventure')">Adventure</li><li role="menuitem" tabindex="0" onclick="filterCategory('Psyhological')" onkeypress="if(event.key==='Enter')filterCategory('Psyhological')">Psyhological</li><li role="menuitem" tabindex="0" onclick="filterCategory('2 Player')" onkeypress="if(event.key==='Enter')filterCategory('2 Player')">2 Player</li><li role="menuitem" tabindex="0" onclick="filterCategory('Platformer')" onkeypress="if(event.key==='Enter')filterCategory('Platformer')">Platformer</li>
     </ul>
-  </div>
-  <div id="sidebarIndicator"></div>
+  </nav>
+  <div id="sidebarIndicator" aria-hidden="true"></div>
 
   <!-- Content -->
-  <div id="content">
+  <div id="content" role="main">
     <!-- Top Header with Search -->
-    <div id="topHeader">
-      <h1 onclick="goToHome()">Chromebook Unlocked Games</h1>
-      <div id="searchContainer">
-        <span id="searchIcon">🔍</span>
-        <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
-        <div id="searchDropdown"></div>
+    <header id="topHeader">
+      <h1 onclick="goToHome()" role="button" tabindex="0" onkeypress="if(event.key==='Enter')goToHome()" style="cursor: pointer;">Chromebook Unlocked Games</h1>
+      <div id="searchContainer" role="search">
+        <label for="searchBar" class="sr-only">Search games</label>
+        <span id="searchIcon" aria-hidden="true">🔍</span>
+        <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)" aria-label="Search for games" autocomplete="off">
+        <div id="searchDropdown" role="listbox" aria-label="Search results"></div>
       </div>
-    </div>
+    </header>
 
-    <div class="content-wrapper">
+    <div class="content-wrapper" id="main-content">
       <div id="controls">
-        <button id="backBtn" onclick="closeGame()">← Back</button>
-        <span id="gameTitle"></span>
-        <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+        <button id="backBtn" onclick="closeGame()" aria-label="Go back to game list">← Back</button>
+        <span id="gameTitle" role="heading" aria-level="2"></span>
+        <button id="fullscreenBtn" onclick="toggleFullscreen()" aria-label="Toggle fullscreen mode">⛶ Fullscreen</button>
       </div>
       
       <div class="viewer-wrapper">
