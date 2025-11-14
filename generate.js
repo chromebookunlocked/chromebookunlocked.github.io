@@ -2156,7 +2156,7 @@ function generateGamePage(game) {
       min-height: 100vh;
     }
 
-    /* Top Header with Logo and Search */
+    /* Top Header with Logo */
     header {
       background: linear-gradient(135deg, #330066 0%, #1a0033 100%);
       backdrop-filter: blur(10px);
@@ -2168,9 +2168,6 @@ function generateGamePage(game) {
       z-index: 1000;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 1.5rem;
-      flex-wrap: wrap;
     }
 
     .header-left {
@@ -2206,51 +2203,17 @@ function generateGamePage(game) {
       transform: scale(1.05);
     }
 
-    .search-container {
-      flex: 1;
-      max-width: 400px;
-      min-width: 200px;
-      position: relative;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 0.7rem 1rem 0.7rem 2.5rem;
-      background: rgba(51, 0, 102, 0.4);
-      border: 2px solid rgba(255, 102, 255, 0.3);
-      border-radius: 25px;
-      color: #fff;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.95rem;
-      outline: none;
-      transition: all 0.3s ease;
-    }
-
-    .search-input:focus {
-      border-color: #ff66ff;
-      box-shadow: 0 0 15px rgba(255, 102, 255, 0.5);
-      background: rgba(51, 0, 102, 0.6);
-    }
-
-    .search-input::placeholder {
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.2rem;
-    }
-
     /* Controls Bar */
     .controls {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      right: 0.75rem;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 0.75rem;
+      z-index: 100;
+      pointer-events: none;
     }
 
     .icon-btn {
@@ -2260,24 +2223,25 @@ function generateGamePage(game) {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(51, 0, 102, 0.6);
+      background: rgba(13, 0, 26, 0.9);
       border: 1px solid rgba(255, 102, 255, 0.3);
       border-radius: 10px;
       cursor: pointer;
       transition: all 0.3s ease;
       backdrop-filter: blur(10px);
       color: #fff;
+      pointer-events: auto;
     }
 
     .icon-btn:hover {
-      background: rgba(102, 0, 153, 0.8);
+      background: rgba(51, 0, 102, 0.95);
       border-color: #ff66ff;
-      box-shadow: 0 4px 15px rgba(255, 102, 255, 0.4);
-      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 102, 255, 0.5);
+      transform: scale(1.05);
     }
 
     .icon-btn:active {
-      transform: translateY(0);
+      transform: scale(0.95);
     }
 
     .icon-btn svg {
@@ -2360,7 +2324,7 @@ function generateGamePage(game) {
     /* Game Viewer */
     .game-container {
       max-width: 1400px;
-      margin: 0 auto 2rem auto;
+      margin: 1.5rem auto 2rem auto;
       padding: 0 1.5rem;
     }
 
@@ -2372,6 +2336,7 @@ function generateGamePage(game) {
       overflow: hidden;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
       border: 2px solid rgba(255, 102, 255, 0.3);
+      background: #000;
     }
 
     iframe {
@@ -2382,6 +2347,7 @@ function generateGamePage(game) {
       height: 100%;
       border: none;
       display: none;
+      object-fit: contain;
     }
 
     iframe.active {
@@ -2479,7 +2445,7 @@ function generateGamePage(game) {
 
     .thumb-container {
       width: 100%;
-      aspect-ratio: 3 / 2;
+      aspect-ratio: 1 / 1;
       overflow: hidden;
       position: relative;
       background: linear-gradient(135deg, #1a0033, #0d001a);
@@ -2530,30 +2496,57 @@ function generateGamePage(game) {
 
     /* Fullscreen styles */
     .game-frame-wrapper:-webkit-full-screen {
-      max-width: 100vw;
-      width: 100vw;
-      height: 100vh;
-      aspect-ratio: auto;
-      border-radius: 0;
-      border: none;
+      max-width: 100vw !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      aspect-ratio: auto !important;
+      border-radius: 0 !important;
+      border: none !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .game-frame-wrapper:-webkit-full-screen iframe {
+      width: 100vw !important;
+      height: 100vh !important;
+      object-fit: contain;
     }
 
     .game-frame-wrapper:-moz-full-screen {
-      max-width: 100vw;
-      width: 100vw;
-      height: 100vh;
-      aspect-ratio: auto;
-      border-radius: 0;
-      border: none;
+      max-width: 100vw !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      aspect-ratio: auto !important;
+      border-radius: 0 !important;
+      border: none !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .game-frame-wrapper:-moz-full-screen iframe {
+      width: 100vw !important;
+      height: 100vh !important;
+      object-fit: contain;
     }
 
     .game-frame-wrapper:fullscreen {
-      max-width: 100vw;
-      width: 100vw;
-      height: 100vh;
-      aspect-ratio: auto;
-      border-radius: 0;
-      border: none;
+      max-width: 100vw !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      aspect-ratio: auto !important;
+      border-radius: 0 !important;
+      border: none !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .game-frame-wrapper:fullscreen iframe {
+      width: 100vw !important;
+      height: 100vh !important;
+      object-fit: contain;
     }
 
     /* Responsive */
@@ -2583,31 +2576,27 @@ function generateGamePage(game) {
   </style>
 </head>
 <body>
-  <!-- Header with Logo and Search -->
+  <!-- Header with Logo -->
   <header>
     <div class="header-left">
       <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="logo" onclick="window.location.href='index.html'">
       <h1 onclick="window.location.href='index.html'">Chromebook Unlocked Games</h1>
     </div>
-    <div class="search-container">
-      <span class="search-icon">🔍</span>
-      <input type="text" class="search-input" id="searchInput" placeholder="Search games..." onkeyup="handleSearch(event)">
-    </div>
   </header>
 
   <!-- Game Viewer -->
   <div class="game-container">
-    <!-- Controls Bar -->
-    <div class="controls">
-      <button class="icon-btn" onclick="window.location.href='index.html'" title="Browse Games" aria-label="Browse Games">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-      </button>
-      <button class="icon-btn" onclick="toggleFullscreen()" title="Fullscreen" aria-label="Toggle Fullscreen">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
-      </button>
-    </div>
-
     <div class="game-frame-wrapper" id="gameWrapper">
+      <!-- Controls Bar (sticky to top of game) -->
+      <div class="controls">
+        <button class="icon-btn" onclick="window.location.href='index.html'" title="Back to Games" aria-label="Back to Games">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <button class="icon-btn" onclick="toggleFullscreen()" title="Fullscreen" aria-label="Toggle Fullscreen">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+        </button>
+      </div>
+
       <div class="play-overlay" id="playOverlay">
         <img src="games/${game.folder}/${thumb}" alt="${game.name}">
         <h2>${game.name}</h2>
@@ -2678,26 +2667,6 @@ function generateGamePage(game) {
       }
     }
 
-    function handleSearch(event) {
-      if (event.key === 'Enter') {
-        const query = document.getElementById('searchInput').value;
-        window.location.href = 'index.html#search=' + encodeURIComponent(query);
-      }
-    }
-
-    // Update fullscreen button text
-    document.addEventListener('fullscreenchange', updateFullscreenButton);
-    document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
-    document.addEventListener('mozfullscreenchange', updateFullscreenButton);
-
-    function updateFullscreenButton() {
-      const btn = document.querySelector('.controls button:last-child');
-      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
-        btn.textContent = '✕ Exit Fullscreen';
-      } else {
-        btn.textContent = '⛶ Fullscreen';
-      }
-    }
   </script>
 </body>
 </html>`;
