@@ -2055,6 +2055,28 @@ function generateGamePage(game) {
   const gameUrl = `games/${game.folder}/index.html`;
   const categoryList = game.categories.join(', ');
 
+  // Get similar games for "You Might Also Like" section
+  const sameCategory = games.filter(g =>
+    g.folder !== game.folder &&
+    g.categories.some(cat => game.categories.includes(cat))
+  );
+  const otherGames = games.filter(g => g.folder !== game.folder);
+
+  // Shuffle and mix
+  const shuffled = [...sameCategory.slice(0, 14), ...otherGames.slice(0, 21)]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 35); // 7 rows x 5 columns = 35 games
+
+  const recommendedGamesHTML = shuffled.map(g => {
+    const gThumb = chooseThumb(g);
+    return `<a href="${g.folder}.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/${g.folder}/${gThumb}" alt="${g.name}" loading="lazy">
+      </div>
+      <div class="card-title">${g.name}</div>
+    </a>`;
+  }).join('');
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2132,20 +2154,23 @@ function generateGamePage(game) {
       background-attachment: fixed;
       color: #fff;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
     }
 
+    /* Top Header with Logo and Search */
     header {
-      background: rgba(13, 0, 26, 0.8);
+      background: linear-gradient(135deg, #330066 0%, #1a0033 100%);
       backdrop-filter: blur(10px);
       padding: 1rem 2rem;
       border-bottom: 2px solid rgba(255, 102, 255, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 1.5rem;
       flex-wrap: wrap;
-      gap: 1rem;
     }
 
     .header-left {
@@ -2154,34 +2179,99 @@ function generateGamePage(game) {
       gap: 1.5rem;
     }
 
-    .back-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: #ff66ff;
-      text-decoration: none;
-      font-weight: 500;
-      padding: 0.5rem 1rem;
-      border: 2px solid #ff66ff;
-      border-radius: 8px;
-      transition: all 0.3s ease;
+    .logo {
+      height: 50px;
+      width: auto;
+      filter: drop-shadow(0 0 10px #ff66ff);
+      cursor: pointer;
+      transition: transform 0.3s ease;
     }
 
-    .back-btn:hover {
-      background: rgba(255, 102, 255, 0.2);
-      transform: translateX(-4px);
+    .logo:hover {
+      transform: scale(1.1);
     }
 
     h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
+      font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+      font-weight: 900;
+      background: linear-gradient(135deg, #ff66ff, #ff99ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    h1:hover {
+      transform: scale(1.05);
+    }
+
+    .search-container {
+      flex: 1;
+      max-width: 400px;
+      min-width: 200px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.7rem 1rem 0.7rem 2.5rem;
+      background: rgba(51, 0, 102, 0.4);
+      border: 2px solid rgba(255, 102, 255, 0.3);
+      border-radius: 25px;
+      color: #fff;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+      border-color: #ff66ff;
+      box-shadow: 0 0 15px rgba(255, 102, 255, 0.5);
+      background: rgba(51, 0, 102, 0.6);
+    }
+
+    .search-input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+    }
+
+    /* Controls Bar */
+    .controls {
+      max-width: 1400px;
+      margin: 1.5rem auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      background: linear-gradient(135deg, rgba(51, 0, 102, 0.4), rgba(26, 0, 51, 0.4));
+      border-radius: 15px;
+      border: 2px solid rgba(255, 102, 255, 0.25);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .game-title {
+      flex: 1;
+      text-align: center;
+      font-weight: 900;
+      font-size: clamp(1.2rem, 2.5vw, 1.6rem);
       background: linear-gradient(135deg, #ff66ff, #ff99ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
-    .game-info {
+    .category-badges {
       display: flex;
       gap: 0.5rem;
       flex-wrap: wrap;
@@ -2196,46 +2286,63 @@ function generateGamePage(game) {
       font-weight: 500;
     }
 
-    .fullscreen-btn {
-      background: linear-gradient(135deg, #ff66ff, #cc00ff);
+    button {
+      padding: 0.8rem 1.6rem;
       border: none;
-      color: white;
-      padding: 0.7rem 1.5rem;
-      border-radius: 8px;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 600;
+      border-radius: 12px;
       cursor: pointer;
+      font-size: 1em;
+      background: linear-gradient(135deg, #ff66ff, #cc00ff);
+      color: #fff;
+      font-weight: 700;
       transition: all 0.3s ease;
-      font-size: 0.95rem;
+      font-family: 'Orbitron', sans-serif;
+      box-shadow: 0 4px 15px rgba(255, 102, 255, 0.3);
+      border: 2px solid transparent;
+      position: relative;
+      overflow: hidden;
     }
 
-    .fullscreen-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(255, 102, 255, 0.4);
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
     }
 
+    button:hover::before {
+      left: 100%;
+    }
+
+    button:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 25px rgba(255, 102, 255, 0.6);
+      border-color: rgba(255, 102, 255, 0.5);
+    }
+
+    button:active {
+      transform: translateY(-1px) scale(0.98);
+    }
+
+    /* Game Viewer */
     .game-container {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 1rem;
+      max-width: 1400px;
+      margin: 0 auto 2rem auto;
+      padding: 0 1.5rem;
     }
 
     .game-frame-wrapper {
-      width: 100%;
-      max-width: 1400px;
       position: relative;
-      border-radius: 12px;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 15px;
       overflow: hidden;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
       border: 2px solid rgba(255, 102, 255, 0.3);
-    }
-
-    .game-frame-wrapper::before {
-      content: '';
-      display: block;
-      padding-top: 66.67%; /* 3:2 aspect ratio */
     }
 
     iframe {
@@ -2245,6 +2352,127 @@ function generateGamePage(game) {
       width: 100%;
       height: 100%;
       border: none;
+      display: none;
+    }
+
+    iframe.active {
+      display: block;
+    }
+
+    /* Play Overlay */
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #330066 0%, #1c0033 50%, #0d001a 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 1.5rem;
+      z-index: 10;
+      transition: opacity 0.5s ease;
+    }
+
+    .play-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .play-overlay img {
+      width: clamp(200px, 40vw, 350px);
+      max-width: 80%;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(255, 102, 255, 0.4);
+      border: 2px solid rgba(255, 102, 255, 0.3);
+    }
+
+    .play-overlay h2 {
+      margin: 0;
+      font-size: clamp(1.5rem, 2.5vw, 3rem);
+      color: #fff;
+      text-shadow: 0 0 20px #ff66ff;
+      font-weight: 900;
+    }
+
+    .play-btn {
+      padding: 1.2rem 3rem;
+      font-size: clamp(1.2rem, 2vw, 1.6rem);
+      font-weight: 900;
+      letter-spacing: 1px;
+      box-shadow: 0 10px 30px rgba(255, 102, 255, 0.5);
+    }
+
+    .play-btn:hover {
+      box-shadow: 0 12px 40px rgba(255, 102, 255, 0.7);
+    }
+
+    /* Recommendations Section */
+    .recommendations {
+      max-width: 1400px;
+      margin: 3rem auto 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .recommendations h2 {
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #ff66ff, #ff99ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 900;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 15vw, 220px), 1fr));
+      gap: clamp(0.8rem, 1.5vw, 1.2rem);
+    }
+
+    .game-card {
+      background: linear-gradient(135deg, rgba(77, 0, 102, 0.3), rgba(51, 0, 102, 0.3));
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 2px solid rgba(255, 102, 255, 0.2);
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .game-card:hover {
+      transform: translateY(-8px) scale(1.03);
+      box-shadow: 0 12px 35px rgba(255, 102, 255, 0.5);
+      border-color: rgba(255, 102, 255, 0.6);
+      background: linear-gradient(135deg, rgba(102, 0, 153, 0.5), rgba(77, 0, 102, 0.5));
+    }
+
+    .thumb-container {
+      width: 100%;
+      aspect-ratio: 3 / 2;
+      overflow: hidden;
+      position: relative;
+      background: linear-gradient(135deg, #1a0033, #0d001a);
+    }
+
+    .thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .game-card:hover .thumb {
+      transform: scale(1.1);
+    }
+
+    .card-title {
+      padding: 0.8rem;
+      font-size: clamp(0.85rem, 1.2vw, 1rem);
+      font-weight: 600;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(26, 0, 51, 0.8), rgba(13, 0, 26, 0.8));
     }
 
     footer {
@@ -2253,6 +2481,7 @@ function generateGamePage(game) {
       padding: 1.5rem 2rem;
       border-top: 2px solid rgba(255, 102, 255, 0.3);
       text-align: center;
+      margin-top: 3rem;
     }
 
     footer p {
@@ -2272,39 +2501,30 @@ function generateGamePage(game) {
 
     /* Fullscreen styles */
     .game-frame-wrapper:-webkit-full-screen {
+      max-width: 100vw;
       width: 100vw;
       height: 100vh;
-      max-width: none;
+      aspect-ratio: auto;
       border-radius: 0;
       border: none;
     }
 
     .game-frame-wrapper:-moz-full-screen {
+      max-width: 100vw;
       width: 100vw;
       height: 100vh;
-      max-width: none;
+      aspect-ratio: auto;
       border-radius: 0;
       border: none;
     }
 
     .game-frame-wrapper:fullscreen {
+      max-width: 100vw;
       width: 100vw;
       height: 100vh;
-      max-width: none;
+      aspect-ratio: auto;
       border-radius: 0;
       border: none;
-    }
-
-    .game-frame-wrapper:-webkit-full-screen::before {
-      display: none;
-    }
-
-    .game-frame-wrapper:-moz-full-screen::before {
-      display: none;
-    }
-
-    .game-frame-wrapper:fullscreen::before {
-      display: none;
     }
 
     /* Responsive */
@@ -2313,52 +2533,65 @@ function generateGamePage(game) {
         padding: 1rem;
       }
 
-      h1 {
-        font-size: 1.3rem;
+      .controls {
+        flex-wrap: wrap;
+        padding: 0.8rem 1rem;
       }
 
-      .back-btn {
-        font-size: 0.9rem;
-        padding: 0.4rem 0.8rem;
-      }
-
-      .fullscreen-btn {
-        padding: 0.5rem 1rem;
-        font-size: 0.85rem;
-      }
-
-      .game-frame-wrapper::before {
-        padding-top: 75%; /* 4:3 aspect ratio on mobile */
+      .game-frame-wrapper {
+        aspect-ratio: 4 / 3;
       }
     }
   </style>
 </head>
 <body>
+  <!-- Header with Logo and Search -->
   <header>
     <div class="header-left">
-      <a href="index.html" class="back-btn">
-        <span>←</span>
-        <span>Back to Games</span>
-      </a>
-      <h1>${game.name}</h1>
+      <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="logo" onclick="window.location.href='index.html'">
+      <h1 onclick="window.location.href='index.html'">Chromebook Unlocked Games</h1>
     </div>
-    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-      <div class="game-info">
-        ${game.categories.map(cat => `<span class="category-badge">${cat}</span>`).join('')}
-      </div>
-      <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    <div class="search-container">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search games..." onkeyup="handleSearch(event)">
     </div>
   </header>
 
+  <!-- Controls Bar -->
+  <div class="controls">
+    <button onclick="window.location.href='index.html'">← Browse Games</button>
+    <div style="flex: 1; text-align: center;">
+      <div class="game-title">${game.name}</div>
+      <div class="category-badges">
+        ${game.categories.map(cat => `<span class="category-badge">${cat}</span>`).join('')}
+      </div>
+    </div>
+    <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
+  </div>
+
+  <!-- Game Viewer -->
   <div class="game-container">
     <div class="game-frame-wrapper" id="gameWrapper">
+      <div class="play-overlay" id="playOverlay">
+        <img src="games/${game.folder}/${thumb}" alt="${game.name}">
+        <h2>${game.name}</h2>
+        <button class="play-btn" onclick="startGame()">▶ Play</button>
+      </div>
       <iframe
-        src="${gameUrl}"
+        id="gameFrame"
+        src=""
         title="Play ${game.name} Unblocked"
         allow="fullscreen; autoplay; encrypted-media"
-        allowfullscreen
-        loading="eager">
+        allowfullscreen>
       </iframe>
+    </div>
+  </div>
+
+  <!-- You Might Also Like Section -->
+  <div class="recommendations">
+    <h2>You Might Also Like</h2>
+    <div class="grid">
+      ${recommendedGamesHTML}
     </div>
   </div>
 
@@ -2371,6 +2604,15 @@ function generateGamePage(game) {
   </footer>
 
   <script>
+    function startGame() {
+      const overlay = document.getElementById('playOverlay');
+      const frame = document.getElementById('gameFrame');
+
+      frame.src = '${gameUrl}';
+      frame.classList.add('active');
+      overlay.classList.add('hidden');
+    }
+
     function toggleFullscreen() {
       const wrapper = document.getElementById('gameWrapper');
 
@@ -2395,13 +2637,20 @@ function generateGamePage(game) {
       }
     }
 
-    // Update button text based on fullscreen state
+    function handleSearch(event) {
+      if (event.key === 'Enter') {
+        const query = document.getElementById('searchInput').value;
+        window.location.href = 'index.html#search=' + encodeURIComponent(query);
+      }
+    }
+
+    // Update fullscreen button text
     document.addEventListener('fullscreenchange', updateFullscreenButton);
     document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
     document.addEventListener('mozfullscreenchange', updateFullscreenButton);
 
     function updateFullscreenButton() {
-      const btn = document.querySelector('.fullscreen-btn');
+      const btn = document.querySelector('.controls button:last-child');
       if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
         btn.textContent = '✕ Exit Fullscreen';
       } else {
@@ -2412,8 +2661,6 @@ function generateGamePage(game) {
 </body>
 </html>`;
 }
-
-// Function to generate sitemap.xml
 function generateSitemap(games) {
   const today = new Date().toISOString().split('T')[0];
   const baseUrl = 'https://chromebookunlocked.github.io';
