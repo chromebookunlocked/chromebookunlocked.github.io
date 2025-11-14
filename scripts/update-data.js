@@ -11,9 +11,7 @@ if (!fs.existsSync(dataDir)) {
 function generateGameData(folderName) {
   return {
     name: folderName,
-    category: "Uncategorized",
-    impressions: 0,
-    opens: 0
+    category: "Uncategorized"
   };
 }
 

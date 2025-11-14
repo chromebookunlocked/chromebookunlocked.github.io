@@ -5,43 +5,65 @@ const dataDir = path.join(__dirname, "data");
 const gamesDir = path.join(__dirname, "games");
 const outputDir = path.join(__dirname, "dist");
 const outputFile = path.join(outputDir, "index.html");
+const templatesDir = path.join(__dirname, "templates");
 
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
 
-// Load games with validation
+// Load CSS templates
+const mainStyles = fs.readFileSync(path.join(templatesDir, "main-styles.css"), "utf8");
+const gamePageStyles = fs.readFileSync(path.join(templatesDir, "game-page-styles.css"), "utf8");
+
+// Load games with validation and error handling
 const games = fs.readdirSync(dataDir)
   .filter(f => f.endsWith(".json"))
   .map(f => {
-    const json = JSON.parse(fs.readFileSync(path.join(dataDir, f)));
-    // Support multiple categories (comma-separated string or array)
-    let gameCategories = json.category || json.categories || "Uncategorized";
-    if (typeof gameCategories === 'string') {
-      gameCategories = gameCategories.split(',').map(c => c.trim());
-    }
-    if (!Array.isArray(gameCategories)) {
-      gameCategories = [gameCategories];
-    }
-    
-    const folder = json.folder || f.replace(".json", "");
-    
-    // Validate game folder and index.html exist
-    const gamePath = path.join(gamesDir, folder);
-    const indexPath = path.join(gamePath, "index.html");
-    
-    if (!fs.existsSync(gamePath) || !fs.existsSync(indexPath)) {
-      console.log(`⚠️  Skipping game "${json.name || folder}" - missing folder or index.html`);
+    try {
+      const filePath = path.join(dataDir, f);
+      const json = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+      // Support multiple categories (comma-separated string or array)
+      let gameCategories = json.category || json.categories || "Uncategorized";
+      if (typeof gameCategories === 'string') {
+        gameCategories = gameCategories.split(',').map(c => c.trim());
+      }
+      if (!Array.isArray(gameCategories)) {
+        gameCategories = [gameCategories];
+      }
+
+      const folder = json.folder || f.replace(".json", "");
+
+      // Validate game folder and index.html exist
+      const gamePath = path.join(gamesDir, folder);
+      const indexPath = path.join(gamePath, "index.html");
+
+      if (!fs.existsSync(gamePath)) {
+        console.log(`⚠️  Skipping game "${json.name || folder}" - folder not found at: ${gamePath}`);
+        return null;
+      }
+
+      if (!fs.existsSync(indexPath)) {
+        console.log(`⚠️  Skipping game "${json.name || folder}" - index.html not found`);
+        return null;
+      }
+
+      return {
+        folder: folder,
+        name: json.name || f.replace(".json", ""),
+        categories: gameCategories, // Array of categories
+        thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.png", "thumbnail.jpg"],
+        dateAdded: json.dateAdded || null // Support for "Newly Added" sorting
+      };
+    } catch (error) {
+      console.error(`❌ Error processing ${f}: ${error.message}`);
       return null;
     }
-    
-    return {
-      folder: folder,
-      name: json.name || f.replace(".json", ""),
-      categories: gameCategories, // Array of categories
-      thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.png", "thumbnail.jpg"],
-      dateAdded: json.dateAdded || null // Support for "Newly Added" sorting
-    };
   })
   .filter(game => game !== null); // Remove invalid games
+
+if (games.length === 0) {
+  console.error("❌ No valid games found! Build aborted.");
+  process.exit(1);
+}
 
 // Group into categories (games can appear in multiple categories)
 const categories = {};
@@ -78,12 +100,12 @@ function generateGameCard(game, idx) {
 // Sidebar categories - exclude "Newly Added" and "Recently Played"
 const sidebarCategories = Object.keys(categories)
   .filter(cat => cat !== "Recently Played" && cat !== "Newly Added")
-  .map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`)
+  .map(cat => `<li role="menuitem" tabindex="0" onclick="filterCategory('${cat}')" onkeypress="if(event.key==='Enter')filterCategory('${cat}')">${cat}</li>`)
   .join("");
 
 // Add "Newly Added" at the top if it exists
-const newlyAddedItem = categories['Newly Added'] ? 
-  `<li onclick="filterCategory('Newly Added')" style="border-bottom: 1px solid rgba(255,102,255,0.3); padding-bottom: 0.8rem; margin-bottom: 0.8rem;">✨ Newly Added</li>` : '';
+const newlyAddedItem = categories['Newly Added'] ?
+  `<li role="menuitem" tabindex="0" onclick="filterCategory('Newly Added')" onkeypress="if(event.key==='Enter')filterCategory('Newly Added')" style="border-bottom: 1px solid rgba(255,102,255,0.3); padding-bottom: 0.8rem; margin-bottom: 0.8rem;">✨ Newly Added</li>` : '';
 
 const finalSidebarCategories = newlyAddedItem + sidebarCategories;
 
@@ -196,6 +218,36 @@ const html = `<!DOCTYPE html>
     * {
       scrollbar-width: thin;
       scrollbar-color: rgba(102, 0, 153, 0.8) rgba(0, 0, 0, 0.3);
+    }
+
+    /* Accessibility: Skip link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      text-decoration: none;
+      font-weight: bold;
+      z-index: 10000;
+      border-radius: 0 0 4px 0;
+    }
+    .skip-link:focus {
+      top: 0;
+    }
+
+    /* Screen reader only text */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
     }
     
     /* Sidebar */
@@ -1044,34 +1096,40 @@ const html = `<!DOCTYPE html>
 </head>
 <body>
   
+  <!-- Skip to main content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
   <!-- Sidebar -->
-  <div id="sidebar">
-    <header onclick="goToHome()"><img src="assets/logo.png" alt="Logo"></header>
-    <ul id="categoryList">
-      <li onclick="filterCategory('Home')">Home</li>
-      <li onclick="filterCategory('All Games')">All Games</li>
+  <nav id="sidebar" role="navigation" aria-label="Game categories">
+    <header onclick="goToHome()" role="button" tabindex="0" onkeypress="if(event.key==='Enter')goToHome()" aria-label="Go to home page">
+      <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo">
+    </header>
+    <ul id="categoryList" role="menu">
+      <li role="menuitem" tabindex="0" onclick="filterCategory('Home')" onkeypress="if(event.key==='Enter')filterCategory('Home')">Home</li>
+      <li role="menuitem" tabindex="0" onclick="filterCategory('All Games')" onkeypress="if(event.key==='Enter')filterCategory('All Games')">All Games</li>
       ${finalSidebarCategories}
     </ul>
-  </div>
-  <div id="sidebarIndicator"></div>
+  </nav>
+  <div id="sidebarIndicator" aria-hidden="true"></div>
 
   <!-- Content -->
-  <div id="content">
+  <div id="content" role="main">
     <!-- Top Header with Search -->
-    <div id="topHeader">
-      <h1 onclick="goToHome()">Chromebook Unlocked Games</h1>
-      <div id="searchContainer">
-        <span id="searchIcon">🔍</span>
-        <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
-        <div id="searchDropdown"></div>
+    <header id="topHeader">
+      <h1 onclick="goToHome()" role="button" tabindex="0" onkeypress="if(event.key==='Enter')goToHome()" style="cursor: pointer;">Chromebook Unlocked Games</h1>
+      <div id="searchContainer" role="search">
+        <label for="searchBar" class="sr-only">Search games</label>
+        <span id="searchIcon" aria-hidden="true">🔍</span>
+        <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)" aria-label="Search for games" autocomplete="off">
+        <div id="searchDropdown" role="listbox" aria-label="Search results"></div>
       </div>
-    </div>
+    </header>
 
-    <div class="content-wrapper">
+    <div class="content-wrapper" id="main-content">
       <div id="controls">
-        <button id="backBtn" onclick="closeGame()">← Back</button>
-        <span id="gameTitle"></span>
-        <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+        <button id="backBtn" onclick="closeGame()" aria-label="Go back to game list">← Back</button>
+        <span id="gameTitle" role="heading" aria-level="2"></span>
+        <button id="fullscreenBtn" onclick="toggleFullscreen()" aria-label="Toggle fullscreen mode">⛶ Fullscreen</button>
       </div>
       
       <div class="viewer-wrapper">
@@ -1920,97 +1978,457 @@ const html = `<!DOCTYPE html>
 </html>`;
 
 // Write output
-fs.writeFileSync(outputFile, html);
-console.log("✅ Build complete: index.html generated");
+try {
+  fs.writeFileSync(outputFile, html);
+  console.log("✅ Build complete: index.html generated");
+} catch (error) {
+  console.error(`❌ Error writing index.html: ${error.message}`);
+  process.exit(1);
+}
 
 // Generate individual game pages
 console.log("\n🎮 Generating individual game pages...");
 
+let successCount = 0;
+let errorCount = 0;
+
 games.forEach(game => {
-  const gamePageHtml = generateGamePage(game);
-  const gamePageFile = path.join(outputDir, `${game.folder}.html`);
-  fs.writeFileSync(gamePageFile, gamePageHtml);
-  console.log(`   ✓ Created ${game.folder}.html`);
+  try {
+    const gamePageHtml = generateGamePage(game);
+    const gamePageFile = path.join(outputDir, `${game.folder}.html`);
+    fs.writeFileSync(gamePageFile, gamePageHtml);
+    console.log(`   ✓ Created ${game.folder}.html`);
+    successCount++;
+  } catch (error) {
+    console.error(`   ❌ Error creating ${game.folder}.html: ${error.message}`);
+    errorCount++;
+  }
 });
 
-console.log(`\n✅ Generated ${games.length} game pages successfully!`);
+console.log(`\n✅ Generated ${successCount} game pages successfully!`);
+if (errorCount > 0) {
+  console.log(`⚠️  ${errorCount} game pages failed to generate`);
+}
+
+// Generate sitemap.xml
+console.log("\n🗺️  Generating sitemap.xml...");
+try {
+  generateSitemap(games);
+} catch (error) {
+  console.error(`❌ Error generating sitemap: ${error.message}`);
+  process.exit(1);
+}
 
 // Function to generate individual game page
 function generateGamePage(game) {
   const thumb = chooseThumb(game);
   const gameUrl = `games/${game.folder}/index.html`;
-  
+  const categoryList = game.categories.join(', ');
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  
+
   <!-- Primary Meta Tags -->
-  <title>${game.name} - Chromebook Unlocked Games</title>
-  <meta name="title" content="${game.name} - Chromebook Unlocked Games">
-  <meta name="description" content="Play ${game.name} unblocked at school on your Chromebook. Free online game that works on school computers. No downloads required - play instantly in your browser!">
-  <meta name="keywords" content="${game.name}, ${game.name} unblocked, chromebook unlocked games, unblocked games, free online games, school games, chromebook games, play ${game.name} at school">
+  <title>Play ${game.name} Unblocked - Chromebook Unlocked Games</title>
+  <meta name="title" content="Play ${game.name} Unblocked - Chromebook Unlocked Games">
+  <meta name="description" content="Play ${game.name} unblocked at school on your Chromebook. Free online ${categoryList} game that works on school computers. No downloads required - play instantly in your browser!">
+  <meta name="keywords" content="${game.name}, ${game.name} unblocked, play ${game.name}, chromebook unlocked games, unblocked games, free online games, school games, chromebook games, ${categoryList} games">
   <meta name="robots" content="index, follow">
   <meta name="language" content="English">
   <meta name="author" content="Chromebook Unlocked Games">
-  
+
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://chromebookunlocked.github.io/${game.folder}.html">
-  <meta property="og:title" content="${game.name} - Chromebook Unlocked Games">
-  <meta property="og:description" content="Play ${game.name} unblocked at school on your Chromebook. Free online game that works on school computers.">
+  <meta property="og:title" content="Play ${game.name} Unblocked - Chromebook Unlocked Games">
+  <meta property="og:description" content="Play ${game.name} unblocked at school on your Chromebook. Free ${categoryList} game - no downloads required!">
   <meta property="og:image" content="https://chromebookunlocked.github.io/games/${game.folder}/${thumb}">
   <meta property="og:site_name" content="Chromebook Unlocked Games">
-  
+
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://chromebookunlocked.github.io/${game.folder}.html">
-  <meta property="twitter:title" content="${game.name} - Chromebook Unlocked Games">
-  <meta property="twitter:description" content="Play ${game.name} unblocked at school on your Chromebook. Free online game that works on school computers.">
+  <meta property="twitter:title" content="Play ${game.name} Unblocked">
+  <meta property="twitter:description" content="Play ${game.name} unblocked at school. Free ${categoryList} game - no downloads required!">
   <meta property="twitter:image" content="https://chromebookunlocked.github.io/games/${game.folder}/${thumb}">
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="48x48" href="assets/logo.png">
   <link rel="icon" type="image/png" sizes="96x96" href="assets/logo.png">
   <link rel="icon" type="image/png" sizes="144x144" href="assets/logo.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/logo.png">
   <link rel="shortcut icon" type="image/png" href="assets/logo.png">
-  
+
   <!-- Additional SEO -->
   <meta name="theme-color" content="#ff66ff">
   <link rel="canonical" href="https://chromebookunlocked.github.io/${game.folder}.html">
-  
-  <script>
-    // Auto-redirect to main page with game hash
-    window.location.href = 'index.html#/game/${encodeURIComponent(game.folder)}';
+
+  <!-- Structured Data for Game -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    "name": "${game.name}",
+    "url": "https://chromebookunlocked.github.io/${game.folder}.html",
+    "image": "https://chromebookunlocked.github.io/games/${game.folder}/${thumb}",
+    "description": "Play ${game.name} unblocked at school. Free online ${categoryList} game.",
+    "genre": "${game.categories[0]}",
+    "gamePlatform": "Web Browser",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Chromebook Unlocked Games"
+    }
+  }
   </script>
-  
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+
   <style>
-    body {
+    * {
       margin: 0;
       padding: 0;
-      background: linear-gradient(135deg, #0d001a 0%, #1c0033 50%, #2d0052 100%);
+      box-sizing: border-box;
+    }
+
+    body {
       font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(135deg, #0d001a 0%, #1c0033 50%, #2d0052 100%);
+      background-attachment: fixed;
       color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: rgba(13, 0, 26, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 1rem 2rem;
+      border-bottom: 2px solid rgba(255, 102, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #ff66ff;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border: 2px solid #ff66ff;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 102, 255, 0.2);
+      transform: translateX(-4px);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff66ff, #ff99ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .game-info {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .category-badge {
+      background: rgba(255, 102, 255, 0.2);
+      border: 1px solid rgba(255, 102, 255, 0.4);
+      padding: 0.3rem 0.8rem;
+      border-radius: 15px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .fullscreen-btn {
+      background: linear-gradient(135deg, #ff66ff, #cc00ff);
+      border: none;
+      color: white;
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .fullscreen-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255, 102, 255, 0.4);
+    }
+
+    .game-container {
+      flex: 1;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      padding: 1rem;
+    }
+
+    .game-frame-wrapper {
+      width: 100%;
+      max-width: 1400px;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(255, 102, 255, 0.3);
+    }
+
+    .game-frame-wrapper::before {
+      content: '';
+      display: block;
+      padding-top: 66.67%; /* 3:2 aspect ratio */
+    }
+
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    footer {
+      background: rgba(13, 0, 26, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 1.5rem 2rem;
+      border-top: 2px solid rgba(255, 102, 255, 0.3);
       text-align: center;
     }
-    .loading {
-      font-size: 1.5rem;
-      animation: pulse 1.5s ease-in-out infinite;
+
+    footer p {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
+
+    footer a {
+      color: #ff66ff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Fullscreen styles */
+    .game-frame-wrapper:-webkit-full-screen {
+      width: 100vw;
+      height: 100vh;
+      max-width: none;
+      border-radius: 0;
+      border: none;
+    }
+
+    .game-frame-wrapper:-moz-full-screen {
+      width: 100vw;
+      height: 100vh;
+      max-width: none;
+      border-radius: 0;
+      border: none;
+    }
+
+    .game-frame-wrapper:fullscreen {
+      width: 100vw;
+      height: 100vh;
+      max-width: none;
+      border-radius: 0;
+      border: none;
+    }
+
+    .game-frame-wrapper:-webkit-full-screen::before {
+      display: none;
+    }
+
+    .game-frame-wrapper:-moz-full-screen::before {
+      display: none;
+    }
+
+    .game-frame-wrapper:fullscreen::before {
+      display: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      header {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 1.3rem;
+      }
+
+      .back-btn {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+      }
+
+      .fullscreen-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+      }
+
+      .game-frame-wrapper::before {
+        padding-top: 75%; /* 4:3 aspect ratio on mobile */
+      }
     }
   </style>
 </head>
 <body>
-  <div class="loading">Loading ${game.name}...</div>
+  <header>
+    <div class="header-left">
+      <a href="index.html" class="back-btn">
+        <span>←</span>
+        <span>Back to Games</span>
+      </a>
+      <h1>${game.name}</h1>
+    </div>
+    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+      <div class="game-info">
+        ${game.categories.map(cat => `<span class="category-badge">${cat}</span>`).join('')}
+      </div>
+      <button class="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
+  </header>
+
+  <div class="game-container">
+    <div class="game-frame-wrapper" id="gameWrapper">
+      <iframe
+        src="${gameUrl}"
+        title="Play ${game.name} Unblocked"
+        allow="fullscreen; autoplay; encrypted-media"
+        allowfullscreen
+        loading="eager">
+      </iframe>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      <strong>${game.name}</strong> - Free to play on <a href="index.html">Chromebook Unlocked Games</a>
+      <br>
+      Categories: ${categoryList} | <a href="dmca.html">DMCA</a>
+    </p>
+  </footer>
+
+  <script>
+    function toggleFullscreen() {
+      const wrapper = document.getElementById('gameWrapper');
+
+      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+        // Enter fullscreen
+        if (wrapper.requestFullscreen) {
+          wrapper.requestFullscreen();
+        } else if (wrapper.webkitRequestFullscreen) {
+          wrapper.webkitRequestFullscreen();
+        } else if (wrapper.mozRequestFullScreen) {
+          wrapper.mozRequestFullScreen();
+        }
+      } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        }
+      }
+    }
+
+    // Update button text based on fullscreen state
+    document.addEventListener('fullscreenchange', updateFullscreenButton);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+    document.addEventListener('mozfullscreenchange', updateFullscreenButton);
+
+    function updateFullscreenButton() {
+      const btn = document.querySelector('.fullscreen-btn');
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+        btn.textContent = '✕ Exit Fullscreen';
+      } else {
+        btn.textContent = '⛶ Fullscreen';
+      }
+    }
+  </script>
 </body>
 </html>`;
+}
+
+// Function to generate sitemap.xml
+function generateSitemap(games) {
+  const today = new Date().toISOString().split('T')[0];
+  const baseUrl = 'https://chromebookunlocked.github.io';
+
+  let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Homepage -->
+  <url>
+    <loc>${baseUrl}/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- DMCA Page -->
+  <url>
+    <loc>${baseUrl}/dmca.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+`;
+
+  // Add all game pages
+  games.forEach(game => {
+    sitemap += `  <!-- ${game.name} -->
+  <url>
+    <loc>${baseUrl}/${encodeURIComponent(game.folder)}.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+`;
+  });
+
+  sitemap += `</urlset>`;
+
+  // Write sitemap to dist folder
+  const sitemapPath = path.join(outputDir, 'sitemap.xml');
+  fs.writeFileSync(sitemapPath, sitemap);
+  console.log(`✅ Sitemap generated with ${games.length + 2} URLs`);
 }
