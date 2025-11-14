@@ -2070,7 +2070,7 @@ function generateGamePage(game) {
   const recommendedGamesHTML = shuffled.map(g => {
     const gThumb = chooseThumb(g);
     return `<a href="${g.folder}.html" class="game-card">
-      <div class="thumb-container">
+      <div class="thumb-container" style="--thumb-url: url('games/${g.folder}/${gThumb}')">
         <img class="thumb" src="games/${g.folder}/${gThumb}" alt="${g.name}" loading="lazy">
       </div>
       <div class="card-title">${g.name}</div>
@@ -2207,7 +2207,7 @@ function generateGamePage(game) {
     .controls {
       position: absolute;
       top: 0.75rem;
-      left: 0.75rem;
+      left: -60px;
       right: 0.75rem;
       display: flex;
       justify-content: space-between;
@@ -2425,49 +2425,95 @@ function generateGamePage(game) {
     }
 
     .game-card {
-      background: linear-gradient(135deg, rgba(77, 0, 102, 0.3), rgba(51, 0, 102, 0.3));
-      border-radius: 12px;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: linear-gradient(135deg, #4d0066, #5a0077);
+      border-radius: 15px;
       overflow: hidden;
       transition: all 0.3s ease;
       cursor: pointer;
       border: 2px solid rgba(255, 102, 255, 0.2);
       text-decoration: none;
       color: inherit;
-      display: block;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     }
 
     .game-card:hover {
-      transform: translateY(-8px) scale(1.03);
-      box-shadow: 0 12px 35px rgba(255, 102, 255, 0.5);
-      border-color: rgba(255, 102, 255, 0.6);
-      background: linear-gradient(135deg, rgba(102, 0, 153, 0.5), rgba(77, 0, 102, 0.5));
+      transform: translateY(-5px) scale(1.03);
+      background: linear-gradient(135deg, #660099, #7700aa);
+      border: 2px solid #ff66ff;
+      box-shadow: 0 8px 30px rgba(255, 102, 255, 0.5);
     }
 
     .thumb-container {
       width: 100%;
-      aspect-ratio: 1 / 1;
-      overflow: hidden;
+      height: 100%;
       position: relative;
-      background: linear-gradient(135deg, #1a0033, #0d001a);
+      overflow: hidden;
+      border-radius: 15px;
+      background: #220033;
+    }
+
+    .thumb-container::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: blur(20px) brightness(0.5);
+      z-index: 0;
+      transition: transform 0.3s ease;
+      background-image: var(--thumb-url);
+    }
+
+    .game-card:hover .thumb-container::before {
+      transform: scale(1.1);
     }
 
     .thumb {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
       transition: transform 0.3s ease;
     }
 
     .game-card:hover .thumb {
-      transform: scale(1.1);
+      transform: scale(1.08);
     }
 
     .card-title {
-      padding: 0.8rem;
-      font-size: clamp(0.85rem, 1.2vw, 1rem);
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0.6rem 0.4rem;
       font-weight: 600;
+      font-size: clamp(0.7rem, 0.85vw, 0.85rem);
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(0, 0, 0, 0);
+      width: 100%;
+      line-height: 1.2;
+      z-index: 2;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(10px);
+      text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
       text-align: center;
-      background: linear-gradient(180deg, rgba(26, 0, 51, 0.8), rgba(13, 0, 26, 0.8));
+    }
+
+    .game-card:hover .card-title {
+      opacity: 1;
+      transform: translateY(0);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
     }
 
     footer {
@@ -2592,8 +2638,8 @@ function generateGamePage(game) {
         <button class="icon-btn" onclick="window.location.href='index.html'" title="Back to Games" aria-label="Back to Games">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         </button>
-        <button class="icon-btn" onclick="toggleFullscreen()" title="Fullscreen" aria-label="Toggle Fullscreen">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+        <button id="fullscreenBtn" class="icon-btn" onclick="toggleFullscreen()" title="Fullscreen" aria-label="Toggle Fullscreen">
+          <svg id="fullscreenIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
         </button>
       </div>
 
@@ -2666,6 +2712,29 @@ function generateGamePage(game) {
         }
       }
     }
+
+    function updateFullscreenIcon() {
+      const icon = document.getElementById('fullscreenIcon');
+      const btn = document.getElementById('fullscreenBtn');
+
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+        // In fullscreen - show X icon
+        icon.innerHTML = '<path d="M18 6L6 18M6 6l12 12"/>';
+        btn.title = 'Exit Fullscreen';
+        btn.setAttribute('aria-label', 'Exit Fullscreen');
+      } else {
+        // Not in fullscreen - show expand icon
+        icon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>';
+        btn.title = 'Fullscreen';
+        btn.setAttribute('aria-label', 'Toggle Fullscreen');
+      }
+    }
+
+    // Listen for fullscreen changes
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+    document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
+    document.addEventListener('MSFullscreenChange', updateFullscreenIcon);
 
   </script>
 </body>
