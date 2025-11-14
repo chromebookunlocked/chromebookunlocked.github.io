@@ -167,44 +167,73 @@
 
     /* Controls Bar */
     .controls {
-      max-width: 1400px;
-      margin: 1.5rem auto;
-      padding: 1rem 2rem;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
-      gap: 1.5rem;
-      background: linear-gradient(135deg, rgba(51, 0, 102, 0.4), rgba(26, 0, 51, 0.4));
-      border-radius: 15px;
-      border: 2px solid rgba(255, 102, 255, 0.25);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
     }
 
-    .game-title {
-      flex: 1;
-      text-align: center;
-      font-weight: 900;
-      font-size: clamp(1.2rem, 2.5vw, 1.6rem);
-      background: linear-gradient(135deg, #ff66ff, #ff99ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .category-badges {
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      padding: 0;
       display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      background: rgba(51, 0, 102, 0.6);
+      border: 1px solid rgba(255, 102, 255, 0.3);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      color: #fff;
     }
 
-    .category-badge {
-      background: rgba(255, 102, 255, 0.2);
+    .icon-btn:hover {
+      background: rgba(102, 0, 153, 0.8);
+      border-color: #ff66ff;
+      box-shadow: 0 4px 15px rgba(255, 102, 255, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .icon-btn:active {
+      transform: translateY(0);
+    }
+
+    .icon-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Category Tags */
+    .category-tags {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+      justify-content: center;
+    }
+
+    .category-tag {
+      background: rgba(255, 102, 255, 0.15);
       border: 1px solid rgba(255, 102, 255, 0.4);
-      padding: 0.3rem 0.8rem;
-      border-radius: 15px;
-      font-size: 0.85rem;
-      font-weight: 500;
+      padding: 0.5rem 1.2rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #ff99ff;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: inline-block;
+    }
+
+    .category-tag:hover {
+      background: rgba(255, 102, 255, 0.3);
+      border-color: #ff66ff;
+      box-shadow: 0 4px 15px rgba(255, 102, 255, 0.3);
+      transform: translateY(-2px);
+      color: #fff;
     }
 
     button {
@@ -454,13 +483,22 @@
         padding: 1rem;
       }
 
-      .controls {
-        flex-wrap: wrap;
-        padding: 0.8rem 1rem;
+      .icon-btn {
+        width: 40px;
+        height: 40px;
       }
 
       .game-frame-wrapper {
         aspect-ratio: 4 / 3;
+      }
+
+      .category-tags {
+        gap: 0.5rem;
+      }
+
+      .category-tag {
+        font-size: 0.85rem;
+        padding: 0.4rem 1rem;
       }
     }
   </style>
@@ -478,20 +516,18 @@
     </div>
   </header>
 
-  <!-- Controls Bar -->
-  <div class="controls">
-    <button onclick="window.location.href='index.html'">← Browse Games</button>
-    <div style="flex: 1; text-align: center;">
-      <div class="game-title">Clear Vision 4</div>
-      <div class="category-badges">
-        <span class="category-badge">Sniper</span>
-      </div>
-    </div>
-    <button onclick="toggleFullscreen()">⛶ Fullscreen</button>
-  </div>
-
   <!-- Game Viewer -->
   <div class="game-container">
+    <!-- Controls Bar -->
+    <div class="controls">
+      <button class="icon-btn" onclick="window.location.href='index.html'" title="Browse Games" aria-label="Browse Games">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+      </button>
+      <button class="icon-btn" onclick="toggleFullscreen()" title="Fullscreen" aria-label="Toggle Fullscreen">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+      </button>
+    </div>
+
     <div class="game-frame-wrapper" id="gameWrapper">
       <div class="play-overlay" id="playOverlay">
         <img src="games/Clear Vision 4/thumbnail.jpg" alt="Clear Vision 4">
@@ -506,47 +542,132 @@
         allowfullscreen>
       </iframe>
     </div>
+
+    <!-- Category Tags -->
+    <div class="category-tags">
+      <a href="index.html#/category/Sniper" class="category-tag">Sniper</a>
+    </div>
   </div>
 
   <!-- You Might Also Like Section -->
   <div class="recommendations">
     <h2>You Might Also Like</h2>
     <div class="grid">
-      <a href="Clear Vision 3.html" class="game-card">
+      <a href="Bad Time Simulator.html" class="game-card">
       <div class="thumb-container">
-        <img class="thumb" src="games/Clear Vision 3/thumbnail.png" alt="Clear Vision 3" loading="lazy">
+        <img class="thumb" src="games/Bad Time Simulator/thumbnail.jpg" alt="Bad Time Simulator" loading="lazy">
       </div>
-      <div class="card-title">Clear Vision 3</div>
-    </a><a href="Basketball FRVR.html" class="game-card">
+      <div class="card-title">Bad Time Simulator</div>
+    </a><a href="Clear Vision 5.html" class="game-card">
       <div class="thumb-container">
-        <img class="thumb" src="games/Basketball FRVR/thumbnail.jpg" alt="Basketball FRVR" loading="lazy">
+        <img class="thumb" src="games/Clear Vision 5/thumbnail.png" alt="Clear Vision 5" loading="lazy">
       </div>
-      <div class="card-title">Basketball FRVR</div>
+      <div class="card-title">Clear Vision 5</div>
+    </a><a href="Bob The Robber 5.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/Bob The Robber 5/thumbnail.jpg" alt="Bob The Robber 5" loading="lazy">
+      </div>
+      <div class="card-title">Bob The Robber 5</div>
+    </a><a href="Bob The Robber 2.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/Bob The Robber 2/thumbnail.jpg" alt="Bob The Robber 2" loading="lazy">
+      </div>
+      <div class="card-title">Bob The Robber 2</div>
+    </a><a href="Clear Vision 1.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/Clear Vision 1/thumbnail.jpg" alt="Clear Vision 1" loading="lazy">
+      </div>
+      <div class="card-title">Clear Vision 1</div>
+    </a><a href="BTD5.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/BTD5/thumbnail.jpg" alt="BTD5" loading="lazy">
+      </div>
+      <div class="card-title">BTD5</div>
+    </a><a href="Bloodmoney 2.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/Bloodmoney 2/thumbnail.jpg" alt="Bloodmoney 2" loading="lazy">
+      </div>
+      <div class="card-title">Bloodmoney 2</div>
+    </a><a href="Bitlife.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/Bitlife/thumbnail.jpg" alt="Bitlife" loading="lazy">
+      </div>
+      <div class="card-title">Bitlife</div>
+    </a><a href="Bit Planes.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/Bit Planes/thumbnail.jpg" alt="Bit Planes" loading="lazy">
+      </div>
+      <div class="card-title">Bit Planes</div>
     </a><a href="Clear Vision 2.html" class="game-card">
       <div class="thumb-container">
         <img class="thumb" src="games/Clear Vision 2/thumbnail.jpg" alt="Clear Vision 2" loading="lazy">
       </div>
       <div class="card-title">Clear Vision 2</div>
-    </a><a href="1v1.lol.html" class="game-card">
+    </a><a href="Bad Parenting.html" class="game-card">
       <div class="thumb-container">
-        <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol" loading="lazy">
+        <img class="thumb" src="games/Bad Parenting/thumbnail.jpg" alt="Bad Parenting" loading="lazy">
       </div>
-      <div class="card-title">1v1.lol</div>
-    </a><a href="10 Minutes Till Dawn.html" class="game-card">
+      <div class="card-title">Bad Parenting</div>
+    </a><a href="Bloxorz.html" class="game-card">
       <div class="thumb-container">
-        <img class="thumb" src="games/10 Minutes Till Dawn/thumbnail.png" alt="10 Minutes Till Dawn" loading="lazy">
+        <img class="thumb" src="games/Bloxorz/thumbnail.png" alt="Bloxorz" loading="lazy">
       </div>
-      <div class="card-title">10 Minutes Till Dawn</div>
+      <div class="card-title">Bloxorz</div>
+    </a><a href="Clear Vision 3.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/Clear Vision 3/thumbnail.png" alt="Clear Vision 3" loading="lazy">
+      </div>
+      <div class="card-title">Clear Vision 3</div>
+    </a><a href="Bob The Robber .html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/Bob The Robber /thumbnail.jpg" alt="Bob The Robber " loading="lazy">
+      </div>
+      <div class="card-title">Bob The Robber </div>
+    </a><a href="Baldi’s Basics.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics" loading="lazy">
+      </div>
+      <div class="card-title">Baldi’s Basics</div>
+    </a><a href="Block Blast.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast" loading="lazy">
+      </div>
+      <div class="card-title">Block Blast</div>
     </a><a href="Ages of Conflict.html" class="game-card">
       <div class="thumb-container">
         <img class="thumb" src="games/Ages of Conflict/thumbnail.png" alt="Ages of Conflict" loading="lazy">
       </div>
       <div class="card-title">Ages of Conflict</div>
-    </a><a href="Bad Time Simulator.html" class="game-card">
+    </a><a href="10 Minutes Till Dawn.html" class="game-card">
       <div class="thumb-container">
-        <img class="thumb" src="games/Bad Time Simulator/thumbnail.jpg" alt="Bad Time Simulator" loading="lazy">
+        <img class="thumb" src="games/10 Minutes Till Dawn/thumbnail.png" alt="10 Minutes Till Dawn" loading="lazy">
       </div>
-      <div class="card-title">Bad Time Simulator</div>
+      <div class="card-title">10 Minutes Till Dawn</div>
+    </a><a href="Bad Piggies.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies" loading="lazy">
+      </div>
+      <div class="card-title">Bad Piggies</div>
+    </a><a href="Age Of War.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War" loading="lazy">
+      </div>
+      <div class="card-title">Age Of War</div>
+    </a><a href="1v1.lol.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol" loading="lazy">
+      </div>
+      <div class="card-title">1v1.lol</div>
+    </a><a href="Basketball FRVR.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/Basketball FRVR/thumbnail.jpg" alt="Basketball FRVR" loading="lazy">
+      </div>
+      <div class="card-title">Basketball FRVR</div>
+    </a><a href="Blackjack.html" class="game-card">
+      <div class="thumb-container">
+        <img class="thumb" src="games/Blackjack/thumbnail.png" alt="Blackjack" loading="lazy">
+      </div>
+      <div class="card-title">Blackjack</div>
     </a><a href="Blaze Drifter.html" class="game-card">
       <div class="thumb-container">
         <img class="thumb" src="games/Blaze Drifter/thumbnail.jpg" alt="Blaze Drifter" loading="lazy">
@@ -557,86 +678,6 @@
         <img class="thumb" src="games/Bloodmoney /thumbnail.jpg" alt="Bloodmoney " loading="lazy">
       </div>
       <div class="card-title">Bloodmoney </div>
-    </a><a href="Bob The Robber 2.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Bob The Robber 2/thumbnail.jpg" alt="Bob The Robber 2" loading="lazy">
-      </div>
-      <div class="card-title">Bob The Robber 2</div>
-    </a><a href="Bloxorz.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Bloxorz/thumbnail.png" alt="Bloxorz" loading="lazy">
-      </div>
-      <div class="card-title">Bloxorz</div>
-    </a><a href="Baldi’s Basics.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics" loading="lazy">
-      </div>
-      <div class="card-title">Baldi’s Basics</div>
-    </a><a href="Blackjack.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Blackjack/thumbnail.png" alt="Blackjack" loading="lazy">
-      </div>
-      <div class="card-title">Blackjack</div>
-    </a><a href="BTD5.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/BTD5/thumbnail.jpg" alt="BTD5" loading="lazy">
-      </div>
-      <div class="card-title">BTD5</div>
-    </a><a href="Clear Vision 5.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Clear Vision 5/thumbnail.png" alt="Clear Vision 5" loading="lazy">
-      </div>
-      <div class="card-title">Clear Vision 5</div>
-    </a><a href="Bob The Robber .html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Bob The Robber /thumbnail.jpg" alt="Bob The Robber " loading="lazy">
-      </div>
-      <div class="card-title">Bob The Robber </div>
-    </a><a href="Bob The Robber 5.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Bob The Robber 5/thumbnail.jpg" alt="Bob The Robber 5" loading="lazy">
-      </div>
-      <div class="card-title">Bob The Robber 5</div>
-    </a><a href="Bloodmoney 2.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Bloodmoney 2/thumbnail.jpg" alt="Bloodmoney 2" loading="lazy">
-      </div>
-      <div class="card-title">Bloodmoney 2</div>
-    </a><a href="Block Blast.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast" loading="lazy">
-      </div>
-      <div class="card-title">Block Blast</div>
-    </a><a href="Bad Parenting.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Bad Parenting/thumbnail.jpg" alt="Bad Parenting" loading="lazy">
-      </div>
-      <div class="card-title">Bad Parenting</div>
-    </a><a href="Bit Planes.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Bit Planes/thumbnail.jpg" alt="Bit Planes" loading="lazy">
-      </div>
-      <div class="card-title">Bit Planes</div>
-    </a><a href="Clear Vision 1.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Clear Vision 1/thumbnail.jpg" alt="Clear Vision 1" loading="lazy">
-      </div>
-      <div class="card-title">Clear Vision 1</div>
-    </a><a href="Bad Piggies.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies" loading="lazy">
-      </div>
-      <div class="card-title">Bad Piggies</div>
-    </a><a href="Bitlife.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Bitlife/thumbnail.jpg" alt="Bitlife" loading="lazy">
-      </div>
-      <div class="card-title">Bitlife</div>
-    </a><a href="Age Of War.html" class="game-card">
-      <div class="thumb-container">
-        <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War" loading="lazy">
-      </div>
-      <div class="card-title">Age Of War</div>
     </a>
     </div>
   </div>
