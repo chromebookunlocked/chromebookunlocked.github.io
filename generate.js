@@ -5,8 +5,13 @@ const dataDir = path.join(__dirname, "data");
 const gamesDir = path.join(__dirname, "games");
 const outputDir = path.join(__dirname, "dist");
 const outputFile = path.join(outputDir, "index.html");
+const templatesDir = path.join(__dirname, "templates");
 
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
+
+// Load CSS templates
+const mainStyles = fs.readFileSync(path.join(templatesDir, "main-styles.css"), "utf8");
+const gamePageStyles = fs.readFileSync(path.join(templatesDir, "game-page-styles.css"), "utf8");
 
 // Load games with validation and error handling
 const games = fs.readdirSync(dataDir)
@@ -95,12 +100,12 @@ function generateGameCard(game, idx) {
 // Sidebar categories - exclude "Newly Added" and "Recently Played"
 const sidebarCategories = Object.keys(categories)
   .filter(cat => cat !== "Recently Played" && cat !== "Newly Added")
-  .map(cat => `<li onclick="filterCategory('${cat}')">${cat}</li>`)
+  .map(cat => `<li role="menuitem" tabindex="0" onclick="filterCategory('${cat}')" onkeypress="if(event.key==='Enter')filterCategory('${cat}')">${cat}</li>`)
   .join("");
 
 // Add "Newly Added" at the top if it exists
-const newlyAddedItem = categories['Newly Added'] ? 
-  `<li onclick="filterCategory('Newly Added')" style="border-bottom: 1px solid rgba(255,102,255,0.3); padding-bottom: 0.8rem; margin-bottom: 0.8rem;">✨ Newly Added</li>` : '';
+const newlyAddedItem = categories['Newly Added'] ?
+  `<li role="menuitem" tabindex="0" onclick="filterCategory('Newly Added')" onkeypress="if(event.key==='Enter')filterCategory('Newly Added')" style="border-bottom: 1px solid rgba(255,102,255,0.3); padding-bottom: 0.8rem; margin-bottom: 0.8rem;">✨ Newly Added</li>` : '';
 
 const finalSidebarCategories = newlyAddedItem + sidebarCategories;
 
@@ -213,6 +218,36 @@ const html = `<!DOCTYPE html>
     * {
       scrollbar-width: thin;
       scrollbar-color: rgba(102, 0, 153, 0.8) rgba(0, 0, 0, 0.3);
+    }
+
+    /* Accessibility: Skip link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--accent);
+      color: white;
+      padding: 8px 16px;
+      text-decoration: none;
+      font-weight: bold;
+      z-index: 10000;
+      border-radius: 0 0 4px 0;
+    }
+    .skip-link:focus {
+      top: 0;
+    }
+
+    /* Screen reader only text */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
     }
     
     /* Sidebar */
@@ -1061,34 +1096,40 @@ const html = `<!DOCTYPE html>
 </head>
 <body>
   
+  <!-- Skip to main content link for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
   <!-- Sidebar -->
-  <div id="sidebar">
-    <header onclick="goToHome()"><img src="assets/logo.png" alt="Logo"></header>
-    <ul id="categoryList">
-      <li onclick="filterCategory('Home')">Home</li>
-      <li onclick="filterCategory('All Games')">All Games</li>
+  <nav id="sidebar" role="navigation" aria-label="Game categories">
+    <header onclick="goToHome()" role="button" tabindex="0" onkeypress="if(event.key==='Enter')goToHome()" aria-label="Go to home page">
+      <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo">
+    </header>
+    <ul id="categoryList" role="menu">
+      <li role="menuitem" tabindex="0" onclick="filterCategory('Home')" onkeypress="if(event.key==='Enter')filterCategory('Home')">Home</li>
+      <li role="menuitem" tabindex="0" onclick="filterCategory('All Games')" onkeypress="if(event.key==='Enter')filterCategory('All Games')">All Games</li>
       ${finalSidebarCategories}
     </ul>
-  </div>
-  <div id="sidebarIndicator"></div>
+  </nav>
+  <div id="sidebarIndicator" aria-hidden="true"></div>
 
   <!-- Content -->
-  <div id="content">
+  <div id="content" role="main">
     <!-- Top Header with Search -->
-    <div id="topHeader">
-      <h1 onclick="goToHome()">Chromebook Unlocked Games</h1>
-      <div id="searchContainer">
-        <span id="searchIcon">🔍</span>
-        <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)">
-        <div id="searchDropdown"></div>
+    <header id="topHeader">
+      <h1 onclick="goToHome()" role="button" tabindex="0" onkeypress="if(event.key==='Enter')goToHome()" style="cursor: pointer;">Chromebook Unlocked Games</h1>
+      <div id="searchContainer" role="search">
+        <label for="searchBar" class="sr-only">Search games</label>
+        <span id="searchIcon" aria-hidden="true">🔍</span>
+        <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)" aria-label="Search for games" autocomplete="off">
+        <div id="searchDropdown" role="listbox" aria-label="Search results"></div>
       </div>
-    </div>
+    </header>
 
-    <div class="content-wrapper">
+    <div class="content-wrapper" id="main-content">
       <div id="controls">
-        <button id="backBtn" onclick="closeGame()">← Back</button>
-        <span id="gameTitle"></span>
-        <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+        <button id="backBtn" onclick="closeGame()" aria-label="Go back to game list">← Back</button>
+        <span id="gameTitle" role="heading" aria-level="2"></span>
+        <button id="fullscreenBtn" onclick="toggleFullscreen()" aria-label="Toggle fullscreen mode">⛶ Fullscreen</button>
       </div>
       
       <div class="viewer-wrapper">
