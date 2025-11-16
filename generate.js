@@ -2207,13 +2207,19 @@ function generateGamePage(game) {
     .controls {
       position: absolute;
       top: 0.75rem;
-      left: -60px;
+      left: -54px;
       right: 0.75rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       z-index: 100;
       pointer-events: none;
+    }
+
+    @media (max-width: 1500px) {
+      .controls {
+        left: 0.75rem;
+      }
     }
 
     .icon-btn {
@@ -2325,7 +2331,13 @@ function generateGamePage(game) {
     .game-container {
       max-width: 1400px;
       margin: 1.5rem auto 2rem auto;
-      padding: 0 1.5rem;
+      padding: 0 4rem;
+    }
+
+    @media (max-width: 1500px) {
+      .game-container {
+        padding: 0 1.5rem;
+      }
     }
 
     .game-frame-wrapper {
@@ -2347,11 +2359,33 @@ function generateGamePage(game) {
       height: 100%;
       border: none;
       display: none;
-      object-fit: contain;
     }
 
     iframe.active {
       display: block;
+    }
+
+    /* Ensure iframe content fits without scrollbars */
+    #gameFrame {
+      overflow: hidden;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE and Edge */
+    }
+
+    #gameFrame::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
+
+    /* Additional fullscreen iframe fixes */
+    .game-frame-wrapper:fullscreen iframe,
+    .game-frame-wrapper:-webkit-full-screen iframe,
+    .game-frame-wrapper:-moz-full-screen iframe {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-width: 100vw;
+      max-height: 100vh;
+      object-fit: contain;
+      overflow: hidden;
     }
 
     /* Play Overlay */
