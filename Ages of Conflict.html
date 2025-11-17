@@ -187,7 +187,9 @@ header {
   width: 48px;
   height: 48px;
   border-radius: var(--radius-md);
-  box-shadow: 0 4px 15px var(--shadow-color);
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  padding: 4px;
+  box-shadow: 0 4px 15px var(--shadow-color), 0 0 20px rgba(139, 92, 246, 0.6);
   transition: var(--transition-medium);
 }
 
@@ -275,8 +277,8 @@ h1 {
 }
 
 .game-frame-wrapper {
-  width: 100%;
-  max-width: 1600px;
+  width: 90%;
+  max-width: min(1200px, 90vw);
   position: relative;
   border-radius: var(--radius-xl);
   overflow: hidden;
@@ -525,9 +527,10 @@ iframe.active {
 ============================================================================ */
 
 .recommendations {
-  width: 100%;
-  max-width: 1600px;
+  width: 90%;
+  max-width: min(1200px, 90vw);
   padding: var(--spacing-xl) var(--spacing-lg);
+  margin: 0 auto;
   animation: fadeIn 1s ease 0.4s both;
 }
 
@@ -555,81 +558,103 @@ iframe.active {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr));
   gap: var(--spacing-md);
   width: 100%;
+  justify-items: center;
 }
 
 .game-card {
-  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
   text-decoration: none;
   color: var(--text-primary);
-  background: var(--card-bg);
+  background: linear-gradient(135deg, var(--card-bg), #5a0077);
   border-radius: var(--radius-md);
   overflow: hidden;
   transition: var(--transition-medium);
-  border: 1px solid transparent;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 102, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   position: relative;
-}
-
-.game-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(255, 102, 255, 0.1), rgba(99, 102, 241, 0.1));
-  opacity: 0;
-  transition: var(--transition-medium);
-  z-index: 0;
+  cursor: pointer;
 }
 
 .game-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  border-color: var(--primary-color);
-  box-shadow:
-    0 15px 40px var(--shadow-color),
-    0 0 0 1px var(--primary-color);
-}
-
-.game-card:hover::before {
-  opacity: 1;
+  transform: translateY(-5px) scale(1.03);
+  background: linear-gradient(135deg, var(--card-hover), #7700aa);
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 8px 30px rgba(255, 102, 255, 0.5);
 }
 
 .thumb-container {
   position: relative;
   width: 100%;
-  padding-top: 75%; /* 4:3 aspect ratio */
+  height: 100%;
   background: var(--bg-darker);
   overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.thumb-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px) brightness(0.5);
+  z-index: 0;
+  transition: transform var(--transition-medium);
+  background-image: var(--thumb-url);
+}
+
+.game-card:hover .thumb-container::before {
+  transform: scale(1.1);
 }
 
 .thumb {
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 1;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: var(--transition-medium);
+  object-position: center;
+  transition: transform var(--transition-medium);
 }
 
 .game-card:hover .thumb {
-  transform: scale(1.1);
-  filter: brightness(1.1);
+  transform: scale(1.08);
 }
 
 .card-title {
-  padding: var(--spacing-md);
-  font-size: 0.95rem;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.6rem 0.4rem;
+  font-family: var(--font-main);
   font-weight: 600;
+  font-size: clamp(0.7rem, 0.85vw, 0.85rem);
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0);
+  width: 100%;
+  line-height: 1.2;
+  z-index: 2;
+  transition: all var(--transition-medium);
+  opacity: 0;
+  transform: translateY(10px);
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
   text-align: center;
-  background: rgba(0, 0, 0, 0.3);
-  position: relative;
-  z-index: 1;
+}
+
+.game-card:hover .card-title {
+  opacity: 1;
+  transform: translateY(0);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
 }
 
 /* ============================================================================
@@ -715,10 +740,14 @@ footer a:hover {
    RESPONSIVE DESIGN
 ============================================================================ */
 
-@media (max-width: 1200px) {
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  }
+@media (min-width: 1200px) {
+  .grid { grid-template-columns: repeat(5, 1fr); }
+}
+@media (min-width: 900px) and (max-width: 1199px) {
+  .grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 600px) and (max-width: 899px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 768px) {
@@ -767,7 +796,7 @@ footer a:hover {
   }
 
   .grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--spacing-sm);
   }
 
@@ -886,61 +915,61 @@ footer a:hover {
   <div class="recommendations">
     <h2>You Might Also Like</h2>
     <div class="grid">
-      <a href="Bitlife.html" class="game-card">
+      <a href="1v1.lol.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/1v1.lol/thumbnail.png')">
+        <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol" loading="lazy">
+      </div>
+      <div class="card-title">1v1.lol</div>
+    </a><a href="Bitlife.html" class="game-card">
       <div class="thumb-container" style="--thumb-url: url('games/Bitlife/thumbnail.jpg')">
         <img class="thumb" src="games/Bitlife/thumbnail.jpg" alt="Bitlife" loading="lazy">
       </div>
       <div class="card-title">Bitlife</div>
-    </a><a href="Age Of War.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Age Of War/thumbnail.png')">
-        <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War" loading="lazy">
+    </a><a href="Bad Parenting.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Bad Parenting/thumbnail.jpg')">
+        <img class="thumb" src="games/Bad Parenting/thumbnail.jpg" alt="Bad Parenting" loading="lazy">
       </div>
-      <div class="card-title">Age Of War</div>
-    </a><a href="10 Minutes Till Dawn.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/10 Minutes Till Dawn/thumbnail.png')">
-        <img class="thumb" src="games/10 Minutes Till Dawn/thumbnail.png" alt="10 Minutes Till Dawn" loading="lazy">
-      </div>
-      <div class="card-title">10 Minutes Till Dawn</div>
-    </a><a href="Blaze Drifter.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Blaze Drifter/thumbnail.jpg')">
-        <img class="thumb" src="games/Blaze Drifter/thumbnail.jpg" alt="Blaze Drifter" loading="lazy">
-      </div>
-      <div class="card-title">Blaze Drifter</div>
-    </a><a href="Bloodmoney .html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Bloodmoney /thumbnail.jpg')">
-        <img class="thumb" src="games/Bloodmoney /thumbnail.jpg" alt="Bloodmoney " loading="lazy">
-      </div>
-      <div class="card-title">Bloodmoney </div>
-    </a><a href="Bloodmoney 2.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Bloodmoney 2/thumbnail.jpg')">
-        <img class="thumb" src="games/Bloodmoney 2/thumbnail.jpg" alt="Bloodmoney 2" loading="lazy">
-      </div>
-      <div class="card-title">Bloodmoney 2</div>
-    </a><a href="Bad Piggies.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Bad Piggies/thumbnail.jpg')">
-        <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies" loading="lazy">
-      </div>
-      <div class="card-title">Bad Piggies</div>
-    </a><a href="Baldi’s Basics.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Baldi’s Basics/thumbnail.png')">
-        <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics" loading="lazy">
-      </div>
-      <div class="card-title">Baldi’s Basics</div>
-    </a><a href="Bob The Robber 2.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber 2/thumbnail.jpg')">
-        <img class="thumb" src="games/Bob The Robber 2/thumbnail.jpg" alt="Bob The Robber 2" loading="lazy">
-      </div>
-      <div class="card-title">Bob The Robber 2</div>
-    </a><a href="Bit Planes.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Bit Planes/thumbnail.jpg')">
-        <img class="thumb" src="games/Bit Planes/thumbnail.jpg" alt="Bit Planes" loading="lazy">
-      </div>
-      <div class="card-title">Bit Planes</div>
+      <div class="card-title">Bad Parenting</div>
     </a><a href="Basketball FRVR.html" class="game-card">
       <div class="thumb-container" style="--thumb-url: url('games/Basketball FRVR/thumbnail.jpg')">
         <img class="thumb" src="games/Basketball FRVR/thumbnail.jpg" alt="Basketball FRVR" loading="lazy">
       </div>
       <div class="card-title">Basketball FRVR</div>
+    </a><a href="Bad Piggies.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Bad Piggies/thumbnail.jpg')">
+        <img class="thumb" src="games/Bad Piggies/thumbnail.jpg" alt="Bad Piggies" loading="lazy">
+      </div>
+      <div class="card-title">Bad Piggies</div>
+    </a><a href="BTD5.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/BTD5/thumbnail.jpg')">
+        <img class="thumb" src="games/BTD5/thumbnail.jpg" alt="BTD5" loading="lazy">
+      </div>
+      <div class="card-title">BTD5</div>
+    </a><a href="Block Blast.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Block Blast/thumbnail.jpg')">
+        <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast" loading="lazy">
+      </div>
+      <div class="card-title">Block Blast</div>
+    </a><a href="Blackjack.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Blackjack/thumbnail.png')">
+        <img class="thumb" src="games/Blackjack/thumbnail.png" alt="Blackjack" loading="lazy">
+      </div>
+      <div class="card-title">Blackjack</div>
+    </a><a href="Age Of War.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Age Of War/thumbnail.png')">
+        <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War" loading="lazy">
+      </div>
+      <div class="card-title">Age Of War</div>
+    </a><a href="Bob The Robber 5.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber 5/thumbnail.jpg')">
+        <img class="thumb" src="games/Bob The Robber 5/thumbnail.jpg" alt="Bob The Robber 5" loading="lazy">
+      </div>
+      <div class="card-title">Bob The Robber 5</div>
+    </a><a href="Bloxorz.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Bloxorz/thumbnail.png')">
+        <img class="thumb" src="games/Bloxorz/thumbnail.png" alt="Bloxorz" loading="lazy">
+      </div>
+      <div class="card-title">Bloxorz</div>
     </a><a href="Bob The Robber .html" class="game-card">
       <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber /thumbnail.jpg')">
         <img class="thumb" src="games/Bob The Robber /thumbnail.jpg" alt="Bob The Robber " loading="lazy">
@@ -951,61 +980,61 @@ footer a:hover {
         <img class="thumb" src="games/Blackjack/thumbnail.png" alt="Blackjack" loading="lazy">
       </div>
       <div class="card-title">Blackjack</div>
-    </a><a href="Bad Time Simulator.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Bad Time Simulator/thumbnail.jpg')">
-        <img class="thumb" src="games/Bad Time Simulator/thumbnail.jpg" alt="Bad Time Simulator" loading="lazy">
-      </div>
-      <div class="card-title">Bad Time Simulator</div>
-    </a><a href="Bloxorz.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Bloxorz/thumbnail.png')">
-        <img class="thumb" src="games/Bloxorz/thumbnail.png" alt="Bloxorz" loading="lazy">
-      </div>
-      <div class="card-title">Bloxorz</div>
-    </a><a href="Bitlife.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Bitlife/thumbnail.jpg')">
-        <img class="thumb" src="games/Bitlife/thumbnail.jpg" alt="Bitlife" loading="lazy">
-      </div>
-      <div class="card-title">Bitlife</div>
-    </a><a href="1v1.lol.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/1v1.lol/thumbnail.png')">
-        <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol" loading="lazy">
-      </div>
-      <div class="card-title">1v1.lol</div>
-    </a><a href="Blackjack.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Blackjack/thumbnail.png')">
-        <img class="thumb" src="games/Blackjack/thumbnail.png" alt="Blackjack" loading="lazy">
-      </div>
-      <div class="card-title">Blackjack</div>
-    </a><a href="Block Blast.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Block Blast/thumbnail.jpg')">
-        <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast" loading="lazy">
-      </div>
-      <div class="card-title">Block Blast</div>
-    </a><a href="Bouncemasters.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Bouncemasters/thumbnail.jpg')">
-        <img class="thumb" src="games/Bouncemasters/thumbnail.jpg" alt="Bouncemasters" loading="lazy">
-      </div>
-      <div class="card-title">Bouncemasters</div>
-    </a><a href="Bad Parenting.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Bad Parenting/thumbnail.jpg')">
-        <img class="thumb" src="games/Bad Parenting/thumbnail.jpg" alt="Bad Parenting" loading="lazy">
-      </div>
-      <div class="card-title">Bad Parenting</div>
-    </a><a href="Bob The Robber 5.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber 5/thumbnail.jpg')">
-        <img class="thumb" src="games/Bob The Robber 5/thumbnail.jpg" alt="Bob The Robber 5" loading="lazy">
-      </div>
-      <div class="card-title">Bob The Robber 5</div>
-    </a><a href="BTD5.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/BTD5/thumbnail.jpg')">
-        <img class="thumb" src="games/BTD5/thumbnail.jpg" alt="BTD5" loading="lazy">
-      </div>
-      <div class="card-title">BTD5</div>
     </a><a href="Age Of War.html" class="game-card">
       <div class="thumb-container" style="--thumb-url: url('games/Age Of War/thumbnail.png')">
         <img class="thumb" src="games/Age Of War/thumbnail.png" alt="Age Of War" loading="lazy">
       </div>
       <div class="card-title">Age Of War</div>
+    </a><a href="Baldi’s Basics.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Baldi’s Basics/thumbnail.png')">
+        <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi’s Basics" loading="lazy">
+      </div>
+      <div class="card-title">Baldi’s Basics</div>
+    </a><a href="Bad Time Simulator.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Bad Time Simulator/thumbnail.jpg')">
+        <img class="thumb" src="games/Bad Time Simulator/thumbnail.jpg" alt="Bad Time Simulator" loading="lazy">
+      </div>
+      <div class="card-title">Bad Time Simulator</div>
+    </a><a href="Bitlife.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Bitlife/thumbnail.jpg')">
+        <img class="thumb" src="games/Bitlife/thumbnail.jpg" alt="Bitlife" loading="lazy">
+      </div>
+      <div class="card-title">Bitlife</div>
+    </a><a href="Blaze Drifter.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Blaze Drifter/thumbnail.jpg')">
+        <img class="thumb" src="games/Blaze Drifter/thumbnail.jpg" alt="Blaze Drifter" loading="lazy">
+      </div>
+      <div class="card-title">Blaze Drifter</div>
+    </a><a href="Bloodmoney 2.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Bloodmoney 2/thumbnail.jpg')">
+        <img class="thumb" src="games/Bloodmoney 2/thumbnail.jpg" alt="Bloodmoney 2" loading="lazy">
+      </div>
+      <div class="card-title">Bloodmoney 2</div>
+    </a><a href="Bouncemasters.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Bouncemasters/thumbnail.jpg')">
+        <img class="thumb" src="games/Bouncemasters/thumbnail.jpg" alt="Bouncemasters" loading="lazy">
+      </div>
+      <div class="card-title">Bouncemasters</div>
+    </a><a href="Bloodmoney .html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Bloodmoney /thumbnail.jpg')">
+        <img class="thumb" src="games/Bloodmoney /thumbnail.jpg" alt="Bloodmoney " loading="lazy">
+      </div>
+      <div class="card-title">Bloodmoney </div>
+    </a><a href="Bit Planes.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Bit Planes/thumbnail.jpg')">
+        <img class="thumb" src="games/Bit Planes/thumbnail.jpg" alt="Bit Planes" loading="lazy">
+      </div>
+      <div class="card-title">Bit Planes</div>
+    </a><a href="10 Minutes Till Dawn.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/10 Minutes Till Dawn/thumbnail.png')">
+        <img class="thumb" src="games/10 Minutes Till Dawn/thumbnail.png" alt="10 Minutes Till Dawn" loading="lazy">
+      </div>
+      <div class="card-title">10 Minutes Till Dawn</div>
+    </a><a href="Bob The Robber 2.html" class="game-card">
+      <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber 2/thumbnail.jpg')">
+        <img class="thumb" src="games/Bob The Robber 2/thumbnail.jpg" alt="Bob The Robber 2" loading="lazy">
+      </div>
+      <div class="card-title">Bob The Robber 2</div>
     </a>
     </div>
   </div>
