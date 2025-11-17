@@ -34,9 +34,10 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   const recommendedGamesHTML = shuffled
     .map((g) => {
       const gThumb = chooseThumb(g, gamesDir);
+      const gThumbPath = getAssetPath(g.folder, gThumb);
       return `<a href="${g.folder}.html" class="game-card">
-      <div class="thumb-container" style="--thumb-url: url('games/${g.folder}/${gThumb}')">
-        <img class="thumb" src="games/${g.folder}/${gThumb}" alt="${g.name}" loading="lazy">
+      <div class="thumb-container" style="--thumb-url: url('${gThumbPath}')">
+        <img class="thumb" src="${gThumbPath}" alt="${g.name}" loading="lazy">
       </div>
       <div class="card-title">${g.name}</div>
     </a>`;
