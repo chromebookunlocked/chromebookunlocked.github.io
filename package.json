@@ -1,6 +1,6 @@
 {
   "name": "chromebook-unlocked-games",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Static site generator for hosting unblocked browser games on GitHub Pages",
   "scripts": {
     "build": "node generate.js",
@@ -9,7 +9,7 @@
     "clean": "rm -rf dist/",
     "prebuild": "npm run validate",
     "dev": "npm run build && npx serve dist -p 3000",
-    "lint": "eslint generate.js scripts/*.js",
+    "lint": "eslint generate.js scripts/*.js src/**/*.js",
     "format": "prettier --write '**/*.{js,json,md}' '!dist/**' '!node_modules/**'",
     "format:check": "prettier --check '**/*.{js,json,md}' '!dist/**' '!node_modules/**'"
   },
