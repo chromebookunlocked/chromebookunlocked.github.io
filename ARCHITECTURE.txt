@@ -1,0 +1,1072 @@
+================================================================================
+  CHROMEBOOK UNLOCKED GAMES - ARCHITECTURE DOCUMENTATION
+================================================================================
+
+PROJECT OVERVIEW
+================================================================================
+Chromebook Unlocked Games is a static site generator that creates a modern
+gaming portal with 90+ browser games. The project uses a modular Node.js
+architecture to generate HTML pages, manage game metadata, and optimize for SEO.
+
+VERSION: 2.1.0
+BUILD SYSTEM: Node.js static site generator
+DEPLOYMENT: GitHub Pages
+LAST REFACTORED: November 2024
+
+
+DIRECTORY STRUCTURE
+================================================================================
+
+chromebookunlocked.github.io/
+│
+├── generate.js                    # Main build orchestrator (89 lines)
+├── generate.js.backup             # Original monolithic version (2,824 lines)
+├── package.json                   # NPM configuration and scripts
+│
+├── src/                           # Source modules
+│   ├── generators/                # HTML generation modules
+│   │   ├── cardGenerator.js       # Game card HTML generator
+│   │   ├── indexGenerator.js      # Main index page generator
+│   │   ├── gamePageGenerator.js   # Individual game page generator
+│   │   └── sitemapGenerator.js    # XML sitemap generator
+│   │
+│   └── utils/                     # Utility modules
+│       ├── dataLoader.js          # Game data loader & validator
+│       ├── assetManager.js        # Asset & thumbnail manager
+│       └── seoBuilder.js          # SEO meta tags & structured data
+│
+├── templates/                     # HTML/CSS/JS templates
+│   ├── main-styles.css            # Styles for main index page
+│   ├── game-page-styles.css       # Styles for game pages
+│   └── client.js                  # Client-side JavaScript
+│
+├── data/                          # Game metadata (JSON files)
+│   ├── Slope.json
+│   ├── FNAF 1.json
+│   └── ... (91 game files)
+│
+├── games/                         # Game content directories
+│   ├── Slope/
+│   │   ├── index.html
+│   │   └── thumbnail.png
+│   └── ... (91 game directories)
+│
+├── dist/                          # Generated output (build artifacts)
+│   ├── index.html                 # Main homepage
+│   ├── Slope.html                 # Individual game pages
+│   ├── ...
+│   └── sitemap.xml                # SEO sitemap
+│
+├── scripts/                       # Utility scripts
+│   ├── validate-games.js          # Validate game data
+│   ├── update-data.js             # Sync game metadata
+│   └── cleanup-analytics.js       # Clean analytics data
+│
+├── assets/                        # Static assets
+│   └── logo.png                   # Site logo
+│
+├── REFACTORING.md                 # Refactoring documentation
+├── ARCHITECTURE.txt               # This file
+├── README.md                      # Project README
+└── CONTRIBUTING.md                # Contribution guidelines
+
+
+BUILD PROCESS FLOW
+================================================================================
+
+1. INITIALIZATION
+   └─> Load configuration (paths, directories)
+   └─> Create dist/ directory if it doesn't exist
+
+2. DATA LOADING (dataLoader.js)
+   └─> Read all JSON files from data/
+   └─> Validate each game:
+       ├─> Check required fields (name, folder, categories)
+       ├─> Verify game folder exists in games/
+       ├─> Confirm index.html exists
+       └─> Parse categories (support string or array)
+   └─> Return validated games array
+
+3. CATEGORIZATION (dataLoader.js)
+   └─> Group games by category
+   └─> Create "Newly Added" category (20 latest games with dateAdded)
+   └─> Sort categories by game count
+
+4. TEMPLATE LOADING
+   └─> Read main-styles.css
+   └─> Read game-page-styles.css
+   └─> Read client.js
+
+5. GENERATE INDEX PAGE (indexGenerator.js)
+   └─> Build SEO meta tags (seoBuilder.js)
+   └─> Generate sidebar with categories (cardGenerator.js)
+   └─> Create game cards for all games (cardGenerator.js)
+   └─> Embed CSS styles and JavaScript
+   └─> Write dist/index.html
+
+6. GENERATE GAME PAGES (gamePageGenerator.js)
+   └─> For each game:
+       ├─> Generate SEO meta tags (seoBuilder.js)
+       ├─> Select 35 recommended games (60% same category, 40% random)
+       ├─> Create game embed iframe
+       ├─> Build "You Might Also Like" section
+       └─> Write dist/{game-folder}.html
+
+7. GENERATE SITEMAP (sitemapGenerator.js)
+   └─> Create XML sitemap
+   └─> Include homepage (priority 1.0)
+   └─> Include DMCA page (priority 0.3)
+   └─> Include all game pages (priority 0.8)
+   └─> Write dist/sitemap.xml
+
+8. BUILD COMPLETE
+   └─> Display summary (games count, categories, pages)
+
+
+DETAILED MODULE DOCUMENTATION
+================================================================================
+
+--------------------------------------------------------------------------------
+MODULE: generate.js (Main Orchestrator)
+--------------------------------------------------------------------------------
+LOCATION: /generate.js
+LINES: 89
+ROLE: Main build script that orchestrates the entire static site generation
+
+RESPONSIBILITIES:
+  - Configure file paths and directories
+  - Load game data using dataLoader
+  - Categorize games
+  - Load CSS and JavaScript templates
+  - Generate main index page
+  - Generate individual game pages
+  - Create XML sitemap
+  - Display build progress and statistics
+
+DEPENDENCIES:
+  - src/utils/dataLoader.js
+  - src/generators/indexGenerator.js
+  - src/generators/gamePageGenerator.js
+  - src/generators/sitemapGenerator.js
+
+FUNCTIONS:
+  None (main script execution flow)
+
+CONFIGURATION:
+  - dataDir: ./data
+  - gamesDir: ./games
+  - outputDir: ./dist
+  - templatesDir: ./templates
+
+EXECUTION:
+  $ node generate.js
+  or
+  $ npm run build
+
+OUTPUT:
+  - Console progress indicators
+  - Build summary statistics
+  - Generated files in dist/
+
+EXAMPLE OUTPUT:
+  🚀 Starting build process...
+  📦 Loading game data...
+  ✅ Loaded 91 games
+  📁 Categorizing games...
+  ✅ Created 20 categories
+  🎨 Loading templates...
+  ✅ Templates loaded
+  🏠 Generating main index page...
+  ✅ Created dist/index.html
+  🎮 Generating game pages...
+  ✅ Generated 91 game pages
+  🗺️  Generating sitemap...
+  ✅ Sitemap generated with 93 URLs
+  ✨ Build complete!
+
+
+--------------------------------------------------------------------------------
+MODULE: src/utils/dataLoader.js
+--------------------------------------------------------------------------------
+LOCATION: /src/utils/dataLoader.js
+LINES: ~90
+ROLE: Load and validate game metadata from JSON files
+
+EXPORTED FUNCTIONS:
+
+  1. loadGames(dataDir, gamesDir)
+     PARAMETERS:
+       - dataDir: Path to directory containing game JSON files
+       - gamesDir: Path to directory containing game folders
+     RETURNS:
+       - Array of validated game objects
+     DESCRIPTION:
+       Reads all .json files from dataDir, validates each game's data,
+       checks that game folders and index.html exist, normalizes category
+       format (converts comma-separated strings to arrays), and filters
+       out invalid games with console warnings.
+     ERROR HANDLING:
+       - Logs warnings for missing folders
+       - Logs warnings for missing index.html
+       - Logs errors for JSON parsing failures
+       - Returns null for invalid games (filtered out)
+       - Exits process if no valid games found
+
+  2. categorizeGames(games)
+     PARAMETERS:
+       - games: Array of game objects
+     RETURNS:
+       - Object with category names as keys, game arrays as values
+     DESCRIPTION:
+       Groups games by category (games can appear in multiple categories).
+       Creates special "Newly Added" category with latest 20 games that
+       have dateAdded field, sorted by date descending.
+
+GAME OBJECT STRUCTURE:
+  {
+    folder: "Slope",              // Game folder name
+    name: "Slope",                // Display name
+    categories: ["Action", "3D"], // Array of categories
+    thumbs: ["thumbnail.png"],    // Array of thumbnail filenames
+    dateAdded: "2024-01-15"       // Optional: ISO date string
+  }
+
+VALIDATION CHECKS:
+  ✓ JSON file is valid and parseable
+  ✓ Game folder exists in gamesDir
+  ✓ index.html exists in game folder
+  ✓ Categories are normalized to array format
+  ✓ Thumbnails array is populated (defaults to common names)
+
+EXAMPLE USAGE:
+  const { loadGames, categorizeGames } = require('./src/utils/dataLoader');
+
+  const games = loadGames('./data', './games');
+  // Returns: [{ folder: "Slope", name: "Slope", ... }, ...]
+
+  const categories = categorizeGames(games);
+  // Returns: { "Action": [...], "3D": [...], "Newly Added": [...] }
+
+
+--------------------------------------------------------------------------------
+MODULE: src/utils/assetManager.js
+--------------------------------------------------------------------------------
+LOCATION: /src/utils/assetManager.js
+LINES: ~30
+ROLE: Manage game thumbnails and asset paths
+
+EXPORTED FUNCTIONS:
+
+  1. chooseThumb(game, gamesDir)
+     PARAMETERS:
+       - game: Game object with folder and thumbs properties
+       - gamesDir: Path to games directory
+     RETURNS:
+       - String: Filename of first existing thumbnail, or first option as fallback
+     DESCRIPTION:
+       Searches through game.thumbs array to find the first thumbnail file
+       that actually exists in the game's folder. Returns fallback if none found.
+     LOGIC:
+       - Iterates through game.thumbs array
+       - Checks filesystem for each thumbnail
+       - Returns first match
+       - Falls back to first option if none exist
+
+  2. getAssetPath(gameFolder, filename)
+     PARAMETERS:
+       - gameFolder: Name of game folder
+       - filename: Asset filename
+     RETURNS:
+       - String: Relative path to asset (e.g., "games/Slope/thumbnail.png")
+     DESCRIPTION:
+       Constructs relative path to game asset for use in HTML.
+
+EXAMPLE USAGE:
+  const { chooseThumb, getAssetPath } = require('./src/utils/assetManager');
+
+  const game = { folder: "Slope", thumbs: ["thumb.jpg", "thumbnail.png"] };
+  const thumb = chooseThumb(game, './games');
+  // Returns: "thumbnail.png" (if it exists)
+
+  const path = getAssetPath("Slope", "thumbnail.png");
+  // Returns: "games/Slope/thumbnail.png"
+
+
+--------------------------------------------------------------------------------
+MODULE: src/utils/seoBuilder.js
+--------------------------------------------------------------------------------
+LOCATION: /src/utils/seoBuilder.js
+LINES: ~170
+ROLE: Generate SEO meta tags and structured data for search engines
+
+EXPORTED FUNCTIONS:
+
+  1. generateIndexMetaTags()
+     RETURNS: HTML string with meta tags for main index page
+     INCLUDES:
+       - charset, viewport
+       - Primary meta tags (title, description, keywords)
+       - robots, language, author
+       - Open Graph tags (Facebook)
+       - Twitter Card tags
+       - Favicon links (multiple sizes)
+       - Theme color
+       - Canonical URL
+
+  2. generateIndexStructuredData()
+     RETURNS: <script> tag with JSON-LD structured data for main page
+     SCHEMA: WebSite (schema.org)
+     INCLUDES:
+       - Site name and URL
+       - Description
+       - Publisher organization
+       - Logo image
+       - SearchAction for search engines
+
+  3. generateGameMetaTags(game, thumbPath)
+     PARAMETERS:
+       - game: Game object
+       - thumbPath: Path to game thumbnail
+     RETURNS: HTML string with game-specific meta tags
+     INCLUDES:
+       - Game-specific title, description, keywords
+       - Open Graph tags with game info
+       - Twitter Card with game image
+       - Favicon links
+       - Canonical URL for game page
+
+  4. generateGameStructuredData(game, thumbPath)
+     PARAMETERS:
+       - game: Game object
+       - thumbPath: Path to game thumbnail
+     RETURNS: <script> tag with JSON-LD for game page
+     SCHEMA: Game (schema.org)
+     INCLUDES:
+       - Game name, URL, description
+       - Genre (categories)
+       - Platform (Browser)
+       - Offer (Free game)
+       - Publisher information
+
+SEO FEATURES:
+  ✓ Optimized titles and descriptions
+  ✓ Relevant keywords
+  ✓ Social media sharing (Open Graph)
+  ✓ Twitter Card support
+  ✓ Structured data for search engines
+  ✓ Canonical URLs to prevent duplicates
+  ✓ Mobile-friendly meta viewport
+
+EXAMPLE USAGE:
+  const { generateIndexMetaTags, generateGameMetaTags } = require('./src/utils/seoBuilder');
+
+  const indexMeta = generateIndexMetaTags();
+  // Returns: "<meta charset="UTF-8">..."
+
+  const gameMeta = generateGameMetaTags(game, "games/Slope/thumb.png");
+  // Returns: "<title>Slope - Play Unblocked...</title>..."
+
+
+--------------------------------------------------------------------------------
+MODULE: src/generators/cardGenerator.js
+--------------------------------------------------------------------------------
+LOCATION: /src/generators/cardGenerator.js
+LINES: ~35
+ROLE: Generate HTML for game cards and category sidebar
+
+EXPORTED FUNCTIONS:
+
+  1. generateGameCard(game, idx, gamesDir)
+     PARAMETERS:
+       - game: Game object
+       - idx: Card index number
+       - gamesDir: Path to games directory
+     RETURNS: HTML string for single game card
+     DESCRIPTION:
+       Creates a clickable game card with thumbnail and title.
+       Uses data attributes for JavaScript filtering.
+     HTML STRUCTURE:
+       <div class="card game-card" data-index="0" data-folder="Slope">
+         <div class="thumb-container">
+           <img class="thumb" src="games/Slope/thumb.png">
+         </div>
+         <div class="card-title">Slope</div>
+       </div>
+     FEATURES:
+       - Thumbnail with fallback image
+       - CSS variable for background image
+       - Click handler to navigate to game page
+       - Data attributes for search/filtering
+
+  2. generateSidebar(categories)
+     PARAMETERS:
+       - categories: Object with category names and game arrays
+     RETURNS: HTML string for category sidebar buttons
+     DESCRIPTION:
+       Creates sidebar navigation with category buttons.
+       Filters out special categories.
+       Sorts by game count (descending).
+     FILTERS:
+       - Excludes "Newly Added"
+       - Excludes "Recently Played"
+     SORTING:
+       Categories with most games appear first
+     HTML OUTPUT:
+       <button class="sidebar-button" onclick="filterCategory('Action')">
+         Action (42)
+       </button>
+
+EXAMPLE USAGE:
+  const { generateGameCard, generateSidebar } = require('./src/generators/cardGenerator');
+
+  const cardHTML = generateGameCard(game, 0, './games');
+  // Returns: "<div class="card game-card">...</div>"
+
+  const sidebarHTML = generateSidebar(categories);
+  // Returns: "<button...>Action (42)</button>..."
+
+
+--------------------------------------------------------------------------------
+MODULE: src/generators/indexGenerator.js
+--------------------------------------------------------------------------------
+LOCATION: /src/generators/indexGenerator.js
+LINES: ~280
+ROLE: Generate complete HTML for main index page
+
+EXPORTED FUNCTIONS:
+
+  1. generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir)
+     PARAMETERS:
+       - games: Array of all game objects
+       - categories: Categorized games object
+       - mainStyles: CSS content string
+       - clientJS: JavaScript content string
+       - gamesDir: Path to games directory (optional, default '.')
+     RETURNS: Complete HTML document as string
+     DESCRIPTION:
+       Builds the entire main index page with all games, categories,
+       search functionality, and game viewer.
+
+HTML STRUCTURE:
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      - Meta tags (SEO)
+      - Structured data (JSON-LD)
+      - Embedded CSS styles
+      - Favicon links
+    </head>
+    <body>
+      - Navigation sidebar
+        - Logo
+        - Category buttons
+      - Top header
+        - Site title
+        - Search bar with dropdown
+      - Game viewer overlay
+        - Game iframe
+        - Play overlay
+        - Control buttons (back, fullscreen)
+      - Ad containers (left, right)
+      - Main content
+        - Recently Played section (populated by JS)
+        - Category sections with game grids
+        - All Games section
+      - DMCA footer link
+      - Client-side JavaScript
+    </body>
+  </html>
+
+FEATURES:
+  ✓ Responsive design
+  ✓ Category navigation
+  ✓ Search with autocomplete dropdown
+  ✓ Recently Played tracking (localStorage)
+  ✓ Game viewer with fullscreen
+  ✓ "Show More" pagination
+  ✓ Hash-based routing (#/game/slope, #/category/action)
+  ✓ Mobile-friendly
+  ✓ Accessibility (ARIA roles, skip links)
+
+CATEGORIES DISPLAYED:
+  1. Recently Played (if any - populated by JavaScript)
+  2. Newly Added (if games have dateAdded)
+  3. All other categories (sorted by game count)
+  4. All Games (complete list)
+
+EXAMPLE USAGE:
+  const { generateIndexHTML } = require('./src/generators/indexGenerator');
+
+  const html = generateIndexHTML(games, categories, css, js, './games');
+  fs.writeFileSync('dist/index.html', html);
+
+
+--------------------------------------------------------------------------------
+MODULE: src/generators/gamePageGenerator.js
+--------------------------------------------------------------------------------
+LOCATION: /src/generators/gamePageGenerator.js
+LINES: ~250
+ROLE: Generate individual game pages with recommendations
+
+EXPORTED FUNCTIONS:
+
+  1. generateGamePage(game, allGames, categories, gamePageStyles, gamesDir)
+     PARAMETERS:
+       - game: Current game object
+       - allGames: Array of all games (for recommendations)
+       - categories: Categories object
+       - gamePageStyles: CSS content string
+       - gamesDir: Path to games directory
+     RETURNS: Complete HTML document for game page
+     DESCRIPTION:
+       Creates a dedicated page for each game with iframe embed,
+       fullscreen support, and recommended games section.
+
+RECOMMENDATION ALGORITHM:
+  1. Find current game's category
+  2. Collect all games from same category
+  3. Collect all other games
+  4. Calculate target count (35 games = 7 rows × 5 columns)
+  5. Fill recommendations:
+     - 60% from same category (up to 21 games)
+     - 40% from other categories (up to 14 games)
+  6. Shuffle final list
+  7. Display in "You Might Also Like" section
+
+HTML STRUCTURE:
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      - Game-specific meta tags
+      - Game-specific structured data
+      - Embedded CSS styles
+    </head>
+    <body>
+      - Top navigation
+        - Back button (← Back to Games)
+        - Game title
+        - Fullscreen button
+      - Game container
+        - Play overlay (thumbnail preview)
+        - Game iframe
+      - You Might Also Like section
+        - 35 recommended games
+      - Footer
+        - Category tags
+        - DMCA link
+      - JavaScript for iframe and fullscreen
+    </body>
+  </html>
+
+FEATURES:
+  ✓ Game embedded in iframe
+  ✓ Play overlay with thumbnail
+  ✓ Fullscreen toggle (cross-browser)
+  ✓ Back navigation to home
+  ✓ Smart recommendations (same category first)
+  ✓ Mobile responsive
+  ✓ Game-specific SEO
+
+IFRAME CONFIGURATION:
+  - Fullscreen enabled (allow="fullscreen")
+  - Encrypted media support
+  - Autoplay enabled
+  - Source: games/{folder}/index.html
+
+EXAMPLE USAGE:
+  const { generateGamePage } = require('./src/generators/gamePageGenerator');
+
+  const html = generateGamePage(game, allGames, categories, css, './games');
+  fs.writeFileSync(`dist/${game.folder}.html`, html);
+
+
+--------------------------------------------------------------------------------
+MODULE: src/generators/sitemapGenerator.js
+--------------------------------------------------------------------------------
+LOCATION: /src/generators/sitemapGenerator.js
+LINES: ~60
+ROLE: Generate XML sitemap for search engine optimization
+
+EXPORTED FUNCTIONS:
+
+  1. generateSitemap(games, outputDir)
+     PARAMETERS:
+       - games: Array of all game objects
+       - outputDir: Path to output directory (e.g., './dist')
+     RETURNS: None (writes file directly)
+     DESCRIPTION:
+       Creates an XML sitemap following sitemaps.org protocol.
+       Includes homepage, DMCA page, and all game pages.
+
+SITEMAP STRUCTURE:
+  <?xml version="1.0" encoding="UTF-8"?>
+  <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <!-- Homepage -->
+    <url>
+      <loc>https://chromebookunlocked.github.io/</loc>
+      <lastmod>2024-11-17</lastmod>
+      <changefreq>daily</changefreq>
+      <priority>1.0</priority>
+    </url>
+
+    <!-- DMCA Page -->
+    <url>
+      <loc>https://chromebookunlocked.github.io/dmca.html</loc>
+      <changefreq>monthly</changefreq>
+      <priority>0.3</priority>
+    </url>
+
+    <!-- Game Pages -->
+    <url>
+      <loc>https://chromebookunlocked.github.io/Slope.html</loc>
+      <changefreq>weekly</changefreq>
+      <priority>0.8</priority>
+    </url>
+    ...
+  </urlset>
+
+PRIORITY LEVELS:
+  - Homepage: 1.0 (highest)
+  - Game pages: 0.8 (high)
+  - DMCA page: 0.3 (low)
+
+CHANGE FREQUENCY:
+  - Homepage: daily (updated often)
+  - Game pages: weekly (occasionally updated)
+  - DMCA page: monthly (rarely changes)
+
+OUTPUT:
+  - File: dist/sitemap.xml
+  - Encoding: UTF-8
+  - Format: XML 1.0
+  - Console: "✅ Sitemap generated with X URLs"
+
+EXAMPLE USAGE:
+  const { generateSitemap } = require('./src/generators/sitemapGenerator');
+
+  generateSitemap(games, './dist');
+  // Creates: dist/sitemap.xml
+
+
+--------------------------------------------------------------------------------
+MODULE: templates/client.js
+--------------------------------------------------------------------------------
+LOCATION: /templates/client.js
+LINES: ~690
+ROLE: Client-side JavaScript for interactive features
+
+GLOBAL VARIABLES:
+  - MAX_RECENT: 25 (max recently played games)
+  - offsets: {} (pagination offsets per category)
+  - gameViewActive: false (is game viewer open?)
+  - currentViewMode: 'home' (current view mode)
+  - currentGameFolder: null (currently playing game)
+
+MAIN FUNCTIONS:
+
+  1. Game Validation & Cleanup
+     - getValidGameFolders(): Get all game folders from DOM
+     - cleanRecentlyPlayed(): Remove deleted games from localStorage
+     - gameExists(folder): Check if game still exists
+
+  2. Grid & Layout Management
+     - gridForCategory(cat): Get grid element for category
+     - getColumnCount(grid): Calculate responsive column count
+     - createMoreCard(cat): Create "Show More" button
+     - updateCategoryView(cat): Show/hide cards with pagination
+     - updateAllCategories(): Update all category grids
+
+  3. Recently Played
+     - loadRecentlyPlayed(): Populate Recently Played grid
+     - saveRecentlyPlayed(game): Save game to localStorage
+     - Logic: Max 25 games, most recent first
+
+  4. Search Functionality
+     - searchGames(query): Search with dropdown
+     - hideSearchDropdown(): Hide search results
+     - Features: Fuzzy matching, relevance sorting, top 8 results
+
+  5. Game Viewer
+     - prepareGame(folder, name, thumb): Open game viewer
+     - startGame(): Load game in iframe
+     - closeGame(): Close viewer, restore categories
+     - Features: Overlay with thumbnail, fullscreen support
+
+  6. Curated Games (Recommendations)
+     - showCuratedGames(currentGameFolder): Show recommended games
+     - Algorithm: 60% same category, 40% random
+     - Always fills 7 rows dynamically
+
+  7. Fullscreen
+     - toggleFullscreen(): Enter/exit fullscreen
+     - handleFullscreenChange(): Handle fullscreen events
+     - Cross-browser support: webkit, moz, ms, standard
+
+  8. Navigation & Routing
+     - filterCategory(cat): Show specific category
+     - goToHome(): Return to homepage
+     - handleRouting(): Handle hash-based URLs
+     - Supports: #/game/slope, #/category/action
+
+  9. Event Listeners
+     - DOMContentLoaded: Initialize on page load
+     - hashchange: Handle URL changes
+     - resize: Update grids on window resize
+     - click: Close search dropdown on outside click
+     - fullscreenchange: Handle fullscreen state
+
+FEATURES:
+  ✓ localStorage for Recently Played
+  ✓ Real-time search with dropdown
+  ✓ Responsive grid with "Show More"
+  ✓ Hash-based routing
+  ✓ Fullscreen support (all browsers)
+  ✓ Error handling for broken images
+  ✓ Cleanup of deleted games
+  ✓ Dynamic column calculation
+
+LOCAL STORAGE:
+  Key: 'recentlyPlayed'
+  Format: JSON array of game objects
+  Example: [{ folder: "Slope", name: "Slope", thumb: "..." }, ...]
+
+
+--------------------------------------------------------------------------------
+MODULE: scripts/validate-games.js
+--------------------------------------------------------------------------------
+LOCATION: /scripts/validate-games.js
+ROLE: Validate game data before build
+
+PURPOSE:
+  Runs before build (prebuild script) to ensure all game data is valid.
+  Checks for missing files, invalid JSON, and data integrity.
+
+VALIDATION CHECKS:
+  ✓ All JSON files are valid and parseable
+  ✓ Required fields exist (name, folder)
+  ✓ Game folders exist in games/
+  ✓ index.html exists in each game folder
+  ✓ Thumbnails exist
+  ✓ Categories are properly formatted
+  ✓ No duplicate game folders
+
+EXECUTION:
+  $ npm run validate
+  or
+  Automatically runs before: npm run build
+
+
+--------------------------------------------------------------------------------
+MODULE: scripts/update-data.js
+--------------------------------------------------------------------------------
+LOCATION: /scripts/update-data.js
+ROLE: Sync game metadata from games/ folders
+
+PURPOSE:
+  Automatically creates or updates JSON files in data/ based on what's
+  in games/ directories. Useful for bulk imports.
+
+EXECUTION:
+  $ npm run sync-data
+
+
+--------------------------------------------------------------------------------
+MODULE: scripts/cleanup-analytics.js
+--------------------------------------------------------------------------------
+LOCATION: /scripts/cleanup-analytics.js
+ROLE: Clean up analytics data
+
+PURPOSE:
+  Removes old analytics data or cleans up tracking files.
+
+EXECUTION:
+  $ node scripts/cleanup-analytics.js
+
+
+CONFIGURATION FILES
+================================================================================
+
+--------------------------------------------------------------------------------
+FILE: package.json
+--------------------------------------------------------------------------------
+LOCATION: /package.json
+VERSION: 2.1.0
+
+NPM SCRIPTS:
+  build         - Run main build process (node generate.js)
+  validate      - Validate game data
+  sync-data     - Sync metadata from game folders
+  clean         - Remove dist/ directory
+  prebuild      - Runs automatically before build (validation)
+  dev           - Build and serve locally on port 3000
+  lint          - Run ESLint on all JavaScript files
+  format        - Format code with Prettier
+  format:check  - Check code formatting
+
+DEPENDENCIES:
+  None (vanilla Node.js)
+
+DEV DEPENDENCIES:
+  - eslint: ^8.57.0 (code linting)
+  - prettier: ^3.2.5 (code formatting)
+  - serve: ^14.2.1 (local development server)
+
+KEYWORDS:
+  games, unblocked, chromebook, school-games, browser-games, static-site
+
+
+--------------------------------------------------------------------------------
+FILE: .eslintrc.json
+--------------------------------------------------------------------------------
+LOCATION: /.eslintrc.json
+PURPOSE: ESLint configuration for code quality
+
+RULES:
+  - Enforces consistent code style
+  - Catches common errors
+  - Ensures best practices
+
+
+--------------------------------------------------------------------------------
+FILE: .prettierrc.json
+--------------------------------------------------------------------------------
+LOCATION: /.prettierrc.json
+PURPOSE: Prettier configuration for code formatting
+
+SETTINGS:
+  - Consistent formatting across project
+  - Auto-formatting on save (if configured)
+
+
+DATA STRUCTURE
+================================================================================
+
+--------------------------------------------------------------------------------
+GAME JSON FORMAT (data/*.json)
+--------------------------------------------------------------------------------
+
+EXAMPLE: data/Slope.json
+{
+  "name": "Slope",
+  "folder": "Slope",
+  "category": "Action,3D",           // Can be string (comma-separated)
+  "categories": ["Action", "3D"],    // Or array
+  "thumbs": [
+    "thumbnail.png",
+    "thumb.jpg"
+  ],
+  "dateAdded": "2024-01-15"          // Optional: for "Newly Added"
+}
+
+REQUIRED FIELDS:
+  - name: Display name of the game
+  - folder: Folder name in games/ directory
+
+OPTIONAL FIELDS:
+  - category: String with comma-separated categories
+  - categories: Array of category strings (overrides category)
+  - thumbs: Array of thumbnail filenames to try (in order)
+  - dateAdded: ISO date string for "Newly Added" section
+
+VALIDATION:
+  ✓ JSON must be valid
+  ✓ name field required
+  ✓ folder must match existing directory in games/
+  ✓ games/{folder}/index.html must exist
+  ✓ Categories normalized to array format
+
+
+--------------------------------------------------------------------------------
+GAME DIRECTORY STRUCTURE (games/*)
+--------------------------------------------------------------------------------
+
+EXAMPLE: games/Slope/
+  index.html         - Main game file (required)
+  thumbnail.png      - Game thumbnail (recommended)
+  thumb.jpg          - Alternate thumbnail
+  assets/            - Game assets (images, sounds, etc.)
+  js/                - JavaScript files
+  css/               - Stylesheets
+  ...                - Other game files
+
+REQUIREMENTS:
+  ✓ index.html must exist
+  ✓ At least one thumbnail should exist
+  ✓ Self-contained (all assets in game folder)
+
+
+OUTPUT STRUCTURE
+================================================================================
+
+--------------------------------------------------------------------------------
+GENERATED FILES (dist/)
+--------------------------------------------------------------------------------
+
+dist/
+├── index.html              - Main homepage
+├── sitemap.xml             - SEO sitemap
+│
+├── Slope.html              - Individual game pages
+├── FNAF 1.html
+├── Drift Hunters.html
+└── ... (91 game pages)
+
+FILE SIZES (approximate):
+  - index.html: 150-200 KB (includes all games)
+  - Game pages: 18-25 KB each
+  - sitemap.xml: 5-10 KB
+
+TOTAL OUTPUT:
+  - 1 homepage
+  - 91 game pages
+  - 1 sitemap
+  - Total: 93 files
+
+
+WORKFLOW & DEVELOPMENT
+================================================================================
+
+TYPICAL WORKFLOW:
+
+1. ADD NEW GAME
+   ├─> Create games/NewGame/ directory
+   ├─> Add games/NewGame/index.html
+   ├─> Add thumbnail to games/NewGame/
+   ├─> Create data/NewGame.json
+   └─> Run: npm run build
+
+2. UPDATE GAME METADATA
+   ├─> Edit data/GameName.json
+   ├─> Change name, categories, or thumbnails
+   └─> Run: npm run build
+
+3. DEVELOPMENT
+   ├─> Make changes to source files
+   ├─> Run: npm run dev
+   └─> Visit: http://localhost:3000
+
+4. VALIDATE DATA
+   └─> Run: npm run validate
+
+5. FORMAT CODE
+   └─> Run: npm run format
+
+6. DEPLOY
+   ├─> Run: npm run build
+   ├─> Commit changes to git
+   └─> Push to GitHub (auto-deploys via GitHub Pages)
+
+
+PERFORMANCE CONSIDERATIONS
+================================================================================
+
+BUILD TIME:
+  - Average: 3-5 seconds for 91 games
+  - Scales linearly with game count
+
+OPTIMIZATION:
+  - CSS embedded in HTML (no extra HTTP request)
+  - JavaScript embedded (single file load)
+  - Static HTML (no server-side processing)
+  - Thumbnails lazy-loaded by browser
+
+OUTPUT SIZE:
+  - Minimal: No external dependencies
+  - Compressed: GitHub Pages uses gzip
+  - Efficient: Single page load for homepage
+
+
+BROWSER COMPATIBILITY
+================================================================================
+
+SUPPORTED BROWSERS:
+  ✓ Chrome 90+
+  ✓ Firefox 88+
+  ✓ Safari 14+
+  ✓ Edge 90+
+  ✓ Mobile browsers (iOS Safari, Chrome Mobile)
+
+FEATURES USED:
+  - ES6 JavaScript (arrow functions, template literals)
+  - CSS Grid Layout
+  - CSS Custom Properties (variables)
+  - LocalStorage API
+  - Fullscreen API (with vendor prefixes)
+  - History API (pushState)
+
+
+SECURITY CONSIDERATIONS
+================================================================================
+
+XSS PREVENTION:
+  - User input sanitized in search
+  - No eval() or dangerous HTML injection
+  - CSP headers recommended (via server config)
+
+DATA VALIDATION:
+  - All game data validated before build
+  - File existence checked
+  - JSON parsing with error handling
+
+GAME SANDBOXING:
+  - Games run in iframes
+  - Isolated from main page JavaScript
+  - No direct DOM access
+
+
+FUTURE IMPROVEMENTS
+================================================================================
+
+PLANNED FEATURES:
+  1. Unit tests for all modules
+  2. TypeScript migration for type safety
+  3. Parallel game page generation
+  4. CSS/JS minification for production
+  5. Progressive Web App (PWA) support
+  6. Offline game caching
+  7. Search index generation
+  8. Analytics integration
+  9. A/B testing framework
+  10. Automated screenshot generation
+
+
+TROUBLESHOOTING
+================================================================================
+
+COMMON ISSUES:
+
+1. "No valid games found"
+   CAUSE: No JSON files in data/ or all invalid
+   FIX: Check data/ directory, validate JSON format
+
+2. "Game folder not found"
+   CAUSE: Mismatch between JSON folder field and actual folder
+   FIX: Ensure data/Game.json "folder" matches games/Game/
+
+3. "Build fails"
+   CAUSE: Missing dependencies or invalid data
+   FIX: Run npm install, then npm run validate
+
+4. "Game doesn't appear"
+   CAUSE: Missing index.html in game folder
+   FIX: Ensure games/{folder}/index.html exists
+
+5. "Recently Played not working"
+   CAUSE: localStorage disabled or blocked
+   FIX: Enable localStorage in browser settings
+
+
+CONTACT & SUPPORT
+================================================================================
+
+REPOSITORY: https://github.com/chromebookunlocked/chromebookunlocked.github.io
+ISSUES: https://github.com/chromebookunlocked/chromebookunlocked.github.io/issues
+LICENSE: MIT
+
+
+END OF DOCUMENTATION
+================================================================================
+Generated: November 2024
+Version: 2.1.0
+Maintained by: Chromebook Unlocked Games Team
+================================================================================
