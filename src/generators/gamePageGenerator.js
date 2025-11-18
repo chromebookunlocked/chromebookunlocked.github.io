@@ -16,20 +16,30 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   const categoryList = game.categories.join(", ");
   const thumbPath = getAssetPath(game.folder, thumb);
 
-  // Get similar games for "You Might Also Like" section
+  // Get similar games for "You Might Also Like" section (no duplicates)
   const sameCategory = allGames.filter((g) =>
     g.folder !== game.folder &&
     g.categories.some((cat) => game.categories.includes(cat))
   );
-  const otherGames = allGames.filter((g) => g.folder !== game.folder);
 
-  // Shuffle and mix: 60% same category (14 games) + 40% random (21 games) = 35 total
+  // Shuffle same category games
+  const shuffledSameCategory = sameCategory.sort(() => Math.random() - 0.5);
+
+  // Get other games, excluding already selected same-category games
+  const sameCategoryFolders = new Set(shuffledSameCategory.map(g => g.folder));
+  const otherGames = allGames.filter((g) =>
+    g.folder !== game.folder &&
+    !sameCategoryFolders.has(g.folder)
+  );
+
+  // Shuffle other games
+  const shuffledOtherGames = otherGames.sort(() => Math.random() - 0.5);
+
+  // Combine: prioritize same category, then fill with others to reach 35 games (7 rows x 5 columns)
   const shuffled = [
-    ...sameCategory.slice(0, 14),
-    ...otherGames.slice(0, 21),
-  ]
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 35); // 7 rows x 5 columns = 35 games
+    ...shuffledSameCategory,
+    ...shuffledOtherGames,
+  ].slice(0, 35);
 
   const recommendedGamesHTML = shuffled
     .map((g) => {
