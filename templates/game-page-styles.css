@@ -267,14 +267,13 @@ h1 {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
   z-index: 10;
-  opacity: 0;
-  transition: opacity var(--transition-medium);
+  opacity: 1;
+  pointer-events: none;
 }
 
-.game-frame-wrapper:hover .controls {
-  opacity: 1;
+.controls > * {
+  pointer-events: auto;
 }
 
 .icon-btn {
