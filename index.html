@@ -225,26 +225,6 @@ html,body {
   transform: rotate(180deg);
 }
 
-#sidebar header {
-  display:flex;
-  justify-content:center;
-  padding: 1rem 0;
-  cursor: pointer;
-  flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  background: transparent;
-  z-index: 10;
-}
-#sidebar header img {
-  height:60px;
-  width:auto;
-  filter: drop-shadow(0 0 10px var(--accent));
-  transition: transform .3s ease;
-}
-#sidebar:hover header img {
-  transform: scale(1.1);
-}
 #sidebar ul {
   list-style:none;
   padding:1rem 0;
@@ -368,6 +348,26 @@ html,body {
     width: 100%;
     text-align: center;
   }
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.5rem, 1vw, 1.5rem);
+  cursor: pointer;
+}
+
+.logo {
+  height: clamp(32px, 4vw, 48px);
+  width: auto;
+  border-radius: 12px;
+  filter: drop-shadow(0 0 10px var(--accent));
+  transition: transform .3s ease;
+  cursor: pointer;
+}
+
+.logo:hover {
+  transform: scale(1.1);
 }
 
 #searchContainer {
@@ -992,9 +992,9 @@ button:active {
 
   <!-- Top Header with Search -->
   <header id="topHeader">
-    <div class="header-left" onclick="goToHome()" role="button" tabindex="0" onkeypress="if(event.key==='Enter')goToHome()" style="cursor: pointer;">
-      <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo">
-      <h1>Chromebook Unlocked Games</h1>
+    <div class="header-left">
+      <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="logo" onclick="window.location.href='index.html'">
+      <h1 onclick="window.location.href='index.html'">Chromebook Unlocked Games</h1>
     </div>
     <div id="searchContainer" role="search">
       <span id="searchIcon" aria-hidden="true">🔍</span>
