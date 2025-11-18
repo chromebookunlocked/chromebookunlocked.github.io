@@ -140,12 +140,13 @@ html,body {
   width: var(--sidebar-width);
   background: linear-gradient(180deg, #330066 0%, #1a0033 100%);
   padding:0;
-  padding-top: 80px; /* Space for header */
-  height:100vh;
+  padding-top: 0;
+  height: calc(100vh - 80px); /* Full height minus header */
   overflow-y:auto;
   overflow-x:hidden;
   position:fixed;
-  left:0; top:0;
+  left:0;
+  top: 80px; /* Start below header */
   z-index:999;
   transition: width .3s ease;
   border-right: 2px solid rgba(255, 102, 255, 0.2);
@@ -199,7 +200,7 @@ html,body {
 #sidebarIndicator {
   position: fixed;
   left: calc(var(--sidebar-width) - 15px);
-  top: 50%;
+  top: calc(50% + 40px); /* Centered in viewport accounting for header */
   transform: translateY(-50%);
   display: flex;
   align-items: center;
@@ -272,9 +273,10 @@ html,body {
   overflow-y:auto;
   overflow-x:hidden;
   margin-left: var(--sidebar-width);
+  margin-top: 80px; /* Space for fixed header */
   width: calc(100% - var(--sidebar-width));
   transition: margin-left .3s;
-  height:100vh;
+  height: calc(100vh - 80px);
   -webkit-overflow-scrolling: touch;
 }
 
@@ -291,11 +293,13 @@ html,body {
   #content {
     margin-left: 0;
     width: 100%;
-    padding-top: env(safe-area-inset-top);
+    margin-top: 80px;
   }
   #sidebar {
     transform: translateX(-100%);
     width: 250px;
+    top: 80px;
+    height: calc(100vh - 80px);
     z-index: 2000;
   }
   #sidebar:hover,
@@ -304,6 +308,7 @@ html,body {
   }
   #sidebarIndicator {
     right: -35px;
+    top: calc(50% + 40px);
     opacity: 0.8;
   }
 }
@@ -314,14 +319,18 @@ html,body {
   padding: clamp(0.8rem, 1.5vw, 1.5rem) clamp(0.8rem, 2vw, 2rem);
   border-bottom: 2px solid rgba(255, 102, 255, 0.3);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
   z-index: 1001;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: clamp(0.8rem, 1.5vw, 2rem);
   flex-wrap: wrap;
+  backdrop-filter: blur(10px);
 }
 
 .header-left {
@@ -372,6 +381,7 @@ html,body {
     flex-direction: column;
     gap: 0.8rem;
     padding: 0.8rem 1rem;
+    position: fixed;
   }
   .header-left {
     width: 100%;
@@ -384,6 +394,14 @@ html,body {
   #topHeader h1 {
     font-size: clamp(1rem, 4vw, 1.5rem);
     text-align: center;
+  }
+  #sidebar {
+    top: 100px; /* Adjusted for mobile header height */
+    height: calc(100vh - 100px);
+  }
+  #content {
+    margin-top: 100px; /* Adjusted for mobile header height */
+    height: calc(100vh - 100px);
   }
 }
 
