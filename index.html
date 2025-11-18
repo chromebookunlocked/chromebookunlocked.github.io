@@ -992,9 +992,6 @@ button:active {
 
   <!-- Sidebar -->
   <nav id="sidebar" role="navigation" aria-label="Game categories">
-    <header onclick="goToHome()" role="button" tabindex="0" onkeypress="if(event.key==='Enter')goToHome()" aria-label="Go to home page">
-      <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo">
-    </header>
     <ul id="categoryList" role="menu">
       <li role="menuitem" tabindex="0" onclick="filterCategory('Home')" onkeypress="if(event.key==='Enter')filterCategory('Home')">Home</li>
       <li role="menuitem" tabindex="0" onclick="filterCategory('All Games')" onkeypress="if(event.key==='Enter')filterCategory('All Games')">All Games</li>
@@ -1007,9 +1004,11 @@ button:active {
   <div id="content" role="main">
     <!-- Top Header with Search -->
     <header id="topHeader">
-      <h1 onclick="goToHome()" role="button" tabindex="0" onkeypress="if(event.key==='Enter')goToHome()" style="cursor: pointer;">Chromebook Unlocked Games</h1>
+      <div class="header-left" onclick="goToHome()" role="button" tabindex="0" onkeypress="if(event.key==='Enter')goToHome()" style="cursor: pointer;">
+        <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo">
+        <h1>Chromebook Unlocked Games</h1>
+      </div>
       <div id="searchContainer" role="search">
-        <label for="searchBar" class="sr-only">Search games</label>
         <span id="searchIcon" aria-hidden="true">🔍</span>
         <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)" aria-label="Search for games" autocomplete="off">
         <div id="searchDropdown" role="listbox" aria-label="Search results"></div>
