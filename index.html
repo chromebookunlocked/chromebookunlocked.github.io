@@ -990,6 +990,19 @@ button:active {
   <!-- Skip to main content link for accessibility -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
+  <!-- Top Header with Search -->
+  <header id="topHeader">
+    <div class="header-left" onclick="goToHome()" role="button" tabindex="0" onkeypress="if(event.key==='Enter')goToHome()" style="cursor: pointer;">
+      <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo">
+      <h1>Chromebook Unlocked Games</h1>
+    </div>
+    <div id="searchContainer" role="search">
+      <span id="searchIcon" aria-hidden="true">🔍</span>
+      <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)" aria-label="Search for games" autocomplete="off">
+      <div id="searchDropdown" role="listbox" aria-label="Search results"></div>
+    </div>
+  </header>
+
   <!-- Sidebar -->
   <nav id="sidebar" role="navigation" aria-label="Game categories">
     <ul id="categoryList" role="menu">
@@ -1002,18 +1015,6 @@ button:active {
 
   <!-- Content -->
   <div id="content" role="main">
-    <!-- Top Header with Search -->
-    <header id="topHeader">
-      <div class="header-left" onclick="goToHome()" role="button" tabindex="0" onkeypress="if(event.key==='Enter')goToHome()" style="cursor: pointer;">
-        <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo">
-        <h1>Chromebook Unlocked Games</h1>
-      </div>
-      <div id="searchContainer" role="search">
-        <span id="searchIcon" aria-hidden="true">🔍</span>
-        <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)" aria-label="Search for games" autocomplete="off">
-        <div id="searchDropdown" role="listbox" aria-label="Search results"></div>
-      </div>
-    </header>
 
     <div class="content-wrapper" id="main-content">
       <div id="controls">
