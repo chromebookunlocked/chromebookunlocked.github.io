@@ -428,6 +428,14 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Dud -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Dud.html</loc>
+    <lastmod>2025-11-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Dunk Shot -->
   <url>
     <loc>https://chromebookunlocked.github.io/Dunk%20Shot.html</loc>
