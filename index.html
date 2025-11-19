@@ -360,19 +360,17 @@ html,body {
 .logo {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
   padding: 4px;
-  box-shadow: 0 4px 15px rgba(255, 102, 255, 0.2), 0 0 20px rgba(139, 92, 246, 0.6);
-  transition: transform .3s ease;
-  cursor: pointer;
+  box-shadow: 0 4px 15px var(--shadow-color), 0 0 20px rgba(139, 92, 246, 0.6);
+  transition: var(--transition-medium);
 }
 
 .logo:hover {
   transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 6px 25px rgba(255, 102, 255, 0.2);
+  box-shadow: 0 6px 25px var(--shadow-color);
 }
-
 #searchContainer {
   flex: 1;
   max-width: 500px;
