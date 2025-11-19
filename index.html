@@ -205,33 +205,41 @@ html,body {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.7;
-  transition: all .3s ease;
+  opacity: 0.8;
+  transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
-  font-size: 2rem;
-  color: rgba(255, 255, 255, 0.8);
   z-index: 998;
-  text-shadow: 0 0 10px rgba(255, 102, 255, 0.5);
-  width: 30px;
-  height: 30px;
-  background: rgba(255, 102, 255, 0.15);
-  border-radius: 50%;
-  backdrop-filter: blur(5px);
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.25), rgba(236, 72, 153, 0.25));
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 #sidebar:hover ~ #sidebarIndicator {
   opacity: 1;
   left: 240px;
-  background: rgba(255, 102, 255, 0.25);
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.4), rgba(236, 72, 153, 0.4));
+  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.5);
+  border-color: rgba(255, 255, 255, 0.2);
 }
+/* Modern chevron arrow using CSS */
 #sidebarIndicator::before {
-  content: '›';
-  font-weight: 300;
-  transition: transform .3s ease;
+  content: '';
   display: block;
-  line-height: 1;
+  width: 10px;
+  height: 10px;
+  border-right: 2.5px solid rgba(255, 255, 255, 0.9);
+  border-bottom: 2.5px solid rgba(255, 255, 255, 0.9);
+  transform: rotate(-45deg);
+  transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-left: 2px; /* Slight offset to center visually */
+  filter: drop-shadow(0 2px 4px rgba(147, 51, 234, 0.4));
 }
 #sidebar:hover ~ #sidebarIndicator::before {
-  transform: rotate(180deg);
+  transform: rotate(135deg);
+  margin-left: -2px; /* Adjust offset when rotated */
 }
 
 #sidebar ul {
@@ -2314,7 +2322,7 @@ function updateAllCategories() {
 
 // Populate Recently Played grid
 function loadRecentlyPlayed() {
-  const list = cleanRecentlyPlayed(); // Clean before loading
+  let list = cleanRecentlyPlayed(); // Clean before loading
 
   const recentSection = document.getElementById('recentlyPlayedSection');
   const recentGrid = document.getElementById('recentlyPlayedGrid');
@@ -2328,6 +2336,13 @@ function loadRecentlyPlayed() {
   }
 
   if (recentSection) recentSection.style.display = 'block';
+
+  // Sort by lastPlayed timestamp (most recent first)
+  list.sort((a, b) => {
+    const timeA = a.lastPlayed || 0;
+    const timeB = b.lastPlayed || 0;
+    return timeB - timeA; // Descending order (newest first)
+  });
 
   const displayList = list.slice(0, MAX_RECENT);
 
@@ -2817,8 +2832,16 @@ function handleFullscreenChange() {
 function saveRecentlyPlayed(game) {
   let list = cleanRecentlyPlayed(); // Clean before saving
 
+  // Remove existing entry if present
   list = list.filter(g => g.folder !== game.folder);
-  list.unshift(game);
+
+  // Add timestamp to track when game was played
+  const gameWithTimestamp = {
+    ...game,
+    lastPlayed: Date.now()
+  };
+
+  list.unshift(gameWithTimestamp);
   if (list.length > MAX_RECENT) list = list.slice(0, MAX_RECENT);
   localStorage.setItem('recentlyPlayed', JSON.stringify(list));
   loadRecentlyPlayed();
