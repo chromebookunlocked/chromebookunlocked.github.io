@@ -140,12 +140,14 @@ html,body {
   width: var(--sidebar-width);
   background: linear-gradient(180deg, #330066 0%, #1a0033 100%);
   padding:0;
-  height:100vh;
+  padding-top: 0;
+  height: calc(100vh - 80px); /* Full height minus header */
   overflow-y:auto;
   overflow-x:hidden;
   position:fixed;
-  left:0; top:0;
-  z-index:1000;
+  left:0;
+  top: 80px; /* Start below header */
+  z-index:999;
   transition: width .3s ease;
   border-right: 2px solid rgba(255, 102, 255, 0.2);
   box-shadow: 5px 0 20px rgba(255, 102, 255, 0.1);
@@ -198,28 +200,35 @@ html,body {
 #sidebarIndicator {
   position: fixed;
   left: calc(var(--sidebar-width) - 15px);
-  top: 50%;
+  top: calc(50% + 40px); /* Centered in viewport accounting for header */
   transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.5;
+  opacity: 0.7;
   transition: all .3s ease;
   pointer-events: none;
-  font-size: 1.8rem;
-  color: rgba(255, 255, 255, 0.7);
-  z-index: 999;
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.8);
+  z-index: 998;
   text-shadow: 0 0 10px rgba(255, 102, 255, 0.5);
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 102, 255, 0.15);
+  border-radius: 50%;
+  backdrop-filter: blur(5px);
 }
 #sidebar:hover ~ #sidebarIndicator {
-  opacity: 0;
+  opacity: 1;
   left: 240px;
+  background: rgba(255, 102, 255, 0.25);
 }
 #sidebarIndicator::before {
   content: '›';
   font-weight: 300;
   transition: transform .3s ease;
   display: block;
+  line-height: 1;
 }
 #sidebar:hover ~ #sidebarIndicator::before {
   transform: rotate(180deg);
@@ -264,9 +273,10 @@ html,body {
   overflow-y:auto;
   overflow-x:hidden;
   margin-left: var(--sidebar-width);
+  margin-top: 80px; /* Space for fixed header */
   width: calc(100% - var(--sidebar-width));
   transition: margin-left .3s;
-  height:100vh;
+  height: calc(100vh - 80px);
   -webkit-overflow-scrolling: touch;
 }
 
@@ -283,11 +293,13 @@ html,body {
   #content {
     margin-left: 0;
     width: 100%;
-    padding-top: env(safe-area-inset-top);
+    margin-top: 80px;
   }
   #sidebar {
     transform: translateX(-100%);
     width: 250px;
+    top: 80px;
+    height: calc(100vh - 80px);
     z-index: 2000;
   }
   #sidebar:hover,
@@ -296,6 +308,7 @@ html,body {
   }
   #sidebarIndicator {
     right: -35px;
+    top: calc(50% + 40px);
     opacity: 0.8;
   }
 }
@@ -306,14 +319,46 @@ html,body {
   padding: clamp(0.8rem, 1.5vw, 1.5rem) clamp(0.8rem, 2vw, 2rem);
   border-bottom: 2px solid rgba(255, 102, 255, 0.3);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 100;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 1001;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: clamp(0.8rem, 1.5vw, 2rem);
   flex-wrap: wrap;
+  backdrop-filter: blur(10px);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.6rem, 1vw, 1rem);
+  cursor: pointer;
+  transition: transform .3s ease;
+}
+
+.header-left:hover {
+  transform: translateX(-4px);
+}
+
+.header-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), #8b5cf6);
+  padding: 4px;
+  box-shadow: 0 4px 15px rgba(255, 102, 255, 0.4), 0 0 20px rgba(139, 92, 246, 0.6);
+  transition: all .3s ease;
+  object-fit: contain;
+}
+
+.header-logo:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 25px rgba(255, 102, 255, 0.6);
 }
 
 #topHeader h1 {
@@ -325,16 +370,10 @@ html,body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   white-space: nowrap;
-  cursor: pointer;
-  transition: transform .3s ease;
   overflow: hidden;
   text-overflow: ellipsis;
   flex-shrink: 1;
   min-width: 0;
-}
-
-#topHeader h1:hover {
-  transform: scale(1.05);
 }
 
 @media (max-width: 768px) {
@@ -342,37 +381,30 @@ html,body {
     flex-direction: column;
     gap: 0.8rem;
     padding: 0.8rem 1rem;
+    position: fixed;
+  }
+  .header-left {
+    width: 100%;
+    justify-content: center;
+  }
+  .header-logo {
+    width: 40px;
+    height: 40px;
   }
   #topHeader h1 {
     font-size: clamp(1rem, 4vw, 1.5rem);
-    width: 100%;
     text-align: center;
+  }
+  #sidebar {
+    top: 100px; /* Adjusted for mobile header height */
+    height: calc(100vh - 100px);
+  }
+  #content {
+    margin-top: 100px; /* Adjusted for mobile header height */
+    height: calc(100vh - 100px);
   }
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: clamp(0.5rem, 1vw, 1.5rem);
-  cursor: pointer;
-}
-
-.logo {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  padding: 4px;
-  box-shadow: 0 4px 15px var(--shadow-color), 0 0 20px rgba(139, 92, 246, 0.6);
-  transition: var(--transition-medium);
-  object-fit: contain;
-  box-sizing: border-box;
-}
-
-.logo:hover {
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 6px 25px var(--shadow-color);
-}
 #searchContainer {
   flex: 1;
   max-width: 500px;
@@ -993,19 +1025,6 @@ button:active {
   <!-- Skip to main content link for accessibility -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <!-- Top Header with Search -->
-  <header id="topHeader">
-    <div class="header-left">
-      <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="logo" onclick="window.location.href='index.html'">
-      <h1 onclick="window.location.href='index.html'">Chromebook Unlocked Games</h1>
-    </div>
-    <div id="searchContainer" role="search">
-      <span id="searchIcon" aria-hidden="true">🔍</span>
-      <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)" aria-label="Search for games" autocomplete="off">
-      <div id="searchDropdown" role="listbox" aria-label="Search results"></div>
-    </div>
-  </header>
-
   <!-- Sidebar -->
   <nav id="sidebar" role="navigation" aria-label="Game categories">
     <ul id="categoryList" role="menu">
@@ -1018,6 +1037,18 @@ button:active {
 
   <!-- Content -->
   <div id="content" role="main">
+    <!-- Top Header with Search -->
+    <header id="topHeader">
+      <div class="header-left">
+        <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='index.html'">
+        <h1 onclick="window.location.href='index.html'">Chromebook Unlocked Games</h1>
+      </div>
+      <div id="searchContainer" role="search">
+        <span id="searchIcon" aria-hidden="true">🔍</span>
+        <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)" aria-label="Search for games" autocomplete="off">
+        <div id="searchDropdown" role="listbox" aria-label="Search results"></div>
+      </div>
+    </header>
 
     <div class="content-wrapper" id="main-content">
       <div id="controls">
