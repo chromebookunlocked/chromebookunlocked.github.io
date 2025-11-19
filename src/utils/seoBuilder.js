@@ -83,7 +83,7 @@ function generateIndexStructuredData() {
 function generateGameMetaTags(game, thumbPath) {
   const gameTitle = `${game.name} - Play Unblocked on Chromebook`;
   const gameDescription = `Play ${game.name} unblocked at school on your Chromebook. Free online game that works on school computers. No downloads required!`;
-  const gameUrl = `https://chromebookunlocked.github.io/pages/${game.folder}.html`;
+  const gameUrl = `https://chromebookunlocked.github.io/${game.folder}.html`;
   const imageUrl = `https://chromebookunlocked.github.io/${thumbPath}`;
 
   return `<meta charset="UTF-8">
@@ -134,7 +134,7 @@ function generateGameMetaTags(game, thumbPath) {
  * @returns {string} Script tag with JSON-LD structured data
  */
 function generateGameStructuredData(game, thumbPath) {
-  const gameUrl = `https://chromebookunlocked.github.io/pages/${game.folder}.html`;
+  const gameUrl = `https://chromebookunlocked.github.io/${game.folder}.html`;
   const imageUrl = `https://chromebookunlocked.github.io/${thumbPath}`;
 
   return `<script type="application/ld+json">
