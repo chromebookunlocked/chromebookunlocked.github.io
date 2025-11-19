@@ -78,7 +78,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     <!-- Top Header with Search -->
     <header id="topHeader">
       <div class="header-left">
-        <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="logo" onclick="window.location.href='index.html'">
+        <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='index.html'">
         <h1 onclick="window.location.href='index.html'">Chromebook Unlocked Games</h1>
       </div>
       <div id="searchContainer" role="search">
