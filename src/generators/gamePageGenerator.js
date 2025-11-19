@@ -12,9 +12,9 @@ const { generateGameMetaTags, generateGameStructuredData } = require("../utils/s
  */
 function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) {
   const thumb = chooseThumb(game, gamesDir);
-  const gameUrl = `games/${game.folder}/index.html`;
+  const gameUrl = `../games/${game.folder}/index.html`;
   const categoryList = game.categories.join(", ");
-  const thumbPath = getAssetPath(game.folder, thumb);
+  const thumbPath = getAssetPath(game.folder, thumb, true);
 
   // Get similar games for "You Might Also Like" section (no duplicates)
   const sameCategory = allGames.filter((g) =>
@@ -44,7 +44,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   const recommendedGamesHTML = shuffled
     .map((g) => {
       const gThumb = chooseThumb(g, gamesDir);
-      const gThumbPath = getAssetPath(g.folder, gThumb);
+      const gThumbPath = getAssetPath(g.folder, gThumb, true);
       return `<a href="${g.folder}.html" class="game-card">
       <div class="thumb-container" style="--thumb-url: url('${gThumbPath}')">
         <img class="thumb" src="${gThumbPath}" alt="${g.name}" loading="lazy">
@@ -76,15 +76,15 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   <!-- Header with Logo -->
   <header>
     <div class="header-left">
-      <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='index.html'">
-      <h1 onclick="window.location.href='index.html'">Chromebook Unlocked Games</h1>
+      <img src="../assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='../index.html'">
+      <h1 onclick="window.location.href='../index.html'">Chromebook Unlocked Games</h1>
     </div>
   </header>
 
   <!-- Game Viewer -->
   <div class="game-container">
     <!-- Back Button (outside game frame) -->
-    <button class="back-button" onclick="window.location.href='index.html'" title="Back to Games" aria-label="Back to Games">
+    <button class="back-button" onclick="window.location.href='../index.html'" title="Back to Games" aria-label="Back to Games">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       <span>Back</span>
     </button>
@@ -98,7 +98,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
       </div>
 
       <div class="play-overlay" id="playOverlay">
-        <img src="games/${game.folder}/${thumb}" alt="${game.name}">
+        <img src="${thumbPath}" alt="${game.name}">
         <h2>${game.name}</h2>
         <button class="play-btn" onclick="startGame()">▶ Play</button>
       </div>
@@ -116,7 +116,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
       ${game.categories
         .map(
           (cat) =>
-            `<a href="index.html#/category/${encodeURIComponent(cat)}" class="category-tag">${cat}</a>`
+            `<a href="../index.html#/category/${encodeURIComponent(cat)}" class="category-tag">${cat}</a>`
         )
         .join("")}
     </div>
@@ -132,9 +132,9 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
   <footer>
     <p>
-      <strong>${game.name}</strong> - Free to play on <a href="index.html">Chromebook Unlocked Games</a>
+      <strong>${game.name}</strong> - Free to play on <a href="../index.html">Chromebook Unlocked Games</a>
       <br>
-      Categories: ${categoryList} | <a href="dmca.html">DMCA</a>
+      Categories: ${categoryList} | <a href="../dmca.html">DMCA</a>
     </p>
   </footer>
 

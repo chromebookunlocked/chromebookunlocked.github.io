@@ -83,8 +83,10 @@ function generateIndexStructuredData() {
 function generateGameMetaTags(game, thumbPath) {
   const gameTitle = `${game.name} - Play Unblocked on Chromebook`;
   const gameDescription = `Play ${game.name} unblocked at school on your Chromebook. Free online game that works on school computers. No downloads required!`;
-  const gameUrl = `https://chromebookunlocked.github.io/${game.folder}.html`;
-  const imageUrl = `https://chromebookunlocked.github.io/${thumbPath}`;
+  const gameUrl = `https://chromebookunlocked.github.io/games-html/${game.folder}.html`;
+  // Strip ../ prefix from thumbPath for absolute URL
+  const cleanThumbPath = thumbPath.replace(/^\.\.\//, '');
+  const imageUrl = `https://chromebookunlocked.github.io/${cleanThumbPath}`;
 
   return `<meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -114,13 +116,13 @@ function generateGameMetaTags(game, thumbPath) {
   <meta property="twitter:image" content="${imageUrl}">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="assets/logo.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/logo.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/logo.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="assets/logo.png">
-  <link rel="icon" type="image/png" sizes="144x144" href="assets/logo.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/logo.png">
-  <link rel="shortcut icon" type="image/png" href="assets/logo.png">
+  <link rel="icon" type="image/x-icon" href="../assets/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/logo.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="../assets/logo.png">
+  <link rel="icon" type="image/png" sizes="144x144" href="../assets/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/logo.png">
+  <link rel="shortcut icon" type="image/png" href="../assets/logo.png">
 
   <!-- Additional SEO -->
   <meta name="theme-color" content="#ff66ff">
@@ -134,8 +136,10 @@ function generateGameMetaTags(game, thumbPath) {
  * @returns {string} Script tag with JSON-LD structured data
  */
 function generateGameStructuredData(game, thumbPath) {
-  const gameUrl = `https://chromebookunlocked.github.io/${game.folder}.html`;
-  const imageUrl = `https://chromebookunlocked.github.io/${thumbPath}`;
+  const gameUrl = `https://chromebookunlocked.github.io/games-html/${game.folder}.html`;
+  // Strip ../ prefix from thumbPath for absolute URL
+  const cleanThumbPath = thumbPath.replace(/^\.\.\//, '');
+  const imageUrl = `https://chromebookunlocked.github.io/${cleanThumbPath}`;
 
   return `<script type="application/ld+json">
   {

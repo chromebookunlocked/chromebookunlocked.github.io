@@ -18,10 +18,12 @@ function chooseThumb(game, gamesDir) {
  * Get asset path for a game file
  * @param {string} gameFolder - Game folder name
  * @param {string} filename - File name
+ * @param {boolean} fromGamePage - If true, adds ../ prefix (for pages in games-html/)
  * @returns {string} Relative path to asset
  */
-function getAssetPath(gameFolder, filename) {
-  return `games/${gameFolder}/${filename}`;
+function getAssetPath(gameFolder, filename, fromGamePage = false) {
+  const basePath = `games/${gameFolder}/${filename}`;
+  return fromGamePage ? `../${basePath}` : basePath;
 }
 
 module.exports = {

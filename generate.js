@@ -25,11 +25,15 @@ const { generateGamePage } = require("./src/generators/gamePageGenerator");
 const dataDir = path.join(__dirname, "data");
 const gamesDir = path.join(__dirname, "games");
 const outputDir = path.join(__dirname, "dist");
+const gamesHtmlDir = path.join(outputDir, "games-html");
 const templatesDir = path.join(__dirname, "templates");
 
-// Ensure output directory exists
+// Ensure output directories exist
 if (!fs.existsSync(outputDir)) {
   fs.mkdirSync(outputDir, { recursive: true });
+}
+if (!fs.existsSync(gamesHtmlDir)) {
+  fs.mkdirSync(gamesHtmlDir, { recursive: true });
 }
 
 console.log("🚀 Starting build process...\n");
@@ -64,7 +68,7 @@ let generatedCount = 0;
 
 games.forEach(game => {
   const gameHTML = generateGamePage(game, games, categories, gamePageStyles, gamesDir);
-  const gamePagePath = path.join(outputDir, `${game.folder}.html`);
+  const gamePagePath = path.join(gamesHtmlDir, `${game.folder}.html`);
   fs.writeFileSync(gamePagePath, gameHTML);
   generatedCount++;
 
@@ -74,7 +78,7 @@ games.forEach(game => {
   }
 });
 
-console.log(`✅ Generated ${generatedCount} game pages\n`);
+console.log(`✅ Generated ${generatedCount} game pages in games-html/ folder\n`);
 
 // Step 6: Generate sitemap
 console.log("🗺️  Generating sitemap...");

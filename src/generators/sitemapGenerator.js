@@ -38,7 +38,7 @@ function generateSitemap(games, outputDir) {
   games.forEach(game => {
     sitemap += `  <!-- ${game.name} -->
   <url>
-    <loc>${baseUrl}/${encodeURIComponent(game.folder)}.html</loc>
+    <loc>${baseUrl}/games-html/${encodeURIComponent(game.folder)}.html</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
