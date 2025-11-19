@@ -132,7 +132,7 @@ function updateAllCategories() {
 
 // Populate Recently Played grid
 function loadRecentlyPlayed() {
-  const list = cleanRecentlyPlayed(); // Clean before loading
+  let list = cleanRecentlyPlayed(); // Clean before loading
 
   const recentSection = document.getElementById('recentlyPlayedSection');
   const recentGrid = document.getElementById('recentlyPlayedGrid');
@@ -146,6 +146,13 @@ function loadRecentlyPlayed() {
   }
 
   if (recentSection) recentSection.style.display = 'block';
+
+  // Sort by lastPlayed timestamp (most recent first)
+  list.sort((a, b) => {
+    const timeA = a.lastPlayed || 0;
+    const timeB = b.lastPlayed || 0;
+    return timeB - timeA; // Descending order (newest first)
+  });
 
   const displayList = list.slice(0, MAX_RECENT);
 
@@ -635,8 +642,16 @@ function handleFullscreenChange() {
 function saveRecentlyPlayed(game) {
   let list = cleanRecentlyPlayed(); // Clean before saving
 
+  // Remove existing entry if present
   list = list.filter(g => g.folder !== game.folder);
-  list.unshift(game);
+
+  // Add timestamp to track when game was played
+  const gameWithTimestamp = {
+    ...game,
+    lastPlayed: Date.now()
+  };
+
+  list.unshift(gameWithTimestamp);
   if (list.length > MAX_RECENT) list = list.slice(0, MAX_RECENT);
   localStorage.setItem('recentlyPlayed', JSON.stringify(list));
   loadRecentlyPlayed();
