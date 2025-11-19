@@ -40,6 +40,7 @@ jobs:
           cp dmca.html dist/dmca.html
           cp sitemap.xml dist/sitemap.xml
           cp robots.txt dist/robots.txt
+          cp google0d95473435a7c986.html dist/google0d95473435a7c986.html
 
       # 🚀 Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
