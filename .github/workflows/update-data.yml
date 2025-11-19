@@ -29,20 +29,48 @@ jobs:
       - name: Run update-data script
         run: node scripts/update-data.js
 
-      - name: Pull latest changes
+      - name: Commit and Push with retry
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main || echo "Nothing to pull"
 
-      - name: Commit & Push changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Update game JSON data"
-          file_pattern: "data/*.json"
-          commit_user_name: github-actions[bot]
-          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
-          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
-          skip_dirty_check: false
-          skip_fetch: false
-          skip_checkout: false
+          # Check if there are changes to commit
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          # Add changes
+          git add data/*.json
+
+          # Commit
+          git commit -m "Update game JSON data" --author="github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+
+          # Try to push with retry logic
+          MAX_RETRIES=5
+          RETRY_COUNT=0
+          DELAY=2
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            echo "Attempting to push (attempt $((RETRY_COUNT + 1))/$MAX_RETRIES)..."
+
+            if git push origin main; then
+              echo "Successfully pushed changes"
+              exit 0
+            else
+              echo "Push failed, pulling with rebase..."
+              if git pull --rebase origin main; then
+                echo "Rebase successful, retrying push..."
+                RETRY_COUNT=$((RETRY_COUNT + 1))
+                sleep $DELAY
+                DELAY=$((DELAY * 2))
+              else
+                echo "Rebase failed, aborting..."
+                git rebase --abort
+                exit 1
+              fi
+            fi
+          done
+
+          echo "Failed to push after $MAX_RETRIES attempts"
+          exit 1
