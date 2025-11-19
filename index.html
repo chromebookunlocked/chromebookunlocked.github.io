@@ -358,16 +358,19 @@ html,body {
 }
 
 .logo {
-  height: clamp(32px, 4vw, 48px);
-  width: auto;
+  width: 48px;
+  height: 48px;
   border-radius: 12px;
-  filter: drop-shadow(0 0 10px var(--accent));
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  padding: 4px;
+  box-shadow: 0 4px 15px rgba(255, 102, 255, 0.2), 0 0 20px rgba(139, 92, 246, 0.6);
   transition: transform .3s ease;
   cursor: pointer;
 }
 
 .logo:hover {
-  transform: scale(1.1);
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 25px rgba(255, 102, 255, 0.2);
 }
 
 #searchContainer {
