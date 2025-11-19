@@ -141,6 +141,38 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   ${structuredData}
 
   <script>
+    // Constants
+    const MAX_RECENT = 25;
+
+    // Track this game as recently played
+    function saveRecentlyPlayed(game) {
+      try {
+        let list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+
+        // Remove existing entry if present
+        list = list.filter(g => g.folder !== game.folder);
+
+        // Add timestamp to track when game was played
+        const gameWithTimestamp = {
+          ...game,
+          lastPlayed: Date.now()
+        };
+
+        list.unshift(gameWithTimestamp);
+        if (list.length > MAX_RECENT) list = list.slice(0, MAX_RECENT);
+        localStorage.setItem('recentlyPlayed', JSON.stringify(list));
+      } catch(e) {
+        console.error('Failed to save recently played:', e);
+      }
+    }
+
+    // Track this game when page loads
+    saveRecentlyPlayed({
+      folder: '${game.folder}',
+      name: '${game.name}',
+      thumb: '${thumbPath}'
+    });
+
     function startGame() {
       const overlay = document.getElementById('playOverlay');
       const frame = document.getElementById('gameFrame');
