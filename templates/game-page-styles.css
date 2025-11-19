@@ -134,7 +134,7 @@ header {
   transform: translateX(-4px);
 }
 
-.logo {
+.header-logo {
   width: 48px;
   height: 48px;
   border-radius: var(--radius-md);
@@ -142,9 +142,10 @@ header {
   padding: 4px;
   box-shadow: 0 4px 15px var(--shadow-color), 0 0 20px rgba(139, 92, 246, 0.6);
   transition: var(--transition-medium);
+  object-fit: contain;
 }
 
-.logo:hover {
+.header-logo:hover {
   transform: scale(1.1) rotate(5deg);
   box-shadow: 0 6px 25px var(--shadow-color);
 }
