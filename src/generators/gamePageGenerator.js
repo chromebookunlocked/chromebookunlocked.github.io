@@ -63,20 +63,22 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 <head>
   ${metaTags}
 
-  <!-- Google Fonts -->
+  <!-- Resource Hints for Performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
 
-  <style>
-    ${gamePageStyles}
-  </style>
+  <!-- Optimized Font Loading -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet"></noscript>
+
+  <!-- External CSS for better caching -->
+  <link rel="stylesheet" href="game-styles.css">
 </head>
 <body>
   <!-- Header with Logo -->
   <header>
     <div class="header-left">
-      <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='index.html'">
+      <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='index.html'" loading="eager">
       <h1 onclick="window.location.href='index.html'">Chromebook Unlocked Games</h1>
     </div>
   </header>
@@ -98,7 +100,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
       </div>
 
       <div class="play-overlay" id="playOverlay">
-        <img src="games/${game.folder}/${thumb}" alt="${game.name}">
+        <img src="games/${game.folder}/${thumb}" alt="${game.name}" loading="eager">
         <h2>${game.name}</h2>
         <button class="play-btn" onclick="startGame()">▶ Play</button>
       </div>

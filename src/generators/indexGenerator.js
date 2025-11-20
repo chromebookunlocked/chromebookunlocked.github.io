@@ -51,12 +51,19 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
 <head>
   ${metaTags}
 
+  <!-- Resource Hints for Performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Optimized Font Loading -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet"></noscript>
+
   <!-- Structured Data for Search Engines -->
   ${structuredData}
 
-  <style>
-    ${mainStyles}
-  </style>
+  <!-- External CSS for better caching -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -78,7 +85,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     <!-- Top Header with Search -->
     <header id="topHeader">
       <div class="header-left">
-        <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='index.html'">
+        <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='index.html'" loading="eager">
         <h1 onclick="window.location.href='index.html'">Chromebook Unlocked Games</h1>
       </div>
       <div id="searchContainer" role="search">
@@ -106,11 +113,11 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         <!-- Game Viewer -->
         <div class="viewer" id="viewer">
           <div id="startOverlay">
-            <img id="startThumb" src="" alt="Game Thumbnail">
+            <img id="startThumb" src="" alt="Game Thumbnail" loading="eager">
             <h1 id="startName"></h1>
             <button id="startButton" onclick="startGame()">▶ Play</button>
           </div>
-          <iframe id="gameFrame" src="" scrolling="no"></iframe>
+          <iframe id="gameFrame" src="" scrolling="no" loading="lazy"></iframe>
         </div>
 
         <!-- Right Banner Ad -->
@@ -142,9 +149,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     </div>
   </div>
 
-  <script>
-    ${clientJS}
-  </script>
+  <!-- External JS for better caching -->
+  <script src="client.js" defer></script>
 </body>
 </html>`;
 

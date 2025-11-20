@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+/* Font loaded via preconnect in HTML head for better performance */
 :root {
   --base-font: clamp(11px, 1vw, 16px);
   --thumb-height: clamp(100px, 12vw, 200px);

@@ -51,6 +51,13 @@ const gamePageStyles = fs.readFileSync(path.join(templatesDir, "game-page-styles
 const clientJS = fs.readFileSync(path.join(templatesDir, "client.js"), "utf8");
 console.log("✅ Templates loaded\n");
 
+// Step 3.5: Write external CSS and JS files for better caching
+console.log("📄 Writing external CSS and JS files...");
+fs.writeFileSync(path.join(outputDir, "styles.css"), mainStyles);
+fs.writeFileSync(path.join(outputDir, "game-styles.css"), gamePageStyles);
+fs.writeFileSync(path.join(outputDir, "client.js"), clientJS);
+console.log("✅ External files created\n");
+
 // Step 4: Generate main index page
 console.log("🏠 Generating main index page...");
 const indexHTML = generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir);
