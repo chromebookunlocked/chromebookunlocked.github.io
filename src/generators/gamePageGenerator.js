@@ -148,6 +148,38 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
       frame.src = '${gameUrl}';
       frame.classList.add('active');
       overlay.classList.add('hidden');
+
+      // Track in Recently Played
+      saveToRecentlyPlayed();
+    }
+
+    function saveToRecentlyPlayed() {
+      const gameData = {
+        folder: '${game.folder}',
+        name: '${game.name}',
+        thumb: '${thumbPath}',
+        lastPlayed: Date.now()
+      };
+
+      let recentlyPlayed = [];
+      try {
+        recentlyPlayed = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+      } catch(e) {
+        recentlyPlayed = [];
+      }
+
+      // Remove existing entry if present
+      recentlyPlayed = recentlyPlayed.filter(g => g.folder !== gameData.folder);
+
+      // Add to beginning
+      recentlyPlayed.unshift(gameData);
+
+      // Keep max 25
+      if (recentlyPlayed.length > 25) {
+        recentlyPlayed = recentlyPlayed.slice(0, 25);
+      }
+
+      localStorage.setItem('recentlyPlayed', JSON.stringify(recentlyPlayed));
     }
 
     function toggleFullscreen() {
