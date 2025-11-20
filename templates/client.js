@@ -3,10 +3,11 @@ const offsets = {}; // offsets[category] = number of revealed rows - 1
 let gameViewActive = false; // Track if game viewer is open
 let currentViewMode = 'home'; // Track current view: 'home' or 'category'
 
-// Get all valid game folders
+// Get all valid game folders (excluding Recently Played section to avoid circular validation)
 function getValidGameFolders() {
   const folders = new Set();
-  document.querySelectorAll('.game-card[data-folder]').forEach(card => {
+  // Only get cards from actual game catalog sections, NOT from recently played
+  document.querySelectorAll('.category:not(#recentlyPlayedSection) .game-card[data-folder]').forEach(card => {
     folders.add(card.getAttribute('data-folder'));
   });
   return folders;
