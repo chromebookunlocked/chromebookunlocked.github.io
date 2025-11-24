@@ -45,7 +45,8 @@ function loadGames(dataDir, gamesDir) {
           name: json.name || f.replace(".json", ""),
           categories: gameCategories, // Array of categories
           thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.png", "thumbnail.jpg"],
-          dateAdded: json.dateAdded || null // Support for "Newly Added" sorting
+          dateAdded: json.dateAdded || null, // Support for "Newly Added" sorting
+          description: json.description || null // Optional custom description
         };
       } catch (error) {
         console.error(`❌ Error processing ${f}: ${error.message}`);

@@ -137,16 +137,29 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     <!-- SEO Game Description Section -->
     <section class="game-description" aria-label="About ${game.name}">
       <h2>Play ${game.name} Unblocked</h2>
-      <p itemprop="description">
-        ${seoDescription} This free online game is perfect for playing at school on your Chromebook or any computer.
-        ${game.name} is one of the best ${categoryText} games available on our unblocked games site.
-        No downloads needed - just click play and enjoy ${game.name} instantly in your browser!
-      </p>
-      <p>
-        <strong>How to Play ${game.name}:</strong> Click the play button above to start the game.
-        ${game.name} works on all devices including Chromebooks, laptops, and desktop computers.
-        Use fullscreen mode for the best gaming experience!
-      </p>
+      <div class="description-content">
+        <div class="description-text" id="descriptionText">
+          <p itemprop="description">
+            ${game.description || seoDescription}
+          </p>
+          <div class="description-expanded">
+            <p>
+              This free online game is perfect for playing at school on your Chromebook or any computer.
+              ${game.name} is one of the best ${categoryText} games available on our unblocked games site.
+              No downloads needed - just click play and enjoy ${game.name} instantly in your browser!
+            </p>
+            <p>
+              <strong>How to Play ${game.name}:</strong> Click the play button above to start the game.
+              ${game.name} works on all devices including Chromebooks, laptops, and desktop computers.
+              Use fullscreen mode for the best gaming experience!
+            </p>
+          </div>
+        </div>
+        <button class="expand-btn" id="expandBtn" onclick="toggleDescription()" aria-expanded="false">
+          <span class="expand-text">Read More</span>
+          <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+      </div>
     </section>
   </main>
 
@@ -258,6 +271,25 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
     document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
     document.addEventListener('MSFullscreenChange', updateFullscreenIcon);
+
+    // Toggle description expand/collapse
+    function toggleDescription() {
+      const descText = document.getElementById('descriptionText');
+      const btn = document.getElementById('expandBtn');
+      const expandText = btn.querySelector('.expand-text');
+
+      if (descText.classList.contains('expanded')) {
+        descText.classList.remove('expanded');
+        btn.classList.remove('expanded');
+        btn.setAttribute('aria-expanded', 'false');
+        expandText.textContent = 'Read More';
+      } else {
+        descText.classList.add('expanded');
+        btn.classList.add('expanded');
+        btn.setAttribute('aria-expanded', 'true');
+        expandText.textContent = 'Show Less';
+      }
+    }
 
   </script>
 </body>

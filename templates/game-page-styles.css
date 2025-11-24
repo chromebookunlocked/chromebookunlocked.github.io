@@ -524,6 +524,76 @@ iframe.active {
   font-weight: 700;
 }
 
+/* Expandable Description Styles */
+.description-content {
+  position: relative;
+}
+
+.description-text {
+  overflow: hidden;
+  max-height: 4.5em;
+  transition: max-height 0.4s ease-out;
+  position: relative;
+}
+
+.description-text::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2.5em;
+  background: linear-gradient(transparent, rgba(20, 20, 30, 0.95));
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.description-text.expanded {
+  max-height: 1000px;
+}
+
+.description-text.expanded::after {
+  opacity: 0;
+}
+
+.description-expanded {
+  margin-top: var(--spacing-md);
+}
+
+.expand-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(255, 102, 255, 0.15), rgba(99, 102, 241, 0.15));
+  border: 1px solid var(--border-color);
+  color: var(--primary-light);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  margin-top: var(--spacing-md);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  border-radius: var(--radius-md);
+  transition: all 0.3s ease;
+  width: 100%;
+  max-width: 200px;
+}
+
+.expand-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 102, 255, 0.25), rgba(99, 102, 241, 0.25));
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.expand-icon {
+  transition: transform 0.3s ease;
+}
+
+.expand-btn.expanded .expand-icon {
+  transform: rotate(180deg);
+}
+
 @media (max-width: 768px) {
   .game-description {
     padding: var(--spacing-lg) var(--spacing-md);
@@ -531,6 +601,10 @@ iframe.active {
 
   .game-description p {
     font-size: 0.95rem;
+  }
+
+  .expand-btn {
+    max-width: 100%;
   }
 }
 
