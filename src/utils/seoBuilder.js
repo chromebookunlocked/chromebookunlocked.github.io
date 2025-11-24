@@ -28,7 +28,16 @@ const PRIMARY_KEYWORDS = [
   'play free games online',
   'games that work at school',
   'undetected games',
-  'games not blocked at school'
+  'games not blocked at school',
+  'unrestricted games',
+  'unrestricted games at school',
+  'chromebook unlocked games',
+  'chromebook unlocked',
+  'play online free',
+  'games online free',
+  'unrestricted school games',
+  'unblocked chromebook games',
+  'free unrestricted games'
 ];
 
 /**
@@ -36,8 +45,8 @@ const PRIMARY_KEYWORDS = [
  * @returns {string} HTML string with meta tags
  */
 function generateIndexMetaTags() {
-  const title = 'Unblocked Games - Free Online Games for School | Chromebook Unlocked Games';
-  const description = 'Play 100+ free unblocked games online at school! Access the best unblocked games for Chromebook and school computers. No downloads, no blocks - play instantly in your browser. Popular games like Slope, Happy Wheels, FNAF and more!';
+  const title = 'Chromebook Unlocked Games - Play Unblocked Games Online Free at School';
+  const description = 'Chromebook Unlocked Games - Play 100+ free unblocked games online at school! Access unrestricted games for Chromebook and school computers. No downloads, no blocks - play online free instantly. Popular unblocked games like Slope, Happy Wheels, FNAF and more!';
   const keywords = [
     ...PRIMARY_KEYWORDS,
     'play unblocked games',
@@ -52,7 +61,12 @@ function generateIndexMetaTags() {
     'free school games',
     'chromebook unlocked',
     'games unblocked at school',
-    'play games free online'
+    'play games free online',
+    'unrestricted online games',
+    'play online free games',
+    'chromebook unlocked games site',
+    'unblocked games chromebook',
+    'school unblocked games online'
   ].join(', ');
 
   return `<meta charset="UTF-8">
@@ -76,7 +90,7 @@ function generateIndexMetaTags() {
   <meta property="og:title" content="${title}">
   <meta property="og:description" content="${description}">
   <meta property="og:image" content="${LOGO_URL}">
-  <meta property="og:image:alt" content="Chromebook Unlocked Games - Free Unblocked Games for School">
+  <meta property="og:image:alt" content="Chromebook Unlocked Games - Play Unblocked Games Online Free at School">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:site_name" content="${SITE_NAME}">
@@ -88,7 +102,7 @@ function generateIndexMetaTags() {
   <meta name="twitter:title" content="${title}">
   <meta name="twitter:description" content="${description}">
   <meta name="twitter:image" content="${LOGO_URL}">
-  <meta name="twitter:image:alt" content="Chromebook Unlocked Games - Free Unblocked Games for School">
+  <meta name="twitter:image:alt" content="Chromebook Unlocked Games - Play Unblocked Games Online Free at School">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/logo.png">
@@ -122,9 +136,9 @@ function generateIndexStructuredData(games = []) {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": SITE_NAME,
-    "alternateName": ["Chromebook Unlocked", "Unblocked Games", "Free School Games"],
+    "alternateName": ["Chromebook Unlocked", "Unblocked Games", "Free School Games", "Unrestricted Games", "Games Online Free"],
     "url": `${BASE_URL}/`,
-    "description": "Play 100+ free unblocked games online at school! Access the best unblocked games for Chromebook and school computers. No downloads required.",
+    "description": "Chromebook Unlocked Games - Play 100+ free unblocked games online at school! Access unrestricted games for Chromebook and school computers. Play online free - no downloads required.",
     "image": LOGO_URL,
     "inLanguage": "en-US",
     "publisher": {
@@ -153,7 +167,7 @@ function generateIndexStructuredData(games = []) {
     "name": SITE_NAME,
     "url": `${BASE_URL}/`,
     "logo": LOGO_URL,
-    "description": "Free unblocked games website for school and Chromebook users",
+    "description": "Chromebook Unlocked Games - Free unrestricted unblocked games website for school and Chromebook users. Play online free!",
     "sameAs": []
   };
 
@@ -161,8 +175,8 @@ function generateIndexStructuredData(games = []) {
   const itemListSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": "Free Unblocked Games",
-    "description": "Collection of free unblocked online games to play at school",
+    "name": "Chromebook Unlocked Games - Free Unblocked Games",
+    "description": "Collection of free unblocked unrestricted online games to play at school on Chromebook - play online free",
     "numberOfItems": games.length || 100,
     "itemListElement": games.slice(0, 20).map((game, index) => ({
       "@type": "ListItem",
@@ -205,11 +219,14 @@ function generateGameKeywords(game) {
   const categories = game.categories || [];
 
   const gameSpecificKeywords = [
-    // Game name variations with SEO terms
+    // Game name variations with SEO terms - (game name) unblocked play online free
     `${gameName}`,
     `${gameName} unblocked`,
     `${gameName} online`,
     `${gameName} free`,
+    `${gameName} unblocked play online free`,
+    `play ${gameName} online free`,
+    `${gameName} play online free`,
     `play ${gameName}`,
     `play ${gameName} online`,
     `play ${gameName} free`,
@@ -226,11 +243,15 @@ function generateGameKeywords(game) {
     `${gameName} no download`,
     `free ${gameName} game`,
     `unblocked ${gameName}`,
+    `${gameName} unrestricted`,
+    `${gameName} unrestricted game`,
+    `play ${gameName} unrestricted`,
     // Category-based keywords
     ...categories.map(cat => `${cat.toLowerCase()} games unblocked`),
     ...categories.map(cat => `free ${cat.toLowerCase()} games`),
     ...categories.map(cat => `${cat.toLowerCase()} games online`),
-    // Generic SEO terms
+    ...categories.map(cat => `${cat.toLowerCase()} games unrestricted`),
+    // Generic SEO terms with new keywords
     'unblocked games',
     'free online games',
     'school games',
@@ -238,7 +259,12 @@ function generateGameKeywords(game) {
     'unblocked games at school',
     'play games at school',
     'browser games free',
-    'games not blocked'
+    'games not blocked',
+    'unrestricted games',
+    'chromebook unlocked games',
+    'play online free',
+    'games online free',
+    'unrestricted school games'
   ];
 
   return gameSpecificKeywords.join(', ');
@@ -255,11 +281,11 @@ function generateGameMetaTags(game, thumbPath) {
   const categories = game.categories || [];
   const categoryText = categories.length > 0 ? categories.join(', ') : 'Action';
 
-  // SEO-optimized title variations
-  const gameTitle = `${gameName} Unblocked - Play Free Online | School Games`;
+  // SEO-optimized title variations - (game name) Unblocked - Play Online Free
+  const gameTitle = `${gameName} Unblocked - Play Online Free | Chromebook Unlocked Games`;
 
-  // Rich, keyword-dense description
-  const gameDescription = `Play ${gameName} unblocked for free online! Enjoy ${gameName} on your Chromebook or school computer with no downloads required. ${gameName} is a popular ${categoryText.toLowerCase()} game that works at school. Start playing ${gameName} now - it's free, fun, and unblocked!`;
+  // Rich, keyword-dense description with unrestricted, online, chromebook, school keywords
+  const gameDescription = `Play ${gameName} unblocked online free! Enjoy ${gameName} unrestricted on your Chromebook or school computer with no downloads required. ${gameName} is a popular ${categoryText.toLowerCase()} game that works at school. Play ${gameName} online free now - unblocked and unrestricted!`;
 
   const gameUrl = `${BASE_URL}/${game.folder}.html`;
   const imageUrl = `${BASE_URL}/${thumbPath}`;
@@ -285,7 +311,7 @@ function generateGameMetaTags(game, thumbPath) {
   <meta property="og:title" content="${gameTitle}">
   <meta property="og:description" content="${gameDescription}">
   <meta property="og:image" content="${LOGO_URL}">
-  <meta property="og:image:alt" content="${gameName} - Free Unblocked Game">
+  <meta property="og:image:alt" content="${gameName} Unblocked - Play Online Free">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:site_name" content="${SITE_NAME}">
@@ -297,7 +323,7 @@ function generateGameMetaTags(game, thumbPath) {
   <meta name="twitter:title" content="${gameTitle}">
   <meta name="twitter:description" content="${gameDescription}">
   <meta name="twitter:image" content="${LOGO_URL}">
-  <meta name="twitter:image:alt" content="${gameName} - Free Unblocked Game">
+  <meta name="twitter:image:alt" content="${gameName} Unblocked - Play Online Free">
 
   <!-- Game-specific meta -->
   <meta property="game:name" content="${gameName}">
@@ -337,9 +363,9 @@ function generateGameStructuredData(game, thumbPath) {
     "@context": "https://schema.org",
     "@type": "VideoGame",
     "name": gameName,
-    "alternateName": [`${gameName} Unblocked`, `${gameName} Online`, `${gameName} Free`],
+    "alternateName": [`${gameName} Unblocked`, `${gameName} Online`, `${gameName} Free`, `${gameName} Unrestricted`, `Play ${gameName} Online Free`],
     "url": gameUrl,
-    "description": `Play ${gameName} unblocked for free online! Enjoy this popular ${categories.join(', ').toLowerCase() || 'action'} game on your Chromebook or school computer. No downloads required - play instantly in your browser!`,
+    "description": `Play ${gameName} unblocked online free! Enjoy this popular ${categories.join(', ').toLowerCase() || 'action'} game unrestricted on your Chromebook or school computer. No downloads required - play online free instantly!`,
     "image": LOGO_URL,
     "thumbnailUrl": imageUrl,
     "genre": categories,
@@ -407,8 +433,8 @@ function generateGameStructuredData(game, thumbPath) {
   const webPageSchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    "name": `${gameName} Unblocked - Play Free Online`,
-    "description": `Play ${gameName} unblocked for free at school on your Chromebook`,
+    "name": `${gameName} Unblocked - Play Online Free`,
+    "description": `Play ${gameName} unblocked online free at school on your Chromebook - unrestricted games`,
     "url": gameUrl,
     "image": LOGO_URL,
     "inLanguage": "en-US",
@@ -445,7 +471,7 @@ ${JSON.stringify(webPageSchema, null, 2)}
  * @returns {string} SEO title
  */
 function generateGameSEOTitle(game) {
-  return `${game.name} Unblocked - Play Free Online | School Games`;
+  return `${game.name} Unblocked - Play Online Free | Chromebook Unlocked Games`;
 }
 
 /**
@@ -456,7 +482,7 @@ function generateGameSEOTitle(game) {
 function generateGameSEODescription(game) {
   const categories = game.categories || [];
   const categoryText = categories.length > 0 ? categories[0].toLowerCase() : 'action';
-  return `Play ${game.name} unblocked for free online! This ${categoryText} game works on Chromebook and school computers. No downloads - play ${game.name} instantly!`;
+  return `Play ${game.name} unblocked online free! This ${categoryText} game works unrestricted on Chromebook and school computers. No downloads - play ${game.name} online free instantly!`;
 }
 
 module.exports = {
