@@ -138,15 +138,21 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     <section class="game-description" aria-label="About ${game.name}">
       <h2>Play ${game.name} Unblocked</h2>
       <p itemprop="description">
-        ${seoDescription} This free online game is perfect for playing at school on your Chromebook or any computer.
+        <span class="description-preview">Play ${game.name} unblocked</span><span class="description-full"> - ${seoDescription.replace(/^Play [^!]+unblocked[^!]*!\s*/i, '')} This free online game is perfect for playing at school on your Chromebook or any computer.
         ${game.name} is one of the best ${categoryText} games available on our unblocked games site.
-        No downloads needed - just click play and enjoy ${game.name} instantly in your browser!
+        No downloads needed - just click play and enjoy ${game.name} instantly in your browser!</span>
       </p>
-      <p>
+      <p class="description-full">
         <strong>How to Play ${game.name}:</strong> Click the play button above to start the game.
         ${game.name} works on all devices including Chromebooks, laptops, and desktop computers.
         Use fullscreen mode for the best gaming experience!
       </p>
+      <button class="show-more-btn" onclick="toggleDescription()" aria-label="Show more description">
+        <span class="show-more-text">Show more</span>
+        <svg class="show-more-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </button>
     </section>
   </main>
 
@@ -258,6 +264,24 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
     document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
     document.addEventListener('MSFullscreenChange', updateFullscreenIcon);
+
+    // Toggle description show more/less
+    function toggleDescription() {
+      const description = document.querySelector('.game-description');
+      const btn = document.querySelector('.show-more-btn');
+      const btnText = btn.querySelector('.show-more-text');
+      const btnIcon = btn.querySelector('.show-more-icon');
+
+      if (description.classList.contains('expanded')) {
+        description.classList.remove('expanded');
+        btnText.textContent = 'Show more';
+        btnIcon.style.transform = 'rotate(0deg)';
+      } else {
+        description.classList.add('expanded');
+        btnText.textContent = 'Show less';
+        btnIcon.style.transform = 'rotate(180deg)';
+      }
+    }
 
   </script>
 </body>
