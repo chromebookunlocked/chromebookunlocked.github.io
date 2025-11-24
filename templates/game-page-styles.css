@@ -524,6 +524,50 @@ iframe.active {
   font-weight: 700;
 }
 
+/* Show more/less functionality */
+.description-full {
+  display: none;
+}
+
+.game-description.expanded .description-full {
+  display: inline;
+}
+
+.show-more-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  margin-top: var(--spacing-md);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--primary-light);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.show-more-btn:hover {
+  background: var(--primary-color);
+  color: var(--text-primary);
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.show-more-btn:active {
+  transform: translateY(0);
+}
+
+.show-more-icon {
+  transition: transform var(--transition-medium);
+}
+
 @media (max-width: 768px) {
   .game-description {
     padding: var(--spacing-lg) var(--spacing-md);
