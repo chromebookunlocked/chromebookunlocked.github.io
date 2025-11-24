@@ -41,9 +41,9 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         </div>`;
     }).join('');
 
-  // Get SEO meta tags and structured data
+  // Get SEO meta tags and structured data (pass games for ItemList schema)
   const metaTags = generateIndexMetaTags();
-  const structuredData = generateIndexStructuredData();
+  const structuredData = generateIndexStructuredData(games);
 
   // Full HTML template
   const html = `<!DOCTYPE html>
