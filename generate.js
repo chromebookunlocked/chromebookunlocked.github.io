@@ -76,9 +76,9 @@ games.forEach(game => {
 
 console.log(`✅ Generated ${generatedCount} game pages\n`);
 
-// Step 6: Generate sitemap
-console.log("🗺️  Generating sitemap...");
-generateSitemap(games, outputDir);
+// Step 6: Generate sitemap and robots.txt
+console.log("🗺️  Generating sitemap and robots.txt...");
+generateSitemap(games, outputDir, gamesDir);
 
 // Build complete
 console.log("\n✨ Build complete! All files generated successfully.\n");
@@ -86,4 +86,5 @@ console.log("📊 Build summary:");
 console.log(`   - Games: ${games.length}`);
 console.log(`   - Categories: ${Object.keys(categories).length}`);
 console.log(`   - Total pages: ${games.length + 1} (index + games)`);
+console.log(`   - SEO files: sitemap.xml, robots.txt`);
 console.log(`   - Output directory: ${outputDir}\n`);

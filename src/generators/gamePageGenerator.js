@@ -1,5 +1,5 @@
 const { chooseThumb, getAssetPath } = require("../utils/assetManager");
-const { generateGameMetaTags, generateGameStructuredData } = require("../utils/seoBuilder");
+const { generateGameMetaTags, generateGameStructuredData, generateGameSEOTitle, generateGameSEODescription } = require("../utils/seoBuilder");
 
 /**
  * Generate HTML for an individual game page
@@ -45,9 +45,11 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     .map((g) => {
       const gThumb = chooseThumb(g, gamesDir);
       const gThumbPath = getAssetPath(g.folder, gThumb);
-      return `<a href="${g.folder}.html" class="game-card">
+      // SEO-optimized alt text with keywords
+      const altText = `Play ${g.name} Unblocked - Free Online Game`;
+      return `<a href="${g.folder}.html" class="game-card" title="Play ${g.name} Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('${gThumbPath}')">
-        <img class="thumb" src="${gThumbPath}" alt="${g.name}" loading="lazy">
+        <img class="thumb" src="${gThumbPath}" alt="${altText}" loading="lazy">
       </div>
       <div class="card-title">${g.name}</div>
     </a>`;
@@ -57,6 +59,10 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   // Get SEO meta tags and structured data
   const metaTags = generateGameMetaTags(game, thumbPath);
   const structuredData = generateGameStructuredData(game, thumbPath);
+
+  // Generate SEO description for the game
+  const seoDescription = generateGameSEODescription(game);
+  const categoryText = game.categories.length > 0 ? game.categories[0].toLowerCase() : 'action';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -76,65 +82,89 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   <!-- Header with Logo -->
   <header>
     <div class="header-left">
-      <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='index.html'">
+      <img src="assets/logo.png" alt="Chromebook Unlocked Games - Free Unblocked Games for School" class="header-logo" onclick="window.location.href='index.html'">
       <h1 onclick="window.location.href='index.html'">Chromebook Unlocked Games</h1>
     </div>
   </header>
 
-  <!-- Game Viewer -->
-  <div class="game-container">
-    <!-- Back Button (outside game frame) -->
-    <button class="back-button" onclick="window.location.href='index.html'" title="Back to Games" aria-label="Back to Games">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      <span>Back</span>
-    </button>
+  <!-- Main Game Content -->
+  <main itemscope itemtype="https://schema.org/VideoGame">
+    <meta itemprop="name" content="${game.name}">
+    <meta itemprop="gamePlatform" content="Web Browser">
+    <meta itemprop="applicationCategory" content="Game">
 
-    <div class="game-frame-wrapper" id="gameWrapper">
-      <!-- Controls Bar (sticky to top of game) -->
-      <div class="controls">
-        <button id="fullscreenBtn" class="icon-btn" onclick="toggleFullscreen()" title="Fullscreen" aria-label="Toggle Fullscreen">
-          <svg id="fullscreenIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
-        </button>
+    <!-- Game Viewer -->
+    <div class="game-container">
+      <!-- Back Button (outside game frame) -->
+      <button class="back-button" onclick="window.location.href='index.html'" title="Back to Unblocked Games" aria-label="Back to Free Unblocked Games">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        <span>Back</span>
+      </button>
+
+      <div class="game-frame-wrapper" id="gameWrapper">
+        <!-- Controls Bar (sticky to top of game) -->
+        <div class="controls">
+          <button id="fullscreenBtn" class="icon-btn" onclick="toggleFullscreen()" title="Play ${game.name} Fullscreen" aria-label="Toggle Fullscreen Mode">
+            <svg id="fullscreenIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+          </button>
+        </div>
+
+        <div class="play-overlay" id="playOverlay">
+          <img src="games/${game.folder}/${thumb}" alt="Play ${game.name} Unblocked - Free Online ${categoryText} Game" itemprop="image">
+          <h2 itemprop="headline">${game.name}</h2>
+          <button class="play-btn" onclick="startGame()" aria-label="Play ${game.name} Free Online">▶ Play</button>
+        </div>
+        <iframe
+          id="gameFrame"
+          src=""
+          title="${game.name} Unblocked - Play Free Online Game at School"
+          allow="fullscreen; autoplay; encrypted-media"
+          allowfullscreen>
+        </iframe>
       </div>
 
-      <div class="play-overlay" id="playOverlay">
-        <img src="games/${game.folder}/${thumb}" alt="${game.name}">
-        <h2>${game.name}</h2>
-        <button class="play-btn" onclick="startGame()">▶ Play</button>
+      <!-- Category Tags with SEO -->
+      <div class="category-tags" role="navigation" aria-label="Game Categories">
+        ${game.categories
+          .map(
+            (cat) =>
+              `<a href="index.html#/category/${encodeURIComponent(cat)}" class="category-tag" title="Play Free ${cat} Games Unblocked">${cat}</a>`
+          )
+          .join("")}
       </div>
-      <iframe
-        id="gameFrame"
-        src=""
-        title="Play ${game.name} Unblocked"
-        allow="fullscreen; autoplay; encrypted-media"
-        allowfullscreen>
-      </iframe>
     </div>
 
-    <!-- Category Tags -->
-    <div class="category-tags">
-      ${game.categories
-        .map(
-          (cat) =>
-            `<a href="index.html#/category/${encodeURIComponent(cat)}" class="category-tag">${cat}</a>`
-        )
-        .join("")}
-    </div>
-  </div>
+    <!-- SEO Game Description Section -->
+    <section class="game-description" aria-label="About ${game.name}">
+      <h2>Play ${game.name} Unblocked</h2>
+      <p itemprop="description">
+        ${seoDescription} This free online game is perfect for playing at school on your Chromebook or any computer.
+        ${game.name} is one of the best ${categoryText} games available on our unblocked games site.
+        No downloads needed - just click play and enjoy ${game.name} instantly in your browser!
+      </p>
+      <p>
+        <strong>How to Play ${game.name}:</strong> Click the play button above to start the game.
+        ${game.name} works on all devices including Chromebooks, laptops, and desktop computers.
+        Use fullscreen mode for the best gaming experience!
+      </p>
+    </section>
+  </main>
 
   <!-- You Might Also Like Section -->
-  <div class="recommendations">
-    <h2>You Might Also Like</h2>
+  <section class="recommendations" aria-label="Similar Unblocked Games">
+    <h2>You Might Also Like - More Free Unblocked Games</h2>
     <div class="grid">
       ${recommendedGamesHTML}
     </div>
-  </div>
+  </section>
 
   <footer>
     <p>
-      <strong>${game.name}</strong> - Free to play on <a href="index.html">Chromebook Unlocked Games</a>
+      <strong>${game.name} Unblocked</strong> - Play Free Online on <a href="index.html" title="Free Unblocked Games for School">Chromebook Unlocked Games</a>
       <br>
-      Categories: ${categoryList} | <a href="dmca.html">DMCA</a>
+      <span>Categories: ${categoryList}</span> | <a href="dmca.html">DMCA</a>
+      <br>
+      <small>Play ${game.name} and 100+ more free unblocked games at school. No downloads, no blocks - just fun!</small>
     </p>
   </footer>
 
