@@ -1,24 +1,73 @@
-<!-- Ultimate Game Stash file-->
-<!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ -->
-
-<Module>
-<ModulePrefs title="Google.com" />
-<Content type="html"><![CDATA[
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/AndreajnRcm4/b398dl2h74v@9a23fbb2373d743a564873251cbb57736ebc1f73/style.css" type="text/css" />
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+        }
+
+        #game-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Ensures Ruffle or embed scales properly */
+        #game-container object, #game-container embed, #game-container ruffle-player {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        #fullscreen-btn {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            padding: 10px 16px;
+            font-size: 14px;
+            border: none;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            z-index: 9999;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/gh/u-cvlassrom-y/google@main/ruffle.js"></script>
 </head>
 <body>
-<script src="https://cdn.jsdelivr.net/gh/u-cvlassrom-y/google@main/ruffle.js"></script>
 
-<object width="100%" height="100%">
-    <param name="movie" value="REPLACE">
-	<embed src="https://cdn.jsdelivr.net/gh/Stinkalistic/UGS@main/SWFs/visitor.swf" width="100%" height="100%">
+<div id="game-container">
+    <object id="flash-object">
+        <param name="movie" value="REPLACE">
+        <embed src="https://cdn.jsdelivr.net/gh/Stinkalistic/UGS@main/SWFs/visitor.swf"></embed>
+    </object>
+</div>
+
+<button id="fullscreen-btn">Fullscreen</button>
+
+<script>
+    const container = document.getElementById("game-container");
+    const fsBtn = document.getElementById("fullscreen-btn");
+
+    fsBtn.addEventListener("click", () => {
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        } else {
+            container.requestFullscreen().catch(err => console.log(err));
+        }
+    });
+</script>
+
 </body>
 </html>
-]]></Content>
-</Module>
