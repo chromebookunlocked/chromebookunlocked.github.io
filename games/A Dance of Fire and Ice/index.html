@@ -1,27 +1,29 @@
-<!-- Ultimate Game Stash file -->
-<!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ -->
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Unity Game</title>
 
-<!-- Reset HTML scaling so Unity can fill screen -->
 <style>
     html, body {
         margin: 0;
         padding: 0;
         height: 100%;
-        width: 100%;
         overflow: hidden;
     }
+
+    #gameContainer, 
+    canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
     #gameContainer {
-        width: 100vw;
-        height: 100vh;
-        position: fixed;
+        position: absolute;
         top: 0;
         left: 0;
+        right: 0;
+        bottom: 0;
     }
 </style>
 
@@ -47,6 +49,15 @@ var gameInstance = UnityLoader.instantiate(
         }
     }
 );
+
+// Force Unity canvas to resize with iframe
+window.addEventListener("resize", function () {
+    const canvas = document.querySelector("#gameContainer canvas");
+    if (canvas) {
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
+    }
+});
 </script>
 
 </body>
