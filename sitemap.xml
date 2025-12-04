@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd
+        http://www.google.com/schemas/sitemap-image/1.1
+        http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd">
 
   <!-- Homepage - Free Unblocked Games for School -->
   <url>
     <loc>https://chromebookunlocked.github.io/</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -18,7 +23,7 @@
   <!-- DMCA Page -->
   <url>
     <loc>https://chromebookunlocked.github.io/dmca.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
@@ -26,72 +31,176 @@
   <!-- 10 Minutes Till Dawn - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/10%20Minutes%20Till%20Dawn.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>10 Minutes Till Dawn Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play 10 Minutes Till Dawn unblocked for free at school. Action game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play 10 Minutes Till Dawn unblocked for free at school. Action, Roguelike, Shooter game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- 1on1 Soccer - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/1on1%20Soccer.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>1on1 Soccer Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play 1on1 Soccer unblocked for free at school. 2 Player game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play 1on1 Soccer unblocked for free at school. Sports, 2 Player game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- 1on1 Tennis - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/1on1%20Tennis.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>1on1 Tennis Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play 1on1 Tennis unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play 1on1 Tennis unblocked for free at school. Sports, 2 Player game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- 1v1.lol - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/1v1.lol.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>1v1.lol Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play 1v1.lol unblocked for free at school. Shooter game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play 1v1.lol unblocked for free at school. Shooter, Building, Multiplayer game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- 2048 - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/2048.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>2048 Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play 2048 unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- 3Dash - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/3Dash.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>3Dash Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play 3Dash unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play 3Dash unblocked for free at school. Platformer, Rhythm game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- 4th and Goal - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/4th%20and%20Goal.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>4th and Goal Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play 4th and Goal unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- 8 Ball Pool - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/8%20Ball%20Pool.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>8 Ball Pool Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play 8 Ball Pool unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- A Dance of Fire and Ice - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/A%20Dance%20of%20Fire%20and%20Ice.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>A Dance of Fire and Ice Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play A Dance of Fire and Ice unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- A Dark Room - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/A%20Dark%20Room.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>A Dark Room Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play A Dark Room unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Ace Combat 3 - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Ace%20Combat%203.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Ace Combat 3 Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Ace Combat 3 unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Achilles 2 - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Achilles%202.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Achilles 2 Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Achilles 2 unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Adventure Capitalist - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Adventure%20Capitalist.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Adventure Capitalist Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Adventure Capitalist unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Age Of War - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Age%20Of%20War.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -104,7 +213,7 @@
   <!-- Ages of Conflict - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Ages%20of%20Conflict.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -117,98 +226,98 @@
   <!-- BTD5 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/BTD5.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>BTD5 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play BTD5 unblocked for free at school. Tower Defence game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play BTD5 unblocked for free at school. Tower Defence, Strategy game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Bad Parenting - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bad%20Parenting.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Bad Parenting Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Bad Parenting unblocked for free at school. Horror game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Bad Parenting unblocked for free at school. Horror, Psychological game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Bad Piggies - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bad%20Piggies.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Bad Piggies Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Bad Piggies unblocked for free at school. Puzzle game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Bad Piggies unblocked for free at school. Puzzle, Physics game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Bad Time Simulator - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bad%20Time%20Simulator.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Bad Time Simulator Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Bad Time Simulator unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Bad Time Simulator unblocked for free at school. Action, Boss Fight game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
-  <!-- Baldi’s Basics - Free Unblocked Game -->
+  <!-- Baldi's Basics - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Baldi%E2%80%99s%20Basics.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
-      <image:title>Baldi’s Basics Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Baldi’s Basics unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:title>Baldi's Basics Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Baldi's Basics unblocked for free at school. Horror, Educational game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Basketball FRVR - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Basketball%20FRVR.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Basketball FRVR Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Basketball FRVR unblocked for free at school. Basketball game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Basketball FRVR unblocked for free at school. Sports, Arcade game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Bit Planes - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bit%20Planes.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Bit Planes Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Bit Planes unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Bit Planes unblocked for free at school. Arcade, Shooter game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Bitlife - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bitlife.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -221,46 +330,46 @@
   <!-- Blackjack - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Blackjack.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Blackjack Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Blackjack unblocked for free at school. Strategy, Casual game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Blackjack unblocked for free at school. Card, Casino, Casual game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Blaze Drifter - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Blaze%20Drifter.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Blaze Drifter Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Blaze Drifter unblocked for free at school. Driving game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Blaze Drifter unblocked for free at school. Driving, Racing game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Block Blast - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Block%20Blast.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Block Blast Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Block Blast unblocked for free at school. Puzzle game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Block Blast unblocked for free at school. Puzzle, Casual game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Bloodmoney  - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bloodmoney%20.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -273,7 +382,7 @@
   <!-- Bloodmoney 2 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bloodmoney%202.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -286,72 +395,72 @@
   <!-- Bloxorz - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bloxorz.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Bloxorz Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Bloxorz unblocked for free at school. Puzzle game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Bloxorz unblocked for free at school. Puzzle, Logic game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Bob The Robber  - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bob%20The%20Robber%20.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Bob The Robber  Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Bob The Robber  unblocked for free at school. Puzzle game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Bob The Robber  unblocked for free at school. Stealth, Adventure game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Bob The Robber 2 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bob%20The%20Robber%202.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Bob The Robber 2 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Bob The Robber 2 unblocked for free at school. Puzzle game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Bob The Robber 2 unblocked for free at school. Stealth, Adventure game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Bob The Robber 5 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bob%20The%20Robber%205.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Bob The Robber 5 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Bob The Robber 5 unblocked for free at school. Puzzle game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Bob The Robber 5 unblocked for free at school. Stealth, Adventure game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Bouncemasters - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bouncemasters.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Bouncemasters Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Bouncemasters unblocked for free at school. Arcade game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Bouncemasters unblocked for free at school. Arcade, Casual game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Bouncy Motors - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bouncy%20Motors.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -364,345 +473,345 @@
   <!-- Bounty of One - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bounty%20of%20One.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Bounty of One Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Bounty of One unblocked for free at school. Action game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Bounty of One unblocked for free at school. Action, Roguelike game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Bullet Force - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Bullet%20Force.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Bullet Force Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Bullet Force unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Burger and Frights - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Burger%20and%20Frights.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Burger and Frights Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Burger and Frights unblocked for free at school. Horror game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Burger and Frights unblocked for free at school. Horror, Driving game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Burrito Bison Launcha Libre - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Burrito%20Bison%20Launcha%20Libre.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Burrito Bison Launcha Libre Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Burrito Bison Launcha Libre unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Burrito Bison Launcha Libre unblocked for free at school. Arcade, Action game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- CS Go Clicker - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/CS%20Go%20Clicker.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>CS Go Clicker Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play CS Go Clicker unblocked for free at school. Clicker game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play CS Go Clicker unblocked for free at school. Clicker, Idle game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Capybara Clicker - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Capybara%20Clicker.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Capybara Clicker Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Capybara Clicker unblocked for free at school. Clickers game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Capybara Clicker unblocked for free at school. Clicker, Idle game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Clear Vision 1 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Clear%20Vision%201.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Clear Vision 1 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Clear Vision 1 unblocked for free at school. Sniper game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Clear Vision 1 unblocked for free at school. Sniper, Shooter game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Clear Vision 2 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Clear%20Vision%202.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Clear Vision 2 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Clear Vision 2 unblocked for free at school. Sniper game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Clear Vision 2 unblocked for free at school. Sniper, Shooter game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Clear Vision 3 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Clear%20Vision%203.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Clear Vision 3 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Clear Vision 3 unblocked for free at school. Sniper game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Clear Vision 3 unblocked for free at school. Sniper, Shooter game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Clear Vision 4 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Clear%20Vision%204.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Clear Vision 4 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Clear Vision 4 unblocked for free at school. Sniper game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Clear Vision 4 unblocked for free at school. Sniper, Shooter game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Clear Vision 5 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Clear%20Vision%205.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Clear Vision 5 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Clear Vision 5 unblocked for free at school. Sniper game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Clear Vision 5 unblocked for free at school. Sniper, Shooter game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Cluster Rush - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Cluster%20Rush.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Cluster Rush Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Cluster Rush unblocked for free at school. Action game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Cluster Rush unblocked for free at school. Action, Platformer game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Cookie Clicker - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Cookie%20Clicker.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Cookie Clicker Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Cookie Clicker unblocked for free at school. Clickers game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Cookie Clicker unblocked for free at school. Clicker, Idle game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Crank It! - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Crank%20It!.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Crank It! Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Crank It! unblocked for free at school. Horror game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Crank It! unblocked for free at school. Horror, Puzzle game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Crazy Cars - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Crazy%20Cars.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Crazy Cars Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Crazy Cars unblocked for free at school. Driving game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Crazy Cars unblocked for free at school. Driving, Racing game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Crazy Cattle 3D - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Crazy%20Cattle%203D.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Crazy Cattle 3D Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Crazy Cattle 3D unblocked for free at school. Arcade, Driving game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Crazy Cattle 3D unblocked for free at school. Arcade, Action game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Crazy Motorcycle - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Crazy%20Motorcycle.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Crazy Motorcycle Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Crazy Motorcycle unblocked for free at school. Driving game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Crazy Motorcycle unblocked for free at school. Driving, Racing game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Crossy Road - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Crossy%20Road.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Crossy Road Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Crossy Road unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Crossy Road unblocked for free at school. Arcade, Casual game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Cut the Rope - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Cut%20the%20Rope.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Cut the Rope Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Cut the Rope unblocked for free at school. Puzzle game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Cut the Rope unblocked for free at school. Puzzle, Physics, Casual game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Dead Zed 2 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Dead%20Zed%202.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Dead Zed 2 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Dead Zed 2 unblocked for free at school. Shooter game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Dead Zed 2 unblocked for free at school. Shooter, Zombie, Survival game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Deadly Descent - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Deadly%20Descent.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Deadly Descent Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Deadly Descent unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Deadly Descent unblocked for free at school. Arcade, Action game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Deepest Sword - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Deepest%20Sword.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Deepest Sword Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Deepest Sword unblocked for free at school. Adventure game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Deepest Sword unblocked for free at school. Adventure, Platformer game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Deltarune - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Deltarune.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Deltarune Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Deltarune unblocked for free at school. Adventure game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Deltarune unblocked for free at school. Adventure, RPG game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Doki Doki Literature Club - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Doki%20Doki%20Literature%20Club.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Doki Doki Literature Club Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Doki Doki Literature Club unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
-    </image:image>
-  </url>
-
-  <!-- Don't Escape  - Free Unblocked Game -->
-  <url>
-    <loc>https://chromebookunlocked.github.io/Don't%20Escape%20.html</loc>
-    <lastmod>2025-11-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
-      <image:title>Don't Escape  Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Don't Escape  unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Doki Doki Literature Club unblocked for free at school. Horror, Visual Novel, Psychological game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Douchebag Life - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Douchebag%20Life.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Douchebag Life Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Douchebag Life unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Douchebag Life unblocked for free at school. Simulation, Casual game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Dreader - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Dreader.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Dreader Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Dreader unblocked for free at school. Psyhological game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Dreader unblocked for free at school. Psychological, Horror game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Drift Boss - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Drift%20Boss.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -715,475 +824,488 @@
   <!-- Drift Hunters - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Drift%20Hunters.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Drift Hunters Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Drift Hunters unblocked for free at school. Driving game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Drift Hunters unblocked for free at school. Driving, Racing game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Drive Mad - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Drive%20Mad.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Drive Mad Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Drive Mad unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Drive Mad unblocked for free at school. Driving, Physics, Puzzle game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Dud - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Dud.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Dud Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Dud unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Dud unblocked for free at school. Puzzle, Casual game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Dunk Shot - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Dunk%20Shot.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Dunk Shot Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Dunk Shot unblocked for free at school. Basketball game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Dunk Shot unblocked for free at school. Sports, Arcade game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Earth Taken - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Earth%20Taken.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Earth Taken Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Earth Taken unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Earth Taken unblocked for free at school. Action, Shooter, Survival game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Effing Worms - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Effing%20Worms.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Effing Worms Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Effing Worms unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Effing Worms unblocked for free at school. Action, Arcade game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Elastic Face - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Elastic%20Face.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Elastic Face Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Elastic Face unblocked for free at school. Casual game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Elastic Face unblocked for free at school. Casual, Funny game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Escape Road  - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Escape%20Road%20.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Escape Road  Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Escape Road  unblocked for free at school. Driving game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Escape Road  unblocked for free at school. Driving, Action game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Extreme Run 3D - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Extreme%20Run%203D.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Extreme Run 3D Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Extreme Run 3D unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Extreme Run 3D unblocked for free at school. Platformer, Running game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- FNAF 1 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/FNAF%201.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>FNAF 1 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play FNAF 1 unblocked for free at school. Horror game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play FNAF 1 unblocked for free at school. Horror, Strategy game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- FNAF 2 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/FNAF%202.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>FNAF 2 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play FNAF 2 unblocked for free at school. Horror game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play FNAF 2 unblocked for free at school. Horror, Strategy game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- FNAF 3 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/FNAF%203.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>FNAF 3 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play FNAF 3 unblocked for free at school. Horror game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play FNAF 3 unblocked for free at school. Horror, Strategy game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- FNAF 4 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/FNAF%204.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>FNAF 4 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play FNAF 4 unblocked for free at school. Horror game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play FNAF 4 unblocked for free at school. Horror, Strategy game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- FNAF Pizzeria Simulator - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/FNAF%20Pizzeria%20Simulator.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>FNAF Pizzeria Simulator Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play FNAF Pizzeria Simulator unblocked for free at school. Horror game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play FNAF Pizzeria Simulator unblocked for free at school. Horror, Simulation, Strategy game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- FNAF Sister Location - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/FNAF%20Sister%20Location.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>FNAF Sister Location Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play FNAF Sister Location unblocked for free at school. Horror game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play FNAF Sister Location unblocked for free at school. Horror, Strategy game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Fireboy and Watergirl 1 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Fireboy%20and%20Watergirl%201.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Fireboy and Watergirl 1 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Fireboy and Watergirl 1 unblocked for free at school. 2 Player, Platformer game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Fireboy and Watergirl 1 unblocked for free at school. 2 Player, Platformer, Puzzle game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Friday Night Funkin - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Friday%20Night%20Funkin.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Friday Night Funkin Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Friday Night Funkin unblocked for free at school. Casual game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Friday Night Funkin unblocked for free at school. Rhythm, Music game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Fruit Ninja - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Fruit%20Ninja.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Fruit Ninja Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Fruit Ninja unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Fruit Ninja unblocked for free at school. Arcade, Casual game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Geometry Dash Lite - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Geometry%20Dash%20Lite.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Geometry Dash Lite Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Geometry Dash Lite unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Geometry Dash Lite unblocked for free at school. Platformer, Rhythm game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Get Yoked - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Get%20Yoked.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Get Yoked Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Get Yoked unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Get Yoked unblocked for free at school. Action, Arcade game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Gladdihoppers - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Gladdihoppers.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Gladdihoppers Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Gladdihoppers unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Gobble - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Gobble.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Gobble Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Gobble unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Gobble unblocked for free at school. Arcade, Casual game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Going Balls - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Going%20Balls.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Going Balls Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Going Balls unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Going Balls unblocked for free at school. Arcade, Casual game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Gold Digger FRVR - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Gold%20Digger%20FRVR.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Gold Digger FRVR Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Gold Digger FRVR unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Gold Digger FRVR unblocked for free at school. Arcade, Mining game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Granny - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Granny.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Granny Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Granny unblocked for free at school. Horror game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Granny unblocked for free at school. Horror, Escape game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Grindcraft - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Grindcraft.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Grindcraft Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Grindcraft unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Grindcraft unblocked for free at school. Clicker, Crafting, Idle game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Gun Spin - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Gun%20Spin.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Gun Spin Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Gun Spin unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Gun Spin unblocked for free at school. Puzzle, Physics game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Hanger 2 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Hanger%202.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Hanger 2 Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Hanger 2 unblocked for free at school. Arcade game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Hanger 2 unblocked for free at school. Arcade, Physics game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Happy Room - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Happy%20Room.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Happy Room Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Happy Room unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Happy Room unblocked for free at school. Simulation, Ragdoll, Action game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Happy Wheels - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Happy%20Wheels.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Happy Wheels Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Happy Wheels unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Happy Wheels unblocked for free at school. Ragdoll, Racing, Physics game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Helix Jump - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Helix%20Jump.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Helix Jump Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Helix Jump unblocked for free at school. Arcade game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Helix Jump unblocked for free at school. Arcade, Casual game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Henry Stickmin Escaping The Prison - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Henry%20Stickmin%20Escaping%20The%20Prison.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Henry Stickmin Escaping The Prison Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Henry Stickmin Escaping The Prison unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Henry Stickmin Escaping The Prison unblocked for free at school. Adventure, Point and Click game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Henry Stickmin Fleeing The Complex - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Henry%20Stickmin%20Fleeing%20The%20Complex.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Henry Stickmin Fleeing The Complex Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Henry Stickmin Fleeing The Complex unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Henry Stickmin Fleeing The Complex unblocked for free at school. Adventure, Point and Click game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Henry Stickmin Infiltrating The Airship - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Henry%20Stickmin%20Infiltrating%20The%20Airship.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Henry Stickmin Infiltrating The Airship Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Henry Stickmin Infiltrating The Airship unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Henry Stickmin Infiltrating The Airship unblocked for free at school. Adventure, Point and Click game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Henry Stickmin Stealing The Diamond - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Henry%20Stickmin%20Stealing%20The%20Diamond.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Henry Stickmin Stealing The Diamond Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Henry Stickmin Stealing The Diamond unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Henry Stickmin Stealing The Diamond unblocked for free at school. Adventure, Point and Click game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Highway Racer - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Highway%20Racer.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Highway Racer Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Highway Racer unblocked for free at school. Driving game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Highway Racer unblocked for free at school. Driving, Racing game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Hover Race Drive - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Hover%20Race%20Drive.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Hover Race Drive Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Hover Race Drive unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Hover Race Drive unblocked for free at school. Driving, Racing game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Hungry Lamu - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Hungry%20Lamu.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -1196,78 +1318,260 @@
   <!-- Idle Breakout - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Idle%20Breakout.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Idle Breakout Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Idle Breakout unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Idle Breakout unblocked for free at school. Clicker, Idle, Arcade game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Infinite Craft - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Infinite%20Craft.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Infinite Craft Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Infinite Craft unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Infinite Craft unblocked for free at school. Puzzle, Crafting, Sandbox game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Ink Game - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Ink%20Game.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Ink Game Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Ink Game unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Ink Game unblocked for free at school. Horror, Action game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Mana God - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Mana%20God.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Mana God Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Mana God unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Minecraft - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Minecraft.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Minecraft Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Minecraft unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- One Bit Adventure - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/One%20Bit%20Adventure.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>One Bit Adventure Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play One Bit Adventure unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Perfect Hotel - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Perfect%20Hotel.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Perfect Hotel Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Perfect Hotel unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Plants vs Zombies 2 - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Plants%20vs%20Zombies%202.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Plants vs Zombies 2 Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Plants vs Zombies 2 unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Road of the Dead - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Road%20of%20the%20Dead.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Road of the Dead Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Road of the Dead unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Rocket Soccer Derby - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Rocket%20Soccer%20Derby.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Rocket Soccer Derby Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Rocket Soccer Derby unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Sea Mongrel - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Sea%20Mongrel.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Sea Mongrel Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Sea Mongrel unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Slide in the Woods - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Slide%20in%20the%20Woods.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Slide in the Woods Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Slide in the Woods unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Slope - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Slope.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Slope Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Slope unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Slope unblocked for free at school. Arcade, Running, Endless game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Smash Carts - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Smash%20Carts.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Smash Carts Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Smash Carts unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Super Cold - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Super%20Cold.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Super Cold Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Super Cold unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Superhot - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Superhot.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Superhot Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Superhot unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- The Binding of Isaac - Wrath of the Lamb - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>The Binding of Isaac - Wrath of the Lamb Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play The Binding of Isaac - Wrath of the Lamb unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play The Binding of Isaac - Wrath of the Lamb unblocked for free at school. Roguelike, Action, Adventure game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- The Visitor - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/The%20Visitor.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>The Visitor Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play The Visitor unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
   <!-- Vapmpire Survivors - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Vapmpire%20Survivors.html</loc>
-    <lastmod>2025-11-24</lastmod>
+    <lastmod>2025-12-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Vapmpire Survivors Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Vapmpire Survivors unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+      <image:caption>Play Vapmpire Survivors unblocked for free at school. Action, Roguelike, Survival game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Vollyball Challenge - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Vollyball%20Challenge.html</loc>
+    <lastmod>2025-12-04</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Vollyball Challenge Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Vollyball Challenge unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
