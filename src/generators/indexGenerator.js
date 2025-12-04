@@ -49,6 +49,16 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-4QZLTDX504');
+  </script>
+
   ${metaTags}
 
   <!-- Structured Data for Search Engines -->
