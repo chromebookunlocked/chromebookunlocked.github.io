@@ -74,11 +74,11 @@ jobs:
           if git diff --quiet && git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            # Add changes
-            git add data/*.json
+            # Add all changes in data folder (including deletions)
+            git add -A data/
 
-            # Check if there are deleted game HTML files to remove
-            git add -u "*.html" 2>/dev/null || true
+            # Add all changes to HTML files in root (including deletions)
+            git add -A "*.html" 2>/dev/null || true
 
             # Commit
             git commit -m "Update game data and cleanup orphaned pages" --author="github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
