@@ -1,0 +1,133 @@
+name: Manual Update & Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_validation:
+        description: 'Skip validation (not recommended)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+jobs:
+  update-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      # Step 1: Update game data (with validation)
+      - name: Update game data
+        run: node scripts/update-data.js
+
+      # Step 2: Cleanup orphaned game HTML pages
+      - name: Cleanup orphaned game pages
+        run: node scripts/cleanup-orphaned-pages.js
+
+      # Step 3: Validate games (unless skipped)
+      - name: Validate games
+        if: inputs.skip_validation != 'true'
+        run: npm run validate
+
+      # Step 4: Build site
+      - name: Build site
+        run: npm run build
+
+      # Step 5: Copy files to dist
+      - name: Copy game, data, asset folders, and static files
+        run: |
+          mkdir -p dist
+          cp -r games dist/games
+          cp -r assets dist/assets
+
+          # Use rsync so dist/data matches repo/data exactly (deletes removed files)
+          rsync -av --delete data/ dist/data/
+
+          # Copy static files
+          cp ads.txt dist/ads.txt
+          cp dmca.html dist/dmca.html
+          cp sitemap.xml dist/sitemap.xml
+          cp robots.txt dist/robots.txt
+          cp google0d95473435a7c986.html dist/google0d95473435a7c986.html
+
+      # Step 6: Commit data changes (if any)
+      - name: Commit data changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Check if there are changes to commit
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            # Add changes
+            git add data/*.json
+
+            # Check if there are deleted game HTML files to remove
+            git add -u "*.html" 2>/dev/null || true
+
+            # Commit
+            git commit -m "Update game data and cleanup orphaned pages" --author="github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+
+            # Push with retry logic
+            MAX_RETRIES=5
+            RETRY_COUNT=0
+            DELAY=2
+
+            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+              echo "Attempting to push (attempt $((RETRY_COUNT + 1))/$MAX_RETRIES)..."
+
+              if git push origin main; then
+                echo "Successfully pushed changes"
+                break
+              else
+                echo "Push failed, pulling with rebase..."
+                if git pull --rebase origin main; then
+                  echo "Rebase successful, retrying push..."
+                  RETRY_COUNT=$((RETRY_COUNT + 1))
+                  sleep $DELAY
+                  DELAY=$((DELAY * 2))
+                else
+                  echo "Rebase failed, aborting..."
+                  git rebase --abort
+                  exit 1
+                fi
+              fi
+            done
+
+            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+              echo "Failed to push after $MAX_RETRIES attempts"
+              exit 1
+            fi
+          fi
+
+      # Step 7: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          clean: false
+
+      - name: Summary
+        run: |
+          echo "✨ Update and build completed successfully!"
+          echo "📊 Summary:"
+          echo "   - Updated game data JSON files"
+          echo "   - Cleaned up orphaned game pages"
+          echo "   - Validated all games"
+          echo "   - Built and deployed to GitHub Pages"

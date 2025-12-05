@@ -1,10 +1,11 @@
-name: Build and Deploy
+name: Build and Deploy (Legacy - Use Manual Update Instead)
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+  # Automatic triggers disabled - use manual-update.yml instead
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
   build:
