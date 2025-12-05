@@ -148,13 +148,24 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       <!-- All category sections (including games for home view) -->
       ${categorySections}
 
-      <a href="dmca.html" id="dmcaLink" target="_blank">DMCA</a>
+      <footer id="siteFooter">
+        <div class="footer-links">
+          <a href="privacy-policy.html">Privacy Policy</a> |
+          <a href="cookie-policy.html">Cookie Policy</a> |
+          <a href="contact.html">Contact</a> |
+          <a href="dmca.html">DMCA</a>
+        </div>
+      </footer>
     </div>
   </div>
 
   <script>
     ${clientJS}
   </script>
+
+  <!-- Cookie Consent Banner -->
+  <link rel="stylesheet" href="assets/cookie-consent.css">
+  <script src="assets/cookie-consent.js"></script>
 </body>
 </html>`;
 

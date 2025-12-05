@@ -178,10 +178,16 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     <p>
       <strong>${game.name} Unblocked</strong> - Play Free Online on <a href="index.html" title="Free Unblocked Games for School">Chromebook Unlocked Games</a>
       <br>
-      <span>Categories: ${categoryList}</span> | <a href="dmca.html">DMCA</a>
+      <span>Categories: ${categoryList}</span>
       <br>
       <small>Play ${game.name} and 100+ more free unblocked games at school. No downloads, no blocks - just fun!</small>
     </p>
+    <div class="footer-links">
+      <a href="privacy-policy.html">Privacy Policy</a> |
+      <a href="cookie-policy.html">Cookie Policy</a> |
+      <a href="contact.html">Contact</a> |
+      <a href="dmca.html">DMCA</a>
+    </div>
   </footer>
 
   ${structuredData}
@@ -294,6 +300,10 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     }
 
   </script>
+
+  <!-- Cookie Consent Banner -->
+  <link rel="stylesheet" href="assets/cookie-consent.css">
+  <script src="assets/cookie-consent.js"></script>
 </body>
 </html>`;
 }
