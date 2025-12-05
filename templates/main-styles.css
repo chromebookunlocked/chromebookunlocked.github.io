@@ -938,7 +938,37 @@ button:active {
   letter-spacing: 1px;
 }
 
-/* DMCA */
+/* Footer */
+#siteFooter {
+  display: block;
+  text-align: center;
+  background: transparent;
+  padding: 2rem 1rem;
+  margin-top: 4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-links {
+  font-family: var(--font-main);
+  font-size: 0.75rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.footer-links a {
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  padding: 0.5rem;
+  display: inline-block;
+}
+
+.footer-links a:hover {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: underline;
+}
+
+/* Keep legacy DMCA link style for backwards compatibility */
 #dmcaLink {
   display: block;
   text-align: center;
