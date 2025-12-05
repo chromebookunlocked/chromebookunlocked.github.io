@@ -1,12 +1,14 @@
-name: Update Game Data
+name: Update Game Data (Legacy - Use Manual Update Instead)
 
 on:
-  push:
-    paths:
-      - "games/**"
-      - ".github/workflows/update-data.yml"
-    branches:
-      - main
+  workflow_dispatch:
+  # Automatic triggers disabled - use manual-update.yml instead
+  # push:
+  #   paths:
+  #     - "games/**"
+  #     - ".github/workflows/update-data.yml"
+  #   branches:
+  #     - main
 
 jobs:
   update:

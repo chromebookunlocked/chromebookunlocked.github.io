@@ -6,6 +6,8 @@
     "build": "node generate.js",
     "validate": "node scripts/validate-games.js",
     "sync-data": "node scripts/update-data.js",
+    "cleanup": "node scripts/cleanup-orphaned-pages.js",
+    "update-all": "npm run sync-data && npm run cleanup && npm run validate && npm run build",
     "clean": "rm -rf dist/",
     "prebuild": "npm run validate",
     "dev": "npm run build && npx serve dist -p 3000",
