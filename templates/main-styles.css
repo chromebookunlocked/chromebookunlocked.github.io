@@ -971,7 +971,7 @@ button:active {
 .footer-brand h3 {
   font-size: 1.1rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  background: linear-gradient(135deg, #ff66ff, #ff99ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1014,12 +1014,12 @@ button:active {
   left: 0;
   width: 0;
   height: 1px;
-  background: var(--accent1);
+  background: #ff66ff;
   transition: width 0.2s ease;
 }
 
 .footer-links a:hover {
-  color: var(--accent1);
+  color: #ff66ff;
   text-decoration: none;
 }
 

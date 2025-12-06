@@ -11,9 +11,10 @@ const { generateIndexMetaTags, generateIndexStructuredData } = require('../utils
  * @returns {string} Complete HTML document
  */
 function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.') {
-  // Generate sidebar categories
+  // Generate sidebar categories - sorted by game count (largest first)
   const sidebarCategories = Object.keys(categories)
     .filter(cat => cat !== "Recently Played" && cat !== "Newly Added")
+    .sort((a, b) => categories[b].length - categories[a].length) // Sort by count, largest first
     .map(cat => `<li role="menuitem" tabindex="0" onclick="filterCategory('${cat}')" onkeypress="if(event.key==='Enter')filterCategory('${cat}')">${cat}</li>`)
     .join("");
 
@@ -23,8 +24,9 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
 
   const finalSidebarCategories = newlyAddedItem + sidebarCategories;
 
-  // Generate category sections with games
+  // Generate category sections with games - filter out categories with less than 4 games
   const categorySections = Object.keys(categories)
+    .filter(cat => categories[cat].length >= 4) // Only show categories with 4+ games
     .sort((a, b) => {
       // Keep "Newly Added" at top, sort rest by game count
       if (a === "Newly Added") return -1;
