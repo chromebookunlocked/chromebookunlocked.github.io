@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact Us - Chromebook Unlocked Games</title>
+  <meta name="description" content="Get in touch with Chromebook Unlocked Games - Contact us for support, suggestions, or feedback.">
+  <link rel="icon" type="image/png" href="../assets/logo.png">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #ff66ff;
+      --primary-dark: #cc00ff;
+      --primary-light: #ff99ff;
+      --bg-dark: #0d001a;
+      --bg-medium: #1c0033;
+      --bg-light: #2d0052;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.8);
+      --text-muted: rgba(255, 255, 255, 0.6);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-medium) 50%, var(--bg-light) 100%);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    header {
+      background: rgba(13, 0, 26, 0.85);
+      backdrop-filter: blur(20px);
+      padding: 1rem 2rem;
+      border-bottom: 2px solid rgba(255, 102, 255, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 102, 255, 0.2);
+    }
+
+    h2 {
+      color: var(--primary-light);
+      margin: 2rem 0 1rem 0;
+      font-size: 1.5rem;
+    }
+
+    h3 {
+      color: var(--text-primary);
+      margin: 1.5rem 0 0.75rem 0;
+      font-size: 1.2rem;
+    }
+
+    p {
+      color: var(--text-secondary);
+      margin: 1rem 0;
+    }
+
+    .contact-card {
+      background: rgba(255, 102, 255, 0.08);
+      border: 1px solid rgba(255, 102, 255, 0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .contact-card h3 {
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .icon {
+      font-size: 1.5rem;
+    }
+
+    .email-link {
+      color: var(--primary-color);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 102, 255, 0.4);
+      font-size: 1.1rem;
+      display: inline-block;
+      margin: 0.5rem 0;
+    }
+
+    .email-link:hover {
+      color: var(--primary-light);
+      border-bottom-color: var(--primary-light);
+    }
+
+    ul {
+      margin: 1rem 0 1rem 2rem;
+      color: var(--text-secondary);
+    }
+
+    li {
+      margin: 0.5rem 0;
+    }
+
+    .note {
+      background: rgba(255, 102, 255, 0.1);
+      border-left: 3px solid var(--primary-color);
+      padding: 1rem;
+      margin: 1.5rem 0;
+      border-radius: 4px;
+    }
+
+    .back-button {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      border-radius: 12px;
+      font-weight: 600;
+      margin-top: 2rem;
+      transition: all 0.3s ease;
+      border: none;
+      text-decoration: none;
+    }
+
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 102, 255, 0.4);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      main {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+
+      h1 {
+        font-size: 1.2rem;
+      }
+
+      h2 {
+        font-size: 1.3rem;
+      }
+
+      .contact-card {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <img src="../assets/logo.png" alt="Chromebook Unlocked Games" class="logo">
+      <h1>Contact Us</h1>
+    </div>
+  </header>
+
+  <main>
+    <p>
+      We'd love to hear from you! Whether you have questions, suggestions, or need support,
+      feel free to reach out to us.
+    </p>
+
+    <div class="contact-card">
+      <h3><span class="icon">📧</span> Email</h3>
+      <p>For general inquiries, support, or feedback:</p>
+      <a href="mailto:contact@chromebookunlocked.github.io" class="email-link">
+        contact@chromebookunlocked.github.io
+      </a>
+    </div>
+
+    <div class="contact-card">
+      <h3><span class="icon">🎮</span> Game Requests</h3>
+      <p>
+        Want to see a specific game added to our site? Let us know! Send us an email with:
+      </p>
+      <ul>
+        <li>Game name</li>
+        <li>Brief description</li>
+        <li>Why you'd like to see it added</li>
+      </ul>
+    </div>
+
+    <div class="contact-card">
+      <h3><span class="icon">🐛</span> Report Issues</h3>
+      <p>
+        Found a bug or experiencing technical difficulties? Please contact us with:
+      </p>
+      <ul>
+        <li>Description of the issue</li>
+        <li>Game or page where the issue occurs</li>
+        <li>Your device and browser information</li>
+        <li>Steps to reproduce (if applicable)</li>
+      </ul>
+    </div>
+
+    <div class="contact-card">
+      <h3><span class="icon">⚖️</span> Legal & DMCA</h3>
+      <p>
+        For copyright concerns or DMCA takedown requests, please visit our
+        <a href="dmca.html" style="color: var(--primary-color);">DMCA page</a>.
+      </p>
+    </div>
+
+    <h2>Response Time</h2>
+    <p>
+      We typically respond to inquiries within 1-3 business days. During peak times,
+      it may take slightly longer. We appreciate your patience!
+    </p>
+
+    <div class="note">
+      <strong>Note:</strong> We do not collect personal information through our website.
+      Any information you provide via email is used solely to respond to your inquiry.
+      For more details, see our <a href="privacy-policy.html" style="color: var(--primary-color);">Privacy Policy</a>.
+    </div>
+
+    <h2>Community Guidelines</h2>
+    <p>When contacting us, please:</p>
+    <ul>
+      <li>Be respectful and courteous</li>
+      <li>Provide clear and detailed information</li>
+      <li>Use appropriate language</li>
+      <li>Be patient while waiting for a response</li>
+    </ul>
+
+    <a href="../index.html" class="back-button">← Back to Games</a>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Chromebook Unlocked Games. All rights reserved.</p>
+  </footer>
+</body>
+</html>
