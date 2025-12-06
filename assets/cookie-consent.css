@@ -211,18 +211,6 @@
   }
 }
 
-/* Cookie Settings Link (in footer) */
-.cookie-settings-link {
-  color: inherit;
-  text-decoration: none;
-  cursor: pointer;
-  font-size: inherit;
-}
-
-.cookie-settings-link:hover {
-  text-decoration: underline;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
   .cookie-consent-banner {
