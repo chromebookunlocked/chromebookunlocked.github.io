@@ -164,7 +164,6 @@
     settingsLink.id = 'cookieSettingsLink';
     settingsLink.href = '#';
     settingsLink.textContent = 'Cookie Settings';
-    settingsLink.className = 'cookie-settings-link';
     settingsLink.setAttribute('aria-label', 'Manage cookie preferences');
 
     settingsLink.addEventListener('click', function(e) {
@@ -176,12 +175,16 @@
       }
     });
 
-    // Try to add to footer if it exists
-    const footer = document.querySelector('footer');
-    if (footer) {
-      const separator = document.createTextNode(' | ');
-      footer.appendChild(separator);
-      footer.appendChild(settingsLink);
+    // Try to add to footer links section if it exists
+    const footerLinks = document.querySelector('.footer-links');
+    if (footerLinks) {
+      footerLinks.appendChild(settingsLink);
+    } else {
+      // Fallback: add to footer if footer-links doesn't exist
+      const footer = document.querySelector('footer');
+      if (footer) {
+        footer.appendChild(settingsLink);
+      }
     }
   }
 
