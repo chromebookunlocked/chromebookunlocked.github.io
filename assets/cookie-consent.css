@@ -75,13 +75,15 @@
 /* Buttons Section */
 .cookie-consent-buttons {
   display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 400px;
 }
 
 .cookie-btn {
-  padding: 12px 28px;
+  width: 100%;
+  padding: 12px 24px;
   border: none;
   border-radius: 12px;
   font-size: 14px;
@@ -92,6 +94,7 @@
   font-family: inherit;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  text-align: center;
 }
 
 .cookie-btn:focus {
@@ -189,9 +192,7 @@
 
 /* Settings expanded state */
 .cookie-settings-expanded {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
   animation: slideIn 0.3s ease;
 }
 
@@ -251,13 +252,10 @@
   }
 
   .cookie-consent-buttons {
-    flex-direction: column;
-    width: 100%;
-    gap: 10px;
+    max-width: 100%;
   }
 
   .cookie-btn {
-    width: 100%;
     padding: 12px;
   }
 }
