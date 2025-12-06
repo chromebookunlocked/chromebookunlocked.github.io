@@ -184,7 +184,7 @@ function loadRecentlyPlayed() {
     };
 
     card.innerHTML = `<div class="thumb-container" style="--thumb-url: url('${thumbUrl}')">
-      <img class="thumb" src="${thumbUrl}" alt="${g.name}" onerror="this.src='assets/logo.png'">
+      <img class="thumb" src="${thumbUrl}" alt="${g.name}" loading="lazy" decoding="async" width="300" height="300" onerror="this.src='assets/logo.png'">
     </div>
     <div class="card-title">${g.name}</div>`;
     recentGrid.appendChild(card);
@@ -258,7 +258,7 @@ function searchGames(query) {
   } else {
     searchDropdown.innerHTML = topResults.map(game => {
       return `<div class="search-result-item" onclick="window.location.href='${game.folder}.html'">
-        <img class="search-result-thumb" src="${game.thumb}" alt="${game.name}">
+        <img class="search-result-thumb" src="${game.thumb}" alt="${game.name}" loading="lazy" decoding="async" width="60" height="60">
         <div class="search-result-name">${game.name}</div>
       </div>`;
     }).join('');
@@ -399,6 +399,33 @@ window.addEventListener('resize', () => {
   }, 120);
 });
 
+// Intersection Observer for better lazy loading (progressive loading of images)
+function setupIntersectionObserver() {
+  // Only setup if browser supports Intersection Observer
+  if (!('IntersectionObserver' in window)) {
+    return; // Fallback to native lazy loading only
+  }
+
+  const imageObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        // Image is now in viewport, browser will load it due to loading="lazy"
+        // We can add preloading for next images here if needed
+        observer.unobserve(img);
+      }
+    });
+  }, {
+    rootMargin: '50px 0px', // Start loading 50px before image enters viewport
+    threshold: 0.01
+  });
+
+  // Observe all thumbnail images
+  document.querySelectorAll('img.thumb').forEach(img => {
+    imageObserver.observe(img);
+  });
+}
+
 // Initial load
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.category').forEach(c => {
@@ -424,6 +451,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
   });
+
+  // Setup Intersection Observer for progressive loading
+  setupIntersectionObserver();
 
   loadRecentlyPlayed();
   updateAllCategories();

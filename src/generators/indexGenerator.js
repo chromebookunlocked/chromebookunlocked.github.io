@@ -51,6 +51,10 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Resource Hints for Performance -->
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com">
+  <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
   <script>
