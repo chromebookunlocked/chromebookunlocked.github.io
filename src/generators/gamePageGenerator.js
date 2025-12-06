@@ -143,27 +143,6 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
           .join("")}
       </div>
     </div>
-
-    <!-- SEO Game Description Section -->
-    <section class="game-description" aria-label="About ${game.name}">
-      <h2>Play ${game.name} Unblocked</h2>
-      <p itemprop="description">
-        <span class="description-preview">Play ${game.name} unblocked</span><span class="description-full"> - ${seoDescription.replace(/^Play [^!]+unblocked[^!]*!\s*/i, '')} This free online game is perfect for playing at school on your Chromebook or any computer.
-        ${game.name} is one of the best ${categoryText} games available on our unblocked games site.
-        No downloads needed - just click play and enjoy ${game.name} instantly in your browser!</span>
-      </p>
-      <p class="description-full">
-        <strong>How to Play ${game.name}:</strong> Click the play button above to start the game.
-        ${game.name} works on all devices including Chromebooks, laptops, and desktop computers.
-        Use fullscreen mode for the best gaming experience!
-      </p>
-      <button class="show-more-btn" onclick="toggleDescription()" aria-label="Show more description">
-        <span class="show-more-text">Show more</span>
-        <svg class="show-more-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
-      </button>
-    </section>
   </main>
 
   <!-- You Might Also Like Section -->
@@ -174,19 +153,99 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     </div>
   </section>
 
+  <!-- Enhanced SEO Section -->
+  <section class="game-info-section" aria-label="About ${game.name}">
+    <div class="game-info-container">
+      <div class="info-card">
+        <div class="info-card-icon">📝</div>
+        <h3>Description</h3>
+        <p itemprop="description">
+          ${seoDescription} This free online game is perfect for playing at school on your Chromebook or any computer.
+          ${game.name} is one of the best ${categoryText} games available on our unblocked games site.
+          No downloads needed - just click play and enjoy ${game.name} instantly in your browser!
+        </p>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-icon">🎮</div>
+        <h3>How to Play</h3>
+        <p>
+          Click the play button above to start ${game.name}. The game works on all devices including Chromebooks, laptops, and desktop computers.
+          Use the fullscreen mode for the best gaming experience! All controls are explained in-game.
+          ${game.name} is completely free to play with no registration required.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-icon">🔍</div>
+        <h3>Game Information</h3>
+        <div class="info-details">
+          <p><strong>Game Name:</strong> ${game.name}</p>
+          <p><strong>Categories:</strong> ${categoryList}</p>
+          <p><strong>Platform:</strong> Web Browser (HTML5)</p>
+          <p><strong>Compatibility:</strong> Chromebook, PC, Mac, Mobile</p>
+          <p><strong>Status:</strong> Unblocked & Free to Play</p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-card-icon">🏷️</div>
+        <h3>Popular Keywords</h3>
+        <div class="keywords-list">
+          <span class="keyword">${game.name} unblocked</span>
+          <span class="keyword">${game.name} online</span>
+          <span class="keyword">play ${game.name}</span>
+          <span class="keyword">${game.name} free</span>
+          <span class="keyword">${game.name} game</span>
+          <span class="keyword">${categoryText} games</span>
+          <span class="keyword">unblocked games</span>
+          <span class="keyword">school games</span>
+          <span class="keyword">chromebook games</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <footer>
-    <p>
-      <strong>${game.name} Unblocked</strong> - Play Free Online on <a href="index.html" title="Free Unblocked Games for School">Chromebook Unlocked Games</a>
-      <br>
-      <span>Categories: ${categoryList}</span>
-      <br>
-      <small>Play ${game.name} and 100+ more free unblocked games at school. No downloads, no blocks - just fun!</small>
-    </p>
-    <div class="footer-links">
-      <a href="privacy-policy.html">Privacy Policy</a> |
-      <a href="cookie-policy.html">Cookie Policy</a> |
-      <a href="contact.html">Contact</a> |
-      <a href="dmca.html">DMCA</a>
+    <div class="footer-container">
+      <div class="footer-branding">
+        <h3>Chromebook Unlocked Games</h3>
+        <p class="footer-url">chromebookunlocked.github.io</p>
+        <p class="footer-tagline">Free unblocked games for school - Play online instantly!</p>
+      </div>
+
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <div class="footer-links-grid">
+          <a href="index.html">Home</a>
+          <a href="index.html#recently-played">Recent Games</a>
+          <a href="index.html#all-games">All Games</a>
+        </div>
+      </div>
+
+      <div class="footer-section">
+        <h4>Legal</h4>
+        <div class="footer-links-grid">
+          <a href="/important-pages/privacy-policy.html">Privacy Policy</a>
+          <a href="/important-pages/cookie-policy.html">Cookie Policy</a>
+          <a href="/important-pages/terms-of-service.html">Terms of Service</a>
+          <a href="/important-pages/contact.html">Contact</a>
+          <a href="/important-pages/dmca.html">DMCA</a>
+        </div>
+      </div>
+
+      <div class="footer-section">
+        <h4>Currently Playing</h4>
+        <p class="footer-game-info">
+          <strong>${game.name}</strong><br>
+          <span>${categoryList}</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; ${new Date().getFullYear()} Chromebook Unlocked Games. All rights reserved.</p>
+      <p class="footer-disclaimer">All games are copyrighted by their respective owners.</p>
     </div>
   </footer>
 
@@ -280,25 +339,6 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
     document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
     document.addEventListener('MSFullscreenChange', updateFullscreenIcon);
-
-    // Toggle description show more/less
-    function toggleDescription() {
-      const description = document.querySelector('.game-description');
-      const btn = document.querySelector('.show-more-btn');
-      const btnText = btn.querySelector('.show-more-text');
-      const btnIcon = btn.querySelector('.show-more-icon');
-
-      if (description.classList.contains('expanded')) {
-        description.classList.remove('expanded');
-        btnText.textContent = 'Show more';
-        btnIcon.style.transform = 'rotate(0deg)';
-      } else {
-        description.classList.add('expanded');
-        btnText.textContent = 'Show less';
-        btnIcon.style.transform = 'rotate(180deg)';
-      }
-    }
-
   </script>
 
   <!-- Cookie Consent Banner -->

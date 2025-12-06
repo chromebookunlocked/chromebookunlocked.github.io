@@ -53,6 +53,7 @@ jobs:
           mkdir -p dist
           cp -r games dist/games
           cp -r assets dist/assets
+          cp -r important-pages dist/important-pages
 
           # Use rsync so dist/data matches repo/data exactly (deletes removed files)
           rsync -av --delete data/ dist/data/
@@ -63,6 +64,7 @@ jobs:
           cp sitemap.xml dist/sitemap.xml
           cp robots.txt dist/robots.txt
           cp google0d95473435a7c986.html dist/google0d95473435a7c986.html
+          cp .nojekyll dist/.nojekyll
 
       # Step 6: Commit data changes (if any)
       - name: Commit data changes

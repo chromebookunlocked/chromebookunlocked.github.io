@@ -43,24 +43,38 @@
     banner.className = 'cookie-consent-banner';
 
     banner.innerHTML = `
+      <button class="cookie-close-btn" id="cookieConsentClose" aria-label="Accept and close" title="Accept cookies and close">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
       <div class="cookie-consent-content">
         <div class="cookie-consent-text">
-          <h3 id="cookieConsentTitle">🍪 We Use Cookies</h3>
+          <h3 id="cookieConsentTitle">🍪 We Value Your Privacy</h3>
           <p id="cookieConsentDescription">
-            We use cookies to enhance your experience, remember your preferences, and analyze site traffic.
-            By clicking "Accept All", you consent to our use of cookies.
-            <a href="cookie-policy.html" target="_blank">Learn more</a>
+            We use cookies to enhance your gaming experience, remember your preferences, and analyze site traffic.
+            By clicking "Accept" or closing this banner, you consent to our use of cookies.
+            <a href="/important-pages/cookie-policy.html">Cookie Policy</a>
           </p>
         </div>
-        <div class="cookie-consent-buttons">
+        <div class="cookie-consent-buttons" id="cookieButtons">
           <button id="cookieConsentAccept" class="cookie-btn cookie-btn-accept" aria-label="Accept all cookies">
-            Accept All
+            ✓ Accept
+          </button>
+          <button id="cookieConsentSettings" class="cookie-btn cookie-btn-settings" aria-label="More settings">
+            More Settings
+          </button>
+        </div>
+        <div class="cookie-consent-buttons cookie-settings-expanded" id="cookieSettingsExpanded" style="display: none;">
+          <button id="cookieConsentAcceptExpanded" class="cookie-btn cookie-btn-accept" aria-label="Accept all cookies">
+            ✓ Accept All
           </button>
           <button id="cookieConsentDecline" class="cookie-btn cookie-btn-decline" aria-label="Decline non-essential cookies">
             Decline
           </button>
-          <button id="cookieConsentSettings" class="cookie-btn cookie-btn-settings" aria-label="Customize cookie settings">
-            Settings
+          <button id="cookieConsentBack" class="cookie-btn cookie-btn-settings" aria-label="Go back">
+            ← Back
           </button>
         </div>
       </div>
@@ -69,7 +83,15 @@
     document.body.appendChild(banner);
 
     // Add event listeners
+    document.getElementById('cookieConsentClose').addEventListener('click', function() {
+      acceptCookies();
+    });
+
     document.getElementById('cookieConsentAccept').addEventListener('click', function() {
+      acceptCookies();
+    });
+
+    document.getElementById('cookieConsentAcceptExpanded').addEventListener('click', function() {
       acceptCookies();
     });
 
@@ -78,7 +100,11 @@
     });
 
     document.getElementById('cookieConsentSettings').addEventListener('click', function() {
-      openCookieSettings();
+      toggleSettings();
+    });
+
+    document.getElementById('cookieConsentBack').addEventListener('click', function() {
+      toggleSettings();
     });
 
     // Animate in
@@ -102,9 +128,18 @@
     console.log('Cookies declined');
   }
 
-  // Open cookie settings (redirect to cookie policy page)
-  function openCookieSettings() {
-    window.open('cookie-policy.html', '_blank');
+  // Toggle settings view
+  function toggleSettings() {
+    const defaultButtons = document.getElementById('cookieButtons');
+    const expandedSettings = document.getElementById('cookieSettingsExpanded');
+
+    if (defaultButtons.style.display === 'none') {
+      defaultButtons.style.display = 'flex';
+      expandedSettings.style.display = 'none';
+    } else {
+      defaultButtons.style.display = 'none';
+      expandedSettings.style.display = 'flex';
+    }
   }
 
   // Hide banner
