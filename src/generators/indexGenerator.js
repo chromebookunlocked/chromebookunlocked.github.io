@@ -149,11 +149,21 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       ${categorySections}
 
       <footer id="siteFooter">
-        <div class="footer-links">
-          <a href="privacy-policy.html">Privacy Policy</a> |
-          <a href="cookie-policy.html">Cookie Policy</a> |
-          <a href="contact.html">Contact</a> |
-          <a href="dmca.html">DMCA</a>
+        <div class="footer-content">
+          <div class="footer-brand">
+            <h3>Chromebook Unlocked Games</h3>
+            <span class="footer-url">chromebookunlocked.github.io</span>
+          </div>
+          <div class="footer-links">
+            <a href="/important-pages/privacy-policy.html">Privacy Policy</a>
+            <a href="/important-pages/cookie-policy.html">Cookie Policy</a>
+            <a href="/important-pages/terms-of-service.html">Terms of Service</a>
+            <a href="/important-pages/contact.html">Contact</a>
+            <a href="/important-pages/dmca.html">DMCA</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; ${new Date().getFullYear()} Chromebook Unlocked Games. All rights reserved.</p>
         </div>
       </footer>
     </div>
