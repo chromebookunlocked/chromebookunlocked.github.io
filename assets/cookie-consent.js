@@ -178,6 +178,9 @@
     // Try to add to footer links section if it exists
     const footerLinks = document.querySelector('.footer-links');
     if (footerLinks) {
+      // Add separator before the link
+      const separator = document.createTextNode(' | ');
+      footerLinks.appendChild(separator);
       footerLinks.appendChild(settingsLink);
     } else {
       // Fallback: add to footer if footer-links doesn't exist
