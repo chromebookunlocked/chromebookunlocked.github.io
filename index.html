@@ -1410,32 +1410,125 @@ button:active {
 
 /* Footer */
 #siteFooter {
-  display: block;
-  text-align: center;
-  background: transparent;
-  padding: 2rem 1rem;
+  background: linear-gradient(180deg, rgba(13, 0, 26, 0.95) 0%, rgba(8, 0, 18, 0.98) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 2px solid rgba(255, 102, 255, 0.3);
   margin-top: 4rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4);
+  padding: 1.5rem 1rem;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.footer-brand h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent1), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.footer-url {
+  font-family: 'Courier New', monospace;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  padding: 0.25rem 0.6rem;
+  background: rgba(255, 102, 255, 0.08);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 102, 255, 0.15);
 }
 
 .footer-links {
-  font-family: var(--font-main);
-  font-size: 0.75rem;
-  font-weight: 300;
-  color: rgba(255, 255, 255, 0.4);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: center;
 }
 
 .footer-links a {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
-  transition: all 0.3s ease;
-  padding: 0.5rem;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  position: relative;
+  font-family: var(--font-main);
+  font-weight: 400;
+  padding: 0;
   display: inline-block;
 }
 
+.footer-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent1);
+  transition: width 0.2s ease;
+}
+
 .footer-links a:hover {
-  color: rgba(255, 255, 255, 0.8);
-  text-decoration: underline;
+  color: var(--accent1);
+  text-decoration: none;
+}
+
+.footer-links a:hover::after {
+  width: 100%;
+}
+
+.footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 1.5rem;
+  text-align: center;
+}
+
+.footer-bottom p {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  margin: 0;
+  opacity: 0.8;
+  font-family: var(--font-main);
+  font-weight: 300;
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-brand {
+    width: 100%;
+  }
+
+  .footer-links {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
 }
 
 /* Keep legacy DMCA link style for backwards compatibility */
@@ -3540,11 +3633,21 @@ button:active {
         </div>
 
       <footer id="siteFooter">
-        <div class="footer-links">
-          <a href="privacy-policy.html">Privacy Policy</a> |
-          <a href="cookie-policy.html">Cookie Policy</a> |
-          <a href="contact.html">Contact</a> |
-          <a href="dmca.html">DMCA</a>
+        <div class="footer-content">
+          <div class="footer-brand">
+            <h3>Chromebook Unlocked Games</h3>
+            <span class="footer-url">chromebookunlocked.github.io</span>
+          </div>
+          <div class="footer-links">
+            <a href="/important-pages/privacy-policy.html">Privacy Policy</a>
+            <a href="/important-pages/cookie-policy.html">Cookie Policy</a>
+            <a href="/important-pages/terms-of-service.html">Terms of Service</a>
+            <a href="/important-pages/contact.html">Contact</a>
+            <a href="/important-pages/dmca.html">DMCA</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2025 Chromebook Unlocked Games. All rights reserved.</p>
         </div>
       </footer>
     </div>
