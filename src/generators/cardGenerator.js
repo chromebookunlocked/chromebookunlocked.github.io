@@ -13,7 +13,7 @@ function generateGameCard(game, idx, gamesDir) {
 
   return `<div class="card game-card" data-index="${idx}" data-folder="${game.folder}" data-name="${game.name.toLowerCase()}" onclick="window.location.href='${game.folder}.html'">
     <div class="thumb-container" style="--thumb-url: url('${thumbPath}')">
-      <img class="thumb" src="${thumbPath}" alt="${game.name}">
+      <img class="thumb" src="${thumbPath}" alt="${game.name}" loading="lazy" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">${game.name}</div>
   </div>`;
