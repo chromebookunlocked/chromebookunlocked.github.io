@@ -11,35 +11,59 @@
             box-sizing: border-box;
         }
 
+        html {
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+        }
+
         body {
             font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
             background: #faf8ef;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
+            height: 100%;
+            width: 100%;
+            padding: 10px;
+            overflow: hidden;
+            box-sizing: border-box;
         }
 
         .container {
-            max-width: min(500px, 100vw - 40px);
+            max-width: min(500px, calc(100% - 20px));
             width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .content-wrapper {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: clamp(8px, 1.5%, 15px);
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
+            flex-shrink: 0;
         }
 
         .title {
-            font-size: clamp(40px, 12vw, 80px);
+            font-size: clamp(30px, 7vmin, 70px);
             font-weight: bold;
             color: #776e65;
+            line-height: 1;
         }
 
         .scores-container {
@@ -63,10 +87,11 @@
             top: -10px;
             color: #776e65;
             font-weight: bold;
-            font-size: 18px;
+            font-size: clamp(14px, 3vmin, 20px);
             opacity: 0;
             animation: scorePopup 0.6s ease-out;
             pointer-events: none;
+            z-index: 10;
         }
 
         @keyframes scorePopup {
@@ -81,14 +106,14 @@
         }
 
         .score-label {
-            font-size: clamp(11px, 2.5vw, 13px);
+            font-size: clamp(10px, 2vmin, 13px);
             font-weight: bold;
             text-transform: uppercase;
             margin-bottom: 5px;
         }
 
         .score {
-            font-size: clamp(18px, 4.5vw, 25px);
+            font-size: clamp(16px, 4vmin, 25px);
             font-weight: bold;
         }
 
@@ -96,16 +121,17 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            gap: 15px;
+            margin-bottom: clamp(8px, 1.5%, 15px);
+            gap: 10px;
             flex-wrap: wrap;
+            flex-shrink: 0;
         }
 
         .game-intro {
             color: #776e65;
-            font-size: clamp(14px, 3.5vw, 18px);
-            line-height: 1.65;
-            flex: 1 1 200px;
+            font-size: clamp(11px, 2.5vmin, 16px);
+            line-height: 1.4;
+            flex: 1 1 150px;
         }
 
         .restart-button {
@@ -114,7 +140,7 @@
             border: none;
             padding: 10px 18px;
             border-radius: 3px;
-            font-size: clamp(14px, 3vw, 16px);
+            font-size: clamp(12px, 2.5vmin, 16px);
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -143,14 +169,14 @@
 
         .grid-container {
             position: absolute;
-            top: clamp(10px, 2.5vw, 15px);
-            left: clamp(10px, 2.5vw, 15px);
-            right: clamp(10px, 2.5vw, 15px);
-            bottom: clamp(10px, 2.5vw, 15px);
+            top: clamp(8px, 1.5%, 15px);
+            left: clamp(8px, 1.5%, 15px);
+            right: clamp(8px, 1.5%, 15px);
+            bottom: clamp(8px, 1.5%, 15px);
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(4, 1fr);
-            gap: clamp(10px, 2.5vw, 15px);
+            gap: clamp(8px, 1.5%, 15px);
         }
 
         .grid-cell {
@@ -160,14 +186,14 @@
 
         .tile-container {
             position: absolute;
-            top: clamp(10px, 2.5vw, 15px);
-            left: clamp(10px, 2.5vw, 15px);
-            right: clamp(10px, 2.5vw, 15px);
-            bottom: clamp(10px, 2.5vw, 15px);
+            top: clamp(8px, 1.5%, 15px);
+            left: clamp(8px, 1.5%, 15px);
+            right: clamp(8px, 1.5%, 15px);
+            bottom: clamp(8px, 1.5%, 15px);
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(4, 1fr);
-            gap: clamp(10px, 2.5vw, 15px);
+            gap: clamp(8px, 1.5%, 15px);
         }
 
         .tile {
@@ -175,7 +201,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: clamp(30px, 8vw, 55px);
+            font-size: clamp(24px, 6vmin, 55px);
             font-weight: bold;
             border-radius: 3px;
             transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -220,12 +246,12 @@
         .tile-16 { background: #f59563; color: #f9f6f2; }
         .tile-32 { background: #f67c5f; color: #f9f6f2; }
         .tile-64 { background: #f65e3b; color: #f9f6f2; }
-        .tile-128 { background: #edcf72; color: #f9f6f2; font-size: clamp(25px, 7vw, 45px); }
-        .tile-256 { background: #edcc61; color: #f9f6f2; font-size: clamp(25px, 7vw, 45px); }
-        .tile-512 { background: #edc850; color: #f9f6f2; font-size: clamp(25px, 7vw, 45px); }
-        .tile-1024 { background: #edc53f; color: #f9f6f2; font-size: clamp(20px, 5.5vw, 35px); }
-        .tile-2048 { background: #edc22e; color: #f9f6f2; font-size: clamp(20px, 5.5vw, 35px); }
-        .tile-super { background: #3c3a32; color: #f9f6f2; font-size: clamp(18px, 4.5vw, 30px); }
+        .tile-128 { background: #edcf72; color: #f9f6f2; font-size: clamp(20px, 5vmin, 45px); }
+        .tile-256 { background: #edcc61; color: #f9f6f2; font-size: clamp(20px, 5vmin, 45px); }
+        .tile-512 { background: #edc850; color: #f9f6f2; font-size: clamp(20px, 5vmin, 45px); }
+        .tile-1024 { background: #edc53f; color: #f9f6f2; font-size: clamp(18px, 4vmin, 35px); }
+        .tile-2048 { background: #edc22e; color: #f9f6f2; font-size: clamp(18px, 4vmin, 35px); }
+        .tile-super { background: #3c3a32; color: #f9f6f2; font-size: clamp(16px, 3.5vmin, 30px); }
 
         .game-message {
             position: absolute;
@@ -257,14 +283,14 @@
         }
 
         .game-message h2 {
-            font-size: clamp(35px, 10vw, 60px);
+            font-size: clamp(30px, 8vmin, 60px);
             color: #776e65;
             margin-bottom: 20px;
             animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .game-message p {
-            font-size: clamp(16px, 4vw, 20px);
+            font-size: clamp(14px, 3.5vmin, 20px);
             color: #776e65;
             margin-bottom: 30px;
             animation: slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s;
@@ -277,7 +303,7 @@
             border: none;
             padding: 12px 25px;
             border-radius: 3px;
-            font-size: clamp(16px, 3.5vw, 18px);
+            font-size: clamp(14px, 3vmin, 18px);
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -305,59 +331,71 @@
         .game-container {
             background: #bbada0;
             border-radius: 6px;
-            padding: clamp(10px, 2.5vw, 15px);
+            padding: clamp(8px, 1.5%, 15px);
             position: relative;
             width: 100%;
-            aspect-ratio: 1;
+            aspect-ratio: 1 / 1;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: min(500px, 90vmin);
+            max-height: min(500px, 90vmin);
+        }
+
+        @supports not (aspect-ratio: 1 / 1) {
+            .game-container::before {
+                content: '';
+                display: block;
+                padding-top: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="title">2048</div>
-            <div class="scores-container">
-                <div class="score-container">
-                    <div class="score-label">Score</div>
-                    <div class="score" id="score">0</div>
-                </div>
-                <div class="score-container">
-                    <div class="score-label">Best</div>
-                    <div class="score" id="best">0</div>
+        <div class="content-wrapper">
+            <div class="header">
+                <div class="title">2048</div>
+                <div class="scores-container">
+                    <div class="score-container">
+                        <div class="score-label">Score</div>
+                        <div class="score" id="score">0</div>
+                    </div>
+                    <div class="score-container">
+                        <div class="score-label">Best</div>
+                        <div class="score" id="best">0</div>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="above-game">
-            <div class="game-intro">Join the numbers and get to the <strong>2048 tile!</strong></div>
-            <button class="restart-button" onclick="game.restart()">New Game</button>
-        </div>
+            
+            <div class="above-game">
+                <div class="game-intro">Join the numbers and get to the <strong>2048 tile!</strong></div>
+                <button class="restart-button" onclick="game.restart()">New Game</button>
+            </div>
 
-        <div class="game-container">
-            <div class="grid-container">
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-                <div class="grid-cell"></div>
-            </div>
-            <div class="tile-container" id="tile-container"></div>
-            <div class="game-message" id="game-message">
-                <h2 id="message-title">Game over!</h2>
-                <p id="message-text">No more moves available</p>
-                <button onclick="game.restart()">Try again</button>
+            <div class="game-container">
+                <div class="grid-container">
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                    <div class="grid-cell"></div>
+                </div>
+                <div class="tile-container" id="tile-container"></div>
+                <div class="game-message" id="game-message">
+                    <h2 id="message-title">Game over!</h2>
+                    <p id="message-text">No more moves available</p>
+                    <button onclick="game.restart()">Try again</button>
+                </div>
             </div>
         </div>
     </div>
@@ -378,6 +416,7 @@
             init() {
                 this.grid = Array(this.size).fill(null).map(() => Array(this.size).fill(0));
                 this.score = 0;
+                this.previousScore = 0; // Track previous score for animations
                 this.gameWon = false;
                 this.updateScore();
                 this.addRandomTile();
@@ -653,8 +692,7 @@
 
             updateScore() {
                 const scoreEl = document.getElementById('score');
-                const prevScore = parseInt(scoreEl.textContent) || 0;
-                const scoreDiff = this.score - prevScore;
+                const scoreDiff = this.score - this.previousScore;
                 
                 if (scoreDiff > 0) {
                     // Show score addition popup
@@ -668,6 +706,9 @@
                     scoreContainer.appendChild(popup);
                     
                     setTimeout(() => popup.remove(), 600);
+                    
+                    // Update previous score for next time
+                    this.previousScore = this.score;
                 }
                 
                 scoreEl.textContent = this.score;
@@ -675,10 +716,8 @@
                 if (this.score > this.best) {
                     this.best = this.score;
                     localStorage.setItem('best2048', this.best);
-                    document.getElementById('best').textContent = this.best;
-                } else {
-                    document.getElementById('best').textContent = this.best;
                 }
+                document.getElementById('best').textContent = this.best;
             }
 
             render() {
@@ -687,9 +726,9 @@
                 const padding = parseFloat(getComputedStyle(tileContainer).padding);
                 const containerWidth = tileContainer.offsetWidth - (padding * 2);
                 
-                // Calculate responsive gap
-                const viewportWidth = window.innerWidth;
-                const gap = Math.max(10, Math.min(15, viewportWidth * 0.025));
+                // Calculate responsive gap to match CSS clamp(8px, 1.5%, 15px)
+                // Use container width as reference for percentage
+                const gap = Math.max(8, Math.min(15, containerWidth * 0.015));
                 
                 const cellSize = (containerWidth - (gap * 3)) / 4;
                 
