@@ -67,9 +67,14 @@ body {
   background-attachment: fixed;
   color: var(--text-primary);
   min-height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+}
+
+main {
+  flex: 1;
 }
 
 /* Animated background particles */
@@ -821,10 +826,9 @@ footer {
 .footer-content {
   max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
-  flex-wrap: wrap;
   gap: var(--spacing-md);
   padding-bottom: var(--spacing-md);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -862,6 +866,7 @@ footer {
   flex-wrap: wrap;
   gap: var(--spacing-md);
   align-items: center;
+  justify-content: center;
 }
 
 .footer-links a {
@@ -1005,19 +1010,19 @@ footer {
   }
 
   .footer-content {
-    flex-direction: column;
-    align-items: flex-start;
+    grid-template-columns: 1fr;
     gap: var(--spacing-md);
   }
 
   .footer-brand {
     width: 100%;
+    justify-content: center;
   }
 
   .footer-links {
     width: 100%;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: var(--spacing-sm);
   }
 
