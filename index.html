@@ -499,11 +499,6 @@ html,body {
   overflow:hidden;
 }
 
-body {
-  display: flex;
-  flex-direction: column;
-}
-
 /* Accessibility - Skip Link */
 .skip-link {
   position: absolute;
@@ -696,8 +691,6 @@ body {
   transition: margin-left .3s;
   height: calc(100vh - 80px);
   -webkit-overflow-scrolling: touch;
-  display: flex;
-  flex-direction: column;
 }
 
 /* Optimize for Chromebook 11.6" screens (1366x768) */
@@ -948,9 +941,6 @@ body {
 
 .content-wrapper {
   padding: 0.5rem 1.5rem 1.5rem 1.5rem;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
 }
 
 /* Controls (buttons) */
@@ -1428,7 +1418,7 @@ button:active {
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-top: 2px solid rgba(255, 102, 255, 0.3);
-  margin-top: auto;
+  margin-top: 4rem;
   box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4);
   padding: 1.5rem 1rem;
 }
@@ -1436,9 +1426,10 @@ button:active {
 .footer-content {
   max-width: 1200px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: auto 1fr;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   gap: 1.5rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -1476,7 +1467,6 @@ button:active {
   flex-wrap: wrap;
   gap: 1.5rem;
   align-items: center;
-  justify-content: center;
 }
 
 .footer-links a {
@@ -1529,19 +1519,18 @@ button:active {
 
 @media (max-width: 768px) {
   .footer-content {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .footer-brand {
     width: 100%;
-    justify-content: center;
   }
 
   .footer-links {
     width: 100%;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.75rem;
   }
 }
@@ -2250,7 +2239,7 @@ button:active {
       </div>
 
       <!-- All category sections (including games for home view) -->
-      <div class="category" data-category="Action" data-small="false">
+      <div class="category" data-category="Action">
           <h2>Action</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="10 Minutes Till Dawn" data-name="10 minutes till dawn" onclick="window.location.href='10 Minutes Till Dawn.html'">
@@ -2365,7 +2354,7 @@ button:active {
     <div class="card-title">Vapmpire Survivors</div>
   </div>
           </div>
-        </div><div class="category" data-category="Arcade" data-small="false">
+        </div><div class="category" data-category="Arcade">
           <h2>Arcade</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="Bad Ice Cream " data-name="bad ice cream " onclick="window.location.href='Bad Ice Cream .html'">
@@ -2475,7 +2464,7 @@ button:active {
     <div class="card-title">Slope</div>
   </div>
           </div>
-        </div><div class="category" data-category="Horror" data-small="false">
+        </div><div class="category" data-category="Horror">
           <h2>Horror</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="Bad Parenting" data-name="bad parenting" onclick="window.location.href='Bad Parenting.html'">
@@ -2565,7 +2554,7 @@ button:active {
     <div class="card-title">The Visitor</div>
   </div>
           </div>
-        </div><div class="category" data-category="Shooter" data-small="false">
+        </div><div class="category" data-category="Shooter">
           <h2>Shooter</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="10 Minutes Till Dawn" data-name="10 minutes till dawn" onclick="window.location.href='10 Minutes Till Dawn.html'">
@@ -2645,7 +2634,7 @@ button:active {
     <div class="card-title">Superhot</div>
   </div>
           </div>
-        </div><div class="category" data-category="Strategy" data-small="false">
+        </div><div class="category" data-category="Strategy">
           <h2>Strategy</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="Age Of War" data-name="age of war" onclick="window.location.href='Age Of War.html'">
@@ -2720,7 +2709,7 @@ button:active {
     <div class="card-title">Superhot</div>
   </div>
           </div>
-        </div><div class="category" data-category="Adventure" data-small="false">
+        </div><div class="category" data-category="Adventure">
           <h2>Adventure</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="Blockcraft Parkour" data-name="blockcraft parkour" onclick="window.location.href='Blockcraft Parkour.html'">
@@ -2795,7 +2784,7 @@ button:active {
     <div class="card-title">The Binding of Isaac - Wrath of the Lamb</div>
   </div>
           </div>
-        </div><div class="category" data-category="Puzzle" data-small="false">
+        </div><div class="category" data-category="Puzzle">
           <h2>Puzzle</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="2048" data-name="2048" onclick="window.location.href='2048.html'">
@@ -2865,7 +2854,7 @@ button:active {
     <div class="card-title">Infinite Craft</div>
   </div>
           </div>
-        </div><div class="category" data-category="Casual" data-small="false">
+        </div><div class="category" data-category="Casual">
           <h2>Casual</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="Bitlife" data-name="bitlife" onclick="window.location.href='Bitlife.html'">
@@ -2935,7 +2924,7 @@ button:active {
     <div class="card-title">Helix Jump</div>
   </div>
           </div>
-        </div><div class="category" data-category="Driving" data-small="false">
+        </div><div class="category" data-category="Driving">
           <h2>Driving</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="Blaze Drifter" data-name="blaze drifter" onclick="window.location.href='Blaze Drifter.html'">
@@ -2995,7 +2984,7 @@ button:active {
     <div class="card-title">Hover Race Drive</div>
   </div>
           </div>
-        </div><div class="category" data-category="Sports" data-small="false">
+        </div><div class="category" data-category="Sports">
           <h2>Sports</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="1on1 Soccer" data-name="1on1 soccer" onclick="window.location.href='1on1 Soccer.html'">
@@ -3050,7 +3039,7 @@ button:active {
     <div class="card-title">Vollyball Challenge</div>
   </div>
           </div>
-        </div><div class="category" data-category="Simulation" data-small="false">
+        </div><div class="category" data-category="Simulation">
           <h2>Simulation</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="Ace Combat 3" data-name="ace combat 3" onclick="window.location.href='Ace Combat 3.html'">
@@ -3100,7 +3089,7 @@ button:active {
     <div class="card-title">Perfect Hotel</div>
   </div>
           </div>
-        </div><div class="category" data-category="Racing" data-small="false">
+        </div><div class="category" data-category="Racing">
           <h2>Racing</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="Blaze Drifter" data-name="blaze drifter" onclick="window.location.href='Blaze Drifter.html'">
@@ -3150,7 +3139,7 @@ button:active {
     <div class="card-title">Smash Carts</div>
   </div>
           </div>
-        </div><div class="category" data-category="Clicker" data-small="false">
+        </div><div class="category" data-category="Clicker">
           <h2>Clicker</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="Adventure Capitalist" data-name="adventure capitalist" onclick="window.location.href='Adventure Capitalist.html'">
@@ -3195,7 +3184,7 @@ button:active {
     <div class="card-title">Idle Breakout</div>
   </div>
           </div>
-        </div><div class="category" data-category="Platformer" data-small="false">
+        </div><div class="category" data-category="Platformer">
           <h2>Platformer</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="3Dash" data-name="3dash" onclick="window.location.href='3Dash.html'">
@@ -3230,7 +3219,7 @@ button:active {
     <div class="card-title">Geometry Dash Lite</div>
   </div>
           </div>
-        </div><div class="category" data-category="Idle" data-small="false">
+        </div><div class="category" data-category="Idle">
           <h2>Idle</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="Adventure Capitalist" data-name="adventure capitalist" onclick="window.location.href='Adventure Capitalist.html'">
@@ -3265,7 +3254,7 @@ button:active {
     <div class="card-title">Idle Breakout</div>
   </div>
           </div>
-        </div><div class="category" data-category="Psychological" data-small="false">
+        </div><div class="category" data-category="Psychological">
           <h2>Psychological</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="Bad Parenting" data-name="bad parenting" onclick="window.location.href='Bad Parenting.html'">
@@ -3300,7 +3289,7 @@ button:active {
     <div class="card-title">Hungry Lamu</div>
   </div>
           </div>
-        </div><div class="category" data-category="Physics" data-small="false">
+        </div><div class="category" data-category="Physics">
           <h2>Physics</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="Bad Piggies" data-name="bad piggies" onclick="window.location.href='Bad Piggies.html'">
@@ -3335,7 +3324,7 @@ button:active {
     <div class="card-title">Happy Wheels</div>
   </div>
           </div>
-        </div><div class="category" data-category="Sniper" data-small="false">
+        </div><div class="category" data-category="Sniper">
           <h2>Sniper</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="Clear Vision 1" data-name="clear vision 1" onclick="window.location.href='Clear Vision 1.html'">
@@ -3365,7 +3354,7 @@ button:active {
     <div class="card-title">Clear Vision 5</div>
   </div>
           </div>
-        </div><div class="category" data-category="Point and Click" data-small="false">
+        </div><div class="category" data-category="Point and Click">
           <h2>Point and Click</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="Henry Stickmin Escaping The Prison" data-name="henry stickmin escaping the prison" onclick="window.location.href='Henry Stickmin Escaping The Prison.html'">
@@ -3395,7 +3384,7 @@ button:active {
     <div class="card-title">The Visitor</div>
   </div>
           </div>
-        </div><div class="category" data-category="Roguelike" data-small="false">
+        </div><div class="category" data-category="Roguelike">
           <h2>Roguelike</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="10 Minutes Till Dawn" data-name="10 minutes till dawn" onclick="window.location.href='10 Minutes Till Dawn.html'">
@@ -3420,7 +3409,7 @@ button:active {
     <div class="card-title">Vapmpire Survivors</div>
   </div>
           </div>
-        </div><div class="category" data-category="Rhythm" data-small="false">
+        </div><div class="category" data-category="Rhythm">
           <h2>Rhythm</h2>
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="3Dash" data-name="3dash" onclick="window.location.href='3Dash.html'">
@@ -3443,421 +3432,6 @@ button:active {
       <img class="thumb" src="games/Geometry Dash Lite/thumbnail.png" alt="Geometry Dash Lite" loading="lazy" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">Geometry Dash Lite</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="2 Player" data-small="true">
-          <h2>2 Player</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="1on1 Soccer" data-name="1on1 soccer" onclick="window.location.href='1on1 Soccer.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/1on1 Soccer/thumbnail.png')">
-      <img class="thumb" src="games/1on1 Soccer/thumbnail.png" alt="1on1 Soccer" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">1on1 Soccer</div>
-  </div><div class="card game-card" data-index="1" data-folder="1on1 Tennis" data-name="1on1 tennis" onclick="window.location.href='1on1 Tennis.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/1on1 Tennis/thumbnail.png')">
-      <img class="thumb" src="games/1on1 Tennis/thumbnail.png" alt="1on1 Tennis" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">1on1 Tennis</div>
-  </div><div class="card game-card" data-index="2" data-folder="Fireboy and Watergirl 1" data-name="fireboy and watergirl 1" onclick="window.location.href='Fireboy and Watergirl 1.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Fireboy and Watergirl 1/thumbnail.jpg')">
-      <img class="thumb" src="games/Fireboy and Watergirl 1/thumbnail.jpg" alt="Fireboy and Watergirl 1" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Fireboy and Watergirl 1</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Multiplayer" data-small="true">
-          <h2>Multiplayer</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="1v1.lol" data-name="1v1.lol" onclick="window.location.href='1v1.lol.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/1v1.lol/thumbnail.png')">
-      <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">1v1.lol</div>
-  </div><div class="card game-card" data-index="1" data-folder="Bullet Force" data-name="bullet force" onclick="window.location.href='Bullet Force.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Bullet Force/thumbnail.png')">
-      <img class="thumb" src="games/Bullet Force/thumbnail.png" alt="Bullet Force" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Bullet Force</div>
-  </div><div class="card game-card" data-index="2" data-folder="Smash Carts" data-name="smash carts" onclick="window.location.href='Smash Carts.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Smash Carts/thumbnail.png')">
-      <img class="thumb" src="games/Smash Carts/thumbnail.png" alt="Smash Carts" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Smash Carts</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Stealth" data-small="true">
-          <h2>Stealth</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Bob The Robber " data-name="bob the robber " onclick="window.location.href='Bob The Robber .html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber /thumbnail.jpg')">
-      <img class="thumb" src="games/Bob The Robber /thumbnail.jpg" alt="Bob The Robber " loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Bob The Robber </div>
-  </div><div class="card game-card" data-index="1" data-folder="Bob The Robber 2" data-name="bob the robber 2" onclick="window.location.href='Bob The Robber 2.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber 2/thumbnail.jpg')">
-      <img class="thumb" src="games/Bob The Robber 2/thumbnail.jpg" alt="Bob The Robber 2" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Bob The Robber 2</div>
-  </div><div class="card game-card" data-index="2" data-folder="Bob The Robber 5" data-name="bob the robber 5" onclick="window.location.href='Bob The Robber 5.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber 5/thumbnail.jpg')">
-      <img class="thumb" src="games/Bob The Robber 5/thumbnail.jpg" alt="Bob The Robber 5" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Bob The Robber 5</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Survival" data-small="true">
-          <h2>Survival</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Dead Zed 2" data-name="dead zed 2" onclick="window.location.href='Dead Zed 2.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Dead Zed 2/thumbnail.jpg')">
-      <img class="thumb" src="games/Dead Zed 2/thumbnail.jpg" alt="Dead Zed 2" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Dead Zed 2</div>
-  </div><div class="card game-card" data-index="1" data-folder="Earth Taken" data-name="earth taken" onclick="window.location.href='Earth Taken.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Earth Taken/thumbnail.jpg')">
-      <img class="thumb" src="games/Earth Taken/thumbnail.jpg" alt="Earth Taken" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Earth Taken</div>
-  </div><div class="card game-card" data-index="2" data-folder="Vapmpire Survivors" data-name="vapmpire survivors" onclick="window.location.href='Vapmpire Survivors.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Vapmpire Survivors/thumbnail.png')">
-      <img class="thumb" src="games/Vapmpire Survivors/thumbnail.png" alt="Vapmpire Survivors" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Vapmpire Survivors</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="RPG" data-small="true">
-          <h2>RPG</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Deltarune" data-name="deltarune" onclick="window.location.href='Deltarune.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Deltarune/thumbnail.jpg')">
-      <img class="thumb" src="games/Deltarune/thumbnail.jpg" alt="Deltarune" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Deltarune</div>
-  </div><div class="card game-card" data-index="1" data-folder="Mana God" data-name="mana god" onclick="window.location.href='Mana God.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Mana God/thumbnail.png')">
-      <img class="thumb" src="games/Mana God/thumbnail.png" alt="Mana God" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Mana God</div>
-  </div><div class="card game-card" data-index="2" data-folder="One Bit Adventure" data-name="one bit adventure" onclick="window.location.href='One Bit Adventure.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/One Bit Adventure/thumbnail.png')">
-      <img class="thumb" src="games/One Bit Adventure/thumbnail.png" alt="One Bit Adventure" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">One Bit Adventure</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Music" data-small="true">
-          <h2>Music</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="A Dance of Fire and Ice" data-name="a dance of fire and ice" onclick="window.location.href='A Dance of Fire and Ice.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/A Dance of Fire and Ice/thumbnail.png')">
-      <img class="thumb" src="games/A Dance of Fire and Ice/thumbnail.png" alt="A Dance of Fire and Ice" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">A Dance of Fire and Ice</div>
-  </div><div class="card game-card" data-index="1" data-folder="Friday Night Funkin" data-name="friday night funkin" onclick="window.location.href='Friday Night Funkin.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Friday Night Funkin/thumbnail.png')">
-      <img class="thumb" src="games/Friday Night Funkin/thumbnail.png" alt="Friday Night Funkin" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Friday Night Funkin</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Fighting" data-small="true">
-          <h2>Fighting</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Achilles 2" data-name="achilles 2" onclick="window.location.href='Achilles 2.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Achilles 2/thumbnail.png')">
-      <img class="thumb" src="games/Achilles 2/thumbnail.png" alt="Achilles 2" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Achilles 2</div>
-  </div><div class="card game-card" data-index="1" data-folder="Gladdihoppers" data-name="gladdihoppers" onclick="window.location.href='Gladdihoppers.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Gladdihoppers/thumbnail.png')">
-      <img class="thumb" src="games/Gladdihoppers/thumbnail.png" alt="Gladdihoppers" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Gladdihoppers</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Basketball" data-small="true">
-          <h2>Basketball</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Basketball Legends" data-name="basketball legends" onclick="window.location.href='Basketball Legends.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Basketball Legends/thumbnail.png')">
-      <img class="thumb" src="games/Basketball Legends/thumbnail.png" alt="Basketball Legends" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Basketball Legends</div>
-  </div><div class="card game-card" data-index="1" data-folder="Basketball Stars" data-name="basketball stars" onclick="window.location.href='Basketball Stars.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Basketball Stars/thumbnail.jpg')">
-      <img class="thumb" src="games/Basketball Stars/thumbnail.jpg" alt="Basketball Stars" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Basketball Stars</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Zombie" data-small="true">
-          <h2>Zombie</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Dead Zed 2" data-name="dead zed 2" onclick="window.location.href='Dead Zed 2.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Dead Zed 2/thumbnail.jpg')">
-      <img class="thumb" src="games/Dead Zed 2/thumbnail.jpg" alt="Dead Zed 2" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Dead Zed 2</div>
-  </div><div class="card game-card" data-index="1" data-folder="Road of the Dead" data-name="road of the dead" onclick="window.location.href='Road of the Dead.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Road of the Dead/thumbnail.png')">
-      <img class="thumb" src="games/Road of the Dead/thumbnail.png" alt="Road of the Dead" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Road of the Dead</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Running" data-small="true">
-          <h2>Running</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Extreme Run 3D" data-name="extreme run 3d" onclick="window.location.href='Extreme Run 3D.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Extreme Run 3D/thumbnail.jpg')">
-      <img class="thumb" src="games/Extreme Run 3D/thumbnail.jpg" alt="Extreme Run 3D" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Extreme Run 3D</div>
-  </div><div class="card game-card" data-index="1" data-folder="Slope" data-name="slope" onclick="window.location.href='Slope.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Slope/thumbnail.jpg')">
-      <img class="thumb" src="games/Slope/thumbnail.jpg" alt="Slope" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Slope</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Crafting" data-small="true">
-          <h2>Crafting</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Grindcraft" data-name="grindcraft" onclick="window.location.href='Grindcraft.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Grindcraft/thumbnail.jpg')">
-      <img class="thumb" src="games/Grindcraft/thumbnail.jpg" alt="Grindcraft" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Grindcraft</div>
-  </div><div class="card game-card" data-index="1" data-folder="Infinite Craft" data-name="infinite craft" onclick="window.location.href='Infinite Craft.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Infinite Craft/thumbnail.png')">
-      <img class="thumb" src="games/Infinite Craft/thumbnail.png" alt="Infinite Craft" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Infinite Craft</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Ragdoll" data-small="true">
-          <h2>Ragdoll</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Happy Room" data-name="happy room" onclick="window.location.href='Happy Room.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Happy Room/thumbnail.png')">
-      <img class="thumb" src="games/Happy Room/thumbnail.png" alt="Happy Room" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Happy Room</div>
-  </div><div class="card game-card" data-index="1" data-folder="Happy Wheels" data-name="happy wheels" onclick="window.location.href='Happy Wheels.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Happy Wheels/thumbnail.jpg')">
-      <img class="thumb" src="games/Happy Wheels/thumbnail.jpg" alt="Happy Wheels" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Happy Wheels</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Building" data-small="true">
-          <h2>Building</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="1v1.lol" data-name="1v1.lol" onclick="window.location.href='1v1.lol.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/1v1.lol/thumbnail.png')">
-      <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">1v1.lol</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Football" data-small="true">
-          <h2>Football</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="4th and Goal" data-name="4th and goal" onclick="window.location.href='4th and Goal.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/4th and Goal/thumbnail.png')">
-      <img class="thumb" src="games/4th and Goal/thumbnail.png" alt="4th and Goal" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">4th and Goal</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Flight" data-small="true">
-          <h2>Flight</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Ace Combat 3" data-name="ace combat 3" onclick="window.location.href='Ace Combat 3.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Ace Combat 3/thumbnail.png')">
-      <img class="thumb" src="games/Ace Combat 3/thumbnail.png" alt="Ace Combat 3" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Ace Combat 3</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Tower Defence" data-small="true">
-          <h2>Tower Defence</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="BTD5" data-name="btd5" onclick="window.location.href='BTD5.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/BTD5/thumbnail.jpg')">
-      <img class="thumb" src="games/BTD5/thumbnail.jpg" alt="BTD5" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">BTD5</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Boss Fight" data-small="true">
-          <h2>Boss Fight</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Bad Time Simulator" data-name="bad time simulator" onclick="window.location.href='Bad Time Simulator.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Bad Time Simulator/thumbnail.jpg')">
-      <img class="thumb" src="games/Bad Time Simulator/thumbnail.jpg" alt="Bad Time Simulator" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Bad Time Simulator</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Educational" data-small="true">
-          <h2>Educational</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Baldi’s Basics" data-name="baldi's basics" onclick="window.location.href='Baldi’s Basics.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Baldi’s Basics/thumbnail.png')">
-      <img class="thumb" src="games/Baldi’s Basics/thumbnail.png" alt="Baldi's Basics" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Baldi's Basics</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Card" data-small="true">
-          <h2>Card</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Blackjack" data-name="blackjack" onclick="window.location.href='Blackjack.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Blackjack/thumbnail.png')">
-      <img class="thumb" src="games/Blackjack/thumbnail.png" alt="Blackjack" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Blackjack</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Casino" data-small="true">
-          <h2>Casino</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Blackjack" data-name="blackjack" onclick="window.location.href='Blackjack.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Blackjack/thumbnail.png')">
-      <img class="thumb" src="games/Blackjack/thumbnail.png" alt="Blackjack" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Blackjack</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Parkour" data-small="true">
-          <h2>Parkour</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Blockcraft Parkour" data-name="blockcraft parkour" onclick="window.location.href='Blockcraft Parkour.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Blockcraft Parkour/thumbnail.jpg')">
-      <img class="thumb" src="games/Blockcraft Parkour/thumbnail.jpg" alt="Blockcraft Parkour" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Blockcraft Parkour</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="3D" data-small="true">
-          <h2>3D</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Blockcraft Parkour" data-name="blockcraft parkour" onclick="window.location.href='Blockcraft Parkour.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Blockcraft Parkour/thumbnail.jpg')">
-      <img class="thumb" src="games/Blockcraft Parkour/thumbnail.jpg" alt="Blockcraft Parkour" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Blockcraft Parkour</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Logic" data-small="true">
-          <h2>Logic</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Bloxorz" data-name="bloxorz" onclick="window.location.href='Bloxorz.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Bloxorz/thumbnail.png')">
-      <img class="thumb" src="games/Bloxorz/thumbnail.png" alt="Bloxorz" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Bloxorz</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Visual Novel" data-small="true">
-          <h2>Visual Novel</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Doki Doki Literature Club" data-name="doki doki literature club" onclick="window.location.href='Doki Doki Literature Club.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Doki Doki Literature Club/thumbnail.jpg')">
-      <img class="thumb" src="games/Doki Doki Literature Club/thumbnail.jpg" alt="Doki Doki Literature Club" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Doki Doki Literature Club</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Funny" data-small="true">
-          <h2>Funny</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Elastic Face" data-name="elastic face" onclick="window.location.href='Elastic Face.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Elastic Face/thumbnail.png')">
-      <img class="thumb" src="games/Elastic Face/thumbnail.png" alt="Elastic Face" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Elastic Face</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Mining" data-small="true">
-          <h2>Mining</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Gold Digger FRVR" data-name="gold digger frvr" onclick="window.location.href='Gold Digger FRVR.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Gold Digger FRVR/thumbnail.png')">
-      <img class="thumb" src="games/Gold Digger FRVR/thumbnail.png" alt="Gold Digger FRVR" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Gold Digger FRVR</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Escape" data-small="true">
-          <h2>Escape</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Granny" data-name="granny" onclick="window.location.href='Granny.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Granny/thumbnail.png')">
-      <img class="thumb" src="games/Granny/thumbnail.png" alt="Granny" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Granny</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Sandbox" data-small="true">
-          <h2>Sandbox</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Infinite Craft" data-name="infinite craft" onclick="window.location.href='Infinite Craft.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Infinite Craft/thumbnail.png')">
-      <img class="thumb" src="games/Infinite Craft/thumbnail.png" alt="Infinite Craft" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Infinite Craft</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Management" data-small="true">
-          <h2>Management</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Perfect Hotel" data-name="perfect hotel" onclick="window.location.href='Perfect Hotel.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Perfect Hotel/thumbnail.png')">
-      <img class="thumb" src="games/Perfect Hotel/thumbnail.png" alt="Perfect Hotel" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Perfect Hotel</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Tower Defense" data-small="true">
-          <h2>Tower Defense</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Plants vs Zombies 2" data-name="plants vs zombies 2" onclick="window.location.href='Plants vs Zombies 2.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Plants vs Zombies 2/thumbnail.png')">
-      <img class="thumb" src="games/Plants vs Zombies 2/thumbnail.png" alt="Plants vs Zombies 2" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Plants vs Zombies 2</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Soccer" data-small="true">
-          <h2>Soccer</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Rocket Soccer Derby" data-name="rocket soccer derby" onclick="window.location.href='Rocket Soccer Derby.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Rocket Soccer Derby/thumbnail.png')">
-      <img class="thumb" src="games/Rocket Soccer Derby/thumbnail.png" alt="Rocket Soccer Derby" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Rocket Soccer Derby</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Endless" data-small="true">
-          <h2>Endless</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Slope" data-name="slope" onclick="window.location.href='Slope.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Slope/thumbnail.jpg')">
-      <img class="thumb" src="games/Slope/thumbnail.jpg" alt="Slope" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Slope</div>
-  </div>
-          </div>
-        </div><div class="category" data-category="Volleyball" data-small="true">
-          <h2>Volleyball</h2>
-          <div class="grid">
-            <div class="card game-card" data-index="0" data-folder="Vollyball Challenge" data-name="vollyball challenge" onclick="window.location.href='Vollyball Challenge.html'">
-    <div class="thumb-container" style="--thumb-url: url('games/Vollyball Challenge/thumbnail.png')">
-      <img class="thumb" src="games/Vollyball Challenge/thumbnail.png" alt="Vollyball Challenge" loading="lazy" decoding="async" width="300" height="300">
-    </div>
-    <div class="card-title">Vollyball Challenge</div>
   </div>
           </div>
         </div>
@@ -4223,18 +3797,14 @@ function filterCategory(cat, updateURL = true) {
     currentViewMode = 'home';
     all.forEach(c => {
       const category = c.getAttribute('data-category');
-      const isSmall = c.getAttribute('data-small') === 'true';
 
       // Skip special sections
       if (c.id === 'searchResultsSection' || category === 'All Games') return;
 
-      // Show recently played and all categories on home (except small categories)
+      // Show recently played and all categories on home
       if (category === 'Recently Played') {
         const recentGrid = document.getElementById('recentlyPlayedGrid');
         c.style.display = (recentGrid && recentGrid.children.length > 0) ? 'block' : 'none';
-      } else if (isSmall) {
-        // Hide small categories on homepage
-        c.style.display = 'none';
       } else {
         c.style.display = 'block';
       }
