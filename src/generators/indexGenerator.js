@@ -24,8 +24,9 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
 
   const finalSidebarCategories = newlyAddedItem + sidebarCategories;
 
-  // Generate category sections with games - include all categories, mark small ones
+  // Generate category sections with games - filter out categories with less than 4 games
   const categorySections = Object.keys(categories)
+    .filter(cat => categories[cat].length >= 4) // Only show categories with 4+ games
     .sort((a, b) => {
       // Keep "Newly Added" at top, sort rest by game count
       if (a === "Newly Added") return -1;
@@ -34,8 +35,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     })
     .map(cat => {
       const list = categories[cat];
-      const isSmallCategory = list.length < 4;
-      return `<div class="category" data-category="${cat}" data-small="${isSmallCategory}">
+      return `<div class="category" data-category="${cat}">
           <h2>${cat}</h2>
           <div class="grid">
             ${list.map((g, i) => generateGameCard(g, i, gamesDir)).join('')}
