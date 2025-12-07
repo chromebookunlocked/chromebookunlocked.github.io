@@ -25,6 +25,11 @@ html,body {
   overflow:hidden;
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+}
+
 /* Accessibility - Skip Link */
 .skip-link {
   position: absolute;
@@ -217,6 +222,8 @@ html,body {
   transition: margin-left .3s;
   height: calc(100vh - 80px);
   -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Optimize for Chromebook 11.6" screens (1366x768) */
@@ -467,6 +474,9 @@ html,body {
 
 .content-wrapper {
   padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Controls (buttons) */
@@ -944,7 +954,7 @@ button:active {
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-top: 2px solid rgba(255, 102, 255, 0.3);
-  margin-top: 4rem;
+  margin-top: auto;
   box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4);
   padding: 1.5rem 1rem;
 }
@@ -952,10 +962,9 @@ button:active {
 .footer-content {
   max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
-  flex-wrap: wrap;
   gap: 1.5rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -993,6 +1002,7 @@ button:active {
   flex-wrap: wrap;
   gap: 1.5rem;
   align-items: center;
+  justify-content: center;
 }
 
 .footer-links a {
@@ -1045,18 +1055,19 @@ button:active {
 
 @media (max-width: 768px) {
   .footer-content {
-    flex-direction: column;
-    align-items: flex-start;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .footer-brand {
     width: 100%;
+    justify-content: center;
   }
 
   .footer-links {
     width: 100%;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.75rem;
   }
 }
