@@ -164,8 +164,8 @@
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  border: none;
   border-radius: 8px;
   width: 36px;
   height: 36px;
@@ -173,21 +173,18 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease, color 0.2s ease;
   color: rgba(255, 255, 255, 0.7);
   z-index: 10;
 }
 
 .cookie-close-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  border-color: #ff66ff;
+  background: rgba(255, 255, 255, 0.15);
   color: #ff66ff;
-  transform: rotate(90deg);
 }
 
 .cookie-close-btn:focus {
-  outline: 2px solid #ff66ff;
-  outline-offset: 2px;
+  outline: none;
 }
 
 /* Settings expanded state */
