@@ -13,7 +13,7 @@ const { generateIndexMetaTags, generateIndexStructuredData } = require('../utils
 function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.') {
   // Generate sidebar categories - sorted by game count (largest first)
   const sidebarCategories = Object.keys(categories)
-    .filter(cat => cat !== "Recently Played" && cat !== "Newly Added")
+    .filter(cat => cat !== "Recently Played" && cat !== "Newly Added" && cat !== "Trending Games")
     .sort((a, b) => categories[b].length - categories[a].length) // Sort by count, largest first
     .map(cat => `<li role="menuitem" tabindex="0" onclick="filterCategory('${cat}')" onkeypress="if(event.key==='Enter')filterCategory('${cat}')">${cat}</li>`)
     .join("");
@@ -22,15 +22,21 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   const newlyAddedItem = categories['Newly Added'] ?
     `<li role="menuitem" tabindex="0" onclick="filterCategory('Newly Added')" onkeypress="if(event.key==='Enter')filterCategory('Newly Added')" style="border-bottom: 1px solid rgba(255,102,255,0.3); padding-bottom: 0.8rem; margin-bottom: 0.8rem;">✨ Newly Added</li>` : '';
 
-  const finalSidebarCategories = newlyAddedItem + sidebarCategories;
+  // Add "Trending Games" after "Newly Added" if it exists
+  const trendingGamesItem = categories['Trending Games'] ?
+    `<li role="menuitem" tabindex="0" onclick="filterCategory('Trending Games')" onkeypress="if(event.key==='Enter')filterCategory('Trending Games')" style="border-bottom: 1px solid rgba(255,102,255,0.3); padding-bottom: 0.8rem; margin-bottom: 0.8rem;">🔥 Trending Games</li>` : '';
+
+  const finalSidebarCategories = newlyAddedItem + trendingGamesItem + sidebarCategories;
 
   // Generate category sections with games - filter out categories with less than 4 games
   const categorySections = Object.keys(categories)
     .filter(cat => categories[cat].length >= 4) // Only show categories with 4+ games
     .sort((a, b) => {
-      // Keep "Newly Added" at top, sort rest by game count
+      // Keep "Newly Added" at top, "Trending Games" second, sort rest by game count
       if (a === "Newly Added") return -1;
       if (b === "Newly Added") return 1;
+      if (a === "Trending Games") return -1;
+      if (b === "Trending Games") return 1;
       return categories[b].length - categories[a].length;
     })
     .map(cat => {
