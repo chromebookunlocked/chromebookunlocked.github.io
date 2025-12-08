@@ -1231,36 +1231,11 @@ button:active {
   border-bottom: 2px solid rgba(255, 102, 255, 0.3);
 }
 .grid {
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr));
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
   gap: var(--grid-gap);
-  justify-items:center;
+  justify-items: center;
   width: 100%;
-}
-
-/* Optimized grid for different screen sizes */
-@media (min-width: 1400px) {
-  .grid { grid-template-columns: repeat(6, 1fr); }
-}
-@media (min-width: 1200px) and (max-width: 1399px) {
-  .grid { grid-template-columns: repeat(5, 1fr); }
-}
-@media (min-width: 900px) and (max-width: 1199px) {
-  .grid { grid-template-columns: repeat(4, 1fr); }
-}
-@media (min-width: 600px) and (max-width: 899px) {
-  .grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (min-width: 400px) and (max-width: 599px) {
-  .grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 399px) {
-  .grid { grid-template-columns: 1fr; }
-}
-
-/* Chromebook 11.6" optimization */
-@media (width: 1366px) and (height: 768px) {
-  .grid { grid-template-columns: repeat(5, 1fr); }
 }
 
 .card {
