@@ -45,7 +45,8 @@ function loadGames(dataDir, gamesDir) {
           name: json.name || f.replace(".json", ""),
           categories: gameCategories, // Array of categories
           thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.png", "thumbnail.jpg"],
-          dateAdded: json.dateAdded || null // Support for "Newly Added" sorting
+          dateAdded: json.dateAdded || null, // Support for "Newly Added" sorting
+          trending: json.trending || false // Support for "Trending Games" category
         };
       } catch (error) {
         console.error(`❌ Error processing ${f}: ${error.message}`);
@@ -76,6 +77,12 @@ function categorizeGames(games) {
       categories[cat].push(g);
     });
   });
+
+  // Add "Trending Games" category if games are marked as trending
+  const trendingGames = games.filter(g => g.trending);
+  if (trendingGames.length > 0) {
+    categories['Trending Games'] = trendingGames;
+  }
 
   // Add "Newly Added" category if games have dateAdded
   const gamesWithDates = games.filter(g => g.dateAdded)
