@@ -337,14 +337,18 @@ function filterCategory(cat, updateURL = true) {
     currentViewMode = 'home';
     all.forEach(c => {
       const category = c.getAttribute('data-category');
+      const hideOnHome = c.getAttribute('data-hide-on-home');
 
       // Skip special sections
       if (c.id === 'searchResultsSection' || category === 'All Games') return;
 
-      // Show recently played and all categories on home
+      // Show recently played and all categories on home (except those with less than 4 games)
       if (category === 'Recently Played') {
         const recentGrid = document.getElementById('recentlyPlayedGrid');
         c.style.display = (recentGrid && recentGrid.children.length > 0) ? 'block' : 'none';
+      } else if (hideOnHome === 'true') {
+        // Hide categories with less than 4 games on home view
+        c.style.display = 'none';
       } else {
         c.style.display = 'block';
       }
@@ -369,7 +373,7 @@ function filterCategory(cat, updateURL = true) {
       // Skip special sections
       if (c.id === 'searchResultsSection' || category === 'All Games') return;
 
-      // Show only selected category (show all games at once)
+      // Show only selected category (show all games at once, even if it has less than 4 games)
       c.style.display = (category === cat) ? 'block' : 'none';
     });
   }

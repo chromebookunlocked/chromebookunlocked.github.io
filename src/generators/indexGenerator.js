@@ -28,9 +28,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
 
   const finalSidebarCategories = newlyAddedItem + trendingGamesItem + sidebarCategories;
 
-  // Generate category sections with games - filter out categories with less than 4 games
+  // Generate category sections with games - hide categories with less than 4 games on homepage
   const categorySections = Object.keys(categories)
-    .filter(cat => categories[cat].length >= 4) // Only show categories with 4+ games
     .sort((a, b) => {
       // Keep "Newly Added" at top, "Trending Games" second, sort rest by game count
       if (a === "Newly Added") return -1;
@@ -41,7 +40,9 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     })
     .map(cat => {
       const list = categories[cat];
-      return `<div class="category" data-category="${cat}">
+      const isSmallCategory = list.length < 4;
+      const hideOnHome = isSmallCategory ? ' data-hide-on-home="true" style="display:none;"' : '';
+      return `<div class="category" data-category="${cat}"${hideOnHome}>
           <h2>${cat}</h2>
           <div class="grid">
             ${list.map((g, i) => generateGameCard(g, i, gamesDir)).join('')}
