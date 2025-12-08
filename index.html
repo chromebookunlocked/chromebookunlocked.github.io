@@ -685,14 +685,8 @@ html,body {
   margin-top: 80px; /* Space for fixed header */
   width: calc(100% - var(--sidebar-width));
   transition: margin-left .3s;
-  min-height: calc(100vh - 80px);
+  height: calc(100vh - 80px);
   -webkit-overflow-scrolling: touch;
-  display: flex;
-  flex-direction: column;
-}
-
-.main-content-wrapper {
-  flex: 1 0 auto;
 }
 
 /* Optimize for Chromebook 11.6" screens (1366x768) */
@@ -709,7 +703,6 @@ html,body {
     margin-left: 0;
     width: 100%;
     margin-top: 80px;
-    min-height: calc(100vh - 80px);
   }
   #sidebar {
     transform: translateX(-100%);
@@ -817,7 +810,7 @@ html,body {
   }
   #content {
     margin-top: 100px; /* Adjusted for mobile header height */
-    min-height: calc(100vh - 100px);
+    height: calc(100vh - 100px);
   }
 }
 
@@ -1417,129 +1410,32 @@ button:active {
 
 /* Footer */
 #siteFooter {
-  background: linear-gradient(180deg, rgba(13, 0, 26, 0.95) 0%, rgba(8, 0, 18, 0.98) 100%);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-top: 2px solid rgba(255, 102, 255, 0.3);
-  margin-top: auto;
-  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4);
-  padding: 1.5rem 1rem;
-  flex-shrink: 0;
-}
-
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.footer-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.footer-brand h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--accent), var(--accent-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0;
-}
-
-.footer-url {
-  font-family: 'Courier New', monospace;
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.85rem;
-  padding: 0.25rem 0.6rem;
-  background: rgba(255, 102, 255, 0.08);
-  border-radius: 6px;
-  border: 1px solid rgba(255, 102, 255, 0.15);
+  display: block;
+  text-align: center;
+  background: transparent;
+  padding: 2rem 1rem;
+  margin-top: 4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
   font-family: var(--font-main);
+  font-size: 0.75rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .footer-links a {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
   text-decoration: none;
-  font-size: 0.85rem;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.footer-links a::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: var(--accent);
-  transition: width 0.2s ease;
+  transition: all 0.3s ease;
+  padding: 0.5rem;
+  display: inline-block;
 }
 
 .footer-links a:hover {
-  color: var(--accent);
-}
-
-.footer-links a:hover::after {
-  width: 100%;
-}
-
-.footer-bottom {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-top: 1rem;
-  text-align: center;
-}
-
-.footer-bottom p {
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.75rem;
-  margin: 0;
-  opacity: 0.8;
-}
-
-@media (max-width: 768px) {
-  .footer-content {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  .footer-brand {
-    width: 100%;
-  }
-
-  .footer-links {
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-    justify-content: flex-start;
-  }
-
-  .footer-url {
-    font-size: 0.8rem;
-    padding: 0.25rem 0.5rem;
-  }
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: underline;
 }
 
 /* Keep legacy DMCA link style for backwards compatibility */
@@ -1593,7 +1489,7 @@ button:active {
       </div>
     </header>
 
-    <div class="content-wrapper main-content-wrapper" id="main-content">
+    <div class="content-wrapper" id="main-content">
       <div id="controls">
         <button id="backBtn" onclick="closeGame()" aria-label="Go back to game list">← Back</button>
         <span id="gameTitle" role="heading" aria-level="2"></span>
@@ -3664,20 +3560,11 @@ button:active {
         </div>
 
       <footer id="siteFooter">
-        <div class="footer-content">
-          <div class="footer-brand">
-            <h3>Chromebook Unlocked Games</h3>
-            <span class="footer-url">chromebookunlocked.github.io</span>
-          </div>
-          <div class="footer-links">
-            <a href="privacy-policy.html">Privacy Policy</a>
-            <a href="cookie-policy.html">Cookie Policy</a>
-            <a href="contact.html">Contact</a>
-            <a href="dmca.html">DMCA</a>
-          </div>
-        </div>
-        <div class="footer-bottom">
-          <p>&copy; <script>document.write(new Date().getFullYear())</script> Chromebook Unlocked Games. All rights reserved.</p>
+        <div class="footer-links">
+          <a href="privacy-policy.html">Privacy Policy</a> |
+          <a href="cookie-policy.html">Cookie Policy</a> |
+          <a href="contact.html">Contact</a> |
+          <a href="dmca.html">DMCA</a>
         </div>
       </footer>
     </div>
