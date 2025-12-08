@@ -1,114 +1,50 @@
 <!DOCTYPE html>
-<html lang="en-us">
 
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Baldi's Basics The Ultra Decompile</title>
-  <link type="image/png" href="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@104c364f36401fd94165923f6b5a76c113e3540e/baldi%20decomp/TemplateData/favicon.png" rel="icon">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@104c364f36401fd94165923f6b5a76c113e3540e/baldi%20decomp/TemplateData/style.css">
-  <link rel="apple-touch-icon" href="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@104c364f36401fd94165923f6b5a76c113e3540e/baldi%20decomp/TemplateData/AppIcon.png">
-  <meta name="theme-color" content="white">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-</head>
+<!-- Ultimate Game Stash file--> 
+<!-- For the regularly updating doc go to https://docs.google.com/document/d/1_FmH3BlSBQI7FGgAQL59-ZPe8eCxs35wel6JUyVaG8Q/ -->
 
-<body>
-  <div id="unity-container" class="unity-desktop">
-    <canvas id="unity-canvas" width="1024" height="576"></canvas>
 
-    <div id="unity-loading-bar">
-      <div id="unity-logo"></div>
-      <div id="unity-progress-bar-empty">
-        <div id="unity-progress-bar-full"></div>
-      </div>
-    </div>
 
-    <div id="unity-warning"></div>
-  </div>
+<html>
+  <head>
+    <base href="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/baldis-basics/">
+    <title>Baldi's Basics</title>
+    <link rel="icon" type="image/png" href="/favicon.ico" />
+    <script type="text/javascript" src="/js/main.js"></script>
 
-  <script>
-    const ROOT = "https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@104c364f36401fd94165923f6b5a76c113e3540e/baldi%20decomp/";
-    const buildUrl = ROOT + "Build/";
-
-    const container = document.querySelector("#unity-container");
-    const canvas = document.querySelector("#unity-canvas");
-    const loadingBar = document.querySelector("#unity-loading-bar");
-    const progressBarFull = document.querySelector("#unity-progress-bar-full");
-    const warningBanner = document.querySelector("#unity-warning");
-
-    function unityShowBanner(msg, type) {
-      let div = document.createElement("div");
-      div.innerHTML = msg;
-      div.style = `padding:10px; background:${type === "error" ? "red" : "yellow"}`;
-      warningBanner.appendChild(div);
-
-      if (type !== "error") {
-        setTimeout(() => div.remove(), 5000);
-      }
-    }
-
-    function mergeFiles(parts) {
-      return new Promise((resolve, reject) => {
-        const buffers = [];
-        const load = (i) => {
-          if (i >= parts.length) {
-            const blob = new Blob(buffers);
-            resolve(URL.createObjectURL(blob));
-            return;
-          }
-          fetch(parts[i])
-            .then(res => res.arrayBuffer())
-            .then(buf => { buffers.push(buf); load(i + 1); })
-            .catch(reject);
-        };
-        load(0);
-      });
-    }
-
-    function getParts(base, start, end) {
-      const arr = [];
-      for (let i = start; i <= end; i++) {
-        arr.push(base + ".part" + i);
-      }
-      return arr;
-    }
-
-    // No iframe blocking
-    // No service worker (browsers block them in iframes)
-
-    Promise.all([
-      mergeFiles(getParts(buildUrl + "HTML.data.unityweb", 1, 9)),
-      mergeFiles(getParts(buildUrl + "HTML.wasm.unityweb", 1, 2))
-    ])
-      .then(([dataUrl, wasmUrl]) => {
-        loadingBar.style.display = "block";
-
-        const config = {
-          dataUrl: dataUrl,
-          frameworkUrl: buildUrl + "HTML.framework.js.unityweb",
-          codeUrl: wasmUrl,
-          streamingAssetsUrl: ROOT + "StreamingAssets",
-          companyName: "SmashGames",
-          productName: "Kindergarten2",
-          productVersion: "2.00",
-          showBanner: unityShowBanner
-        };
-
-        const script = document.createElement("script");
-        script.src = buildUrl + "HTML.loader.js";
-        script.onload = () => {
-          createUnityInstance(canvas, config, (p) => {
-            progressBarFull.style.width = (p * 100) + "%";
-          }).then(() => {
-            loadingBar.style.display = "none";
-          }).catch(alert);
-        };
-        document.body.appendChild(script);
-      })
-      .catch(err => {
-        unityShowBanner("Failed to load: " + err, "error");
-      });
+    <link rel="stylesheet" href="TemplateData/style.css" />
+     <script>
+    window.fileMergerConfig = {
+      files: [
+        { name: 'baldi.data.unityweb', parts: 2 },
+        { name: 'baldi.wasm.code.unityweb', parts: 1 },
+        { name: 'baldi.wasm.framework.unityweb', parts: 1 },
+      ],
+      basePath: 'unity/',
+      debug: true
+    };
   </script>
-</body>
+    <script src="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/merge.js"></script>
+    <script src="TemplateData/UnityProgress.js"></script>
+    <script src="baldi.js"></script>
+    <script>
+      var gameInstance = UnityLoader.instantiate("gameContainer", "baldi.json", {
+        onProgress: UnityProgress,
+        Module: {
+          onRuntimeInitialized: function () {
+            UnityProgress(gameInstance, "complete");
+          },
+        },
+      });
+    </script>
+  </head>
+  <body style="margin: 0;">
+    <div class="webgl-content">
+      <div id="unityContainer" style="width: 960px; height: 600px; padding: 0px; margin: 0px; border: 0px; position: relative; background: rgb(35, 31, 32);">
+        <div id="gameContainer" style="width: 800px; height: 560px; margin: auto;"></div>
+      </div>
+      <script src="firebase-app.js"></script>
+    </div>
+  </body>
 </html>
