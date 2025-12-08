@@ -1408,35 +1408,7 @@ button:active {
   letter-spacing: 1px;
 }
 
-/* Footer */
-#siteFooter {
-  display: block;
-  text-align: center;
-  background: transparent;
-  padding: 2rem 1rem;
-  margin-top: 4rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.footer-links {
-  font-family: var(--font-main);
-  font-size: 0.75rem;
-  font-weight: 300;
-  color: rgba(255, 255, 255, 0.4);
-}
-
-.footer-links a {
-  color: rgba(255, 255, 255, 0.5);
-  text-decoration: none;
-  transition: all 0.3s ease;
-  padding: 0.5rem;
-  display: inline-block;
-}
-
-.footer-links a:hover {
-  color: rgba(255, 255, 255, 0.8);
-  text-decoration: underline;
-}
+/* Footer styles are now in templates/main-styles.css */
 
 /* Keep legacy DMCA link style for backwards compatibility */
 #dmcaLink {
@@ -3560,11 +3532,20 @@ button:active {
         </div>
 
       <footer id="siteFooter">
-        <div class="footer-links">
-          <a href="privacy-policy.html">Privacy Policy</a> |
-          <a href="cookie-policy.html">Cookie Policy</a> |
-          <a href="contact.html">Contact</a> |
-          <a href="dmca.html">DMCA</a>
+        <div class="footer-content">
+          <div class="footer-brand">
+            <h3>Chromebook Unlocked</h3>
+            <span class="footer-url">chromebookunlocked.github.io</span>
+          </div>
+          <div class="footer-links">
+            <a href="privacy-policy.html">Privacy Policy</a>
+            <a href="cookie-policy.html">Cookie Policy</a>
+            <a href="contact.html">Contact</a>
+            <a href="dmca.html">DMCA</a>
+          </div>
+          <div class="footer-bottom">
+            <p>&copy; 2024 Chromebook Unlocked. All rights reserved.</p>
+          </div>
         </div>
       </footer>
     </div>

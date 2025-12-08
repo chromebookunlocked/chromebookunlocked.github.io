@@ -805,7 +805,7 @@ iframe.active {
 ============================================================================ */
 
 /* ============================================================================
-   FOOTER - MINIMALISTIC LAYOUT
+   FOOTER - CENTERED & BALANCED LAYOUT
 ============================================================================ */
 
 footer {
@@ -815,30 +815,30 @@ footer {
   border-top: 2px solid rgba(255, 102, 255, 0.3);
   margin-top: auto;
   box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4);
-  padding: var(--spacing-lg) var(--spacing-md);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
 }
 
 .footer-content {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  flex-wrap: wrap;
-  gap: var(--spacing-md);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: 2rem;
 }
 
 .footer-brand {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--spacing-sm);
-  flex-wrap: wrap;
+  gap: 0.75rem;
+  text-align: center;
 }
 
 .footer-brand h3 {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
   -webkit-background-clip: text;
@@ -851,7 +851,7 @@ footer {
   font-family: 'Courier New', monospace;
   color: var(--text-muted);
   font-size: 0.85rem;
-  padding: 0.25rem 0.6rem;
+  padding: 0.4rem 0.8rem;
   background: rgba(255, 102, 255, 0.08);
   border-radius: 6px;
   border: 1px solid rgba(255, 102, 255, 0.15);
@@ -860,31 +860,40 @@ footer {
 .footer-links {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-md);
+  justify-content: center;
   align-items: center;
+  gap: 2rem;
+  width: 100%;
 }
 
 .footer-links a {
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.65);
   text-decoration: none;
-  font-size: 0.85rem;
-  transition: all var(--transition-fast);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
   position: relative;
+  font-weight: 500;
+  padding: 0.5rem 0;
+  display: inline-block;
+  text-align: center;
 }
 
 .footer-links a::after {
   content: '';
   position: absolute;
-  bottom: -2px;
-  left: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: 0;
-  height: 1px;
-  background: var(--primary-color);
-  transition: width var(--transition-fast);
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+  transition: width 0.3s ease;
 }
 
 .footer-links a:hover {
   color: var(--primary-color);
+  text-decoration: none;
+  transform: translateY(-2px);
 }
 
 .footer-links a:hover::after {
@@ -894,15 +903,18 @@ footer {
 .footer-bottom {
   max-width: 1200px;
   margin: 0 auto;
-  padding-top: var(--spacing-md);
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   text-align: center;
 }
 
 .footer-bottom p {
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.5);
   font-size: 0.75rem;
   margin: 0;
   opacity: 0.8;
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 /* ============================================================================
@@ -1004,21 +1016,26 @@ footer {
     padding: 0.4rem 0.8rem;
   }
 
-  .footer-content {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-md);
+  footer {
+    padding: 2rem 1rem;
   }
 
-  .footer-brand {
-    width: 100%;
+  .footer-content {
+    gap: 1.5rem;
   }
 
   .footer-links {
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-sm);
+    gap: 1.5rem;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .footer-links a {
+    font-size: 0.85rem;
+  }
+
+  .footer-bottom {
+    padding-top: 1.5rem;
   }
 
   .footer-url {
@@ -1034,6 +1051,14 @@ footer {
 
   .controls {
     opacity: 1; /* Always show on mobile */
+  }
+
+  .footer-links {
+    gap: 1.2rem;
+  }
+
+  .footer-links a {
+    font-size: 0.8rem;
   }
 }
 
