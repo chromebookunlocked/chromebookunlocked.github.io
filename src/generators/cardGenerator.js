@@ -11,7 +11,8 @@ function generateGameCard(game, idx, gamesDir) {
   const thumb = chooseThumb(game, gamesDir);
   const thumbPath = getAssetPath(game.folder, thumb);
 
-  return `<div class="card game-card" data-index="${idx}" data-folder="${game.folder}" data-name="${game.name.toLowerCase()}" onclick="window.location.href='${game.folder}.html'">
+  const encodedFolder = encodeURIComponent(game.folder);
+  return `<div class="card game-card" data-index="${idx}" data-folder="${game.folder}" data-name="${game.name.toLowerCase()}" onclick="window.location.href='${encodedFolder}.html'">
     <div class="thumb-container" style="--thumb-url: url('${thumbPath}')">
       <img class="thumb" src="${thumbPath}" alt="${game.name}" loading="lazy" decoding="async" width="300" height="300">
     </div>

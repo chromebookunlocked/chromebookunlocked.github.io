@@ -180,7 +180,7 @@ function loadRecentlyPlayed() {
         loadRecentlyPlayed();
         return;
       }
-      window.location.href = g.folder + '.html';
+      window.location.href = encodeURIComponent(g.folder) + '.html';
     };
 
     card.innerHTML = `<div class="thumb-container" style="--thumb-url: url('${thumbUrl}')">
@@ -257,7 +257,8 @@ function searchGames(query) {
     searchDropdown.innerHTML = '<div class="search-no-results">No games found</div>';
   } else {
     searchDropdown.innerHTML = topResults.map(game => {
-      return `<div class="search-result-item" onclick="window.location.href='${game.folder}.html'">
+      const encodedFolder = encodeURIComponent(game.folder);
+      return `<div class="search-result-item" onclick="window.location.href='${encodedFolder}.html'">
         <img class="search-result-thumb" src="${game.thumb}" alt="${game.name}" loading="lazy" decoding="async" width="60" height="60">
         <div class="search-result-name">${game.name}</div>
       </div>`;
@@ -370,8 +371,14 @@ function filterCategory(cat, updateURL = true) {
     all.forEach(c => {
       const category = c.getAttribute('data-category');
 
-      // Skip special sections
-      if (c.id === 'searchResultsSection' || category === 'All Games') return;
+      // Skip search results section
+      if (c.id === 'searchResultsSection') return;
+
+      // Hide All Games section when viewing specific categories
+      if (category === 'All Games') {
+        c.style.display = 'none';
+        return;
+      }
 
       // Show only selected category (show all games at once, even if it has less than 4 games)
       c.style.display = (category === cat) ? 'block' : 'none';
