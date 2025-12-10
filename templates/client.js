@@ -371,7 +371,11 @@ function filterCategory(cat, updateURL = true) {
       const category = c.getAttribute('data-category');
 
       // Skip special sections
-      if (c.id === 'searchResultsSection' || category === 'All Games') return;
+      if (c.id === 'searchResultsSection') return;
+      if (category === 'All Games') {
+        c.style.display = 'none';
+        return;
+      }
 
       // Show only selected category (show all games at once, even if it has less than 4 games)
       c.style.display = (category === cat) ? 'block' : 'none';
