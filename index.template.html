@@ -233,9 +233,9 @@
         }).catch(()=>{});
     }
 
-    // prevent arrow key scroll when game open
+    // prevent arrow key, space, and WASD scroll when game open
     window.addEventListener('keydown', (e) => {
-      const blocked = [' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+      const blocked = [' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D'];
       if (viewer.style.display === 'block' && blocked.includes(e.key)) {
         e.preventDefault();
       }

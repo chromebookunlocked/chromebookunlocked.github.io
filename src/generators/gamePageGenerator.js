@@ -319,6 +319,17 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
     document.addEventListener('MSFullscreenChange', updateFullscreenIcon);
 
+    // Prevent arrow keys, space, and WASD from scrolling the page when game is active
+    window.addEventListener('keydown', (e) => {
+      const gameFrame = document.getElementById('gameFrame');
+      const blocked = [' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'W', 'A', 'S', 'D'];
+
+      // Only prevent default if game is active (iframe has loaded)
+      if (gameFrame && gameFrame.src && gameFrame.src !== '' && blocked.includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+
     // Toggle game info section
     function toggleGameInfo() {
       const section = document.getElementById('gameInfoSection');
