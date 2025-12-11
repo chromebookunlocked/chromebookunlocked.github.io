@@ -161,11 +161,104 @@
       box-shadow: 0 6px 20px rgba(255, 102, 255, 0.4);
     }
 
-    footer {
+    /* Footer */
+    #siteFooter {
+      background: linear-gradient(180deg, rgba(13, 0, 26, 0.95) 0%, rgba(8, 0, 18, 0.98) 100%);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-top: 2px solid rgba(255, 102, 255, 0.3);
+      margin-top: 4rem;
+      box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4);
+      padding: 2.5rem 1.5rem;
       text-align: center;
-      padding: 2rem;
-      color: var(--text-muted);
+    }
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+    }
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      text-align: center;
+    }
+    .footer-brand h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff66ff, #ff99ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+    }
+    .footer-url {
+      font-family: 'Courier New', monospace;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.85rem;
+      padding: 0.4rem 0.8rem;
+      background: rgba(255, 102, 255, 0.08);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 102, 255, 0.15);
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      width: 100%;
+    }
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.65);
+      text-decoration: none;
       font-size: 0.9rem;
+      transition: all 0.3s ease;
+      position: relative;
+      font-weight: 500;
+      padding: 0.5rem 0;
+      display: inline-block;
+      text-align: center;
+      border-bottom: none;
+    }
+    .footer-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #ff66ff, transparent);
+      transition: width 0.3s ease;
+    }
+    .footer-links a:hover {
+      color: #ff66ff;
+      text-decoration: none;
+      transform: translateY(-2px);
+    }
+    .footer-links a:hover::after {
+      width: 100%;
+    }
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: center;
+    }
+    .footer-bottom p {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.75rem;
+      margin: 0;
+      opacity: 0.8;
+      font-weight: 300;
+      letter-spacing: 0.5px;
     }
 
     @media (max-width: 768px) {
@@ -182,6 +275,31 @@
       .contact-card {
         padding: 1rem;
       }
+      #siteFooter {
+        padding: 2rem 1rem;
+      }
+      .footer-content {
+        gap: 1.5rem;
+      }
+      .footer-links {
+        gap: 1.5rem;
+        flex-direction: row;
+        justify-content: center;
+      }
+      .footer-links a {
+        font-size: 0.85rem;
+      }
+      .footer-bottom {
+        padding-top: 1.5rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .footer-links {
+        gap: 1.2rem;
+      }
+      .footer-links a {
+        font-size: 0.8rem;
+      }
     }
   </style>
 </head>
@@ -195,74 +313,88 @@
 
   <main>
     <p>
-      Have a question, suggestion, or concern? We're here to help!  
-      Use the contact options below to reach the Chromebook Unlocked Games team.
+      Need to contact us regarding business inquiries, content removal requests, or technical issues?
+      We're here to help! Use the contact options below to reach the Chromebook Unlocked Games team.
     </p>
 
     <div class="contact-card">
-      <h3><span class="icon">📧</span> Email Support</h3>
-      <p>For general questions, support, feedback, or account-related concerns:</p>
-      <a href="mailto:chunblocked.contact@gmail.com" class="email-link">
-        chunblocked.contact@gmail.com
+      <h3><span class="icon">💼</span> Business Inquiries</h3>
+      <p>For business partnerships, collaborations, advertising opportunities, or general business matters:</p>
+      <a href="mailto:chunlocked.business@gmail.com" class="email-link">
+        chunlocked.business@gmail.com
       </a>
     </div>
 
     <div class="contact-card">
-      <h3><span class="icon">🎮</span> Game Requests</h3>
-      <p>If you’d like us to add a new game, please include:</p>
+      <h3><span class="icon">🗑️</span> Content Removal Requests</h3>
+      <p>If you need to request the removal of a game or content from our site, please contact us with:</p>
       <ul>
-        <li>Game title</li>
-        <li>A brief description</li>
-        <li>A link if possible</li>
-        <li>Why you want it added</li>
+        <li>The specific game or content to be removed</li>
+        <li>Reason for the removal request</li>
+        <li>Any relevant documentation or proof of ownership (if applicable)</li>
       </ul>
+      <p>For copyright-related removal requests, please visit our <a href="dmca.html" style="color: var(--primary-color);">DMCA page</a> for the proper procedure.</p>
+      <a href="mailto:chunlocked.business@gmail.com" class="email-link">
+        chunlocked.business@gmail.com
+      </a>
     </div>
 
     <div class="contact-card">
       <h3><span class="icon">🐛</span> Bug Reports & Technical Issues</h3>
-      <p>If something isn’t working right, help us fix it by telling us:</p>
+      <p>If something isn't working right, help us fix it by telling us:</p>
       <ul>
-        <li>What happened</li>
-        <li>Where it happened (game/page)</li>
-        <li>Your device & browser</li>
+        <li>What happened (detailed description)</li>
+        <li>Where it happened (specific game or page)</li>
+        <li>Your device type and browser</li>
         <li>Steps to reproduce the issue</li>
+        <li>Any error messages you received</li>
       </ul>
-    </div>
-
-    <div class="contact-card">
-      <h3><span class="icon">⚖️</span> Legal & DMCA Requests</h3>
-      <p>
-        For copyright concerns, takedown notices, or legal inquiries, please visit our
-        <a href="dmca.html" style="color: var(--primary-color);">DMCA page</a>.
-      </p>
+      <a href="mailto:chunlocked.business@gmail.com" class="email-link">
+        chunlocked.business@gmail.com
+      </a>
     </div>
 
     <h2>Response Time</h2>
     <p>
-      We do our best to respond within <strong>1–3 business days</strong>.  
+      We do our best to respond within <strong>1–3 business days</strong>.
       During busy periods, responses may take slightly longer. Thank you for your patience!
     </p>
 
     <div class="note">
-      <strong>Privacy Note:</strong> We do not collect personal information on our website.  
-      Any details you provide via email are used only to respond to your message.  
+      <strong>Privacy Note:</strong> We do not collect personal information on our website.
+      Any details you provide via email are used only to respond to your message.
       See our <a href="privacy-policy.html" style="color: var(--primary-color);">Privacy Policy</a> for more info.
     </div>
 
-    <h2>Community Guidelines</h2>
+    <h2>Contact Guidelines</h2>
     <p>Please follow these when sending messages:</p>
     <ul>
-      <li>Be respectful and polite</li>
+      <li>Be respectful and professional</li>
       <li>Provide clear and accurate details</li>
-      <li>Avoid inappropriate language</li>
+      <li>Include all relevant information in your initial email</li>
       <li>Allow time for a proper response</li>
     </ul>
 
     <a href="../index.html" class="back-button">← Back to Games</a>
   </main>
 
-  <footer>
-    <p>&copy; 2025 Chromebook Unlocked Games. All rights reserved.</p>
+  <footer id="siteFooter">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3>Chromebook Unlocked Games</h3>
+        <span class="footer-url">chromebookunlocked.github.io</span>
+      </div>
+      <div class="footer-links">
+        <a href="/important-pages/privacy-policy.html">Privacy Policy</a>
+        <a href="/important-pages/cookie-policy.html">Cookie Policy</a>
+        <a href="/important-pages/terms-of-service.html">Terms of Service</a>
+        <a href="/important-pages/contact.html">Contact</a>
+        <a href="/important-pages/dmca.html">DMCA</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Chromebook Unlocked Games. All rights reserved.</p>
+    </div>
   </footer>
 </body>
 </html>
