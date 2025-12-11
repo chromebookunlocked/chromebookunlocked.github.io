@@ -1,115 +1,282 @@
-<main>
-  <p><strong>Last Updated:</strong> October 19, 2025</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy - Chromebook Unlocked Games</title>
+  <meta name="description" content="Learn how Chromebook Unlocked Games protects your privacy and handles your data.">
+  <link rel="icon" type="image/png" href="../assets/logo.png">
 
-  <h2>Introduction</h2>
-  <p>
-    ChromebookUnlocked.Github.io ("we", "our", "the Site") is committed to protecting your privacy.
-    This Privacy Policy explains what information we collect, how we use it, and the choices you have
-    when using our website and embedded games.
-  </p>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  <h2>Information We Collect</h2>
+    :root {
+      --primary-color: #ff66ff;
+      --primary-dark: #cc00ff;
+      --primary-light: #ff99ff;
+      --bg-dark: #0d001a;
+      --bg-medium: #1c0033;
+      --bg-light: #2d0052;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.8);
+      --text-muted: rgba(255, 255, 255, 0.6);
+    }
 
-  <h3>1. Automatically Collected Data</h3>
-  <p>When you visit the Site, we may automatically collect anonymized technical information, such as:</p>
-  <ul>
-    <li>Browser type and version</li>
-    <li>Operating system</li>
-    <li>Anonymized IP address</li>
-    <li>Pages you visit and time spent</li>
-    <li>Referring website links</li>
-    <li>Game usage statistics (e.g., which games you play)</li>
-  </ul>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-medium) 50%, var(--bg-light) 100%);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
 
-  <h3>2. Information You Provide</h3>
-  <p>
-    We do not require accounts, logins, or personal details. Any data stored by the Site is stored
-    locally on your device, including:
-  </p>
-  <ul>
-    <li>Recently played games</li>
-    <li>Cookie and privacy preferences</li>
-    <li>Local gameplay data stored by certain games</li>
-  </ul>
+    header {
+      background: rgba(13, 0, 26, 0.85);
+      backdrop-filter: blur(20px);
+      padding: 1rem 2rem;
+      border-bottom: 2px solid rgba(255, 102, 255, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-  <h2>How We Use Your Information</h2>
-  <p>The information we collect is used to:</p>
-  <ul>
-    <li>Improve website functionality and performance</li>
-    <li>Understand which games are most popular</li>
-    <li>Diagnose technical issues</li>
-    <li>Provide a smoother user experience</li>
-    <li>Maintain security of the Site</li>
-  </ul>
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
 
-  <h2>Cookies and Tracking</h2>
-  <p>
-    The Site uses cookies to remember your preferences and improve your experience. Some embedded
-    games may also use their own cookies. For more details, see our
-    <a href="cookie-policy.html">Cookie Policy</a>.
-  </p>
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+    }
 
-  <h2>Third-Party Services</h2>
+    h1 {
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
-  <h3>Google Analytics</h3>
-  <p>
-    We use Google Analytics to understand how visitors use the Site. Google may collect anonymized usage
-    data through cookies. This data is shared with us in aggregate form only and cannot be used to identify
-    individual users.
-  </p>
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 102, 255, 0.2);
+    }
 
-  <h3>Embedded Third-Party Games</h3>
-  <p>
-    Some games hosted or embedded on the Site come from third-party providers. These providers may collect
-    their own data in accordance with their own privacy policies. We encourage you to review the policies
-    of any third-party platforms whose games you play.
-  </p>
+    h2 {
+      color: var(--primary-light);
+      margin: 2rem 0 1rem 0;
+      font-size: 1.5rem;
+    }
 
-  <h2>Data Security</h2>
-  <p>
-    We implement security measures including:
-  </p>
-  <ul>
-    <li>HTTPS encryption</li>
-    <li>No storage of personally identifiable information (PII)</li>
-    <li>Local-only storage for user preferences</li>
-    <li>Anonymized analytics data</li>
-  </ul>
+    h3 {
+      color: var(--text-primary);
+      margin: 1.5rem 0 0.75rem 0;
+      font-size: 1.2rem;
+    }
 
-  <h2>Your Rights</h2>
-  <p>You have the right to:</p>
-  <ul>
-    <li>Disable cookies in your browser</li>
-    <li>Clear localStorage data at any time</li>
-    <li>Opt out of analytics cookies</li>
-    <li>Request information about what anonymized data we store</li>
-    <li>Request deletion of analytics data (if identifiable)</li>
-  </ul>
+    p {
+      color: var(--text-secondary);
+      margin: 1rem 0;
+    }
 
-  <h2>Children’s Privacy</h2>
-  <p>
-    The Site does not knowingly collect personal information from children under 13. No account creation,
-    personal data, or identifying information is required to use the Site. If you believe we have collected
-    information from a child, please contact us immediately.
-  </p>
+    ul, ol {
+      margin: 1rem 0 1rem 2rem;
+      color: var(--text-secondary);
+    }
 
-  <h2>External Links</h2>
-  <p>
-    The Site may contain links to external websites. We are not responsible for the content or privacy
-    practices of third-party websites. Please review their privacy policies separately.
-  </p>
+    li {
+      margin: 0.5rem 0;
+    }
 
-  <h2>Changes to This Policy</h2>
-  <p>
-    We may update this Privacy Policy from time to time. Changes will be posted on this page with a revised
-    \"Last Updated\" date. Continued use of the Site indicates acceptance of any updated terms.
-  </p>
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 102, 255, 0.4);
+    }
 
-  <h2>Contact Us</h2>
-  <p>
-    If you have questions regarding this Privacy Policy, please visit our
-    <a href=\"contact.html\">Contact page</a>.
-  </p>
+    a:hover {
+      color: var(--primary-light);
+      border-bottom-color: var(--primary-light);
+    }
 
-  <a href=\"../index.html\" class=\"back-button\">← Back to Games</a>
-</main>
+    .back-button {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      border-radius: 12px;
+      font-weight: 600;
+      margin-top: 2rem;
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .back-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 102, 255, 0.4);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+      main {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+      h1 {
+        font-size: 1.2rem;
+      }
+      h2 {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <img src="../assets/logo.png" alt="Chromebook Unlocked Games" class="logo">
+      <h1>Privacy Policy</h1>
+    </div>
+  </header>
+
+  <main>
+    <p><strong>Last Updated:</strong> October 19, 2025</p>
+
+    <h2>Introduction</h2>
+    <p>
+      ChromebookUnlocked.Github.io ("we", "our", "the Site") is committed to protecting your privacy.
+      This Privacy Policy explains what information we collect, how we use it, and the choices you have
+      when using our website and embedded games.
+    </p>
+
+    <h2>Information We Collect</h2>
+
+    <h3>1. Automatically Collected Data</h3>
+    <p>When you visit the Site, we may automatically collect anonymized technical information, such as:</p>
+    <ul>
+      <li>Browser type and version</li>
+      <li>Operating system</li>
+      <li>Anonymized IP address</li>
+      <li>Pages you visit and time spent</li>
+      <li>Referring website links</li>
+      <li>Game usage statistics (e.g., which games you play)</li>
+    </ul>
+
+    <h3>2. Information You Provide</h3>
+    <p>
+      We do not require accounts, logins, or personal details. Any data stored by the Site is stored
+      locally on your device, including:
+    </p>
+    <ul>
+      <li>Recently played games</li>
+      <li>Cookie and privacy preferences</li>
+      <li>Local gameplay data stored by certain games</li>
+    </ul>
+
+    <h2>How We Use Your Information</h2>
+    <p>The information we collect is used to:</p>
+    <ul>
+      <li>Improve website functionality and performance</li>
+      <li>Understand which games are most popular</li>
+      <li>Diagnose technical issues</li>
+      <li>Provide a smoother user experience</li>
+      <li>Maintain security of the Site</li>
+    </ul>
+
+    <h2>Cookies and Tracking</h2>
+    <p>
+      The Site uses cookies to remember your preferences and improve your experience. Some embedded
+      games may also use their own cookies. For more details, see our
+      <a href="cookie-policy.html">Cookie Policy</a>.
+    </p>
+
+    <h2>Third-Party Services</h2>
+
+    <h3>Google Analytics</h3>
+    <p>
+      We use Google Analytics to understand how visitors use the Site. Google may collect anonymized usage
+      data through cookies. This data is shared with us in aggregate form only and cannot be used to identify
+      individual users.
+    </p>
+
+    <h3>Embedded Third-Party Games</h3>
+    <p>
+      Some games hosted or embedded on the Site come from third-party providers. These providers may collect
+      their own data in accordance with their own privacy policies. We encourage you to review the policies
+      of any third-party platforms whose games you play.
+    </p>
+
+    <h2>Data Security</h2>
+    <p>
+      We implement security measures including:
+    </p>
+    <ul>
+      <li>HTTPS encryption</li>
+      <li>No storage of personally identifiable information (PII)</li>
+      <li>Local-only storage for user preferences</li>
+      <li>Anonymized analytics data</li>
+    </ul>
+
+    <h2>Your Rights</h2>
+    <p>You have the right to:</p>
+    <ul>
+      <li>Disable cookies in your browser</li>
+      <li>Clear localStorage data at any time</li>
+      <li>Opt out of analytics cookies</li>
+      <li>Request information about what anonymized data we store</li>
+      <li>Request deletion of analytics data (if identifiable)</li>
+    </ul>
+
+    <h2>Children's Privacy</h2>
+    <p>
+      The Site does not knowingly collect personal information from children under 13. No account creation,
+      personal data, or identifying information is required to use the Site. If you believe we have collected
+      information from a child, please contact us immediately.
+    </p>
+
+    <h2>External Links</h2>
+    <p>
+      The Site may contain links to external websites. We are not responsible for the content or privacy
+      practices of third-party websites. Please review their privacy policies separately.
+    </p>
+
+    <h2>Changes to This Policy</h2>
+    <p>
+      We may update this Privacy Policy from time to time. Changes will be posted on this page with a revised
+      "Last Updated" date. Continued use of the Site indicates acceptance of any updated terms.
+    </p>
+
+    <h2>Contact Us</h2>
+    <p>
+      If you have questions regarding this Privacy Policy, please visit our
+      <a href="contact.html">Contact page</a>.
+    </p>
+
+    <a href="../index.html" class="back-button">← Back to Games</a>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Chromebook Unlocked Games. All rights reserved.</p>
+  </footer>
+</body>
+</html>
