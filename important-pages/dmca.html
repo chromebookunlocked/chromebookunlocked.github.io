@@ -66,6 +66,133 @@
       transition: all 0.3s ease;
       border: none;
     }
+
+    /* Footer */
+    #siteFooter {
+      background: linear-gradient(180deg, rgba(13, 0, 26, 0.95) 0%, rgba(8, 0, 18, 0.98) 100%);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-top: 2px solid rgba(255, 102, 255, 0.3);
+      margin-top: 4rem;
+      box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+    }
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+    }
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      text-align: center;
+    }
+    .footer-brand h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff66ff, #ff99ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+    }
+    .footer-url {
+      font-family: 'Courier New', monospace;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.85rem;
+      padding: 0.4rem 0.8rem;
+      background: rgba(255, 102, 255, 0.08);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 102, 255, 0.15);
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      width: 100%;
+    }
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.65);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      position: relative;
+      font-weight: 500;
+      padding: 0.5rem 0;
+      display: inline-block;
+      text-align: center;
+      border-bottom: none;
+    }
+    .footer-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #ff66ff, transparent);
+      transition: width 0.3s ease;
+    }
+    .footer-links a:hover {
+      color: #ff66ff;
+      text-decoration: none;
+      transform: translateY(-2px);
+    }
+    .footer-links a:hover::after {
+      width: 100%;
+    }
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: center;
+    }
+    .footer-bottom p {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.75rem;
+      margin: 0;
+      opacity: 0.8;
+      font-weight: 300;
+      letter-spacing: 0.5px;
+    }
+    @media (max-width: 768px) {
+      #siteFooter {
+        padding: 2rem 1rem;
+      }
+      .footer-content {
+        gap: 1.5rem;
+      }
+      .footer-links {
+        gap: 1.5rem;
+        flex-direction: row;
+        justify-content: center;
+      }
+      .footer-links a {
+        font-size: 0.85rem;
+      }
+      .footer-bottom {
+        padding-top: 1.5rem;
+      }
+    }
+    @media (max-width: 480px) {
+      .footer-links {
+        gap: 1.2rem;
+      }
+      .footer-links a {
+        font-size: 0.8rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -105,8 +232,23 @@
     <a href="../index.html" class="back-button">← Back to Games</a>
   </main>
 
-  <footer>
-    <p>&copy; 2025 Chromebook Unlocked Games. All rights reserved.</p>
+  <footer id="siteFooter">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3>Chromebook Unlocked Games</h3>
+        <span class="footer-url">chromebookunlocked.github.io</span>
+      </div>
+      <div class="footer-links">
+        <a href="/important-pages/privacy-policy.html">Privacy Policy</a>
+        <a href="/important-pages/cookie-policy.html">Cookie Policy</a>
+        <a href="/important-pages/terms-of-service.html">Terms of Service</a>
+        <a href="/important-pages/contact.html">Contact</a>
+        <a href="/important-pages/dmca.html">DMCA</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Chromebook Unlocked Games. All rights reserved.</p>
+    </div>
   </footer>
 </body>
 </html>
