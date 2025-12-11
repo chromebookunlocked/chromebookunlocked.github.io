@@ -30,28 +30,24 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Step 1: Merge split HTML files (index1.html + index2.html, etc.)
-      - name: Merge split HTML files
-        run: npm run merge-html
-
-      # Step 2: Update game data (with validation)
+      # Step 1: Update game data (with validation)
       - name: Update game data
         run: node scripts/update-data.js
 
-      # Step 3: Cleanup orphaned game HTML pages
+      # Step 2: Cleanup orphaned game HTML pages
       - name: Cleanup orphaned game pages
         run: node scripts/cleanup-orphaned-pages.js
 
-      # Step 4: Validate games (unless skipped)
+      # Step 3: Validate games (unless skipped)
       - name: Validate games
         if: inputs.skip_validation != 'true'
         run: npm run validate
 
-      # Step 5: Build site
+      # Step 4: Build site
       - name: Build site
         run: npm run build
 
-      # Step 6: Copy files to dist
+      # Step 5: Copy files to dist
       - name: Copy game, data, asset folders, and static files
         run: |
           mkdir -p dist
@@ -70,7 +66,7 @@ jobs:
           cp google0d95473435a7c986.html dist/google0d95473435a7c986.html
           cp .nojekyll dist/.nojekyll
 
-      # Step 7: Commit data changes (if any)
+      # Step 6: Commit data changes (if any)
       - name: Commit data changes
         run: |
           git config user.name "github-actions[bot]"
@@ -83,14 +79,11 @@ jobs:
             # Add all changes in data folder (including deletions)
             git add -A data/
 
-            # Add merged index.html files in games folders
-            git add -A games/*/index.html 2>/dev/null || true
-
             # Add all changes to HTML files in root (including deletions)
             git add -A "*.html" 2>/dev/null || true
 
             # Commit
-            git commit -m "Update game data, merge split HTML files, and cleanup orphaned pages" --author="github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+            git commit -m "Update game data and cleanup orphaned pages" --author="github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
 
             # Push with retry logic
             MAX_RETRIES=5
@@ -124,7 +117,7 @@ jobs:
             fi
           fi
 
-      # Step 8: Deploy to GitHub Pages
+      # Step 7: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
@@ -136,7 +129,6 @@ jobs:
         run: |
           echo "✨ Update and build completed successfully!"
           echo "📊 Summary:"
-          echo "   - Merged split HTML files (if any)"
           echo "   - Updated game data JSON files"
           echo "   - Cleaned up orphaned game pages"
           echo "   - Validated all games"
