@@ -1,0 +1,125 @@
+name: Join multiple indexs
+
+on:
+  workflow_dispatch:
+    inputs:
+      game_folder:
+        description: 'Game folder path (e.g., games/Minecraft)'
+        required: true
+        type: string
+
+jobs:
+  join-indexes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Join index files
+        run: |
+          GAME_FOLDER="${{ inputs.game_folder }}"
+
+          echo "Processing folder: $GAME_FOLDER"
+
+          # Check if folder exists
+          if [ ! -d "$GAME_FOLDER" ]; then
+            echo "Error: Folder $GAME_FOLDER does not exist"
+            exit 1
+          fi
+
+          # Find all index[number].html files and sort them numerically
+          INDEX_FILES=$(find "$GAME_FOLDER" -maxdepth 1 -name "index[0-9]*.html" -type f | sort -V)
+
+          if [ -z "$INDEX_FILES" ]; then
+            echo "No index[number].html files found in $GAME_FOLDER"
+            exit 1
+          fi
+
+          echo "Found index files:"
+          echo "$INDEX_FILES"
+
+          # Create output file path
+          OUTPUT_FILE="$GAME_FOLDER/index.html"
+
+          # Remove existing index.html if it exists
+          if [ -f "$OUTPUT_FILE" ]; then
+            echo "Removing existing $OUTPUT_FILE"
+            rm "$OUTPUT_FILE"
+          fi
+
+          # Join all files in order
+          echo "Joining files into $OUTPUT_FILE..."
+          for file in $INDEX_FILES; do
+            echo "Adding $(basename $file)..."
+            cat "$file" >> "$OUTPUT_FILE"
+          done
+
+          # Get file size
+          FILE_SIZE=$(du -h "$OUTPUT_FILE" | cut -f1)
+          echo "✅ Successfully created $OUTPUT_FILE (size: $FILE_SIZE)"
+
+          # Optionally remove the split files (commented out by default)
+          # Uncomment the following lines if you want to delete the split files after joining
+          # echo "Removing split files..."
+          # for file in $INDEX_FILES; do
+          #   rm "$file"
+          #   echo "Removed $(basename $file)"
+          # done
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Check if there are changes to commit
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            # Add the new index.html file
+            git add "${{ inputs.game_folder }}/index.html"
+
+            # Commit
+            git commit -m "Join index files for ${{ inputs.game_folder }}" --author="github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+
+            # Push with retry logic
+            MAX_RETRIES=5
+            RETRY_COUNT=0
+            DELAY=2
+
+            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+              echo "Attempting to push (attempt $((RETRY_COUNT + 1))/$MAX_RETRIES)..."
+
+              if git push origin main; then
+                echo "Successfully pushed changes"
+                break
+              else
+                echo "Push failed, pulling with rebase..."
+                if git pull --rebase origin main; then
+                  echo "Rebase successful, retrying push..."
+                  RETRY_COUNT=$((RETRY_COUNT + 1))
+                  sleep $DELAY
+                  DELAY=$((DELAY * 2))
+                else
+                  echo "Rebase failed, aborting..."
+                  git rebase --abort
+                  exit 1
+                fi
+              fi
+            done
+
+            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+              echo "Failed to push after $MAX_RETRIES attempts"
+              exit 1
+            fi
+          fi
+
+      - name: Summary
+        run: |
+          echo "✨ Join operation completed successfully!"
+          echo "📊 Summary:"
+          echo "   - Joined index files in ${{ inputs.game_folder }}"
+          echo "   - Created index.html from index[number].html parts"
+          echo "   - Changes committed and pushed to repository"
