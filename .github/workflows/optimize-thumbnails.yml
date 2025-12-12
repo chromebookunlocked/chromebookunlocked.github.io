@@ -1,0 +1,227 @@
+name: Optimize Game Thumbnails
+
+on:
+  # Run manually from Actions tab
+  workflow_dispatch:
+    inputs:
+      max_width:
+        description: 'Maximum width in pixels'
+        required: false
+        default: '600'
+      quality:
+        description: 'WebP quality (1-100)'
+        required: false
+        default: '85'
+      format:
+        description: 'Output format (webp, jpg, png)'
+        required: false
+        default: 'webp'
+
+  # Run when thumbnails are added/modified
+  push:
+    paths:
+      - 'games/**/thumbnail.*'
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install image optimization tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webp imagemagick optipng jpegoptim
+
+      - name: Set configuration
+        id: config
+        run: |
+          MAX_WIDTH="${{ github.event.inputs.max_width || '600' }}"
+          QUALITY="${{ github.event.inputs.quality || '85' }}"
+          FORMAT="${{ github.event.inputs.format || 'webp' }}"
+
+          echo "max_width=$MAX_WIDTH" >> $GITHUB_OUTPUT
+          echo "quality=$QUALITY" >> $GITHUB_OUTPUT
+          echo "format=$FORMAT" >> $GITHUB_OUTPUT
+
+      - name: Optimize thumbnails
+        run: |
+          #!/bin/bash
+          set -e
+
+          MAX_WIDTH="${{ steps.config.outputs.max_width }}"
+          QUALITY="${{ steps.config.outputs.quality }}"
+          FORMAT="${{ steps.config.outputs.format }}"
+
+          OPTIMIZED=0
+          FAILED=0
+          SKIPPED=0
+          TOTAL_SAVED=0
+
+          echo "🎨 Starting thumbnail optimization..."
+          echo "Configuration: ${FORMAT} format, ${MAX_WIDTH}px max width, ${QUALITY}% quality"
+          echo ""
+
+          # Find all thumbnail files
+          while IFS= read -r -d '' file; do
+            echo "Processing: $file"
+
+            # Get directory and base name
+            dir=$(dirname "$file")
+            base=$(basename "$file")
+            ext="${base##*.}"
+            name="${base%.*}"
+
+            # Skip if already in target format
+            if [[ "$ext" == "$FORMAT" ]] && [[ "$FORMAT" != "webp" ]]; then
+              echo "  ⏭️  Already in $FORMAT format, checking size..."
+
+              # Get current dimensions
+              current_width=$(identify -format "%w" "$file" 2>/dev/null || echo "0")
+
+              if [[ "$current_width" -le "$MAX_WIDTH" ]]; then
+                echo "  ✅ Size OK, skipping"
+                ((SKIPPED++))
+                continue
+              fi
+            fi
+
+            # Calculate original size
+            original_size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null || echo "0")
+
+            # Create output filename
+            if [[ "$FORMAT" == "webp" ]]; then
+              output="${dir}/thumbnail.webp"
+            else
+              output="${dir}/thumbnail.${FORMAT}"
+            fi
+
+            # Convert and optimize based on format
+            if [[ "$FORMAT" == "webp" ]]; then
+              # Convert to WebP
+              if cwebp -q $QUALITY -resize $MAX_WIDTH 0 "$file" -o "$output.tmp" 2>/dev/null; then
+                mv "$output.tmp" "$output"
+
+                # Remove old file if different
+                if [[ "$file" != "$output" ]]; then
+                  rm -f "$file"
+                fi
+
+                new_size=$(stat -f%z "$output" 2>/dev/null || stat -c%s "$output" 2>/dev/null || echo "0")
+                saved=$((original_size - new_size))
+                TOTAL_SAVED=$((TOTAL_SAVED + saved))
+
+                echo "  ✅ Optimized: $(numfmt --to=iec-i --suffix=B $original_size) → $(numfmt --to=iec-i --suffix=B $new_size) (saved $(numfmt --to=iec-i --suffix=B $saved))"
+                ((OPTIMIZED++))
+              else
+                echo "  ❌ Failed to optimize"
+                ((FAILED++))
+              fi
+
+            elif [[ "$FORMAT" == "jpg" ]] || [[ "$FORMAT" == "jpeg" ]]; then
+              # Convert to JPG and optimize
+              if convert "$file" -resize ${MAX_WIDTH}x -quality $QUALITY "$output.tmp" 2>/dev/null; then
+                jpegoptim --strip-all --max=$QUALITY "$output.tmp" 2>/dev/null || true
+                mv "$output.tmp" "$output"
+
+                if [[ "$file" != "$output" ]]; then
+                  rm -f "$file"
+                fi
+
+                new_size=$(stat -f%z "$output" 2>/dev/null || stat -c%s "$output" 2>/dev/null || echo "0")
+                saved=$((original_size - new_size))
+                TOTAL_SAVED=$((TOTAL_SAVED + saved))
+
+                echo "  ✅ Optimized: $(numfmt --to=iec-i --suffix=B $original_size) → $(numfmt --to=iec-i --suffix=B $new_size)"
+                ((OPTIMIZED++))
+              else
+                echo "  ❌ Failed to optimize"
+                ((FAILED++))
+              fi
+
+            elif [[ "$FORMAT" == "png" ]]; then
+              # Convert to PNG and optimize
+              if convert "$file" -resize ${MAX_WIDTH}x "$output.tmp" 2>/dev/null; then
+                optipng -o7 "$output.tmp" 2>/dev/null || true
+                mv "$output.tmp" "$output"
+
+                if [[ "$file" != "$output" ]]; then
+                  rm -f "$file"
+                fi
+
+                new_size=$(stat -f%z "$output" 2>/dev/null || stat -c%s "$output" 2>/dev/null || echo "0")
+                saved=$((original_size - new_size))
+                TOTAL_SAVED=$((TOTAL_SAVED + saved))
+
+                echo "  ✅ Optimized: $(numfmt --to=iec-i --suffix=B $original_size) → $(numfmt --to=iec-i --suffix=B $new_size)"
+                ((OPTIMIZED++))
+              else
+                echo "  ❌ Failed to optimize"
+                ((FAILED++))
+              fi
+            fi
+
+            echo ""
+          done < <(find games -type f \( -name "thumbnail.jpg" -o -name "thumbnail.jpeg" -o -name "thumbnail.png" -o -name "thumbnail.gif" -o -name "thumbnail.webp" \) -print0)
+
+          echo "📊 Optimization Summary:"
+          echo "  ✅ Optimized: $OPTIMIZED files"
+          echo "  ⏭️  Skipped: $SKIPPED files"
+          echo "  ❌ Failed: $FAILED files"
+          echo "  💾 Total saved: $(numfmt --to=iec-i --suffix=B $TOTAL_SAVED)"
+
+          # Save summary for commit message
+          echo "$OPTIMIZED" > /tmp/optimized_count
+          echo "$TOTAL_SAVED" > /tmp/total_saved
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit optimized thumbnails
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          OPTIMIZED=$(cat /tmp/optimized_count)
+          SAVED=$(cat /tmp/total_saved)
+          SAVED_MB=$((SAVED / 1048576))
+          FORMAT="${{ steps.config.outputs.format }}"
+
+          git add games/**/thumbnail.*
+
+          git commit -m "Optimize thumbnails: convert to $FORMAT format
+
+Automatically optimized $OPTIMIZED thumbnail images:
+- Format: $FORMAT
+- Max width: ${{ steps.config.outputs.max_width }}px
+- Quality: ${{ steps.config.outputs.quality }}%
+- Total size reduction: ~${SAVED_MB}MB
+
+This improves page loading performance and reduces bandwidth usage."
+
+          git push
+
+      - name: Summary
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          echo "✅ Thumbnails optimized and committed successfully!"
+          echo "🚀 Page performance should improve significantly."
+
+      - name: No changes
+        if: steps.changes.outputs.has_changes == 'false'
+        run: |
+          echo "ℹ️  No thumbnails needed optimization."

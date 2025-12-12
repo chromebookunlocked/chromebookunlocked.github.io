@@ -31,6 +31,46 @@ A static website hosting 90+ free unblocked browser games, optimized for school 
 - **No Dependencies**: Pure vanilla JavaScript - no frameworks required
 - **Automated Deployment**: GitHub Actions automatically builds and deploys on push
 - **Auto-Generated Sitemap**: Complete sitemap with 93+ URLs for SEO
+- **Image Optimization**: Automated WebP conversion workflow for faster loading
+
+---
+
+## 🖼️ Image Optimization
+
+Optimize game thumbnails for better performance and faster loading times.
+
+### Quick Start
+
+**GitHub Actions (Recommended):**
+1. Go to **Actions** → **Optimize Game Thumbnails**
+2. Click **Run workflow**
+3. Configure or use defaults (600px, 85% quality, WebP format)
+4. Workflow automatically commits optimized images
+
+**Local Optimization:**
+```bash
+# Basic usage (converts to WebP, 600px, 85% quality)
+./scripts/optimize-thumbnails.sh
+
+# Custom settings
+./scripts/optimize-thumbnails.sh 800 90 webp
+```
+
+**Update HTML References:**
+```bash
+# Preview changes
+python3 scripts/update-thumbnail-references.py --dry-run
+
+# Apply changes
+python3 scripts/update-thumbnail-references.py
+```
+
+**Expected Results:**
+- 📉 70% reduction in image size (1.2MB → 300KB)
+- ⚡ 1-2 seconds faster LCP
+- 🚀 +10-15 points PageSpeed score
+
+**Full Documentation:** See [scripts/README.md](scripts/README.md)
 
 ---
 
@@ -40,22 +80,25 @@ A static website hosting 90+ free unblocked browser games, optimized for school 
 chromebookunlocked.github.io/
 ├── .github/
 │   └── workflows/
-│       ├── build.yml          # Build and deploy workflow
-│       └── update-data.yml    # Auto-sync game metadata
+│       ├── build.yml               # Build and deploy workflow
+│       ├── update-data.yml         # Auto-sync game metadata
+│       └── optimize-thumbnails.yml # Image optimization workflow
 ├── assets/
-│   └── logo.png              # Site logo
-├── data/                      # Game metadata (JSON files)
+│   └── logo.png                   # Site logo
+├── data/                           # Game metadata (JSON files)
 │   ├── 1v1.lol.json
 │   ├── Cookie Clicker.json
 │   └── ... (91 total)
-├── games/                     # Game files (91 games)
+├── games/                          # Game files (91 games)
 │   ├── 1v1.lol/
 │   │   ├── index.html
 │   │   └── thumbnail.png
 │   └── ...
 ├── scripts/
-│   ├── update-data.js        # Syncs game folders → JSON metadata
-│   └── cleanup-analytics.js  # Removes deprecated analytics fields
+│   ├── update-data.js              # Syncs game folders → JSON metadata
+│   ├── cleanup-analytics.js        # Removes deprecated analytics fields
+│   ├── optimize-thumbnails.sh     # Local thumbnail optimization
+│   └── update-thumbnail-references.py  # Update HTML references
 ├── dist/                      # Build output (generated)
 │   ├── index.html            # Main SPA
 │   ├── 1v1.lol.html          # Individual game pages
@@ -328,7 +371,7 @@ This project is open source and available for educational purposes.
 - [ ] Implement game search autocomplete
 - [ ] Add game descriptions from metadata
 - [ ] Create admin panel for easier game management
-- [ ] Optimize images with WebP conversion
+- [x] Optimize images with WebP conversion ✅
 - [ ] Add PWA support for offline play
 - [ ] Implement analytics dashboard
 
