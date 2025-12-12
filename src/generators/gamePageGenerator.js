@@ -122,7 +122,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         <div class="play-overlay" id="playOverlay">
           <img src="games/${game.folder}/${thumb}" alt="Play ${game.name} Unblocked - Free Online ${categoryText} Game" itemprop="image">
           <h2 itemprop="headline">${game.name}</h2>
-          <button class="play-btn" onclick="startGame()" aria-label="Play ${game.name} Free Online">▶ Play</button>
+          <button class="play-btn" onclick="startGame(); gtag('event', 'play_button_clicked', {game_name: '${game.name}', game_folder: '${game.folder}'});" aria-label="Play ${game.name} Free Online">▶ Play</button>
         </div>
         <iframe
           id="gameFrame"
@@ -231,6 +231,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   ${structuredData}
 
   <script>
+    let gameStartTime = null;
+
     function startGame() {
       const overlay = document.getElementById('playOverlay');
       const frame = document.getElementById('gameFrame');
@@ -238,6 +240,13 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
       frame.src = '${gameUrl}';
       frame.classList.add('active');
       overlay.classList.add('hidden');
+
+      // Track game start time and send analytics event
+      gameStartTime = Date.now();
+      gtag('event', 'game_started', {
+        game_name: '${game.name}',
+        game_folder: '${game.folder}'
+      });
 
       // Track in Recently Played
       saveToRecentlyPlayed();
@@ -348,6 +357,18 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         btnIcon.style.transform = 'rotate(180deg)';
       }
     }
+
+    // Track game session end when user leaves the page
+    window.addEventListener('beforeunload', () => {
+      if (gameStartTime) {
+        const playDuration = Math.round((Date.now() - gameStartTime) / 1000);
+        gtag('event', 'game_session_end', {
+          game_name: '${game.name}',
+          game_folder: '${game.folder}',
+          duration_seconds: playDuration
+        });
+      }
+    });
   </script>
 
   <!-- Cookie Consent Banner -->
