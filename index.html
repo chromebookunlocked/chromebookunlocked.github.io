@@ -4,9 +4,11 @@
   <!-- Resource Hints for Performance -->
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
+  <!-- Google tag (gtag.js) - deferred for better performance -->
+  <script defer src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -70,6 +72,12 @@
   <!-- Preconnect for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap"></noscript>
+  <link rel="preload" href="assets/logo.png" as="image" fetchpriority="high">
+  <link rel="preload" href="games/1v1.lol/thumbnail.png" as="image" fetchpriority="high">
 
   <!-- Structured Data for Search Engines -->
   <script type="application/ld+json">
@@ -472,7 +480,6 @@
   </script>
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
 :root {
   --base-font: clamp(11px, 1vw, 16px);
   --thumb-height: clamp(100px, 12vw, 200px);
@@ -1236,6 +1243,7 @@ button:active {
   gap: var(--grid-gap);
   justify-items: center;
   width: 100%;
+  contain: layout style;
 }
 
 .card {
@@ -1245,7 +1253,7 @@ button:active {
   border-radius:15px;
   overflow:hidden;
   cursor:pointer;
-  transition: all .3s ease;
+  transition: transform .3s ease, box-shadow .3s ease;
   text-align:center;
   display:flex;
   flex-direction:column;
@@ -1254,6 +1262,8 @@ button:active {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  content-visibility: auto;
+  contain: layout style paint;
 }
 .card:hover {
   transform:translateY(-5px) scale(1.03);
@@ -1301,9 +1311,16 @@ button:active {
   object-position: center;
   transition:transform .3s ease;
   loading:lazy;
+  aspect-ratio: 1 / 1;
+  content-visibility: auto;
 }
 .card:hover .thumb {
   transform:scale(1.08);
+  will-change: transform;
+}
+
+.card:not(:hover) .thumb {
+  will-change: auto;
 }
 
 .card-title {
@@ -1320,7 +1337,7 @@ button:active {
   width: 100%;
   line-height: 1.2;
   z-index: 2;
-  transition: all .3s ease;
+  transition: opacity .3s ease, transform .3s ease, background .3s ease;
   opacity: 0;
   transform: translateY(10px);
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
@@ -1574,7 +1591,7 @@ button:active {
     <!-- Top Header with Search -->
     <header id="topHeader">
       <div class="header-left">
-        <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='index.html'">
+        <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" width="48" height="48" fetchpriority="high" onclick="window.location.href='index.html'">
         <h1 onclick="window.location.href='index.html'">Chromebook Unlocked Games</h1>
       </div>
       <div id="searchContainer" role="search">
@@ -2242,32 +2259,32 @@ button:active {
           <div class="grid">
             <div class="card game-card" data-index="0" data-folder="1v1.lol" data-name="1v1.lol" onclick="window.location.href='1v1.lol.html'">
     <div class="thumb-container" style="--thumb-url: url('games/1v1.lol/thumbnail.png')">
-      <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol" loading="lazy" decoding="async" width="300" height="300">
+      <img class="thumb" src="games/1v1.lol/thumbnail.png" alt="1v1.lol" loading="eager" fetchpriority="high" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">1v1.lol</div>
   </div><div class="card game-card" data-index="1" data-folder="3Dash" data-name="3dash" onclick="window.location.href='3Dash.html'">
     <div class="thumb-container" style="--thumb-url: url('games/3Dash/thumbnail.jpg')">
-      <img class="thumb" src="games/3Dash/thumbnail.jpg" alt="3Dash" loading="lazy" decoding="async" width="300" height="300">
+      <img class="thumb" src="games/3Dash/thumbnail.jpg" alt="3Dash" loading="eager" fetchpriority="high" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">3Dash</div>
   </div><div class="card game-card" data-index="2" data-folder="Basketball Legends" data-name="basketball legends" onclick="window.location.href='Basketball Legends.html'">
     <div class="thumb-container" style="--thumb-url: url('games/Basketball Legends/thumbnail.png')">
-      <img class="thumb" src="games/Basketball Legends/thumbnail.png" alt="Basketball Legends" loading="lazy" decoding="async" width="300" height="300">
+      <img class="thumb" src="games/Basketball Legends/thumbnail.png" alt="Basketball Legends" loading="eager" fetchpriority="high" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">Basketball Legends</div>
   </div><div class="card game-card" data-index="3" data-folder="Block Blast" data-name="block blast" onclick="window.location.href='Block Blast.html'">
     <div class="thumb-container" style="--thumb-url: url('games/Block Blast/thumbnail.jpg')">
-      <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast" loading="lazy" decoding="async" width="300" height="300">
+      <img class="thumb" src="games/Block Blast/thumbnail.jpg" alt="Block Blast" loading="eager" fetchpriority="high" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">Block Blast</div>
   </div><div class="card game-card" data-index="4" data-folder="Bouncemasters" data-name="bouncemasters" onclick="window.location.href='Bouncemasters.html'">
     <div class="thumb-container" style="--thumb-url: url('games/Bouncemasters/thumbnail.jpg')">
-      <img class="thumb" src="games/Bouncemasters/thumbnail.jpg" alt="Bouncemasters" loading="lazy" decoding="async" width="300" height="300">
+      <img class="thumb" src="games/Bouncemasters/thumbnail.jpg" alt="Bouncemasters" loading="eager" fetchpriority="high" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">Bouncemasters</div>
   </div><div class="card game-card" data-index="5" data-folder="Bounty of One" data-name="bounty of one" onclick="window.location.href='Bounty of One.html'">
     <div class="thumb-container" style="--thumb-url: url('games/Bounty of One/thumbnail.png')">
-      <img class="thumb" src="games/Bounty of One/thumbnail.png" alt="Bounty of One" loading="lazy" decoding="async" width="300" height="300">
+      <img class="thumb" src="games/Bounty of One/thumbnail.png" alt="Bounty of One" loading="eager" fetchpriority="high" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">Bounty of One</div>
   </div><div class="card game-card" data-index="6" data-folder="Cookie Clicker" data-name="cookie clicker" onclick="window.location.href='Cookie Clicker.html'">
@@ -4481,6 +4498,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   <!-- Cookie Consent Banner -->
   <link rel="stylesheet" href="assets/cookie-consent.css">
-  <script src="assets/cookie-consent.js"></script>
+  <script defer src="assets/cookie-consent.js"></script>
 </body>
 </html>
