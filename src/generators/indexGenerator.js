@@ -160,6 +160,72 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         <div class="grid" id="recentlyPlayedGrid"></div>
       </div>
 
+      <!-- Load Recently Played Games Synchronously to Prevent Layout Shift -->
+      <script>
+        (function() {
+          const MAX_RECENT = 25;
+          const recentSection = document.getElementById('recentlyPlayedSection');
+          const recentGrid = document.getElementById('recentlyPlayedGrid');
+
+          if (!recentGrid) return;
+
+          // Get all valid game folders from pre-rendered game cards
+          function getValidGameFolders() {
+            const folders = new Set();
+            document.querySelectorAll('.game-card[data-folder]').forEach(card => {
+              folders.add(card.getAttribute('data-folder'));
+            });
+            return folders;
+          }
+
+          // Clean recently played list
+          let list = [];
+          try {
+            list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+          } catch(e) {
+            list = [];
+          }
+
+          if (list.length === 0) {
+            return; // Keep section hidden
+          }
+
+          // Clean invalid entries
+          const validFolders = getValidGameFolders();
+          list = list.filter(game => validFolders.has(game.folder));
+
+          // Sort by lastPlayed timestamp (most recent first)
+          list.sort((a, b) => {
+            const timeA = a.lastPlayed || 0;
+            const timeB = b.lastPlayed || 0;
+            return timeB - timeA;
+          });
+
+          const displayList = list.slice(0, MAX_RECENT);
+
+          // Build cards HTML
+          const cardsHTML = displayList.map((g, i) => {
+            const thumbUrl = g.thumb || 'assets/logo.png';
+            return \`<div class="card game-card" data-index="\${i}" data-folder="\${g.folder}" data-name="\${g.name.toLowerCase()}" onclick="window.location.href='/\${g.folder}.html'">
+              <div class="thumb-container" style="--thumb-url: url('\${thumbUrl}')">
+                <img class="thumb" src="\${thumbUrl}" alt="\${g.name}" loading="eager" decoding="async" width="300" height="300" onerror="this.src='assets/logo.png'">
+              </div>
+              <div class="card-title">\${g.name}</div>
+            </div>\`;
+          }).join('');
+
+          // Set grid content and show section
+          if (cardsHTML) {
+            recentGrid.innerHTML = cardsHTML;
+            if (recentSection) {
+              recentSection.style.display = 'block';
+            }
+            // Mark as loaded for client.js
+            window.__recentlyPlayedLoaded = true;
+          }
+        })();
+      </script>
+
       <!-- All category sections (including games for home view) -->
       ${categorySections}
 
