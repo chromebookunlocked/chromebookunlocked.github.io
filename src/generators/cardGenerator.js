@@ -16,7 +16,7 @@ function generateGameCard(game, idx, gamesDir) {
   const loadingAttr = isFirstRow ? 'eager' : 'lazy';
   const fetchPriorityAttr = isFirstRow ? ' fetchpriority="high"' : '';
 
-  return `<div class="card game-card" data-index="${idx}" data-folder="${game.folder}" data-name="${game.name.toLowerCase()}" onclick="window.location.href='${game.folder}.html'">
+  return `<div class="card game-card" data-index="${idx}" data-folder="${game.folder}" data-name="${game.name.toLowerCase()}" onclick="window.location.href='/${game.folder}.html'">
     <div class="thumb-container" style="--thumb-url: url('${thumbPath}')">
       <img class="thumb" src="${thumbPath}" alt="${game.name}" loading="${loadingAttr}" decoding="async" width="300" height="300"${fetchPriorityAttr}>
     </div>

@@ -57,6 +57,13 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <!-- Preload critical assets -->
   <link rel="preload" as="image" href="assets/logo.png" fetchpriority="high">
 
+  <!-- Redirect /index.html to / -->
+  <script>
+    if (window.location.pathname === '/index.html') {
+      window.location.replace('/' + window.location.hash);
+    }
+  </script>
+
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
   <script>
@@ -96,8 +103,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     <!-- Top Header with Search -->
     <header id="topHeader">
       <div class="header-left">
-        <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='index.html'" width="48" height="48" fetchpriority="high">
-        <h1 onclick="window.location.href='index.html'">Chromebook Unlocked Games</h1>
+        <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='/'" width="48" height="48" fetchpriority="high">
+        <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
       </div>
       <div id="searchContainer" role="search">
         <span id="searchIcon" aria-hidden="true">🔍</span>

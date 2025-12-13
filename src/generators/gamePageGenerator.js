@@ -47,7 +47,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
       const gThumbPath = getAssetPath(g.folder, gThumb);
       // SEO-optimized alt text with keywords
       const altText = `Play ${g.name} Unblocked - Free Online Game`;
-      return `<a href="${g.folder}.html" class="game-card" title="Play ${g.name} Unblocked Free Online">
+      return `<a href="/${g.folder}.html" class="game-card" title="Play ${g.name} Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('${gThumbPath}')">
         <img class="thumb" src="${gThumbPath}" alt="${altText}" loading="lazy">
       </div>
@@ -92,8 +92,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   <!-- Header with Logo -->
   <header>
     <div class="header-left">
-      <img src="assets/logo.png" alt="Chromebook Unlocked Games - Free Unblocked Games for School" class="header-logo" onclick="window.location.href='index.html'">
-      <h1 onclick="window.location.href='index.html'">Chromebook Unlocked Games</h1>
+      <img src="assets/logo.png" alt="Chromebook Unlocked Games - Free Unblocked Games for School" class="header-logo" onclick="window.location.href='/'">
+      <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
     </div>
   </header>
 
@@ -106,7 +106,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     <!-- Game Viewer -->
     <div class="game-container">
       <!-- Back Button (outside game frame) -->
-      <button class="back-button" onclick="window.location.href='index.html'" title="Back to Unblocked Games" aria-label="Back to Free Unblocked Games">
+      <button class="back-button" onclick="window.location.href='/'" title="Back to Unblocked Games" aria-label="Back to Free Unblocked Games">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
         <span>Back</span>
       </button>
@@ -138,7 +138,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         ${game.categories
           .map(
             (cat) =>
-              `<a href="index.html#/category/${encodeURIComponent(cat)}" class="category-tag" title="Play Free ${cat} Games Unblocked">${cat}</a>`
+              `<a href="/#/category/${encodeURIComponent(cat)}" class="category-tag" title="Play Free ${cat} Games Unblocked">${cat}</a>`
           )
           .join("")}
       </div>
