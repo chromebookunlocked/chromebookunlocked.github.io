@@ -9,7 +9,7 @@ if (!fs.existsSync(dataDir)) {
 }
 
 // Valid thumbnail extensions
-const validThumbnailExts = ['.png', '.jpg', '.jpeg', '.gif'];
+const validThumbnailExts = ['.webp', '.png', '.jpg', '.jpeg', '.gif'];
 
 /**
  * Check if a game folder has a valid index.html file
