@@ -44,13 +44,31 @@ function gridForCategory(cat) {
     ?.querySelector('.grid');
 }
 
+// Cache for grid column counts to avoid forced reflows
+const columnCountCache = new WeakMap();
+
 // Helper: compute number of columns currently active for a grid
 function getColumnCount(grid) {
   if (!grid) return 1;
+
+  // Check cache first
+  if (columnCountCache.has(grid)) {
+    return columnCountCache.get(grid);
+  }
+
   const style = window.getComputedStyle(grid);
   const cols = style.gridTemplateColumns;
   if (!cols) return 1;
-  return cols.split(' ').filter(Boolean).length;
+  const count = cols.split(' ').filter(Boolean).length;
+
+  // Cache the result
+  columnCountCache.set(grid, count);
+  return count;
+}
+
+// Clear column count cache (call on resize)
+function clearColumnCountCache() {
+  columnCountCache.clear();
 }
 
 // Create a "more" element
@@ -398,12 +416,16 @@ function handleRouting() {
   }
 }
 
-// On window resize
+// On window resize - debounced and batched
 let resizeTimeout = null;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
-    updateAllCategories();
+    // Use requestAnimationFrame to batch layout reads
+    requestAnimationFrame(() => {
+      clearColumnCountCache();
+      updateAllCategories();
+    });
   }, 120);
 });
 

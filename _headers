@@ -1,0 +1,31 @@
+# Cache headers for better performance
+# Note: GitHub Pages respects these headers for custom domains
+
+# Cache static assets for 1 year
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache game assets for 1 year
+/games/*/thumbnail.webp
+  Cache-Control: public, max-age=31536000, immutable
+
+/games/*/thumbnail.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/games/*/thumbnail.jpg
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache CSS and JS for 1 week (can be updated more frequently)
+/*.css
+  Cache-Control: public, max-age=604800
+
+/*.js
+  Cache-Control: public, max-age=604800
+
+# Cache HTML for 1 hour (can be updated frequently)
+/*.html
+  Cache-Control: public, max-age=3600
+
+# Cache index.html for 5 minutes (homepage should be fresh)
+/index.html
+  Cache-Control: public, max-age=300

@@ -62,6 +62,16 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 
+  <!-- Optimize Google Fonts loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap"></noscript>
+
+  <!-- Preload critical assets -->
+  <link rel="preload" as="image" href="assets/logo.png" fetchpriority="high">
+
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
   <script>
@@ -101,7 +111,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     <!-- Top Header with Search -->
     <header id="topHeader">
       <div class="header-left">
-        <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='index.html'">
+        <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='index.html'" width="48" height="48" fetchpriority="high">
         <h1 onclick="window.location.href='index.html'">Chromebook Unlocked Games</h1>
       </div>
       <div id="searchContainer" role="search">
@@ -186,9 +196,10 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     ${clientJS}
   </script>
 
-  <!-- Cookie Consent Banner -->
-  <link rel="stylesheet" href="assets/cookie-consent.css">
-  <script src="assets/cookie-consent.js"></script>
+  <!-- Cookie Consent Banner - Load asynchronously -->
+  <link rel="preload" as="style" href="assets/cookie-consent.css" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="assets/cookie-consent.css"></noscript>
+  <script src="assets/cookie-consent.js" defer></script>
 </body>
 </html>`;
 
