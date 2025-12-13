@@ -163,19 +163,6 @@ jsonFiles.forEach((file, index) => {
     info(`${file} - Name in JSON ("${gameData.name}") differs from filename ("${gameName}")`);
   }
 
-  // 9. Validate dateAdded if present
-  if (gameData.dateAdded) {
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dateRegex.test(gameData.dateAdded)) {
-      error(`${file} - Invalid dateAdded format: "${gameData.dateAdded}" (should be YYYY-MM-DD)`);
-    } else {
-      const date = new Date(gameData.dateAdded);
-      if (isNaN(date.getTime())) {
-        error(`${file} - Invalid dateAdded: "${gameData.dateAdded}" is not a valid date`);
-      }
-    }
-  }
-
   // If no errors for this game, count as passed
   const gameErrors = errors;
   if (errors === 0 || gameErrors === errors) {

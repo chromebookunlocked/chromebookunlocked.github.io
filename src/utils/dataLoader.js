@@ -44,8 +44,7 @@ function loadGames(dataDir, gamesDir) {
           folder: folder,
           name: json.name || f.replace(".json", ""),
           categories: gameCategories, // Array of categories
-          thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.webp", "thumbnail.png", "thumbnail.jpg"],
-          dateAdded: json.dateAdded || null // Support for "Newly Added" sorting
+          thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.webp", "thumbnail.png", "thumbnail.jpg"]
         };
       } catch (error) {
         console.error(`❌ Error processing ${f}: ${error.message}`);
@@ -76,14 +75,6 @@ function categorizeGames(games) {
       categories[cat].push(g);
     });
   });
-
-  // Add "Newly Added" category if games have dateAdded
-  const gamesWithDates = games.filter(g => g.dateAdded)
-    .sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-
-  if (gamesWithDates.length > 0) {
-    categories['Newly Added'] = gamesWithDates.slice(0, 20); // Show latest 20 games
-  }
 
   return categories;
 }

@@ -129,7 +129,7 @@ function updateAllCategories() {
   });
 }
 
-// Populate Recently Played grid
+// Populate Recently Played grid (optimized to prevent layout shifts)
 function loadRecentlyPlayed() {
   let list = cleanRecentlyPlayed(); // Clean before loading
 
@@ -137,14 +137,13 @@ function loadRecentlyPlayed() {
   const recentGrid = document.getElementById('recentlyPlayedGrid');
   if (!recentGrid) return;
 
-  recentGrid.innerHTML = '';
+  // Use DocumentFragment to batch DOM updates (prevents layout thrashing)
+  const fragment = document.createDocumentFragment();
 
   if (!list.length) {
-    if (recentSection) recentSection.style.display = 'none';
+    // Keep section hidden, don't modify DOM
     return;
   }
-
-  if (recentSection) recentSection.style.display = 'block';
 
   // Sort by lastPlayed timestamp (most recent first)
   list.sort((a, b) => {
@@ -155,7 +154,7 @@ function loadRecentlyPlayed() {
 
   const displayList = list.slice(0, MAX_RECENT);
 
-  // Double-check each game exists before displaying
+  // Build cards in memory first
   displayList.forEach((g, i) => {
     // Verify game still exists
     if (!gameExists(g.folder)) {
@@ -184,18 +183,23 @@ function loadRecentlyPlayed() {
     };
 
     card.innerHTML = `<div class="thumb-container" style="--thumb-url: url('${thumbUrl}')">
-      <img class="thumb" src="${thumbUrl}" alt="${g.name}" loading="lazy" decoding="async" width="300" height="300" onerror="this.src='assets/logo.png'">
+      <img class="thumb" src="${thumbUrl}" alt="${g.name}" loading="eager" decoding="async" width="300" height="300" onerror="this.src='assets/logo.png'">
     </div>
     <div class="card-title">${g.name}</div>`;
-    recentGrid.appendChild(card);
+    fragment.appendChild(card);
   });
 
-  if (offsets['Recently Played'] === undefined) offsets['Recently Played'] = 0;
-  updateCategoryView('Recently Played');
+  // If we have cards, do a single DOM update
+  if (fragment.children.length > 0) {
+    // Clear and append all at once
+    recentGrid.innerHTML = '';
+    recentGrid.appendChild(fragment);
 
-  // If grid is empty after cleanup, hide section
-  if (recentGrid.children.length === 0) {
-    recentSection.style.display = 'none';
+    // Show section only after content is ready
+    if (recentSection) recentSection.style.display = 'block';
+
+    if (offsets['Recently Played'] === undefined) offsets['Recently Played'] = 0;
+    updateCategoryView('Recently Played');
   }
 }
 
@@ -436,6 +440,9 @@ function setupIntersectionObserver() {
 
 // Initial load
 document.addEventListener('DOMContentLoaded', () => {
+  // Load recently played FIRST to minimize layout shift
+  loadRecentlyPlayed();
+
   document.querySelectorAll('.category').forEach(c => {
     const cat = c.getAttribute('data-category');
     if (offsets[cat] === undefined) offsets[cat] = 0;
@@ -463,7 +470,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Setup Intersection Observer for progressive loading
   setupIntersectionObserver();
 
-  loadRecentlyPlayed();
   updateAllCategories();
   handleRouting();
   window.addEventListener('hashchange', handleRouting);
