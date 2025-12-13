@@ -197,7 +197,7 @@ function loadRecentlyPlayed() {
         loadRecentlyPlayed();
         return;
       }
-      window.location.href = g.folder + '.html';
+      window.location.href = '/' + g.folder + '.html';
     };
 
     card.innerHTML = `<div class="thumb-container" style="--thumb-url: url('${thumbUrl}')">
@@ -279,7 +279,7 @@ function searchGames(query) {
     searchDropdown.innerHTML = '<div class="search-no-results">No games found</div>';
   } else {
     searchDropdown.innerHTML = topResults.map(game => {
-      return `<div class="search-result-item" onclick="window.location.href='${game.folder}.html'">
+      return `<div class="search-result-item" onclick="window.location.href='/${game.folder}.html'">
         <img class="search-result-thumb" src="${game.thumb}" alt="${game.name}" loading="lazy" decoding="async" width="60" height="60">
         <div class="search-result-name">${game.name}</div>
       </div>`;
