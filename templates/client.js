@@ -149,6 +149,14 @@ function updateAllCategories() {
 
 // Populate Recently Played grid (optimized to prevent layout shifts)
 function loadRecentlyPlayed() {
+  // Skip if already loaded by inline script
+  if (window.__recentlyPlayedLoaded) {
+    // Still need to set up offset and update view
+    if (offsets['Recently Played'] === undefined) offsets['Recently Played'] = 0;
+    updateCategoryView('Recently Played');
+    return;
+  }
+
   let list = cleanRecentlyPlayed(); // Clean before loading
 
   const recentSection = document.getElementById('recentlyPlayedSection');
@@ -330,6 +338,9 @@ function saveRecentlyPlayed(game) {
   list.unshift(gameWithTimestamp);
   if (list.length > MAX_RECENT) list = list.slice(0, MAX_RECENT);
   localStorage.setItem('recentlyPlayed', JSON.stringify(list));
+
+  // Reset flag to force reload with new data
+  window.__recentlyPlayedLoaded = false;
   loadRecentlyPlayed();
 }
 
