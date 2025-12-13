@@ -137,7 +137,7 @@ jsonFiles.forEach((file, index) => {
   }
 
   // 7. Check thumbnail exists
-  const thumbnails = gameData.thumbs || ['thumbnail.png', 'thumbnail.jpg'];
+  const thumbnails = gameData.thumbs || ['thumbnail.webp', 'thumbnail.png', 'thumbnail.jpg'];
   let foundThumbnail = false;
 
   thumbnails.forEach(thumb => {

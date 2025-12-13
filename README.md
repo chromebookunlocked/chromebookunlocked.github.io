@@ -51,11 +51,13 @@ chromebookunlocked.github.io/
 ├── games/                     # Game files (91 games)
 │   ├── 1v1.lol/
 │   │   ├── index.html
-│   │   └── thumbnail.png
+│   │   └── thumbnail.webp
 │   └── ...
 ├── scripts/
-│   ├── update-data.js        # Syncs game folders → JSON metadata
-│   └── cleanup-analytics.js  # Removes deprecated analytics fields
+│   ├── update-data.js              # Syncs game folders → JSON metadata
+│   ├── validate-games.js           # Validates game metadata and files
+│   ├── cleanup-orphaned-pages.js   # Removes orphaned game pages
+│   └── convert-thumbnails-webp.js  # Converts thumbnails to WebP format
 ├── dist/                      # Build output (generated)
 │   ├── index.html            # Main SPA
 │   ├── 1v1.lol.html          # Individual game pages
@@ -126,7 +128,8 @@ games/
 **Requirements:**
 - Folder name will be used as the game identifier
 - `index.html` must be the main game file
-- Thumbnail should be PNG or JPG (recommended size: 300x200px)
+- Thumbnail should be WebP, PNG, or JPG (will be auto-converted to WebP)
+- Recommended size: 300x300px (larger images will be automatically resized)
 
 ### Step 2: Create Metadata (Automatic or Manual)
 
@@ -161,7 +164,7 @@ Create `data/My Awesome Game.json`:
 | `category` | string | ✅ | Primary category (e.g., "Action", "Puzzle") |
 | `categories` | array | ❌ | Multiple categories (e.g., ["Action", "Multiplayer"]) |
 | `folder` | string | ❌ | Custom folder name (defaults to filename) |
-| `thumbs` | array | ❌ | Custom thumbnail filenames (defaults to ["thumbnail.png", "thumbnail.jpg"]) |
+| `thumbs` | array | ❌ | Custom thumbnail filenames (defaults to ["thumbnail.webp", "thumbnail.png", "thumbnail.jpg"]) |
 | `dateAdded` | string | ❌ | ISO date for "Newly Added" section (e.g., "2024-11-14") |
 
 **Example with all fields:**
@@ -224,6 +227,42 @@ dist/
 ├── assets/                # Copied assets
 └── data/                  # Copied metadata
 ```
+
+---
+
+## 🖼️ Thumbnail Optimization
+
+### Converting Thumbnails to WebP
+
+To optimize thumbnail file sizes and improve page load performance, you can convert all thumbnails to WebP format:
+
+```bash
+npm run convert-thumbnails
+```
+
+This script will:
+- ✅ Convert all PNG/JPG/GIF thumbnails to WebP format
+- ✅ Resize large images to 300×300 pixels (maintaining aspect ratio)
+- ✅ Use 80% quality for optimal balance between size and quality
+- ✅ Delete original thumbnails after successful conversion
+- ✅ Show detailed conversion statistics and size savings
+
+**Example output:**
+```
+✓  1on1 Soccer: 332.9KB → 11.9KB (96.4% smaller) [1024×1024]
+✓  2048: 4.5KB → 3.4KB (24.8% smaller) [512×512]
+✓  Basketball Legends: 537.3KB → 18.0KB (96.7% smaller) [1024×1024]
+```
+
+### Automated Conversion via GitHub Actions
+
+The repository includes a GitHub Actions workflow that can convert all thumbnails automatically:
+
+1. Go to **Actions** → **Convert Thumbnails to WebP**
+2. Click **Run workflow**
+3. The workflow will convert all thumbnails and commit the changes
+
+This is useful when adding multiple new games or performing bulk optimization.
 
 ---
 

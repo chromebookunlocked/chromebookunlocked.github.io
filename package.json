@@ -7,6 +7,7 @@
     "validate": "node scripts/validate-games.js",
     "sync-data": "node scripts/update-data.js",
     "cleanup": "node scripts/cleanup-orphaned-pages.js",
+    "convert-thumbnails": "node scripts/convert-thumbnails-webp.js",
     "update-all": "npm run sync-data && npm run cleanup && npm run validate && npm run build",
     "clean": "rm -rf dist/",
     "prebuild": "npm run validate",
@@ -14,6 +15,9 @@
     "lint": "eslint generate.js scripts/*.js src/**/*.js",
     "format": "prettier --write '**/*.{js,json,md}' '!dist/**' '!node_modules/**'",
     "format:check": "prettier --check '**/*.{js,json,md}' '!dist/**' '!node_modules/**'"
+  },
+  "dependencies": {
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "eslint": "^8.57.0",

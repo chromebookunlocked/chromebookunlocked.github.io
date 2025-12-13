@@ -1,0 +1,62 @@
+name: Convert Thumbnails to WebP
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_unchanged:
+        description: 'Skip already converted WebP thumbnails'
+        required: false
+        default: 'true'
+        type: boolean
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Convert thumbnails to WebP
+        run: npm run convert-thumbnails
+
+      - name: Check for changes
+        id: git-check
+        run: |
+          git diff --exit-code games/ || echo "changes=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push changes
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add games/
+          git commit -m "Convert thumbnails to WebP format
+
+          - Converted all game thumbnails to WebP with optimized resolution
+          - Target size: 300x300 pixels
+          - WebP quality: 80
+          - Reduces file sizes and improves page load performance"
+          git push
+
+      - name: Summary
+        if: steps.git-check.outputs.changes == 'true'
+        run: |
+          echo "✅ Thumbnails converted and pushed to repository"
+          echo "📊 Check the commit for details on size savings"
+
+      - name: No changes
+        if: steps.git-check.outputs.changes != 'true'
+        run: echo "ℹ️ No thumbnails needed conversion - all already in WebP format"

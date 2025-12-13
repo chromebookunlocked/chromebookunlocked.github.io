@@ -44,7 +44,7 @@ function loadGames(dataDir, gamesDir) {
           folder: folder,
           name: json.name || f.replace(".json", ""),
           categories: gameCategories, // Array of categories
-          thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.png", "thumbnail.jpg"],
+          thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.webp", "thumbnail.png", "thumbnail.jpg"],
           dateAdded: json.dateAdded || null // Support for "Newly Added" sorting
         };
       } catch (error) {
