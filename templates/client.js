@@ -71,6 +71,16 @@ function clearColumnCountCache() {
   columnCountCache.clear();
 }
 
+// Load thumbnail from data-src to src
+function loadThumbnail(card) {
+  const img = card.querySelector('img.thumb[data-src]');
+  if (img && img.hasAttribute('data-src')) {
+    const src = img.getAttribute('data-src');
+    img.src = src;
+    img.removeAttribute('data-src');
+  }
+}
+
 // Create a "more" element
 function createMoreCard(cat) {
   const more = document.createElement('div');
@@ -96,9 +106,12 @@ function updateCategoryView(cat) {
   const cards = Array.from(grid.querySelectorAll('.game-card'));
   const total = cards.length;
 
-  // If viewing specific category, show all cards
+  // If viewing specific category, show all cards and load thumbnails
   if (currentViewMode === 'category') {
-    cards.forEach(c => c.style.display = '');
+    cards.forEach(c => {
+      c.style.display = '';
+      loadThumbnail(c);
+    });
     return;
   }
 
@@ -114,9 +127,15 @@ function updateCategoryView(cat) {
   // Number of actual game items to show
   const showCount = showMore ? (slots - 1) : Math.min(total, slots);
 
-  // Show/hide cards
+  // Show/hide cards and load thumbnails for visible cards
   cards.forEach((c, idx) => {
-    c.style.display = (idx < showCount) ? '' : 'none';
+    const shouldShow = idx < showCount;
+    c.style.display = shouldShow ? '' : 'none';
+
+    // Load thumbnail when card becomes visible
+    if (shouldShow) {
+      loadThumbnail(c);
+    }
   });
 
   // If we should show a More card, append it at the end
@@ -208,8 +227,13 @@ function loadRecentlyPlayed() {
       window.location.href = '/' + g.folder + '.html';
     };
 
+    // Eagerly load first 6 thumbnails, lazy load the rest
+    const isFirstRow = i < 6;
+    const srcAttr = isFirstRow ? `src="${thumbUrl}"` : `data-src="${thumbUrl}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E"`;
+    const loadingAttr = isFirstRow ? 'eager' : 'lazy';
+
     card.innerHTML = `<div class="thumb-container" style="--thumb-url: url('${thumbUrl}')">
-      <img class="thumb" src="${thumbUrl}" alt="${g.name}" loading="eager" decoding="async" width="300" height="300" onerror="this.src='assets/logo.png'">
+      <img class="thumb" ${srcAttr} alt="${g.name}" loading="${loadingAttr}" decoding="async" width="300" height="300" onerror="this.src='assets/logo.png'">
     </div>
     <div class="card-title">${g.name}</div>`;
     fragment.appendChild(card);
