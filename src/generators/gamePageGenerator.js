@@ -92,7 +92,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   <!-- Header with Logo -->
   <header>
     <div class="header-left">
-      <img src="assets/logo.png" alt="Chromebook Unlocked Games - Free Unblocked Games for School" class="header-logo" onclick="window.location.href='/'">
+      <img src="assets/logo.webp" alt="Chromebook Unlocked Games - Free Unblocked Games for School" class="header-logo" onclick="window.location.href='/'">
       <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
     </div>
   </header>

@@ -214,7 +214,7 @@ function loadRecentlyPlayed() {
     card.setAttribute('data-name', g.name.toLowerCase());
 
     // Add error handling for broken images
-    const thumbUrl = g.thumb || 'assets/logo.png';
+    const thumbUrl = g.thumb || 'assets/logo.webp';
 
     card.onclick = () => {
       // Verify game exists before opening
@@ -233,7 +233,7 @@ function loadRecentlyPlayed() {
     const loadingAttr = isFirstRow ? 'eager' : 'lazy';
 
     card.innerHTML = `<div class="thumb-container" style="--thumb-url: url('${thumbUrl}')">
-      <img class="thumb" ${srcAttr} alt="${g.name}" loading="${loadingAttr}" decoding="async" width="300" height="300" onerror="this.src='assets/logo.png'">
+      <img class="thumb" ${srcAttr} alt="${g.name}" loading="${loadingAttr}" decoding="async" width="300" height="300" onerror="this.src='assets/logo.webp'">
     </div>
     <div class="card-title">${g.name}</div>`;
     fragment.appendChild(card);
@@ -516,10 +516,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('img.thumb').forEach(img => {
     img.onerror = function() {
       this.onerror = null; // Prevent infinite loop
-      this.src = 'assets/logo.png';
+      this.src = 'assets/logo.webp';
       const container = this.closest('.thumb-container');
       if (container) {
-        container.style.setProperty('--thumb-url', "url('assets/logo.png')");
+        container.style.setProperty('--thumb-url', "url('assets/logo.webp')");
       }
     };
   });
