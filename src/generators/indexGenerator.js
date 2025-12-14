@@ -206,9 +206,14 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
           // Build cards HTML
           const cardsHTML = displayList.map((g, i) => {
             const thumbUrl = g.thumb || 'assets/logo.png';
+            // Eagerly load first 6 thumbnails, lazy load the rest
+            const isFirstRow = i < 6;
+            const srcAttr = isFirstRow ? \`src="\${thumbUrl}"\` : \`data-src="\${thumbUrl}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E"\`;
+            const loadingAttr = isFirstRow ? 'eager' : 'lazy';
+
             return \`<div class="card game-card" data-index="\${i}" data-folder="\${g.folder}" data-name="\${g.name.toLowerCase()}" onclick="window.location.href='/\${g.folder}.html'">
               <div class="thumb-container" style="--thumb-url: url('\${thumbUrl}')">
-                <img class="thumb" src="\${thumbUrl}" alt="\${g.name}" loading="eager" decoding="async" width="300" height="300" onerror="this.src='assets/logo.png'">
+                <img class="thumb" \${srcAttr} alt="\${g.name}" loading="\${loadingAttr}" decoding="async" width="300" height="300" onerror="this.src='assets/logo.png'">
               </div>
               <div class="card-title">\${g.name}</div>
             </div>\`;
