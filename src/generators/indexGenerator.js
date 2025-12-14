@@ -55,7 +55,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap"></noscript>
 
   <!-- Preload critical assets -->
-  <link rel="preload" as="image" href="assets/logo.png" fetchpriority="high">
+  <link rel="preload" as="image" href="assets/logo.webp" fetchpriority="high">
 
   <!-- Redirect /index.html to / -->
   <script>
@@ -103,7 +103,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     <!-- Top Header with Search -->
     <header id="topHeader">
       <div class="header-left">
-        <img src="assets/logo.png" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='/'" width="48" height="48" fetchpriority="high">
+        <img src="assets/logo.webp" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='/'" width="48" height="48" fetchpriority="high">
         <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
       </div>
       <div id="searchContainer" role="search">
@@ -205,7 +205,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
 
           // Build cards HTML
           const cardsHTML = displayList.map((g, i) => {
-            const thumbUrl = g.thumb || 'assets/logo.png';
+            const thumbUrl = g.thumb || 'assets/logo.webp';
             // Eagerly load first 6 thumbnails, lazy load the rest
             const isFirstRow = i < 6;
             const srcAttr = isFirstRow ? \`src="\${thumbUrl}"\` : \`data-src="\${thumbUrl}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E"\`;
@@ -213,7 +213,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
 
             return \`<div class="card game-card" data-index="\${i}" data-folder="\${g.folder}" data-name="\${g.name.toLowerCase()}" onclick="window.location.href='/\${g.folder}.html'">
               <div class="thumb-container" style="--thumb-url: url('\${thumbUrl}')">
-                <img class="thumb" \${srcAttr} alt="\${g.name}" loading="\${loadingAttr}" decoding="async" width="300" height="300" onerror="this.src='assets/logo.png'">
+                <img class="thumb" \${srcAttr} alt="\${g.name}" loading="\${loadingAttr}" decoding="async" width="300" height="300" onerror="this.src='assets/logo.webp'">
               </div>
               <div class="card-title">\${g.name}</div>
             </div>\`;

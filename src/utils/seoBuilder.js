@@ -6,7 +6,7 @@
 
 const BASE_URL = 'https://chromebookunlocked.github.io';
 const SITE_NAME = 'Chromebook Unlocked Games';
-const LOGO_URL = `${BASE_URL}/assets/logo.png`;
+const LOGO_URL = `${BASE_URL}/assets/logo.webp`;
 
 // Primary SEO keywords to include across pages
 const PRIMARY_KEYWORDS = [
