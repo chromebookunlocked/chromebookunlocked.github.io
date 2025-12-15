@@ -139,30 +139,42 @@
   color: rgba(255, 255, 255, 0.85);
 }
 
-/* Close Button */
 .cookie-close-btn {
   position: absolute;
   top: 20px;
   right: 20px;
+
   background: none;
   border: none;
   padding: 0;
   margin: 0;
-  width: 20px;
-  height: 20px;
+
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  color: rgba(255, 255, 255, 0.5);
-  opacity: 0.7;
-  z-index: 10;
+
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+/* Invisible but large hitbox */
+.cookie-close-btn::before {
+  content: "";
+  position: absolute;
+  inset: -10px; /* increases clickable area */
+}
+
+/* SVG only controls visual size */
+.cookie-close-btn svg {
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
 }
 
 .cookie-close-btn:hover {
-  color: rgba(255, 255, 255, 0.9);
-  opacity: 1;
+  color: rgba(255, 255, 255, 0.95);
   transform: scale(1.1);
 }
 
@@ -170,14 +182,10 @@
   transform: scale(0.95);
 }
 
-.cookie-close-btn:focus {
-  outline: none;
-}
-
 .cookie-close-btn:focus-visible {
   outline: 2px solid #a78bfa;
-  outline-offset: 3px;
-  border-radius: 2px;
+  outline-offset: 4px;
+  border-radius: 4px;
 }
 
 /* Settings expanded state */
