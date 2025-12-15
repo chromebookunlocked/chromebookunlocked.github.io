@@ -274,7 +274,26 @@ function searchGames(query) {
     const gameFolder = card.getAttribute('data-folder');
     const gameTitle = card.querySelector('.card-title')?.textContent || '';
     const thumbImg = card.querySelector('.thumb');
-    const thumbSrc = thumbImg ? thumbImg.src : '';
+
+    // Get thumbnail URL - check data-src first (for lazy-loaded images), then src, then fallback to logo
+    let thumbSrc = '';
+    if (thumbImg) {
+      thumbSrc = thumbImg.getAttribute('data-src') || thumbImg.src || 'assets/logo.webp';
+      // If src is still the placeholder SVG, try to get from thumb-container CSS variable
+      if (thumbSrc.startsWith('data:image/svg+xml')) {
+        const thumbContainer = card.querySelector('.thumb-container');
+        if (thumbContainer) {
+          const cssVar = thumbContainer.style.getPropertyValue('--thumb-url');
+          if (cssVar) {
+            // Extract URL from url('...') format
+            const match = cssVar.match(/url\(['"]?([^'"]+)['"]?\)/);
+            if (match) thumbSrc = match[1];
+          }
+        }
+      }
+    } else {
+      thumbSrc = 'assets/logo.webp';
+    }
 
     if (gameName.includes(searchTerm) && !seenFolders.has(gameFolder)) {
       seenFolders.add(gameFolder);
