@@ -38,8 +38,9 @@ jobs:
           rsync -av --delete data/ dist/data/
 
           # Copy static files
+          cp index.html dist/index.html
+          cp *.html dist/
           cp ads.txt dist/ads.txt
-          cp dmca.html dist/dmca.html
           cp sitemap.xml dist/sitemap.xml
           cp robots.txt dist/robots.txt
           cp google0d95473435a7c986.html dist/google0d95473435a7c986.html
