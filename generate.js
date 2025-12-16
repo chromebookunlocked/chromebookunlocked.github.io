@@ -24,13 +24,8 @@ const { generateGamePage } = require("./src/generators/gamePageGenerator");
 // Configuration
 const dataDir = path.join(__dirname, "data");
 const gamesDir = path.join(__dirname, "games");
-const outputDir = path.join(__dirname, "dist");
+const outputDir = __dirname; // Output directly to root directory
 const templatesDir = path.join(__dirname, "templates");
-
-// Ensure output directory exists
-if (!fs.existsSync(outputDir)) {
-  fs.mkdirSync(outputDir, { recursive: true });
-}
 
 console.log("🚀 Starting build process...\n");
 
