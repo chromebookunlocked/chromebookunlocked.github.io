@@ -5,16 +5,16 @@ const { chooseThumb, getAssetPath } = require("../utils/assetManager");
  * @param {Object} game - Game object
  * @param {number} idx - Card index within category
  * @param {string} gamesDir - Path to games directory
- * @param {boolean} loadEagerly - Whether to eagerly load this card's thumbnail
+ * @param {boolean} isFirstCategory - Whether this is the first/largest category
  * @returns {string} HTML string for game card
  */
-function generateGameCard(game, idx, gamesDir, loadEagerly = false) {
+function generateGameCard(game, idx, gamesDir, isFirstCategory = false) {
   const thumb = chooseThumb(game, gamesDir);
   const thumbPath = getAssetPath(game.folder, thumb);
 
-  // Eagerly load first 4 images of each category to ensure first row is ready
+  // Only eagerly load first 6 images of the first category to optimize initial page load
   // All other images use data-src and load when they become visible
-  const shouldEagerLoad = loadEagerly && idx < 4;
+  const shouldEagerLoad = isFirstCategory && idx < 6;
   const loadingAttr = shouldEagerLoad ? 'eager' : 'lazy';
   const fetchPriorityAttr = shouldEagerLoad ? ' fetchpriority="high"' : '';
 

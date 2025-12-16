@@ -29,11 +29,12 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       const list = categories[cat];
       const isSmallCategory = list.length < 4;
       const hideOnHome = isSmallCategory ? ' data-hide-on-home="true" style="display:none;"' : '';
-      // Eagerly load first 4 of each category to ensure first row is ready on homepage
+      // Only the first category (largest) should eagerly load its first row
+      const isFirstCategory = catIndex === 0;
       return `<div class="category" data-category="${cat}"${hideOnHome}>
           <h2>${cat}</h2>
           <div class="grid">
-            ${list.map((g, i) => generateGameCard(g, i, gamesDir, true)).join('')}
+            ${list.map((g, i) => generateGameCard(g, i, gamesDir, isFirstCategory)).join('')}
           </div>
         </div>`;
     }).join('');
