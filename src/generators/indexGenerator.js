@@ -21,16 +21,20 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   const finalSidebarCategories = sidebarCategories;
 
   // Generate category sections with games - hide categories with less than 4 games on homepage
-  const categorySections = Object.keys(categories)
-    .sort((a, b) => categories[b].length - categories[a].length) // Sort by game count
-    .map(cat => {
+  const sortedCategories = Object.keys(categories)
+    .sort((a, b) => categories[b].length - categories[a].length); // Sort by game count
+
+  const categorySections = sortedCategories
+    .map((cat, catIndex) => {
       const list = categories[cat];
       const isSmallCategory = list.length < 4;
       const hideOnHome = isSmallCategory ? ' data-hide-on-home="true" style="display:none;"' : '';
+      // Only the first category (largest) should eagerly load its first row
+      const isFirstCategory = catIndex === 0;
       return `<div class="category" data-category="${cat}"${hideOnHome}>
           <h2>${cat}</h2>
           <div class="grid">
-            ${list.map((g, i) => generateGameCard(g, i, gamesDir)).join('')}
+            ${list.map((g, i) => generateGameCard(g, i, gamesDir, isFirstCategory)).join('')}
           </div>
         </div>`;
     }).join('');
@@ -150,7 +154,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       <div class="category" data-category="All Games" style="display:none;">
         <h2>All Games</h2>
         <div class="grid">
-          ${games.map((g, i) => generateGameCard(g, i, gamesDir)).join('')}
+          ${games.map((g, i) => generateGameCard(g, i, gamesDir, false)).join('')}
         </div>
       </div>
 
