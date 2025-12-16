@@ -12,16 +12,24 @@ const { generateIndexMetaTags, generateIndexStructuredData } = require('../utils
  */
 function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.') {
   // Generate sidebar categories - sorted by game count (largest first)
+  // Trending Games is added manually after All Games, so exclude it from sorting
   const sidebarCategories = Object.keys(categories)
-    .filter(cat => cat !== "Recently Played")
+    .filter(cat => cat !== "Recently Played" && cat !== "Trending Games")
     .sort((a, b) => categories[b].length - categories[a].length) // Sort by count, largest first
     .map(cat => `<li role="menuitem" tabindex="0" onclick="filterCategory('${cat}')" onkeypress="if(event.key==='Enter')filterCategory('${cat}')">${cat}</li>`)
     .join("");
 
-  const finalSidebarCategories = sidebarCategories;
+  // Add Trending Games manually to sidebar (right after All Games)
+  const trendingItem = categories["Trending Games"]
+    ? `<li role="menuitem" tabindex="0" onclick="filterCategory('Trending Games')" onkeypress="if(event.key==='Enter')filterCategory('Trending Games')">Trending Games</li>`
+    : '';
+
+  const finalSidebarCategories = trendingItem + sidebarCategories;
 
   // Generate category sections with games - hide categories with less than 4 games on homepage
+  // Exclude "Trending Games" since it's rendered separately after "Recently Played"
   const sortedCategories = Object.keys(categories)
+    .filter(cat => cat !== "Trending Games")
     .sort((a, b) => categories[b].length - categories[a].length); // Sort by game count
 
   const categorySections = sortedCategories
@@ -37,6 +45,16 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
           </div>
         </div>`;
     }).join('');
+
+  // Generate Trending Games section separately (always shown on homepage)
+  const trendingSection = categories["Trending Games"]
+    ? `<div class="category" data-category="Trending Games">
+          <h2>Trending Games</h2>
+          <div class="grid">
+            ${categories["Trending Games"].map((g, i) => generateGameCard(g, i, gamesDir, true)).join('')}
+          </div>
+        </div>`
+    : '';
 
   // Get SEO meta tags and structured data (pass games for ItemList schema)
   const metaTags = generateIndexMetaTags();
@@ -233,6 +251,9 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
           }
         })();
       </script>
+
+      <!-- Trending Games section (always shown, appears right after Recently Played) -->
+      ${trendingSection}
 
       <!-- All category sections (including games for home view) -->
       ${categorySections}
