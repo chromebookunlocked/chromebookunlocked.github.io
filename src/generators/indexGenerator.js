@@ -1,5 +1,6 @@
 const { generateGameCard } = require('./cardGenerator');
 const { generateIndexMetaTags, generateIndexStructuredData } = require('../utils/seoBuilder');
+const { generateAnalyticsScript } = require('../utils/analyticsEnhanced');
 
 /**
  * Generate the full HTML for the index page
@@ -82,6 +83,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
 
     gtag('config', 'G-4QZLTDX504');
   </script>
+
+  ${generateAnalyticsScript()}
 
   ${metaTags}
 
@@ -281,6 +284,54 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
 
   <script>
     ${clientJS}
+  </script>
+
+  <!-- Track Homepage View -->
+  <script>
+    // Track the homepage visit with enhanced analytics
+    if (typeof trackEnhancedPageView !== 'undefined') {
+      trackEnhancedPageView('homepage', 'Home', {
+        total_games: ${games.length},
+        categories_count: ${Object.keys(categories).length}
+      });
+    }
+
+    // Track category navigation
+    const originalFilterCategory = window.filterCategory;
+    if (originalFilterCategory) {
+      window.filterCategory = function(category) {
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'category_navigation', {
+            category_name: category,
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
+            timestamp: new Date().toISOString()
+          });
+        }
+        originalFilterCategory(category);
+      };
+    }
+
+    // Track search interactions
+    const originalSearchGames = window.searchGames;
+    if (originalSearchGames) {
+      let searchTimeout;
+      window.searchGames = function(query) {
+        // Debounce search tracking
+        clearTimeout(searchTimeout);
+        if (query && query.length >= 2) {
+          searchTimeout = setTimeout(function() {
+            if (typeof gtag !== 'undefined') {
+              gtag('event', 'search', {
+                search_term: query,
+                session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
+                timestamp: new Date().toISOString()
+              });
+            }
+          }, 500);
+        }
+        originalSearchGames(query);
+      };
+    }
   </script>
 
   <!-- Cookie Consent Banner - Load asynchronously -->

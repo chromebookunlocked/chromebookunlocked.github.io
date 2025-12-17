@@ -1,5 +1,6 @@
 const { chooseThumb, getAssetPath } = require("../utils/assetManager");
 const { generateGameMetaTags, generateGameStructuredData, generateGameSEOTitle, generateGameSEODescription } = require("../utils/seoBuilder");
+const { generateAnalyticsScript } = require("../utils/analyticsEnhanced");
 
 /**
  * Generate HTML for an individual game page
@@ -76,6 +77,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
     gtag('config', 'G-4QZLTDX504');
   </script>
+
+  ${generateAnalyticsScript()}
 
   ${metaTags}
 
@@ -232,6 +235,18 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
   <script>
     let gameStartTime = null;
+    let gamePlayDuration = 0;
+    let gameDurationInterval = null;
+
+    // Track initial game page view
+    if (typeof trackEnhancedPageView !== 'undefined') {
+      trackEnhancedPageView('game_page', '${game.name}', {
+        game_name: '${game.name}',
+        game_folder: '${game.folder}',
+        game_categories: '${categoryList}',
+        from_page: document.referrer || 'direct'
+      });
+    }
 
     function startGame() {
       const overlay = document.getElementById('playOverlay');
@@ -243,10 +258,39 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
       // Track game start time and send analytics event
       gameStartTime = Date.now();
-      gtag('event', 'game_started', {
-        game_name: '${game.name}',
-        game_folder: '${game.folder}'
-      });
+      gamePlayDuration = 0;
+
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'game_started', {
+          game_name: '${game.name}',
+          game_folder: '${game.folder}',
+          game_categories: '${categoryList}',
+          session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Track game duration every 30 seconds while playing
+      if (gameDurationInterval) {
+        clearInterval(gameDurationInterval);
+      }
+
+      gameDurationInterval = setInterval(function() {
+        if (gameStartTime && !document.hidden) {
+          const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
+          gamePlayDuration = currentDuration;
+
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'game_playing', {
+              game_name: '${game.name}',
+              game_folder: '${game.folder}',
+              duration_seconds: currentDuration,
+              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
+              timestamp: new Date().toISOString()
+            });
+          }
+        }
+      }, 30000); // Every 30 seconds
 
       // Track in Recently Played
       saveToRecentlyPlayed();
@@ -283,8 +327,9 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
     function toggleFullscreen() {
       const wrapper = document.getElementById('gameWrapper');
+      const isEnteringFullscreen = !document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement;
 
-      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+      if (isEnteringFullscreen) {
         // Enter fullscreen
         if (wrapper.requestFullscreen) {
           wrapper.requestFullscreen();
@@ -292,6 +337,15 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
           wrapper.webkitRequestFullscreen();
         } else if (wrapper.mozRequestFullScreen) {
           wrapper.mozRequestFullScreen();
+        }
+
+        // Track fullscreen enter
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'fullscreen_enter', {
+            game_name: '${game.name}',
+            game_folder: '${game.folder}',
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          });
         }
       } else {
         // Exit fullscreen
@@ -301,6 +355,15 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
           document.webkitExitFullscreen();
         } else if (document.mozCancelFullScreen) {
           document.mozCancelFullScreen();
+        }
+
+        // Track fullscreen exit
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'fullscreen_exit', {
+            game_name: '${game.name}',
+            game_folder: '${game.folder}',
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          });
         }
       }
     }
@@ -351,22 +414,106 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         btnText.textContent = 'Show More';
         btnIcon.style.transform = 'rotate(0deg)';
         section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        // Track collapse
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'game_info_collapse', {
+            game_name: '${game.name}',
+            game_folder: '${game.folder}',
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          });
+        }
       } else {
         section.classList.add('expanded');
         btnText.textContent = 'Show Less';
         btnIcon.style.transform = 'rotate(180deg)';
+
+        // Track expand
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'game_info_expand', {
+            game_name: '${game.name}',
+            game_folder: '${game.folder}',
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          });
+        }
       }
     }
 
     // Track game session end when user leaves the page
     window.addEventListener('beforeunload', () => {
+      // Clear duration tracking interval
+      if (gameDurationInterval) {
+        clearInterval(gameDurationInterval);
+      }
+
       if (gameStartTime) {
         const playDuration = Math.round((Date.now() - gameStartTime) / 1000);
-        gtag('event', 'game_session_end', {
-          game_name: '${game.name}',
-          game_folder: '${game.folder}',
-          duration_seconds: playDuration
-        });
+
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'game_session_end', {
+            game_name: '${game.name}',
+            game_folder: '${game.folder}',
+            game_categories: '${categoryList}',
+            duration_seconds: playDuration,
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
+            timestamp: new Date().toISOString()
+          });
+        }
+      }
+    });
+
+    // Track visibility changes (when user switches tabs while game is running)
+    document.addEventListener('visibilitychange', function() {
+      if (gameStartTime) {
+        if (document.hidden) {
+          // User switched away - pause duration tracking
+          if (gameDurationInterval) {
+            clearInterval(gameDurationInterval);
+          }
+
+          if (typeof gtag !== 'undefined') {
+            const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
+            gtag('event', 'game_paused', {
+              game_name: '${game.name}',
+              game_folder: '${game.folder}',
+              duration_seconds: currentDuration,
+              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+            });
+          }
+        } else {
+          // User returned - resume duration tracking
+          if (typeof gtag !== 'undefined') {
+            const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
+            gtag('event', 'game_resumed', {
+              game_name: '${game.name}',
+              game_folder: '${game.folder}',
+              duration_seconds: currentDuration,
+              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+            });
+          }
+
+          // Restart the duration tracking interval
+          if (gameDurationInterval) {
+            clearInterval(gameDurationInterval);
+          }
+
+          gameDurationInterval = setInterval(function() {
+            if (gameStartTime && !document.hidden) {
+              const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
+              gamePlayDuration = currentDuration;
+
+              if (typeof gtag !== 'undefined') {
+                gtag('event', 'game_playing', {
+                  game_name: '${game.name}',
+                  game_folder: '${game.folder}',
+                  duration_seconds: currentDuration,
+                  session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
+                  timestamp: new Date().toISOString()
+                });
+              }
+            }
+          }, 30000);
+        }
       }
     });
   </script>
