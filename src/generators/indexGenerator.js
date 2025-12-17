@@ -29,6 +29,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
 
   // Generate category sections with games - hide categories with less than 4 games on homepage
   const sortedCategories = Object.keys(categories)
+    .filter(cat => cat !== "Recently Played" && cat !== "Trending Games") // Exclude special sections
     .sort((a, b) => categories[b].length - categories[a].length); // Sort by game count
 
   const categorySections = sortedCategories
