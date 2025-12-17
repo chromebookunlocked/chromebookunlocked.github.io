@@ -153,7 +153,14 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       <div class="category" data-category="All Games" style="display:none;">
         <h2>All Games</h2>
         <div class="grid">
-          ${games.map((g, i) => generateGameCard(g, i, gamesDir, false)).join('')}
+          ${games.sort((a, b) => {
+            // Sort trending games first
+            const aIsTrending = (a.category || '').includes('Trending Games');
+            const bIsTrending = (b.category || '').includes('Trending Games');
+            if (aIsTrending && !bIsTrending) return -1;
+            if (!aIsTrending && bIsTrending) return 1;
+            return 0; // Keep original order otherwise
+          }).map((g, i) => generateGameCard(g, i, gamesDir, false)).join('')}
         </div>
       </div>
 
@@ -233,6 +240,14 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
           }
         })();
       </script>
+
+      <!-- Trending Games -->
+      <div class="category" data-category="Trending Games">
+        <h2>Trending Games</h2>
+        <div class="grid">
+          ${(categories['Trending Games'] || []).map((g, i) => generateGameCard(g, i, gamesDir, true)).join('')}
+        </div>
+      </div>
 
       <!-- All category sections (including games for home view) -->
       ${categorySections}
