@@ -104,7 +104,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <!-- Sidebar -->
   <nav id="sidebar" role="navigation" aria-label="Game categories">
     <ul id="categoryList" role="menu">
-      <li role="menuitem" tabindex="0" onclick="filterCategory('Home')" onkeypress="if(event.key==='Enter')filterCategory('Home')">Home</li>
+      <li role="menuitem" tabindex="0" onclick="window.location.href='/'" onkeypress="if(event.key==='Enter')window.location.href='/'">Home</li>
       <li role="menuitem" tabindex="0" onclick="filterCategory('All Games')" onkeypress="if(event.key==='Enter')filterCategory('All Games')">All Games</li>
       ${finalSidebarCategories}
     </ul>
