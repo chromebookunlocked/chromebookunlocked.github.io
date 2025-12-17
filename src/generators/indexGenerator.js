@@ -12,13 +12,19 @@ const { generateIndexMetaTags, generateIndexStructuredData } = require('../utils
  */
 function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.') {
   // Generate sidebar categories - sorted by game count (largest first)
+  // Extract "Trending Games" to place it right after "All Games"
   const sidebarCategories = Object.keys(categories)
-    .filter(cat => cat !== "Recently Played")
+    .filter(cat => cat !== "Recently Played" && cat !== "Trending Games")
     .sort((a, b) => categories[b].length - categories[a].length) // Sort by count, largest first
     .map(cat => `<li role="menuitem" tabindex="0" onclick="filterCategory('${cat}')" onkeypress="if(event.key==='Enter')filterCategory('${cat}')">${cat}</li>`)
     .join("");
 
-  const finalSidebarCategories = sidebarCategories;
+  // Add Trending Games right after All Games in the sidebar
+  const trendingGamesItem = categories["Trending Games"]
+    ? `<li role="menuitem" tabindex="0" onclick="filterCategory('Trending Games')" onkeypress="if(event.key==='Enter')filterCategory('Trending Games')">Trending Games</li>`
+    : '';
+
+  const finalSidebarCategories = trendingGamesItem + sidebarCategories;
 
   // Generate category sections with games - hide categories with less than 4 games on homepage
   const sortedCategories = Object.keys(categories)
