@@ -11,6 +11,157 @@
     gtag('config', 'G-4QZLTDX504');
   </script>
 
+  
+<script>
+  // Enhanced Analytics Tracking
+  (function() {
+    // Generate or retrieve session ID
+    function getSessionId() {
+      const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes
+      let sessionData = sessionStorage.getItem('ga_session_data');
+
+      if (sessionData) {
+        try {
+          const data = JSON.parse(sessionData);
+          const now = Date.now();
+
+          // Check if session is still valid
+          if (now - data.lastActivity < SESSION_DURATION) {
+            data.lastActivity = now;
+            sessionStorage.setItem('ga_session_data', JSON.stringify(data));
+            return data.sessionId;
+          }
+        } catch (e) {
+          console.error('Error parsing session data:', e);
+        }
+      }
+
+      // Create new session
+      const newSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      const newSessionData = {
+        sessionId: newSessionId,
+        startTime: Date.now(),
+        lastActivity: Date.now()
+      };
+      sessionStorage.setItem('ga_session_data', JSON.stringify(newSessionData));
+
+      // Track session start
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'session_start', {
+          session_id: newSessionId,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      return newSessionId;
+    }
+
+    // Get or create user ID for tracking across sessions
+    function getUserId() {
+      let userId = localStorage.getItem('ga_user_id');
+      if (!userId) {
+        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('ga_user_id', userId);
+      }
+      return userId;
+    }
+
+    // Initialize session tracking
+    window.analyticsSession = {
+      sessionId: getSessionId(),
+      userId: getUserId(),
+      pageViewStartTime: Date.now(),
+      engagementInterval: null
+    };
+
+    // Track page engagement every 15 seconds
+    function startEngagementTracking() {
+      if (window.analyticsSession.engagementInterval) {
+        clearInterval(window.analyticsSession.engagementInterval);
+      }
+
+      window.analyticsSession.engagementInterval = setInterval(function() {
+        const timeOnPage = Math.floor((Date.now() - window.analyticsSession.pageViewStartTime) / 1000);
+
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'user_engagement', {
+            session_id: window.analyticsSession.sessionId,
+            engagement_time_msec: timeOnPage * 1000,
+            page_location: window.location.href,
+            page_title: document.title
+          });
+        }
+      }, 15000); // Every 15 seconds
+    }
+
+    // Track page view with enhanced parameters
+    function trackEnhancedPageView(pageType, pageName, additionalParams) {
+      const sessionData = JSON.parse(sessionStorage.getItem('ga_session_data') || '{}');
+      const params = {
+        page_type: pageType,
+        page_name: pageName,
+        session_id: window.analyticsSession.sessionId,
+        user_id: window.analyticsSession.userId,
+        timestamp: new Date().toISOString(),
+        session_start_time: sessionData.startTime ? new Date(sessionData.startTime).toISOString() : new Date().toISOString(),
+        ...additionalParams
+      };
+
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'page_view', params);
+
+        // Also send as custom event for better tracking in realtime
+        gtag('event', 'page_visited', params);
+      }
+
+      // Reset page view start time
+      window.analyticsSession.pageViewStartTime = Date.now();
+
+      // Start engagement tracking
+      startEngagementTracking();
+    }
+
+    // Track when user leaves page
+    function trackPageExit() {
+      const timeOnPage = Math.floor((Date.now() - window.analyticsSession.pageViewStartTime) / 1000);
+
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'page_exit', {
+          session_id: window.analyticsSession.sessionId,
+          time_on_page_seconds: timeOnPage,
+          page_location: window.location.href,
+          page_title: document.title,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Clear engagement interval
+      if (window.analyticsSession.engagementInterval) {
+        clearInterval(window.analyticsSession.engagementInterval);
+      }
+    }
+
+    // Expose tracking functions globally
+    window.trackEnhancedPageView = trackEnhancedPageView;
+    window.trackPageExit = trackPageExit;
+
+    // Track page exit on beforeunload
+    window.addEventListener('beforeunload', trackPageExit);
+
+    // Track visibility changes (tab switching)
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        if (window.analyticsSession.engagementInterval) {
+          clearInterval(window.analyticsSession.engagementInterval);
+        }
+      } else {
+        startEngagementTracking();
+      }
+    });
+  })();
+</script>
+  
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -1237,76 +1388,11 @@ footer {
   <section class="recommendations" aria-label="Similar Unblocked Games">
     <h2>You Might Also Like - More Free Unblocked Games</h2>
     <div class="grid">
-      <a href="/Ages of Conflict.html" class="game-card" title="Play Ages of Conflict Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Ages of Conflict/thumbnail.webp')">
-        <img class="thumb" src="games/Ages of Conflict/thumbnail.webp" alt="Play Ages of Conflict Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Ages of Conflict</div>
-    </a><a href="/Ultimate Driving Simulator.html" class="game-card" title="Play Ultimate Driving Simulator Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Ultimate Driving Simulator/thumbnail.webp')">
-        <img class="thumb" src="games/Ultimate Driving Simulator/thumbnail.webp" alt="Play Ultimate Driving Simulator Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Ultimate Driving Simulator</div>
-    </a><a href="/Block Blast.html" class="game-card" title="Play Block Blast Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Block Blast/thumbnail.webp')">
-        <img class="thumb" src="games/Block Blast/thumbnail.webp" alt="Play Block Blast Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Block Blast</div>
-    </a><a href="/Crossy Road.html" class="game-card" title="Play Crossy Road Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Crossy Road/thumbnail.webp')">
-        <img class="thumb" src="games/Crossy Road/thumbnail.webp" alt="Play Crossy Road Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Crossy Road</div>
-    </a><a href="/Perfect Hotel.html" class="game-card" title="Play Perfect Hotel Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Perfect Hotel/thumbnail.webp')">
-        <img class="thumb" src="games/Perfect Hotel/thumbnail.webp" alt="Play Perfect Hotel Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Perfect Hotel</div>
-    </a><a href="/Bouncemasters.html" class="game-card" title="Play Bouncemasters Unblocked Free Online">
+      <a href="/Bouncemasters.html" class="game-card" title="Play Bouncemasters Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('games/Bouncemasters/thumbnail.webp')">
         <img class="thumb" src="games/Bouncemasters/thumbnail.webp" alt="Play Bouncemasters Unblocked - Free Online Game" loading="lazy">
       </div>
       <div class="card-title">Bouncemasters</div>
-    </a><a href="/Helix Jump.html" class="game-card" title="Play Helix Jump Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Helix Jump/thumbnail.webp')">
-        <img class="thumb" src="games/Helix Jump/thumbnail.webp" alt="Play Helix Jump Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Helix Jump</div>
-    </a><a href="/Age Of War.html" class="game-card" title="Play Age Of War Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Age Of War/thumbnail.webp')">
-        <img class="thumb" src="games/Age Of War/thumbnail.webp" alt="Play Age Of War Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Age Of War</div>
-    </a><a href="/Cut the Rope.html" class="game-card" title="Play Cut the Rope Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Cut the Rope/thumbnail.webp')">
-        <img class="thumb" src="games/Cut the Rope/thumbnail.webp" alt="Play Cut the Rope Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Cut the Rope</div>
-    </a><a href="/Dud.html" class="game-card" title="Play Dud Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Dud/thumbnail.webp')">
-        <img class="thumb" src="games/Dud/thumbnail.webp" alt="Play Dud Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Dud</div>
-    </a><a href="/Blackjack.html" class="game-card" title="Play Blackjack Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Blackjack/thumbnail.webp')">
-        <img class="thumb" src="games/Blackjack/thumbnail.webp" alt="Play Blackjack Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Blackjack</div>
-    </a><a href="/Elastic Face.html" class="game-card" title="Play Elastic Face Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Elastic Face/thumbnail.webp')">
-        <img class="thumb" src="games/Elastic Face/thumbnail.webp" alt="Play Elastic Face Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Elastic Face</div>
-    </a><a href="/Fruit Ninja.html" class="game-card" title="Play Fruit Ninja Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Fruit Ninja/thumbnail.webp')">
-        <img class="thumb" src="games/Fruit Ninja/thumbnail.webp" alt="Play Fruit Ninja Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Fruit Ninja</div>
-    </a><a href="/Bitlife.html" class="game-card" title="Play Bitlife Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Bitlife/thumbnail.webp')">
-        <img class="thumb" src="games/Bitlife/thumbnail.webp" alt="Play Bitlife Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Bitlife</div>
     </a><a href="/FNAF Pizzeria Simulator.html" class="game-card" title="Play FNAF Pizzeria Simulator Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('games/FNAF Pizzeria Simulator/thumbnail.webp')">
         <img class="thumb" src="games/FNAF Pizzeria Simulator/thumbnail.webp" alt="Play FNAF Pizzeria Simulator Unblocked - Free Online Game" loading="lazy">
@@ -1317,101 +1403,166 @@ footer {
         <img class="thumb" src="games/Happy Room/thumbnail.webp" alt="Play Happy Room Unblocked - Free Online Game" loading="lazy">
       </div>
       <div class="card-title">Happy Room</div>
-    </a><a href="/Going Balls.html" class="game-card" title="Play Going Balls Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Going Balls/thumbnail.webp')">
-        <img class="thumb" src="games/Going Balls/thumbnail.webp" alt="Play Going Balls Unblocked - Free Online Game" loading="lazy">
+    </a><a href="/Helix Jump.html" class="game-card" title="Play Helix Jump Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Helix Jump/thumbnail.webp')">
+        <img class="thumb" src="games/Helix Jump/thumbnail.webp" alt="Play Helix Jump Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Going Balls</div>
+      <div class="card-title">Helix Jump</div>
+    </a><a href="/Dud.html" class="game-card" title="Play Dud Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Dud/thumbnail.webp')">
+        <img class="thumb" src="games/Dud/thumbnail.webp" alt="Play Dud Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Dud</div>
     </a><a href="/Ace Combat 3.html" class="game-card" title="Play Ace Combat 3 Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('games/Ace Combat 3/thumbnail.webp')">
         <img class="thumb" src="games/Ace Combat 3/thumbnail.webp" alt="Play Ace Combat 3 Unblocked - Free Online Game" loading="lazy">
       </div>
       <div class="card-title">Ace Combat 3</div>
+    </a><a href="/Crossy Road.html" class="game-card" title="Play Crossy Road Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Crossy Road/thumbnail.webp')">
+        <img class="thumb" src="games/Crossy Road/thumbnail.webp" alt="Play Crossy Road Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Crossy Road</div>
+    </a><a href="/Cut the Rope.html" class="game-card" title="Play Cut the Rope Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Cut the Rope/thumbnail.webp')">
+        <img class="thumb" src="games/Cut the Rope/thumbnail.webp" alt="Play Cut the Rope Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Cut the Rope</div>
+    </a><a href="/Elastic Face.html" class="game-card" title="Play Elastic Face Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Elastic Face/thumbnail.webp')">
+        <img class="thumb" src="games/Elastic Face/thumbnail.webp" alt="Play Elastic Face Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Elastic Face</div>
+    </a><a href="/Ultimate Driving Simulator.html" class="game-card" title="Play Ultimate Driving Simulator Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Ultimate Driving Simulator/thumbnail.webp')">
+        <img class="thumb" src="games/Ultimate Driving Simulator/thumbnail.webp" alt="Play Ultimate Driving Simulator Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Ultimate Driving Simulator</div>
+    </a><a href="/Block Blast.html" class="game-card" title="Play Block Blast Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Block Blast/thumbnail.webp')">
+        <img class="thumb" src="games/Block Blast/thumbnail.webp" alt="Play Block Blast Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Block Blast</div>
     </a><a href="/Adventure Capitalist.html" class="game-card" title="Play Adventure Capitalist Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('games/Adventure Capitalist/thumbnail.webp')">
         <img class="thumb" src="games/Adventure Capitalist/thumbnail.webp" alt="Play Adventure Capitalist Unblocked - Free Online Game" loading="lazy">
       </div>
       <div class="card-title">Adventure Capitalist</div>
-    </a><a href="/Smash Carts.html" class="game-card" title="Play Smash Carts Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Smash Carts/thumbnail.webp')">
-        <img class="thumb" src="games/Smash Carts/thumbnail.webp" alt="Play Smash Carts Unblocked - Free Online Game" loading="lazy">
+    </a><a href="/Perfect Hotel.html" class="game-card" title="Play Perfect Hotel Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Perfect Hotel/thumbnail.webp')">
+        <img class="thumb" src="games/Perfect Hotel/thumbnail.webp" alt="Play Perfect Hotel Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Smash Carts</div>
-    </a><a href="/Infinite Craft.html" class="game-card" title="Play Infinite Craft Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Infinite Craft/thumbnail.webp')">
-        <img class="thumb" src="games/Infinite Craft/thumbnail.webp" alt="Play Infinite Craft Unblocked - Free Online Game" loading="lazy">
+      <div class="card-title">Perfect Hotel</div>
+    </a><a href="/Age Of War.html" class="game-card" title="Play Age Of War Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Age Of War/thumbnail.webp')">
+        <img class="thumb" src="games/Age Of War/thumbnail.webp" alt="Play Age Of War Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Infinite Craft</div>
-    </a><a href="/Minecraft.html" class="game-card" title="Play Minecraft Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Minecraft/thumbnail.webp')">
-        <img class="thumb" src="games/Minecraft/thumbnail.webp" alt="Play Minecraft Unblocked - Free Online Game" loading="lazy">
+      <div class="card-title">Age Of War</div>
+    </a><a href="/Fruit Ninja.html" class="game-card" title="Play Fruit Ninja Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Fruit Ninja/thumbnail.webp')">
+        <img class="thumb" src="games/Fruit Ninja/thumbnail.webp" alt="Play Fruit Ninja Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Minecraft</div>
-    </a><a href="/Lone Wolf.html" class="game-card" title="Play Lone Wolf Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Lone Wolf/thumbnail.webp')">
-        <img class="thumb" src="games/Lone Wolf/thumbnail.webp" alt="Play Lone Wolf Unblocked - Free Online Game" loading="lazy">
+      <div class="card-title">Fruit Ninja</div>
+    </a><a href="/Going Balls.html" class="game-card" title="Play Going Balls Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Going Balls/thumbnail.webp')">
+        <img class="thumb" src="games/Going Balls/thumbnail.webp" alt="Play Going Balls Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Lone Wolf</div>
-    </a><a href="/Slope.html" class="game-card" title="Play Slope Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Slope/thumbnail.webp')">
-        <img class="thumb" src="games/Slope/thumbnail.webp" alt="Play Slope Unblocked - Free Online Game" loading="lazy">
+      <div class="card-title">Going Balls</div>
+    </a><a href="/Bitlife.html" class="game-card" title="Play Bitlife Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Bitlife/thumbnail.webp')">
+        <img class="thumb" src="games/Bitlife/thumbnail.webp" alt="Play Bitlife Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Slope</div>
-    </a><a href="/Gobble.html" class="game-card" title="Play Gobble Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Gobble/thumbnail.webp')">
-        <img class="thumb" src="games/Gobble/thumbnail.webp" alt="Play Gobble Unblocked - Free Online Game" loading="lazy">
+      <div class="card-title">Bitlife</div>
+    </a><a href="/Blackjack.html" class="game-card" title="Play Blackjack Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Blackjack/thumbnail.webp')">
+        <img class="thumb" src="games/Blackjack/thumbnail.webp" alt="Play Blackjack Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Gobble</div>
-    </a><a href="/Superhot.html" class="game-card" title="Play Superhot Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Superhot/thumbnail.webp')">
-        <img class="thumb" src="games/Superhot/thumbnail.webp" alt="Play Superhot Unblocked - Free Online Game" loading="lazy">
+      <div class="card-title">Blackjack</div>
+    </a><a href="/Ages of Conflict.html" class="game-card" title="Play Ages of Conflict Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Ages of Conflict/thumbnail.webp')">
+        <img class="thumb" src="games/Ages of Conflict/thumbnail.webp" alt="Play Ages of Conflict Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Superhot</div>
-    </a><a href="/10 Minutes Till Dawn.html" class="game-card" title="Play 10 Minutes Till Dawn Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/10 Minutes Till Dawn/thumbnail.webp')">
-        <img class="thumb" src="games/10 Minutes Till Dawn/thumbnail.webp" alt="Play 10 Minutes Till Dawn Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">10 Minutes Till Dawn</div>
-    </a><a href="/BTD5.html" class="game-card" title="Play BTD5 Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/BTD5/thumbnail.webp')">
-        <img class="thumb" src="games/BTD5/thumbnail.webp" alt="Play BTD5 Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">BTD5</div>
-    </a><a href="/Basketball Legends.html" class="game-card" title="Play Basketball Legends Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Basketball Legends/thumbnail.webp')">
-        <img class="thumb" src="games/Basketball Legends/thumbnail.webp" alt="Play Basketball Legends Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Basketball Legends</div>
-    </a><a href="/Zombie Rush.html" class="game-card" title="Play Zombie Rush Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Zombie Rush/thumbnail.png')">
-        <img class="thumb" src="games/Zombie Rush/thumbnail.png" alt="Play Zombie Rush Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Zombie Rush</div>
+      <div class="card-title">Ages of Conflict</div>
     </a><a href="/FNAF 2.html" class="game-card" title="Play FNAF 2 Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('games/FNAF 2/thumbnail.webp')">
         <img class="thumb" src="games/FNAF 2/thumbnail.webp" alt="Play FNAF 2 Unblocked - Free Online Game" loading="lazy">
       </div>
       <div class="card-title">FNAF 2</div>
-    </a><a href="/Sea Mongrel.html" class="game-card" title="Play Sea Mongrel Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Sea Mongrel/thumbnail.webp')">
-        <img class="thumb" src="games/Sea Mongrel/thumbnail.webp" alt="Play Sea Mongrel Unblocked - Free Online Game" loading="lazy">
+    </a><a href="/1on1 Soccer.html" class="game-card" title="Play 1on1 Soccer Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/1on1 Soccer/thumbnail.webp')">
+        <img class="thumb" src="games/1on1 Soccer/thumbnail.webp" alt="Play 1on1 Soccer Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Sea Mongrel</div>
-    </a><a href="/Highway Racer.html" class="game-card" title="Play Highway Racer Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Highway Racer/thumbnail.webp')">
-        <img class="thumb" src="games/Highway Racer/thumbnail.webp" alt="Play Highway Racer Unblocked - Free Online Game" loading="lazy">
+      <div class="card-title">1on1 Soccer</div>
+    </a><a href="/Basketball Stars.html" class="game-card" title="Play Basketball Stars Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Basketball Stars/thumbnail.webp')">
+        <img class="thumb" src="games/Basketball Stars/thumbnail.webp" alt="Play Basketball Stars Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Highway Racer</div>
-    </a><a href="/Bloodmoney 2.html" class="game-card" title="Play Bloodmoney 2 Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Bloodmoney 2/thumbnail.webp')">
-        <img class="thumb" src="games/Bloodmoney 2/thumbnail.webp" alt="Play Bloodmoney 2 Unblocked - Free Online Game" loading="lazy">
+      <div class="card-title">Basketball Stars</div>
+    </a><a href="/Blaze Drifter.html" class="game-card" title="Play Blaze Drifter Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Blaze Drifter/thumbnail.webp')">
+        <img class="thumb" src="games/Blaze Drifter/thumbnail.webp" alt="Play Blaze Drifter Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Bloodmoney 2</div>
+      <div class="card-title">Blaze Drifter</div>
+    </a><a href="/Blockcraft Parkour.html" class="game-card" title="Play Blockcraft Parkour Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Blockcraft Parkour/thumbnail.webp')">
+        <img class="thumb" src="games/Blockcraft Parkour/thumbnail.webp" alt="Play Blockcraft Parkour Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Blockcraft Parkour</div>
+    </a><a href="/Grindcraft.html" class="game-card" title="Play Grindcraft Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Grindcraft/thumbnail.webp')">
+        <img class="thumb" src="games/Grindcraft/thumbnail.webp" alt="Play Grindcraft Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Grindcraft</div>
+    </a><a href="/Burrito Bison Launcha Libre.html" class="game-card" title="Play Burrito Bison Launcha Libre Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Burrito Bison Launcha Libre/thumbnail.webp')">
+        <img class="thumb" src="games/Burrito Bison Launcha Libre/thumbnail.webp" alt="Play Burrito Bison Launcha Libre Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Burrito Bison Launcha Libre</div>
+    </a><a href="/Gun Spin.html" class="game-card" title="Play Gun Spin Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Gun Spin/thumbnail.webp')">
+        <img class="thumb" src="games/Gun Spin/thumbnail.webp" alt="Play Gun Spin Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Gun Spin</div>
+    </a><a href="/Zombotron Reboot.html" class="game-card" title="Play Zombotron Reboot Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Zombotron Reboot/thumbnail.webp')">
+        <img class="thumb" src="games/Zombotron Reboot/thumbnail.webp" alt="Play Zombotron Reboot Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Zombotron Reboot</div>
+    </a><a href="/Clear Vision 2.html" class="game-card" title="Play Clear Vision 2 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 2/thumbnail.webp')">
+        <img class="thumb" src="games/Clear Vision 2/thumbnail.webp" alt="Play Clear Vision 2 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Clear Vision 2</div>
     </a><a href="/FNAF 1.html" class="game-card" title="Play FNAF 1 Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('games/FNAF 1/thumbnail.webp')">
         <img class="thumb" src="games/FNAF 1/thumbnail.webp" alt="Play FNAF 1 Unblocked - Free Online Game" loading="lazy">
       </div>
       <div class="card-title">FNAF 1</div>
+    </a><a href="/Gladdihoppers.html" class="game-card" title="Play Gladdihoppers Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Gladdihoppers/thumbnail.webp')">
+        <img class="thumb" src="games/Gladdihoppers/thumbnail.webp" alt="Play Gladdihoppers Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Gladdihoppers</div>
+    </a><a href="/FNAF 4.html" class="game-card" title="Play FNAF 4 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/FNAF 4/thumbnail.webp')">
+        <img class="thumb" src="games/FNAF 4/thumbnail.webp" alt="Play FNAF 4 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">FNAF 4</div>
+    </a><a href="/Dead Zed 2.html" class="game-card" title="Play Dead Zed 2 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Dead Zed 2/thumbnail.webp')">
+        <img class="thumb" src="games/Dead Zed 2/thumbnail.webp" alt="Play Dead Zed 2 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Dead Zed 2</div>
+    </a><a href="/Road of the Dead.html" class="game-card" title="Play Road of the Dead Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Road of the Dead/thumbnail.webp')">
+        <img class="thumb" src="games/Road of the Dead/thumbnail.webp" alt="Play Road of the Dead Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Road of the Dead</div>
+    </a><a href="/Bad Piggies.html" class="game-card" title="Play Bad Piggies Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Bad Piggies/thumbnail.webp')">
+        <img class="thumb" src="games/Bad Piggies/thumbnail.webp" alt="Play Bad Piggies Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Bad Piggies</div>
     </a>
     </div>
   </section>
@@ -1604,6 +1755,18 @@ footer {
 
   <script>
     let gameStartTime = null;
+    let gamePlayDuration = 0;
+    let gameDurationInterval = null;
+
+    // Track initial game page view
+    if (typeof trackEnhancedPageView !== 'undefined') {
+      trackEnhancedPageView('game_page', 'Douchebag Life', {
+        game_name: 'Douchebag Life',
+        game_folder: 'Douchebag Life',
+        game_categories: 'Simulation, Casual',
+        from_page: document.referrer || 'direct'
+      });
+    }
 
     function startGame() {
       const overlay = document.getElementById('playOverlay');
@@ -1615,10 +1778,39 @@ footer {
 
       // Track game start time and send analytics event
       gameStartTime = Date.now();
-      gtag('event', 'game_started', {
-        game_name: 'Douchebag Life',
-        game_folder: 'Douchebag Life'
-      });
+      gamePlayDuration = 0;
+
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'game_started', {
+          game_name: 'Douchebag Life',
+          game_folder: 'Douchebag Life',
+          game_categories: 'Simulation, Casual',
+          session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Track game duration every 30 seconds while playing
+      if (gameDurationInterval) {
+        clearInterval(gameDurationInterval);
+      }
+
+      gameDurationInterval = setInterval(function() {
+        if (gameStartTime && !document.hidden) {
+          const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
+          gamePlayDuration = currentDuration;
+
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'game_playing', {
+              game_name: 'Douchebag Life',
+              game_folder: 'Douchebag Life',
+              duration_seconds: currentDuration,
+              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
+              timestamp: new Date().toISOString()
+            });
+          }
+        }
+      }, 30000); // Every 30 seconds
 
       // Track in Recently Played
       saveToRecentlyPlayed();
@@ -1655,8 +1847,9 @@ footer {
 
     function toggleFullscreen() {
       const wrapper = document.getElementById('gameWrapper');
+      const isEnteringFullscreen = !document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement;
 
-      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+      if (isEnteringFullscreen) {
         // Enter fullscreen
         if (wrapper.requestFullscreen) {
           wrapper.requestFullscreen();
@@ -1664,6 +1857,15 @@ footer {
           wrapper.webkitRequestFullscreen();
         } else if (wrapper.mozRequestFullScreen) {
           wrapper.mozRequestFullScreen();
+        }
+
+        // Track fullscreen enter
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'fullscreen_enter', {
+            game_name: 'Douchebag Life',
+            game_folder: 'Douchebag Life',
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          });
         }
       } else {
         // Exit fullscreen
@@ -1673,6 +1875,15 @@ footer {
           document.webkitExitFullscreen();
         } else if (document.mozCancelFullScreen) {
           document.mozCancelFullScreen();
+        }
+
+        // Track fullscreen exit
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'fullscreen_exit', {
+            game_name: 'Douchebag Life',
+            game_folder: 'Douchebag Life',
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          });
         }
       }
     }
@@ -1723,22 +1934,106 @@ footer {
         btnText.textContent = 'Show More';
         btnIcon.style.transform = 'rotate(0deg)';
         section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        // Track collapse
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'game_info_collapse', {
+            game_name: 'Douchebag Life',
+            game_folder: 'Douchebag Life',
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          });
+        }
       } else {
         section.classList.add('expanded');
         btnText.textContent = 'Show Less';
         btnIcon.style.transform = 'rotate(180deg)';
+
+        // Track expand
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'game_info_expand', {
+            game_name: 'Douchebag Life',
+            game_folder: 'Douchebag Life',
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          });
+        }
       }
     }
 
     // Track game session end when user leaves the page
     window.addEventListener('beforeunload', () => {
+      // Clear duration tracking interval
+      if (gameDurationInterval) {
+        clearInterval(gameDurationInterval);
+      }
+
       if (gameStartTime) {
         const playDuration = Math.round((Date.now() - gameStartTime) / 1000);
-        gtag('event', 'game_session_end', {
-          game_name: 'Douchebag Life',
-          game_folder: 'Douchebag Life',
-          duration_seconds: playDuration
-        });
+
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'game_session_end', {
+            game_name: 'Douchebag Life',
+            game_folder: 'Douchebag Life',
+            game_categories: 'Simulation, Casual',
+            duration_seconds: playDuration,
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
+            timestamp: new Date().toISOString()
+          });
+        }
+      }
+    });
+
+    // Track visibility changes (when user switches tabs while game is running)
+    document.addEventListener('visibilitychange', function() {
+      if (gameStartTime) {
+        if (document.hidden) {
+          // User switched away - pause duration tracking
+          if (gameDurationInterval) {
+            clearInterval(gameDurationInterval);
+          }
+
+          if (typeof gtag !== 'undefined') {
+            const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
+            gtag('event', 'game_paused', {
+              game_name: 'Douchebag Life',
+              game_folder: 'Douchebag Life',
+              duration_seconds: currentDuration,
+              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+            });
+          }
+        } else {
+          // User returned - resume duration tracking
+          if (typeof gtag !== 'undefined') {
+            const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
+            gtag('event', 'game_resumed', {
+              game_name: 'Douchebag Life',
+              game_folder: 'Douchebag Life',
+              duration_seconds: currentDuration,
+              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+            });
+          }
+
+          // Restart the duration tracking interval
+          if (gameDurationInterval) {
+            clearInterval(gameDurationInterval);
+          }
+
+          gameDurationInterval = setInterval(function() {
+            if (gameStartTime && !document.hidden) {
+              const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
+              gamePlayDuration = currentDuration;
+
+              if (typeof gtag !== 'undefined') {
+                gtag('event', 'game_playing', {
+                  game_name: 'Douchebag Life',
+                  game_folder: 'Douchebag Life',
+                  duration_seconds: currentDuration,
+                  session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
+                  timestamp: new Date().toISOString()
+                });
+              }
+            }
+          }, 30000);
+        }
       }
     });
   </script>
