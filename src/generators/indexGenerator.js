@@ -13,7 +13,7 @@ const { generateIndexMetaTags, generateIndexStructuredData } = require('../utils
 function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.') {
   // Generate sidebar categories - sorted by game count (largest first)
   const sidebarCategories = Object.keys(categories)
-    .filter(cat => cat !== "Recently Played")
+    .filter(cat => cat !== "Recently Played" && cat !== "Trending Games")
     .sort((a, b) => categories[b].length - categories[a].length) // Sort by count, largest first
     .map(cat => `<li role="menuitem" tabindex="0" onclick="filterCategory('${cat}')" onkeypress="if(event.key==='Enter')filterCategory('${cat}')">${cat}</li>`)
     .join("");
@@ -27,9 +27,9 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   const categorySections = sortedCategories
     .map((cat, catIndex) => {
       const list = categories[cat];
-      const isSmallCategory = list.length < 4;
-      const hideOnHome = isSmallCategory ? ' data-hide-on-home="true" style="display:none;"' : '';
-      // Eagerly load first 4 of each category to ensure first row is ready on homepage
+      // Hide all category sections on home page by default
+      const hideOnHome = ' data-hide-on-home="true" style="display:none;"';
+      // Eagerly load first 4 of each category to ensure first row is ready when category is selected
       return `<div class="category" data-category="${cat}"${hideOnHome}>
           <h2>${cat}</h2>
           <div class="grid">
@@ -96,6 +96,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     <ul id="categoryList" role="menu">
       <li role="menuitem" tabindex="0" onclick="filterCategory('Home')" onkeypress="if(event.key==='Enter')filterCategory('Home')">Home</li>
       <li role="menuitem" tabindex="0" onclick="filterCategory('All Games')" onkeypress="if(event.key==='Enter')filterCategory('All Games')">All Games</li>
+      <li role="menuitem" tabindex="0" onclick="filterCategory('Trending Games')" onkeypress="if(event.key==='Enter')filterCategory('Trending Games')">Trending Games</li>
       ${finalSidebarCategories}
     </ul>
   </nav>
@@ -240,14 +241,6 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
           }
         })();
       </script>
-
-      <!-- Trending Games -->
-      <div class="category" data-category="Trending Games">
-        <h2>Trending Games</h2>
-        <div class="grid">
-          ${(categories['Trending Games'] || []).map((g, i) => generateGameCard(g, i, gamesDir, true)).join('')}
-        </div>
-      </div>
 
       <!-- All category sections (including games for home view) -->
       ${categorySections}
