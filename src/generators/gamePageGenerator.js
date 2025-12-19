@@ -36,11 +36,39 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   // Shuffle other games
   const shuffledOtherGames = otherGames.sort(() => Math.random() - 0.5);
 
-  // Combine: prioritize same category, then fill with others to reach 35 games (7 rows x 5 columns)
-  const shuffled = [
-    ...shuffledSameCategory,
-    ...shuffledOtherGames,
-  ].slice(0, 35);
+  // New pattern: alternate 1 related, 1 random, until 5 related used or no more available
+  // Then fill rest with random games (total 42 games for 7 rows x 6 columns)
+  const shuffled = [];
+  const maxRelated = Math.min(5, shuffledSameCategory.length);
+  let relatedIndex = 0;
+  let randomIndex = 0;
+
+  // Alternate pattern: related, random, related, random...
+  while (shuffled.length < 42 && (relatedIndex < maxRelated || randomIndex < shuffledOtherGames.length)) {
+    // Add related game if available and under limit
+    if (relatedIndex < maxRelated && relatedIndex < shuffledSameCategory.length) {
+      shuffled.push(shuffledSameCategory[relatedIndex]);
+      relatedIndex++;
+    }
+
+    // Add random game if available
+    if (shuffled.length < 42 && randomIndex < shuffledOtherGames.length) {
+      shuffled.push(shuffledOtherGames[randomIndex]);
+      randomIndex++;
+    }
+  }
+
+  // If we still need more games and have more related games available
+  while (shuffled.length < 42 && relatedIndex < shuffledSameCategory.length) {
+    shuffled.push(shuffledSameCategory[relatedIndex]);
+    relatedIndex++;
+  }
+
+  // Fill any remaining slots with random games
+  while (shuffled.length < 42 && randomIndex < shuffledOtherGames.length) {
+    shuffled.push(shuffledOtherGames[randomIndex]);
+    randomIndex++;
+  }
 
   const recommendedGamesHTML = shuffled
     .map((g) => {
