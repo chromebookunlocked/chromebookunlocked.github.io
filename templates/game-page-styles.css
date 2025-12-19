@@ -248,9 +248,9 @@ h1 {
 .game-frame-wrapper {
   /* Fixed 16:9 aspect ratio that scales to screen size */
   aspect-ratio: 16 / 9;
-  width: min(90vw, calc(80vh * 16 / 9)); /* Scale based on viewport, maintain aspect ratio */
-  max-width: 1600px; /* Maximum size cap */
-  max-height: 90vh; /* Don't exceed viewport height */
+  width: min(75vw, calc(70vh * 16 / 9)); /* Scale based on viewport, maintain aspect ratio */
+  max-width: 1400px; /* Maximum size cap */
+  max-height: 78.75vh; /* Don't exceed viewport height (1400px / 16 * 9 / viewport) */
   position: relative;
   border-radius: var(--radius-xl);
   overflow: hidden;
@@ -263,6 +263,9 @@ h1 {
   /* GPU acceleration for better performance */
   transform: translateZ(0);
   will-change: transform;
+  /* Enable container queries for internal scaling */
+  container-type: size;
+  container-name: game-window;
 }
 
 .game-frame-wrapper:hover {
@@ -295,8 +298,10 @@ h1 {
 }
 
 .icon-btn {
-  width: clamp(40px, 3vw, 56px);
-  height: clamp(40px, 3vw, 56px);
+  width: 3.5%; /* Scale with container width */
+  aspect-ratio: 1;
+  min-width: 36px;
+  max-width: 52px;
   border-radius: var(--radius-md);
   border: none;
   background: rgba(255, 255, 255, 0.1);
@@ -320,8 +325,8 @@ h1 {
 }
 
 .icon-btn svg {
-  width: clamp(18px, 1.5vw, 24px);
-  height: clamp(18px, 1.5vw, 24px);
+  width: 55%; /* Scale with button size */
+  height: 55%;
 }
 
 /* ============================================================================
@@ -352,9 +357,8 @@ h1 {
 }
 
 .play-overlay img {
-  max-width: clamp(300px, 30vw, 600px);
-  max-height: clamp(300px, 35vh, 600px);
-  width: 80%;
+  width: 50%; /* Scale with container width */
+  max-width: 500px;
   height: auto;
   border-radius: var(--radius-lg);
   box-shadow:
@@ -372,7 +376,7 @@ h1 {
 }
 
 .play-overlay h2 {
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-size: clamp(1.3rem, 3cqw, 2.2rem); /* Container query width for scaling */
   font-weight: 900;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
   -webkit-background-clip: text;
@@ -384,8 +388,8 @@ h1 {
 }
 
 .play-btn {
-  padding: clamp(1rem, 2.5vh, 2rem) clamp(2rem, 4vw, 4rem);
-  font-size: clamp(1.2rem, 1.8vw, 2rem);
+  padding: clamp(0.8rem, 1.5cqh, 1.6rem) clamp(1.5rem, 3cqw, 3rem); /* Container query units */
+  font-size: clamp(1rem, 1.5cqw, 1.6rem);
   font-weight: 700;
   font-family: 'Orbitron', sans-serif;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
@@ -1008,18 +1012,18 @@ footer {
 
   .game-frame-wrapper {
     /* Maintain 16:9 aspect ratio on tablets */
-    width: min(92vw, calc(85vh * 16 / 9));
-    max-height: 85vh;
+    width: min(85vw, calc(75vh * 16 / 9));
+    max-height: 75vh;
   }
 
   .play-overlay img {
-    max-width: 280px;
-    max-height: 280px;
+    width: 55%; /* Slightly larger on tablets */
+    max-width: 350px;
   }
 
   .play-btn {
-    padding: 1rem 1.8rem;
-    font-size: 1.1rem;
+    padding: 0.9rem 1.8rem;
+    font-size: 1.05rem;
   }
 
   .icon-btn {
@@ -1086,18 +1090,18 @@ footer {
 
   .game-frame-wrapper {
     /* Maintain 16:9 aspect ratio on mobile */
-    width: min(95vw, calc(80vh * 16 / 9));
-    max-height: 80vh;
+    width: min(92vw, calc(70vh * 16 / 9));
+    max-height: 70vh;
   }
 
   .play-overlay img {
-    max-width: 250px;
-    max-height: 250px;
+    width: 60%; /* Larger on mobile for better visibility */
+    max-width: 300px;
   }
 
   .play-btn {
-    padding: 0.9rem 1.5rem;
-    font-size: 1rem;
+    padding: 0.8rem 1.4rem;
+    font-size: 0.95rem;
   }
 
   .controls {
