@@ -203,13 +203,13 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(0.5rem, 0.8vw, 0.8rem);
+  padding: clamp(0.6rem, 1vw, 0.9rem);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 102, 255, 0.2);
   border-radius: var(--radius-md);
   color: var(--text-primary);
   cursor: pointer;
-  transition: var(--transition-medium);
+  transition: transform 0.2s ease, background 0.2s ease;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -226,8 +226,8 @@ h1 {
 }
 
 .back-button svg {
-  width: clamp(20px, 1.5vw, 26px);
-  height: clamp(20px, 1.5vw, 26px);
+  width: clamp(22px, 1.8vw, 28px);
+  height: clamp(22px, 1.8vw, 28px);
 }
 
 .back-button span {
@@ -235,22 +235,15 @@ h1 {
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .game-frame-wrapper {
-  /* Fixed 16:9 aspect ratio that scales to screen size */
   aspect-ratio: 16 / 9;
-  width: min(75vw, calc(70vh * 16 / 9)); /* Scale based on viewport, maintain aspect ratio */
-  max-width: 1400px; /* Maximum size cap */
-  max-height: 78.75vh; /* Don't exceed viewport height (1400px / 16 * 9 / viewport) */
+  width: min(78vw, calc(72vh * 16 / 9));
+  max-width: 1400px;
+  max-height: 80vh;
   position: relative;
   border-radius: var(--radius-xl);
   overflow: hidden;
@@ -259,20 +252,26 @@ h1 {
     0 20px 60px rgba(0, 0, 0, 0.4),
     0 0 0 1px var(--border-color),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: var(--transition-medium);
-  /* GPU acceleration for better performance */
+
+  /* Performance & fullscreen safety */
   transform: translateZ(0);
   will-change: transform;
-  /* Enable container queries for internal scaling */
+  contain: layout paint size;
   container-type: size;
   container-name: game-window;
+
+  transition: transform 0.3s ease;
 }
 
-.game-frame-wrapper:hover {
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.4),
-    0 0 0 1px var(--border-color),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+/* FULLSCREEN — no transitions, no lag */
+.game-frame-wrapper:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+  border-radius: 0;
+  transition: none !important;
 }
 
 /* ============================================================================
@@ -289,7 +288,6 @@ h1 {
   justify-content: flex-end;
   align-items: center;
   z-index: 10;
-  opacity: 1;
   pointer-events: none;
 }
 
@@ -298,35 +296,34 @@ h1 {
 }
 
 .icon-btn {
-  width: 3.5%; /* Scale with container width */
+  width: 4.2%;
   aspect-ratio: 1;
-  min-width: 36px;
-  max-width: 52px;
+  min-width: 44px;
+  max-width: 64px;
   border-radius: var(--radius-md);
   border: none;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   color: var(--text-primary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--transition-fast);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, background 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
 }
 
 .icon-btn:hover {
   background: var(--primary-color);
-  transform: scale(1.1);
-  box-shadow: 0 6px 20px var(--shadow-color);
+  transform: scale(1.12);
 }
 
 .icon-btn:active {
-  transform: scale(0.95);
+  transform: scale(0.96);
 }
 
 .icon-btn svg {
-  width: 55%; /* Scale with button size */
-  height: 55%;
+  width: 60%;
+  height: 60%;
 }
 
 /* ============================================================================
@@ -335,62 +332,58 @@ h1 {
 
 .play-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(13, 0, 26, 0.95), rgba(44, 0, 82, 0.95));
+  inset: 0;
+  background: linear-gradient(135deg, rgba(13, 0, 26, 0.96), rgba(44, 0, 82, 0.96));
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-lg);
+  gap: clamp(1.5rem, 3cqh, 3rem);
   z-index: 5;
-  transition: all var(--transition-slow);
   cursor: pointer;
+
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .play-overlay.hidden {
   opacity: 0;
   pointer-events: none;
-  transform: scale(0.9);
+  transform: scale(0.92);
 }
 
+/* 1:1 Thumbnail */
 .play-overlay img {
-  width: clamp(200px, 35cqw, 500px); /* Scale with container using container query units */
+  width: clamp(220px, 28cqw, 420px);
+  aspect-ratio: 1 / 1;
   height: auto;
-  max-height: 40cqh; /* Also constrain height relative to container */
   border-radius: var(--radius-lg);
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.5),
-    0 0 0 1px var(--border-color);
-  transition: var(--transition-medium);
   object-fit: cover;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px var(--border-color);
+
+  transition: transform 0.3s ease;
 }
 
 .play-overlay:hover img {
-  transform: scale(1.05);
-  box-shadow:
-    0 25px 80px rgba(255, 102, 255, 0.4),
-    0 0 0 1px var(--primary-color);
+  transform: scale(1.06);
 }
 
 .play-overlay h2 {
-  font-size: clamp(1.3rem, 3cqw, 2.2rem); /* Container query width for scaling */
+  font-size: clamp(1.5rem, 3.5cqw, 2.6rem);
   font-weight: 900;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
   text-align: center;
-  padding: 0 var(--spacing-md);
-  text-shadow: 0 4px 20px rgba(255, 102, 255, 0.3);
+  text-shadow: 0 4px 25px rgba(255, 102, 255, 0.35);
 }
 
+/* Bigger Play Button */
 .play-btn {
-  padding: clamp(0.8rem, 1.5cqh, 1.6rem) clamp(1.5rem, 3cqw, 3rem); /* Container query units */
-  font-size: clamp(1rem, 1.5cqw, 1.6rem);
-  font-weight: 700;
+  padding: clamp(1rem, 2cqh, 2rem) clamp(2rem, 4cqw, 3.6rem);
+  font-size: clamp(1.1rem, 2cqw, 1.8rem);
+  font-weight: 800;
   font-family: 'Orbitron', sans-serif;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
   border: none;
@@ -401,33 +394,14 @@ h1 {
   align-items: center;
   gap: var(--spacing-sm);
   box-shadow:
-    0 10px 30px var(--shadow-color),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  transition: var(--transition-medium);
-  position: relative;
-  overflow: hidden;
-}
+    0 14px 40px var(--shadow-color),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 
-.play-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s ease;
-}
-
-.play-btn:hover::before {
-  left: 100%;
+  transition: transform 0.25s ease;
 }
 
 .play-btn:hover {
-  transform: translateY(-4px) scale(1.05);
-  box-shadow:
-    0 15px 40px var(--shadow-color),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-4px) scale(1.06);
 }
 
 .play-btn:active {
@@ -440,21 +414,26 @@ h1 {
 
 iframe {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   border: none;
   background: var(--bg-darker);
   opacity: 0;
-  transition: opacity var(--transition-slow);
-  /* Optimize iframe rendering for better performance */
+
+  /* Unity / WebGL performance */
   transform: translateZ(0);
+  will-change: opacity;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* Enable GPU acceleration */
-  will-change: opacity;
-  object-fit: contain;
+  contain: strict;
+  touch-action: none;
+
+  transition: opacity 0.35s ease;
+}
+
+.game-frame-wrapper:fullscreen iframe {
+  transition: none;
 }
 
 iframe.active {
@@ -471,31 +450,27 @@ iframe.active {
   gap: var(--spacing-sm);
   justify-content: center;
   padding: var(--spacing-xs) 0;
-  margin-bottom: 0;
   animation: fadeIn 0.8s ease 0.2s both;
 }
 
 .category-tag {
-  padding: clamp(0.4rem, 0.6vw, 0.7rem) clamp(0.8rem, 1.2vw, 1.5rem);
+  padding: clamp(0.45rem, 0.7vw, 0.8rem) clamp(0.9rem, 1.4vw, 1.6rem);
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   color: var(--text-secondary);
-  text-decoration: none;
-  font-size: clamp(0.8rem, 0.9vw, 1rem);
+  font-size: clamp(0.85rem, 1vw, 1.05rem);
   font-weight: 600;
-  transition: var(--transition-fast);
+  transition: transform 0.2s ease, background 0.2s ease;
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
 .category-tag:hover {
   background: var(--primary-color);
   color: var(--text-primary);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--shadow-color);
-  border-color: var(--primary-color);
 }
+
 
 /* ============================================================================
    GAME INFO SECTION (SEO/Description/Keywords)
