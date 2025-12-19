@@ -176,9 +176,9 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     </div>
   </main>
 
-  <!-- You Might Also Like Section -->
-  <section class="recommendations" aria-label="Similar Unblocked Games">
-    <h2>You Might Also Like - More Free Unblocked Games</h2>
+  <!-- More Games Section -->
+  <section class="recommendations" aria-label="More Unblocked Games">
+    <h2>More Games</h2>
     <div class="grid">
       ${recommendedGamesHTML}
     </div>

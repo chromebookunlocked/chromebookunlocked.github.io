@@ -674,18 +674,18 @@ iframe.active {
 ============================================================================ */
 
 .recommendations {
-  width: 75%;
-  max-width: min(1000px, 80vw);
-  padding: var(--spacing-md) var(--spacing-lg);
-  margin: var(--spacing-sm) auto 0;
+  width: 90%;
+  max-width: min(1400px, 95vw);
+  padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-md);
+  margin: 0 auto;
   animation: fadeIn 1s ease 0.4s both;
 }
 
 .recommendations h2 {
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
-  font-weight: 900;
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+  font-weight: 700;
   text-align: center;
-  margin-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -693,22 +693,13 @@ iframe.active {
   position: relative;
 }
 
-.recommendations h2::after {
-  content: '';
-  display: block;
-  width: 100px;
-  height: 4px;
-  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
-  margin: var(--spacing-md) auto 0;
-  border-radius: var(--radius-sm);
-}
-
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 18vw, 220px), 1fr));
-  gap: var(--spacing-md);
+  grid-template-columns: repeat(6, 1fr);
+  gap: clamp(0.6rem, 1.2vw, 1rem);
   width: 100%;
   justify-items: center;
+  min-height: 0;
 }
 
 .game-card {
