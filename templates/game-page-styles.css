@@ -246,8 +246,8 @@ h1 {
 }
 
 .game-frame-wrapper {
-  width: 55.56vw; /* 5/9 of viewport width */
-  height: 33.33vh; /* 1/3 of viewport height */
+  width: 55vw; /* Approximately 11/20 of viewport width */
+  height: 65vh; /* Approximately 13/20 of viewport height */
   position: relative;
   border-radius: var(--radius-xl);
   overflow: hidden;
@@ -349,8 +349,8 @@ h1 {
 }
 
 .play-overlay img {
-  max-width: clamp(200px, 20vw, 400px);
-  max-height: clamp(200px, 20vh, 400px);
+  max-width: clamp(300px, 30vw, 600px);
+  max-height: clamp(300px, 35vh, 600px);
   width: 80%;
   height: auto;
   border-radius: var(--radius-lg);
@@ -381,8 +381,8 @@ h1 {
 }
 
 .play-btn {
-  padding: clamp(0.75rem, 1.5vh, 1.5rem) clamp(1.5rem, 3vw, 3rem);
-  font-size: clamp(1rem, 1.2vw, 1.4rem);
+  padding: clamp(1rem, 2.5vh, 2rem) clamp(2rem, 4vw, 4rem);
+  font-size: clamp(1.2rem, 1.8vw, 2rem);
   font-weight: 700;
   font-family: 'Orbitron', sans-serif;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
@@ -1001,17 +1001,17 @@ footer {
 
   .game-frame-wrapper {
     width: 85vw;
-    height: 40vh;
+    height: 70vh;
   }
 
   .play-overlay img {
-    max-width: 180px;
-    max-height: 180px;
+    max-width: 280px;
+    max-height: 280px;
   }
 
   .play-btn {
-    padding: 0.7rem 1.2rem;
-    font-size: 0.95rem;
+    padding: 1rem 1.8rem;
+    font-size: 1.1rem;
   }
 
   .icon-btn {
@@ -1078,7 +1078,17 @@ footer {
 
   .game-frame-wrapper {
     width: 90vw;
-    height: 35vh;
+    height: 60vh;
+  }
+
+  .play-overlay img {
+    max-width: 250px;
+    max-height: 250px;
+  }
+
+  .play-btn {
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
   }
 
   .controls {
