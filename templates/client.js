@@ -358,11 +358,11 @@ document.addEventListener('click', (e) => {
 
 // Navigate to home page
 function goToHome() {
-  window.location.hash = '';
+  window.history.pushState(null, '', '/');
   const searchBar = document.getElementById('searchBar');
   if (searchBar) searchBar.value = '';
   hideSearchDropdown();
-  filterCategory('Home');
+  filterCategory('Home', false); // Don't update URL again since we just did
 }
 
 // Recently played storage helpers - called from individual game pages
@@ -395,7 +395,7 @@ function filterCategory(cat, updateURL = true) {
   // Update URL if requested
   if (updateURL) {
     if (cat === 'Home') {
-      window.history.pushState(null, '', '#/');
+      window.history.pushState(null, '', '/');
     } else {
       window.history.pushState(null, '', '#/category/' + encodeURIComponent(cat));
     }
