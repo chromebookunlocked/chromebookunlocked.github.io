@@ -357,9 +357,9 @@ h1 {
 }
 
 .play-overlay img {
-  width: 50%; /* Scale with container width */
-  max-width: 500px;
+  width: clamp(200px, 35cqw, 500px); /* Scale with container using container query units */
   height: auto;
+  max-height: 40cqh; /* Also constrain height relative to container */
   border-radius: var(--radius-lg);
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.5),
@@ -1017,8 +1017,7 @@ footer {
   }
 
   .play-overlay img {
-    width: 55%; /* Slightly larger on tablets */
-    max-width: 350px;
+    width: clamp(220px, 40cqw, 400px); /* Slightly larger on tablets */
   }
 
   .play-btn {
@@ -1095,8 +1094,7 @@ footer {
   }
 
   .play-overlay img {
-    width: 60%; /* Larger on mobile for better visibility */
-    max-width: 300px;
+    width: clamp(200px, 45cqw, 350px); /* Larger on mobile for better visibility */
   }
 
   .play-btn {
