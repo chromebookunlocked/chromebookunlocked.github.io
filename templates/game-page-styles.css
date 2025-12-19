@@ -246,8 +246,7 @@ h1 {
 }
 
 .game-frame-wrapper {
-  width: 75%;
-  max-width: min(1000px, 80vw);
+  width: clamp(300px, 75vw, 1000px);
   position: relative;
   border-radius: var(--radius-xl);
   overflow: hidden;
@@ -674,8 +673,7 @@ iframe.active {
 ============================================================================ */
 
 .recommendations {
-  width: 90%;
-  max-width: min(1400px, 95vw);
+  width: clamp(300px, 90vw, 1400px);
   padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-md);
   margin: 0 auto;
   animation: fadeIn 1s ease 0.4s both;
@@ -971,6 +969,10 @@ footer {
 
   .game-container {
     padding: var(--spacing-md);
+  }
+
+  .game-frame-wrapper {
+    width: clamp(280px, 90vw, 600px);
   }
 
   .game-frame-wrapper::before {
