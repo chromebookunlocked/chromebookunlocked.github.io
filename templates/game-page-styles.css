@@ -190,7 +190,7 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--spacing-sm) var(--spacing-lg);
+  padding: var(--spacing-xs) var(--spacing-lg) var(--spacing-sm);
   gap: var(--spacing-sm);
   position: relative;
   z-index: 1;
@@ -246,8 +246,8 @@ h1 {
 }
 
 .game-frame-wrapper {
-  width: 90%;
-  max-width: 1280px;
+  width: 60%;
+  max-width: 850px;
   position: relative;
   border-radius: var(--radius-xl);
   overflow: hidden;
@@ -1001,11 +1001,11 @@ footer {
   }
 
   .game-container {
-    padding: var(--spacing-md);
+    padding: var(--spacing-xs) var(--spacing-md) var(--spacing-md);
   }
 
   .game-frame-wrapper {
-    width: 95%;
+    width: 90%;
   }
 
   .game-frame-wrapper::before {
