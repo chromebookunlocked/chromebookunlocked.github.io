@@ -449,29 +449,31 @@ iframe.active {
   flex-wrap: wrap;
   gap: var(--spacing-sm);
   justify-content: center;
-  padding: var(--spacing-xs) 0;
+  padding: var(--spacing-md) 0;
   animation: fadeIn 0.8s ease 0.2s both;
 }
 
 .category-tag {
-  padding: clamp(0.45rem, 0.7vw, 0.8rem) clamp(0.9rem, 1.4vw, 1.6rem);
+  padding: var(--spacing-xs) var(--spacing-md);
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   color: var(--text-secondary);
-  font-size: clamp(0.85rem, 1vw, 1.05rem);
+  text-decoration: none;
+  font-size: 0.9rem;
   font-weight: 600;
-  transition: transform 0.2s ease, background 0.2s ease;
+  transition: var(--transition-fast);
   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .category-tag:hover {
   background: var(--primary-color);
   color: var(--text-primary);
   transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--shadow-color);
+  border-color: var(--primary-color);
 }
-
-
 /* ============================================================================
    GAME INFO SECTION (SEO/Description/Keywords)
 ============================================================================ */
