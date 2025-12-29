@@ -99,69 +99,57 @@ body::before {
 }
 
 /* ============================================================================
-   HEADER
+   HEADER - Fixed height with responsive scaling
 ============================================================================ */
 
 header {
-  position: sticky;
+  position: fixed;
   top: 0;
-  background: rgba(13, 0, 26, 0.9);
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: clamp(48px, 6vw, 64px);
+  background: rgba(13, 0, 26, 0.95);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  padding: var(--spacing-xs) var(--spacing-lg);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-  z-index: 100;
-  animation: slideDown 0.4s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .header-left {
+  max-width: 1400px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: clamp(8px, 1.5vw, 16px);
   cursor: pointer;
   transition: var(--transition-medium);
 }
 
 .header-left:hover {
-  transform: translateX(-4px);
+  opacity: 0.9;
 }
 
 .header-logo {
-  width: 36px;
-  height: 36px;
+  width: clamp(28px, 4vw, 40px);
+  height: clamp(28px, 4vw, 40px);
   border-radius: var(--radius-sm);
   background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  padding: 3px;
+  padding: 2px;
   box-shadow: 0 2px 10px var(--shadow-color);
   transition: var(--transition-medium);
   object-fit: contain;
 }
 
- 
-
 .header-logo:hover {
-
-  transform: scale(1.1) rotate(5deg);
-
-  box-shadow: 0 6px 25px var(--shadow-color);
-
+  transform: scale(1.05);
 }
 
 h1 {
-  font-size: clamp(1rem, 2.5vw, 1.5rem);
-  font-weight: 800;
+  font-size: clamp(0.85rem, 2vw, 1.3rem);
+  font-weight: 700;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-light), var(--secondary-color));
   background-size: 200% 200%;
   -webkit-background-clip: text;
@@ -169,6 +157,7 @@ h1 {
   background-clip: text;
   animation: gradientShift 3s ease infinite;
   letter-spacing: -0.3px;
+  white-space: nowrap;
 }
 
 @keyframes gradientShift {
@@ -186,11 +175,10 @@ h1 {
   grid-template-columns: auto 1fr auto;
   align-items: start;
   justify-items: center;
-  padding: 0.25rem var(--spacing-lg) var(--spacing-xs);
+  padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) var(--spacing-lg) var(--spacing-xs);
   gap: var(--spacing-xs);
   position: relative;
   z-index: 1;
-  animation: fadeIn 0.6s ease;
 }
 
 /* Back Button - Matches icon button proportions */
@@ -983,23 +971,18 @@ footer {
     --spacing-xl: 2rem;
   }
 
-  header {
-    padding: var(--spacing-sm) var(--spacing-md);
-  }
-
-  .logo {
-    width: 40px;
-    height: 40px;
+  .header-left {
+    padding: 0 var(--spacing-md);
   }
 
   .game-container {
-    padding: 0.25rem var(--spacing-md) var(--spacing-xs);
+    padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) var(--spacing-md) var(--spacing-xs);
   }
 
   .game-frame-wrapper {
     /* Maintain 16:9 aspect ratio on tablets */
-    width: min(90vw, calc(76vh * 16 / 9));
-    max-height: 78vh;
+    width: min(92vw, calc(74vh * 16 / 9));
+    max-height: 76vh;
   }
 
   .play-overlay img {
