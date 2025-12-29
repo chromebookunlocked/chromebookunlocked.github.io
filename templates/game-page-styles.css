@@ -186,8 +186,8 @@ h1 {
   grid-template-columns: auto 1fr auto;
   align-items: start;
   justify-items: center;
-  padding: var(--spacing-xs) var(--spacing-lg) var(--spacing-sm);
-  gap: var(--spacing-sm);
+  padding: 0.25rem var(--spacing-lg) var(--spacing-xs);
+  gap: var(--spacing-xs);
   position: relative;
   z-index: 1;
   animation: fadeIn 0.6s ease;
@@ -673,7 +673,7 @@ iframe.active {
 .recommendations {
   width: 90%;
   max-width: min(1400px, 95vw);
-  padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-lg) var(--spacing-md);
   margin: 0 auto;
   animation: fadeIn 1s ease 0.4s both;
 }
@@ -682,7 +682,7 @@ iframe.active {
   font-size: clamp(1.2rem, 2.5vw, 1.8rem);
   font-weight: 700;
   text-align: center;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -993,7 +993,7 @@ footer {
   }
 
   .game-container {
-    padding: var(--spacing-xs) var(--spacing-md);
+    padding: 0.25rem var(--spacing-md) var(--spacing-xs);
   }
 
   .game-frame-wrapper {
@@ -1014,7 +1014,7 @@ footer {
   }
 
   .recommendations {
-    padding: var(--spacing-lg) var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
   }
 
   .category-tag {
