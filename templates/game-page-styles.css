@@ -191,10 +191,12 @@ h1 {
 
 .game-container {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: var(--spacing-xs) var(--spacing-lg) var(--spacing-sm);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: start;
+  justify-items: center;
+  padding: var(--spacing-sm) var(--spacing-lg);
   gap: var(--spacing-sm);
   position: relative;
   z-index: 1;
@@ -203,7 +205,10 @@ h1 {
 
 /* Back Button - Matches icon button proportions */
 .back-button {
-  align-self: flex-start;
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  align-self: start;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -246,10 +251,12 @@ h1 {
 }
 
 .game-frame-wrapper {
+  grid-column: 1 / -1;
+  grid-row: 1;
   aspect-ratio: 16 / 9;
-  width: min(78vw, calc(72vh * 16 / 9));
-  max-width: 1400px;
-  max-height: 80vh;
+  width: min(85vw, calc(78vh * 16 / 9));
+  max-width: 1500px;
+  max-height: 82vh;
   position: relative;
   border-radius: var(--radius-xl);
   overflow: hidden;
@@ -452,11 +459,13 @@ iframe.active {
 ============================================================================ */
 
 .category-tags {
+  grid-column: 1 / -1;
+  grid-row: 2;
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-sm);
   justify-content: center;
-  padding: var(--spacing-md) 0;
+  padding: var(--spacing-sm) 0;
   animation: fadeIn 0.8s ease 0.2s both;
 }
 
@@ -995,13 +1004,13 @@ footer {
   }
 
   .game-container {
-    padding: var(--spacing-xs) var(--spacing-md) var(--spacing-md);
+    padding: var(--spacing-xs) var(--spacing-md);
   }
 
   .game-frame-wrapper {
     /* Maintain 16:9 aspect ratio on tablets */
-    width: min(85vw, calc(75vh * 16 / 9));
-    max-height: 75vh;
+    width: min(90vw, calc(76vh * 16 / 9));
+    max-height: 78vh;
   }
 
   .play-overlay img {
@@ -1059,8 +1068,8 @@ footer {
 
   .game-frame-wrapper {
     /* Maintain 16:9 aspect ratio on mobile */
-    width: min(92vw, calc(70vh * 16 / 9));
-    max-height: 70vh;
+    width: min(95vw, calc(72vh * 16 / 9));
+    max-height: 74vh;
   }
 
   .play-overlay img {
