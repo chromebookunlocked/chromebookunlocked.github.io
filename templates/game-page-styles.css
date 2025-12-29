@@ -169,21 +169,19 @@ h1 {
 
 .game-container {
   flex: 1;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: start;
-  justify-items: center;
-  padding: calc(clamp(48px, 6vw, 64px) + 0.25rem) var(--spacing-lg) var(--spacing-xs);
-  gap: var(--spacing-xs);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) var(--spacing-lg) var(--spacing-xs);
   position: relative;
   z-index: 1;
 }
 
-/* Back Button - Matches icon button proportions */
+/* Back Button - Absolutely positioned top-left */
 .back-button {
-  grid-column: 1;
-  justify-self: start;
-  align-self: start;
+  position: absolute;
+  top: calc(clamp(48px, 6vw, 64px) + 0.5rem);
+  left: var(--spacing-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -198,6 +196,7 @@ h1 {
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  z-index: 10;
 }
 
 .back-button:hover {
@@ -226,7 +225,6 @@ h1 {
 }
 
 .game-frame-wrapper {
-  grid-column: 1 / -1;
   aspect-ratio: 16 / 9;
   width: min(85vw, calc(78vh * 16 / 9));
   max-width: 1500px;
@@ -974,7 +972,11 @@ footer {
   }
 
   .game-container {
-    padding: calc(clamp(48px, 6vw, 64px) + 0.25rem) var(--spacing-md) var(--spacing-xs);
+    padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) var(--spacing-md) var(--spacing-xs);
+  }
+
+  .back-button {
+    left: var(--spacing-md);
   }
 
   .game-frame-wrapper {
@@ -1113,23 +1115,7 @@ footer {
 ============================================================================ */
 
 .more-games-hint {
-  position: fixed;
-  right: clamp(0.75rem, 2vw, 1.5rem);
-  bottom: clamp(1rem, 3vh, 2rem);
-  display: flex;
-  align-items: center;
-  gap: clamp(0.3rem, 0.5vw, 0.5rem);
-  padding: clamp(0.5rem, 1vw, 0.7rem) clamp(0.8rem, 1.5vw, 1rem);
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  z-index: 50;
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s ease, border-color 0.2s ease;
+  display: none;
 }
 
 .more-games-hint:hover {
