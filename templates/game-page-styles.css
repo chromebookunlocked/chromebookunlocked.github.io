@@ -1135,3 +1135,95 @@ footer {
   outline: 3px solid var(--primary-color);
   outline-offset: 4px;
 }
+
+/* ============================================================================
+   MORE GAMES HINT BOX
+============================================================================ */
+
+.more-games-hint {
+  position: fixed;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1.5rem, 4vh, 3rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.8rem 1.2rem;
+  background: rgba(13, 0, 26, 0.85);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid rgba(255, 102, 255, 0.3);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  z-index: 50;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease, transform 0.4s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 102, 255, 0.15);
+}
+
+.more-games-hint:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5), 0 0 25px rgba(255, 102, 255, 0.3);
+  transform: translateY(-3px);
+}
+
+.more-games-hint:active {
+  transform: translateY(-1px);
+}
+
+.more-games-hint.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+}
+
+.more-games-hint-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.more-games-hint-arrow {
+  width: 20px;
+  height: 20px;
+  color: var(--primary-color);
+  animation: bounceDown 1.5s ease-in-out infinite;
+}
+
+@keyframes bounceDown {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+/* Hide on smaller screens where scrolling is more natural */
+@media (max-width: 600px) {
+  .more-games-hint {
+    right: 0.75rem;
+    bottom: 1rem;
+    padding: 0.6rem 1rem;
+  }
+
+  .more-games-hint-text {
+    font-size: 0.7rem;
+  }
+
+  .more-games-hint-arrow {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .more-games-hint-arrow {
+    animation: none;
+  }
+}
