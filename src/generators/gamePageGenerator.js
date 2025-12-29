@@ -163,16 +163,6 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
           allowfullscreen>
         </iframe>
       </div>
-
-      <!-- Category Tags with SEO -->
-      <div class="category-tags" role="navigation" aria-label="Game Categories">
-        ${game.categories
-          .map(
-            (cat) =>
-              `<a href="/#/category/${encodeURIComponent(cat)}" class="category-tag" title="Play Free ${cat} Games Unblocked">${cat}</a>`
-          )
-          .join("")}
-      </div>
     </div>
   </main>
 
@@ -191,6 +181,18 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
       ${recommendedGamesHTML}
     </div>
   </section>
+
+  <!-- Category Tags (above About section) -->
+  <div class="category-tags-section">
+    <div class="category-tags" role="navigation" aria-label="Game Categories">
+      ${game.categories
+        .map(
+          (cat) =>
+            `<a href="/#/category/${encodeURIComponent(cat)}" class="category-tag" title="Play Free ${cat} Games Unblocked">${cat}</a>`
+        )
+        .join("")}
+    </div>
+  </div>
 
   <!-- Enhanced SEO Section -->
   <section class="game-info-section" id="gameInfoSection" aria-label="About ${game.name}">
