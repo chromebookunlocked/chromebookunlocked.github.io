@@ -176,8 +176,16 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     </div>
   </main>
 
+  <!-- More Games Hint Box -->
+  <div class="more-games-hint" id="moreGamesHint" onclick="scrollToMoreGames()" role="button" aria-label="Scroll to more games" tabindex="0">
+    <span class="more-games-hint-text">More Games</span>
+    <svg class="more-games-hint-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </div>
+
   <!-- More Games Section -->
-  <section class="recommendations" aria-label="More Unblocked Games">
+  <section class="recommendations" id="moreGamesSection" aria-label="More Unblocked Games">
     <h2>More Games</h2>
     <div class="grid">
       ${recommendedGamesHTML}
@@ -429,6 +437,65 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         e.preventDefault();
       }
     });
+
+    // More Games Hint Box - Scroll behavior and click handler
+    function scrollToMoreGames() {
+      const moreGamesSection = document.getElementById('moreGamesSection');
+      if (moreGamesSection) {
+        moreGamesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Track analytics
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'more_games_hint_clicked', {
+            game_name: '${game.name}',
+            game_folder: '${game.folder}',
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          });
+        }
+      }
+    }
+
+    // Handle keyboard accessibility for More Games hint
+    document.getElementById('moreGamesHint').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        scrollToMoreGames();
+      }
+    });
+
+    // Scroll listener to hide/show More Games hint
+    (function() {
+      const moreGamesHint = document.getElementById('moreGamesHint');
+      const moreGamesSection = document.getElementById('moreGamesSection');
+      let ticking = false;
+
+      function updateHintVisibility() {
+        if (!moreGamesHint || !moreGamesSection) return;
+
+        const sectionRect = moreGamesSection.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+
+        // Hide hint when the More Games section is visible in viewport
+        // (when top of section is within 200px of viewport bottom or already visible)
+        if (sectionRect.top < viewportHeight - 100) {
+          moreGamesHint.classList.add('hidden');
+        } else {
+          moreGamesHint.classList.remove('hidden');
+        }
+
+        ticking = false;
+      }
+
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          window.requestAnimationFrame(updateHintVisibility);
+          ticking = true;
+        }
+      }, { passive: true });
+
+      // Initial check
+      updateHintVisibility();
+    })();
 
     // Toggle game info section
     function toggleGameInfo() {
