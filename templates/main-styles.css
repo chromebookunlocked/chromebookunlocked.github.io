@@ -271,15 +271,17 @@ html,body {
 }
 
 .header-left {
+  height: 100%;
+  padding: 0 clamp(1rem, 2vw, 2rem);
   display: flex;
   align-items: center;
-  gap: clamp(0.6rem, 1vw, 1rem);
+  gap: clamp(8px, 1.5vw, 16px);
   cursor: pointer;
-  transition: transform .3s ease;
+  transition: all 0.3s ease;
 }
 
 .header-left:hover {
-  transform: translateX(-4px);
+  opacity: 0.9;
 }
 
 .header-logo {
