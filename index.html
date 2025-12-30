@@ -813,10 +813,10 @@ html,body {
 }
 #sidebar li {
   cursor:pointer;
-  padding: 0.5rem;
+  padding: 0.5rem 0.5rem;
   margin: 0.15rem 0.25rem;
   border-radius: 6px;
-  transition: background .15s ease, border .15s ease;
+  transition: background .15s ease, border .15s ease, padding .2s ease;
   white-space:nowrap;
   opacity: 0.9;
   font-family:var(--font-main);
@@ -826,27 +826,30 @@ html,body {
   overflow: hidden;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.6rem;
 }
-/* Icon styling - constant size */
+/* Icon styling - fixed position, constant size */
 #sidebar li .icon {
   font-size: 1.15rem;
   flex-shrink: 0;
-  width: 1.4rem;
+  min-width: 1.4rem;
   text-align: center;
 }
-/* Hide text when minimized, show icon */
+/* Text hidden when minimized with smooth transition */
 #sidebar li .text {
-  display: none;
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  transition: opacity .2s ease, max-width .2s ease;
 }
-/* Expanded state - just reveal text, keep same sizing */
+/* Expanded state - reveal text smoothly */
 #sidebar:hover li {
-  justify-content: flex-start;
   padding: 0.5rem 0.7rem;
 }
 #sidebar:hover li .text {
-  display: inline;
+  opacity: 1;
+  max-width: 200px;
 }
 #sidebar li:hover {
   background: rgba(255, 102, 255, 0.15);
@@ -883,24 +886,61 @@ html,body {
   }
   #sidebar {
     transform: translateX(-100%);
-    width: 200px;
+    width: 220px;
     top: clamp(48px, 6vw, 64px);
     height: calc(100vh - clamp(48px, 6vw, 64px));
     z-index: 2000;
+    transition: transform .25s ease;
   }
   #sidebar:hover,
   #sidebar:focus-within {
     transform: translateX(0);
   }
   #sidebar li {
-    justify-content: flex-start;
-    padding: 0.5rem 0.7rem;
+    padding: 0.6rem 0.8rem;
   }
   #sidebar li .text {
-    display: inline;
+    opacity: 1;
+    max-width: 200px;
   }
   #sidebarIndicator {
     display: none;
+  }
+}
+
+/* Mobile devices */
+@media (max-width: 768px) {
+  #sidebar {
+    width: 200px;
+    top: 85px;
+    height: calc(100vh - 85px);
+  }
+  #sidebar li {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.8rem;
+  }
+  #sidebar li .icon {
+    font-size: 1.1rem;
+  }
+  #content {
+    margin-top: 85px;
+    height: calc(100vh - 85px);
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  #sidebar {
+    width: 170px;
+  }
+  #sidebar li {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.7rem;
+    gap: 0.4rem;
+  }
+  #sidebar li .icon {
+    font-size: 0.95rem;
+    min-width: 1.1rem;
   }
 }
 
