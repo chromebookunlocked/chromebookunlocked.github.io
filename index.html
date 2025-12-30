@@ -813,40 +813,37 @@ html,body {
 }
 #sidebar li {
   cursor:pointer;
-  padding: 0.4rem;
-  margin: 0.15rem 0.2rem;
+  padding: 0.5rem;
+  margin: 0.15rem 0.25rem;
   border-radius: 6px;
-  transition: all .2s ease;
+  transition: background .15s ease, border .15s ease;
   white-space:nowrap;
-  opacity: 0.8;
+  opacity: 0.9;
   font-family:var(--font-main);
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   border: 1px solid transparent;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
-/* Icon styling */
+/* Icon styling - constant size */
 #sidebar li .icon {
-  font-size: 1rem;
+  font-size: 1.15rem;
   flex-shrink: 0;
-  width: 1.2rem;
+  width: 1.4rem;
   text-align: center;
 }
 /* Hide text when minimized, show icon */
 #sidebar li .text {
   display: none;
 }
-/* Expanded state */
+/* Expanded state - just reveal text, keep same sizing */
 #sidebar:hover li {
-  opacity: 1;
-  padding: 0.5rem 0.7rem;
-  margin: 0.2rem 0.4rem;
-  font-size: 0.8rem;
   justify-content: flex-start;
+  padding: 0.5rem 0.7rem;
 }
 #sidebar:hover li .text {
   display: inline;
@@ -896,11 +893,8 @@ html,body {
     transform: translateX(0);
   }
   #sidebar li {
-    opacity: 1;
-    padding: 0.5rem 0.7rem;
-    margin: 0.2rem 0.4rem;
-    font-size: 0.8rem;
     justify-content: flex-start;
+    padding: 0.5rem 0.7rem;
   }
   #sidebar li .text {
     display: inline;
@@ -925,7 +919,8 @@ html,body {
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
-  gap: clamp(0.8rem, 1.5vw, 2rem);
+  justify-content: space-between;
+  padding-right: 1.5rem;
 }
 
 .header-left {
