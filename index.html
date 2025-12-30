@@ -686,22 +686,25 @@ html,body {
   top: 0;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar (base) */
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.3);
 }
+
 ::-webkit-scrollbar-thumb {
   background: rgba(102, 0, 153, 0.8);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(128, 0, 192, 0.9);
 }
 
-/* Firefox scrollbar */
+/* Firefox global scrollbar */
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(102, 0, 153, 0.8) rgba(0, 0, 0, 0.3);
@@ -713,46 +716,52 @@ html,body {
   background: rgba(13, 0, 26, 0.95);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
-  padding:0;
-  padding-top: 0;
-  height: calc(100vh - clamp(48px, 6vw, 64px)); /* Full height minus header */
-  overflow-y:auto;
-  overflow-x:hidden;
-  position:fixed;
-  left:0;
-  top: clamp(48px, 6vw, 64px); /* Start below header */
-  z-index:999;
+  padding: 0;
+  height: calc(100vh - clamp(48px, 6vw, 64px));
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: fixed;
+  left: 0;
+  top: clamp(48px, 6vw, 64px);
+  z-index: 999;
   transition: width .25s cubic-bezier(0.4, 0, 0.2, 1);
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
-  scrollbar-width: none; /* Firefox - hidden by default */
+
+  /* Hidden by default (no fade) */
+  scrollbar-width: none;              /* Firefox */
 }
 
-/* Hide scrollbar when sidebar is minimized */
 #sidebar::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;            /* prevent fade animation */
+}
+
+#sidebar::-webkit-scrollbar-thumb {
+  background: transparent;            /* hidden by default */
+}
+
+/* Sidebar minimized scrollbar still hidden */
+#sidebar.minimized::-webkit-scrollbar {
   width: 0;
 }
 
-/* Show scrollbar only when sidebar is expanded */
+/* Hover — show instantly */
 #sidebar:hover {
   width: 200px;
   box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
-  scrollbar-width: thin;
-}
-
-#sidebar:hover::-webkit-scrollbar {
-  width: 3px;
-}
-
-#sidebar:hover::-webkit-scrollbar-track {
-  background: transparent;
+  scrollbar-width: thin;              /* Firefox show */
 }
 
 #sidebar:hover::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 2px;
+}
+
+#sidebar:hover::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 #sidebar:hover::-webkit-scrollbar-thumb:hover {
