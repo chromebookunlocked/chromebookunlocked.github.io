@@ -128,6 +128,11 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     </div>
   </header>
 
+  <!-- Back Button (fixed to left edge of screen) -->
+  <button class="back-button" onclick="window.location.href='/'" title="Back to Unblocked Games" aria-label="Back to Free Unblocked Games">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  </button>
+
   <!-- Main Game Content -->
   <main itemscope itemtype="https://schema.org/VideoGame">
     <meta itemprop="name" content="${game.name}">
@@ -139,10 +144,6 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
       <div class="game-frame-wrapper" id="gameWrapper">
         <!-- Controls Bar (sticky to top of game) -->
         <div class="controls">
-          <!-- Back Button (left side) -->
-          <button class="back-button" onclick="window.location.href='/'" title="Back to Unblocked Games" aria-label="Back to Free Unblocked Games">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-          </button>
           <button id="fullscreenBtn" class="icon-btn" onclick="toggleFullscreen()" title="Play ${game.name} Fullscreen" aria-label="Toggle Fullscreen Mode">
             <svg id="fullscreenIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
           </button>

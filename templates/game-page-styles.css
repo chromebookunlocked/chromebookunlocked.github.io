@@ -142,7 +142,8 @@ header {
 }
 
 .header-logo:hover {
-  transform: scale(1.05);
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 25px var(--shadow-color);
 }
 
 h1 {
@@ -177,8 +178,11 @@ h1 {
   z-index: 1;
 }
 
-/* Back Button - Inside controls, matches icon-btn */
+/* Back Button - Fixed to left edge of screen */
 .back-button {
+  position: fixed;
+  left: var(--spacing-md);
+  top: calc(clamp(48px, 6vw, 64px) + var(--spacing-md) + 0.5rem);
   width: var(--btn-icon-size);
   height: var(--btn-icon-size);
   border-radius: var(--radius-md);
@@ -192,6 +196,7 @@ h1 {
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  z-index: 100;
 }
 
 .back-button:hover {
@@ -257,11 +262,10 @@ h1 {
 .controls {
   position: absolute;
   top: 0;
-  left: 0;
   right: 0;
   padding: var(--spacing-md);
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   z-index: 10;
   pointer-events: none;
@@ -650,7 +654,7 @@ iframe.active {
   max-width: min(1400px, 95vw);
   padding: var(--spacing-xs) var(--spacing-lg) var(--spacing-md);
   margin: 0 auto;
-  animation: fadeIn 1s ease 0.4s both;
+  animation: fadeIn 0.4s ease 0.1s both;
 }
 
 /* Thin separator line between game and recommendations */
