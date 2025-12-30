@@ -88,44 +88,33 @@ html,body {
   scrollbar-width: none; /* Firefox - hidden by default */
 }
 
-/* Hide scrollbar when sidebar is minimized - instant hide */
+/* Hide scrollbar when sidebar is minimized */
 #sidebar::-webkit-scrollbar {
   width: 0;
-  display: none;
 }
 
-#sidebar::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-
-#sidebar::-webkit-scrollbar-thumb {
-  background-color: transparent;
-}
-
-/* Show scrollbar only when sidebar is hovered/expanded - instant show */
+/* Show scrollbar only when sidebar is expanded */
 #sidebar:hover {
   width: 200px;
   box-shadow: 4px 0 20px rgba(0, 0, 0, 0.4);
-  scrollbar-width: thin; /* Firefox - show on hover */
+  scrollbar-width: thin;
 }
 
 #sidebar:hover::-webkit-scrollbar {
-  width: 5px;
-  display: block;
+  width: 3px;
 }
 
 #sidebar:hover::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 3px;
+  background: transparent;
 }
 
 #sidebar:hover::-webkit-scrollbar-thumb {
-  background: rgba(255, 102, 255, 0.4);
-  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
 }
 
 #sidebar:hover::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 102, 255, 0.6);
+  background: rgba(255, 255, 255, 0.35);
 }
 
 /* Sidebar expand indicator - Modern minimal design */
@@ -174,7 +163,7 @@ html,body {
 
 #sidebar ul {
   list-style:none;
-  padding:0.5rem 0;
+  padding:0.3rem 0;
   margin:0;
   overflow-y: auto;
   overflow-x: hidden;
@@ -182,35 +171,47 @@ html,body {
 }
 #sidebar li {
   cursor:pointer;
-  padding: 0.5rem 0.4rem;
-  margin: 0.25rem 0.3rem;
+  padding: 0.4rem;
+  margin: 0.15rem 0.2rem;
   border-radius: 6px;
-  transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all .2s ease;
   white-space:nowrap;
-  opacity: 0.7;
+  opacity: 0.8;
   font-family:var(--font-main);
   font-weight: 600;
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   border: 1px solid transparent;
   overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: calc(var(--sidebar-width) - 0.6rem);
-  text-align: center;
-  background: rgba(255, 255, 255, 0.03);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
+/* Icon styling */
+#sidebar li .icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  width: 1.2rem;
+  text-align: center;
+}
+/* Hide text when minimized, show icon */
+#sidebar li .text {
+  display: none;
+}
+/* Expanded state */
 #sidebar:hover li {
   opacity: 1;
-  padding: 0.6rem 0.8rem;
-  margin: 0.3rem 0.5rem;
-  font-size: 0.85rem;
-  max-width: none;
-  text-align: left;
-  background: transparent;
+  padding: 0.5rem 0.7rem;
+  margin: 0.2rem 0.4rem;
+  font-size: 0.8rem;
+  justify-content: flex-start;
+}
+#sidebar:hover li .text {
+  display: inline;
 }
 #sidebar li:hover {
-  background: rgba(255, 102, 255, 0.12);
-  border: 1px solid rgba(255, 102, 255, 0.3);
-  color:#fff;
+  background: rgba(255, 102, 255, 0.15);
+  border: 1px solid rgba(255, 102, 255, 0.25);
 }
 
 /* Content */
@@ -254,12 +255,13 @@ html,body {
   }
   #sidebar li {
     opacity: 1;
-    padding: 0.6rem 0.8rem;
-    margin: 0.3rem 0.5rem;
-    font-size: 0.85rem;
-    max-width: none;
-    text-align: left;
-    background: transparent;
+    padding: 0.5rem 0.7rem;
+    margin: 0.2rem 0.4rem;
+    font-size: 0.8rem;
+    justify-content: flex-start;
+  }
+  #sidebar li .text {
+    display: inline;
   }
   #sidebarIndicator {
     display: none;
@@ -274,25 +276,24 @@ html,body {
   right: 0;
   z-index: 1001;
   height: clamp(48px, 6vw, 64px);
-  padding: 0 clamp(0.8rem, 2vw, 2rem);
   background: rgba(13, 0, 26, 0.95);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   gap: clamp(0.8rem, 1.5vw, 2rem);
 }
 
 .header-left {
   height: 100%;
-  padding: 0 clamp(1rem, 2vw, 2rem);
+  padding: 0 2rem;
   display: flex;
   align-items: center;
   gap: clamp(8px, 1.5vw, 16px);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: 0.3s ease;
 }
 
 .header-left:hover {
@@ -484,7 +485,7 @@ html,body {
 }
 
 .content-wrapper {
-  padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+  padding: 0.2rem 1.5rem 1.5rem 1.5rem;
 }
 
 /* Controls (buttons) */

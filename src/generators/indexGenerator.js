@@ -2,6 +2,45 @@ const { generateGameCard } = require('./cardGenerator');
 const { generateIndexMetaTags, generateIndexStructuredData } = require('../utils/seoBuilder');
 const { generateAnalyticsScript } = require('../utils/analyticsEnhanced');
 
+// Category to icon mapping
+const categoryIcons = {
+  'Home': '🏠',
+  'All Games': '🎮',
+  'Trending Games': '🔥',
+  'Action': '⚔️',
+  'Puzzle': '🧩',
+  'Shooter': '🔫',
+  'Clickers': '👆',
+  'Horror': '👻',
+  'Racing': '🏎️',
+  'Adventure': '🗺️',
+  'Sports': '⚽',
+  'Strategy': '♟️',
+  'Platformer': '🏃',
+  'RPG': '🎭',
+  'Simulation': '🎯',
+  'Multiplayer': '👥',
+  'Arcade': '🕹️',
+  'Fighting': '🥊',
+  'Rhythm': '🎵',
+  'Music': '🎶',
+  'Building': '🏗️',
+  'Survival': '🏕️',
+  'Roguelike': '💀',
+  'Retro': '👾',
+  '2 Player': '👫',
+  'Football': '🏈',
+  'Basketball': '🏀',
+  'Card': '🃏',
+  'IO': '🌐',
+  'Uncategorized': '📁'
+};
+
+// Get icon for a category, with fallback
+function getCategoryIcon(category) {
+  return categoryIcons[category] || '🎯';
+}
+
 /**
  * Generate the full HTML for the index page
  * @param {Array} games - Array of game objects
@@ -17,12 +56,12 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   const sidebarCategories = Object.keys(categories)
     .filter(cat => cat !== "Recently Played" && cat !== "Trending Games")
     .sort((a, b) => categories[b].length - categories[a].length) // Sort by count, largest first
-    .map(cat => `<li role="menuitem" tabindex="0" onclick="filterCategory('${cat}')" onkeypress="if(event.key==='Enter')filterCategory('${cat}')">${cat}</li>`)
+    .map(cat => `<li role="menuitem" tabindex="0" onclick="filterCategory('${cat}')" onkeypress="if(event.key==='Enter')filterCategory('${cat}')"><span class="icon">${getCategoryIcon(cat)}</span><span class="text">${cat}</span></li>`)
     .join("");
 
   // Add Trending Games right after All Games in the sidebar
   const trendingGamesItem = categories["Trending Games"]
-    ? `<li role="menuitem" tabindex="0" onclick="filterCategory('Trending Games')" onkeypress="if(event.key==='Enter')filterCategory('Trending Games')">Trending Games</li>`
+    ? `<li role="menuitem" tabindex="0" onclick="filterCategory('Trending Games')" onkeypress="if(event.key==='Enter')filterCategory('Trending Games')"><span class="icon">${getCategoryIcon('Trending Games')}</span><span class="text">Trending Games</span></li>`
     : '';
 
   const finalSidebarCategories = trendingGamesItem + sidebarCategories;
@@ -104,8 +143,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <!-- Sidebar -->
   <nav id="sidebar" role="navigation" aria-label="Game categories">
     <ul id="categoryList" role="menu">
-      <li role="menuitem" tabindex="0" onclick="window.location.href='/'" onkeypress="if(event.key==='Enter')window.location.href='/'">Home</li>
-      <li role="menuitem" tabindex="0" onclick="filterCategory('All Games')" onkeypress="if(event.key==='Enter')filterCategory('All Games')">All Games</li>
+      <li role="menuitem" tabindex="0" onclick="window.location.href='/'" onkeypress="if(event.key==='Enter')window.location.href='/'"><span class="icon">🏠</span><span class="text">Home</span></li>
+      <li role="menuitem" tabindex="0" onclick="filterCategory('All Games')" onkeypress="if(event.key==='Enter')filterCategory('All Games')"><span class="icon">🎮</span><span class="text">All Games</span></li>
       ${finalSidebarCategories}
     </ul>
   </nav>
