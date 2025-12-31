@@ -653,6 +653,8 @@
   --font-main: 'Orbitron', sans-serif;
   --content-max-width: min(1400px, 95vw);
   --grid-gap: clamp(0.6rem, 1.2vw, 1rem);
+  --spacing-xs: 0.5rem;
+  --spacing-md: 1.5rem;
 }
 
 /* basics */
@@ -862,10 +864,10 @@ html,body {
   overflow-y:auto;
   overflow-x:hidden;
   margin-left: var(--sidebar-width);
-  margin-top: clamp(48px, 6vw, 64px); /* Space for fixed header */
+  margin-top: 0;
   width: calc(100% - var(--sidebar-width));
   transition: margin-left .3s;
-  height: calc(100vh - clamp(48px, 6vw, 64px));
+  height: 100vh;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -882,7 +884,7 @@ html,body {
   #content {
     margin-left: 0;
     width: 100%;
-    margin-top: clamp(48px, 6vw, 64px);
+    margin-top: 0;
   }
   #sidebar {
     transform: translateX(-100%);
@@ -923,8 +925,8 @@ html,body {
     font-size: 1.1rem;
   }
   #content {
-    margin-top: 85px;
-    height: calc(100vh - 85px);
+    margin-top: 0;
+    height: 100vh;
   }
 }
 
@@ -1035,8 +1037,11 @@ html,body {
     height: calc(100vh - 85px);
   }
   #content {
-    margin-top: 85px;
-    height: calc(100vh - 85px);
+    margin-top: 0;
+    height: 100vh;
+  }
+  .content-wrapper {
+    padding-top: calc(85px + 0.5rem);
   }
 }
 
@@ -1162,7 +1167,7 @@ html,body {
 }
 
 .content-wrapper {
-  padding: 0.2rem 1.5rem 1.5rem 1.5rem;
+  padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) var(--spacing-md) var(--spacing-xs);
 }
 
 /* Controls (buttons) */
