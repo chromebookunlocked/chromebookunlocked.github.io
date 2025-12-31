@@ -1444,6 +1444,16 @@ button:active {
 .category:first-of-type {
   margin-top: 0.5rem;
 }
+
+/* Reduce spacing between header and content when search bar is inline (larger screens) */
+@media (min-width: 769px) {
+  .content-wrapper {
+    padding-top: 0;
+  }
+  .category:first-of-type {
+    margin-top: 0;
+  }
+}
 .category h2 {
   color:#ffccff;
   margin-bottom:1rem;
