@@ -730,10 +730,9 @@ html,body {
   scrollbar-width: none; /* Firefox - hidden by default */
 }
 
-/* Hide scrollbar when sidebar is minimized - instant hide, no delay */
+/* Hide scrollbar when sidebar is minimized */
 #sidebar::-webkit-scrollbar {
   width: 0;
-  display: none;
 }
 
 /* Show scrollbar only when sidebar is expanded */
@@ -745,7 +744,6 @@ html,body {
 
 #sidebar:hover::-webkit-scrollbar {
   width: 3px;
-  display: block;
 }
 
 #sidebar:hover::-webkit-scrollbar-track {
@@ -1164,7 +1162,7 @@ html,body {
 }
 
 .content-wrapper {
-  padding: 0 1.5rem 1.5rem 1.5rem;
+  padding: 0.2rem 1.5rem 1.5rem 1.5rem;
 }
 
 /* Controls (buttons) */
@@ -1444,7 +1442,7 @@ button:active {
   contain-intrinsic-size: auto 500px; /* Reserve space to prevent layout shift */
 }
 .category:first-of-type {
-  margin-top: 0;
+  margin-top: 0.5rem;
 }
 .category h2 {
   color:#ffccff;
