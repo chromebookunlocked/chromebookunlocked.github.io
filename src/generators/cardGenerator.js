@@ -22,7 +22,12 @@ function generateGameCard(game, idx, gamesDir, loadEagerly = false) {
   const srcAttr = shouldEagerLoad ? `src="${thumbPath}"` : `data-src="${thumbPath}"`;
   const placeholderSrc = shouldEagerLoad ? '' : ' src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'300\'%3E%3C/svg%3E"';
 
-  return `<div class="card game-card" data-index="${idx}" data-folder="${game.folder}" data-name="${game.name.toLowerCase()}" onclick="window.location.href='/${game.folder}.html'">
+  // Add aliases for search (otherNames)
+  const aliasesAttr = game.otherNames && game.otherNames.length > 0
+    ? ` data-aliases="${game.otherNames.map(n => n.toLowerCase()).join(',')}"`
+    : '';
+
+  return `<div class="card game-card" data-index="${idx}" data-folder="${game.folder}" data-name="${game.name.toLowerCase()}"${aliasesAttr} onclick="window.location.href='/${game.folder}.html'">
     <div class="thumb-container" style="--thumb-url: url('${thumbPath}')">
       <img class="thumb" ${srcAttr}${placeholderSrc} alt="${game.name}" loading="${loadingAttr}" decoding="async" width="300" height="300"${fetchPriorityAttr}>
     </div>

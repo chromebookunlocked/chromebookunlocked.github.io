@@ -68,6 +68,20 @@ function validateGameFolder(gamePath, folderName) {
   };
 }
 
+/**
+ * Generate initial game data JSON
+ *
+ * Optional fields you can add manually:
+ * - displayName: Override the display name (defaults to folder name)
+ * - otherNames: Alternative names for search (array or comma-separated string)
+ *
+ * Example: {
+ *   "name": "BTD5",
+ *   "displayName": "Bloons Tower Defense 5",
+ *   "otherNames": ["BTD 5", "Bloons TD 5"],
+ *   "category": "Tower Defence, Strategy"
+ * }
+ */
 function generateGameData(folderName) {
   return {
     name: folderName,
