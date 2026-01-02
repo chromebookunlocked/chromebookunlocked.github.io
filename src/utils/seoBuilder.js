@@ -184,7 +184,7 @@ function generateIndexStructuredData(games = []) {
       "item": {
         "@type": "VideoGame",
         "name": game.name,
-        "url": `${BASE_URL}/${encodeURIComponent(game.folder)}.html`,
+        "url": `${BASE_URL}/${game.folder}.html`,
         "playMode": "SinglePlayer",
         "gamePlatform": "Web Browser",
         "applicationCategory": "Game",
@@ -287,7 +287,7 @@ function generateGameMetaTags(game, thumbPath) {
   // Rich, keyword-dense description with unrestricted, online, chromebook, school keywords
   const gameDescription = `Play ${gameName} unblocked online free! Enjoy ${gameName} unrestricted on your Chromebook or school computer with no downloads required. ${gameName} is a popular ${categoryText.toLowerCase()} game that works at school. Play ${gameName} online free now - unblocked and unrestricted!`;
 
-  const gameUrl = `${BASE_URL}/${encodeURIComponent(game.folder)}.html`;
+  const gameUrl = `${BASE_URL}/${game.folder}.html`;
   const imageUrl = `${BASE_URL}/${thumbPath}`;
   const keywords = generateGameKeywords(game);
 
@@ -355,7 +355,7 @@ function generateGameMetaTags(game, thumbPath) {
 function generateGameStructuredData(game, thumbPath) {
   const gameName = game.name;
   const categories = game.categories || [];
-  const gameUrl = `${BASE_URL}/${encodeURIComponent(game.folder)}.html`;
+  const gameUrl = `${BASE_URL}/${game.folder}.html`;
   const imageUrl = `${BASE_URL}/${thumbPath}`;
 
   // VideoGame Schema - primary game data
