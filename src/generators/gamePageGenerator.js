@@ -76,7 +76,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
       const gThumbPath = getAssetPath(g.folder, gThumb);
       // SEO-optimized alt text with keywords
       const altText = `Play ${g.name} Unblocked - Free Online Game`;
-      return `<a href="/${encodeURIComponent(g.folder)}.html" class="game-card" title="Play ${g.name} Unblocked Free Online">
+      return `<a href="/${g.folder}.html" class="game-card" title="Play ${g.name} Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('${gThumbPath}')">
         <img class="thumb" src="${gThumbPath}" alt="${altText}" loading="lazy">
       </div>
