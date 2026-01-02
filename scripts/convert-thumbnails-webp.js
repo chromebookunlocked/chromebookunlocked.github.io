@@ -25,6 +25,42 @@ function checkSharpAvailable() {
   }
 }
 
+function checkImageMagickAvailable() {
+  try {
+    execSync('which convert', { stdio: 'ignore' });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function detectRealFormat(filePath) {
+  try {
+    const output = execSync(`file "${filePath}"`, { encoding: 'utf-8' });
+    if (output.includes('AVIF')) return 'avif';
+    if (output.includes('PNG')) return 'png';
+    if (output.includes('JPEG') || output.includes('JFIF')) return 'jpeg';
+    if (output.includes('GIF')) return 'gif';
+    if (output.includes('WebP')) return 'webp';
+    if (output.includes('BMP')) return 'bmp';
+    if (output.includes('TIFF')) return 'tiff';
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function convertWithImageMagick(inputPath, outputPath) {
+  try {
+    execSync(`convert "${inputPath}" -resize ${TARGET_SIZE}x${TARGET_SIZE}\\> -quality ${WEBP_QUALITY} "${outputPath}"`, {
+      stdio: 'pipe'
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 async function isValidWebP(filePath, sharp) {
   try {
     // Check file size
@@ -135,44 +171,83 @@ async function convertWithSharp() {
       const stats = fs.statSync(inputPath);
       totalSizeBefore += stats.size;
 
-      // Get image metadata
-      const metadata = await sharp(inputPath).metadata();
+      let conversionSuccess = false;
+      let usedFallback = false;
 
-      // Convert to WebP with resize if needed
-      let pipeline = sharp(inputPath);
+      // Detect if file format mismatches extension (e.g., AVIF with .png extension)
+      const realFormat = detectRealFormat(inputPath);
+      const fileExt = path.extname(inputPath).toLowerCase().slice(1);
+      const formatMismatch = realFormat && realFormat !== fileExt && !(realFormat === 'jpeg' && fileExt === 'jpg');
 
-      // Resize if image is larger than target size
-      if (metadata.width > TARGET_SIZE || metadata.height > TARGET_SIZE) {
-        pipeline = pipeline.resize(TARGET_SIZE, TARGET_SIZE, {
-          fit: 'inside', // Maintain aspect ratio
-          withoutEnlargement: true
-        });
+      if (formatMismatch) {
+        console.log(`⚠️  ${folder}: File is actually ${realFormat.toUpperCase()}, not ${fileExt.toUpperCase()}`);
       }
 
-      // Convert to WebP
-      await pipeline
-        .webp({ quality: WEBP_QUALITY })
-        .toFile(outputPath);
+      try {
+        // Get image metadata
+        const metadata = await sharp(inputPath).metadata();
 
-      const newStats = fs.statSync(outputPath);
-      totalSizeAfter += newStats.size;
+        // Convert to WebP with resize if needed
+        let pipeline = sharp(inputPath);
 
-      const sizeBefore = (stats.size / 1024).toFixed(1);
-      const sizeAfter = (newStats.size / 1024).toFixed(1);
-      const savings = (((stats.size - newStats.size) / stats.size) * 100).toFixed(1);
+        // Resize if image is larger than target size
+        if (metadata.width > TARGET_SIZE || metadata.height > TARGET_SIZE) {
+          pipeline = pipeline.resize(TARGET_SIZE, TARGET_SIZE, {
+            fit: 'inside', // Maintain aspect ratio
+            withoutEnlargement: true
+          });
+        }
 
-      const prefix = isReconvert ? '🔄' : '✓';
-      console.log(`${prefix}  ${folder}: ${sizeBefore}KB → ${sizeAfter}KB (${savings}% smaller) [${metadata.width}×${metadata.height}]`);
+        // Convert to WebP
+        await pipeline
+          .webp({ quality: WEBP_QUALITY })
+          .toFile(outputPath);
 
-      // Delete old source thumbnail if conversion was successful
-      if (sourceFile !== 'thumbnail.webp') {
-        fs.unlinkSync(inputPath);
+        conversionSuccess = true;
+
+        const newStats = fs.statSync(outputPath);
+        totalSizeAfter += newStats.size;
+
+        const sizeBefore = (stats.size / 1024).toFixed(1);
+        const sizeAfter = (newStats.size / 1024).toFixed(1);
+        const savings = (((stats.size - newStats.size) / stats.size) * 100).toFixed(1);
+
+        const prefix = isReconvert ? '🔄' : '✓';
+        console.log(`${prefix}  ${folder}: ${sizeBefore}KB → ${sizeAfter}KB (${savings}% smaller)`);
+      } catch (sharpError) {
+        // Sharp failed, try ImageMagick as fallback
+        if (checkImageMagickAvailable()) {
+          console.log(`⚠️  ${folder}: Sharp failed, trying ImageMagick fallback...`);
+          if (convertWithImageMagick(inputPath, outputPath)) {
+            conversionSuccess = true;
+            usedFallback = true;
+
+            const newStats = fs.statSync(outputPath);
+            totalSizeAfter += newStats.size;
+
+            const sizeBefore = (stats.size / 1024).toFixed(1);
+            const sizeAfter = (newStats.size / 1024).toFixed(1);
+
+            console.log(`✓  ${folder}: Converted via ImageMagick (${sizeBefore}KB → ${sizeAfter}KB)`);
+          } else {
+            throw new Error(`Both Sharp and ImageMagick failed: ${sharpError.message}`);
+          }
+        } else {
+          throw sharpError;
+        }
       }
 
-      if (isReconvert) {
-        reconverted++;
-      } else {
-        converted++;
+      if (conversionSuccess) {
+        // Delete old source thumbnail if conversion was successful
+        if (sourceFile !== 'thumbnail.webp') {
+          fs.unlinkSync(inputPath);
+        }
+
+        if (isReconvert) {
+          reconverted++;
+        } else {
+          converted++;
+        }
       }
     } catch (error) {
       console.error(`❌ ${folder}: ${error.message}`);
@@ -293,23 +368,52 @@ function convertWithCwebp() {
     const inputPath = path.join(gamePath, sourceFile);
 
     try {
-      // Use cwebp to convert
-      execSync(`cwebp -q ${WEBP_QUALITY} -resize ${TARGET_SIZE} ${TARGET_SIZE} "${inputPath}" -o "${outputPath}"`, {
-        stdio: 'pipe'
-      });
+      let conversionSuccess = false;
 
-      const prefix = isReconvert ? '🔄' : '✓';
-      console.log(`${prefix}  ${folder}: Converted to WebP`);
+      // Detect if file format mismatches extension
+      const realFormat = detectRealFormat(inputPath);
+      const fileExt = path.extname(inputPath).toLowerCase().slice(1);
+      const formatMismatch = realFormat && realFormat !== fileExt && !(realFormat === 'jpeg' && fileExt === 'jpg');
 
-      // Delete old source thumbnail
-      if (sourceFile !== 'thumbnail.webp') {
-        fs.unlinkSync(inputPath);
+      if (formatMismatch) {
+        console.log(`⚠️  ${folder}: File is actually ${realFormat.toUpperCase()}, not ${fileExt.toUpperCase()}`);
       }
 
-      if (isReconvert) {
-        reconverted++;
-      } else {
-        converted++;
+      try {
+        // Use cwebp to convert
+        execSync(`cwebp -q ${WEBP_QUALITY} -resize ${TARGET_SIZE} ${TARGET_SIZE} "${inputPath}" -o "${outputPath}"`, {
+          stdio: 'pipe'
+        });
+        conversionSuccess = true;
+
+        const prefix = isReconvert ? '🔄' : '✓';
+        console.log(`${prefix}  ${folder}: Converted to WebP`);
+      } catch (cwebpError) {
+        // cwebp failed, try ImageMagick as fallback
+        if (checkImageMagickAvailable()) {
+          console.log(`⚠️  ${folder}: cwebp failed, trying ImageMagick fallback...`);
+          if (convertWithImageMagick(inputPath, outputPath)) {
+            conversionSuccess = true;
+            console.log(`✓  ${folder}: Converted via ImageMagick`);
+          } else {
+            throw new Error(`Both cwebp and ImageMagick failed`);
+          }
+        } else {
+          throw cwebpError;
+        }
+      }
+
+      if (conversionSuccess) {
+        // Delete old source thumbnail
+        if (sourceFile !== 'thumbnail.webp') {
+          fs.unlinkSync(inputPath);
+        }
+
+        if (isReconvert) {
+          reconverted++;
+        } else {
+          converted++;
+        }
       }
     } catch (error) {
       console.error(`❌ ${folder}: ${error.message}`);
