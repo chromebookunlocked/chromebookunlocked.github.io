@@ -759,50 +759,6 @@ html,body {
   background: rgba(255, 255, 255, 0.35);
 }
 
-/* Sidebar expand indicator - Modern minimal design */
-#sidebarIndicator {
-  position: fixed;
-  left: calc(var(--sidebar-width) - 12px);
-  top: calc(50% + clamp(24px, 3vw, 32px)); /* Centered in viewport accounting for header */
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.6;
-  transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-  z-index: 998;
-  width: 24px;
-  height: 24px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 50%;
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-#sidebar:hover ~ #sidebarIndicator {
-  opacity: 1;
-  left: 190px;
-  background: rgba(255, 102, 255, 0.15);
-  border-color: rgba(255, 102, 255, 0.3);
-}
-/* Modern sleek arrow using CSS */
-#sidebarIndicator::before {
-  content: '';
-  display: block;
-  width: 6px;
-  height: 6px;
-  border-right: 2px solid rgba(255, 255, 255, 0.8);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.8);
-  transform: rotate(-45deg);
-  transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-left: 1px;
-}
-#sidebar:hover ~ #sidebarIndicator::before {
-  transform: rotate(135deg);
-  margin-left: -1px;
-  border-color: var(--accent);
-}
-
 #sidebar ul {
   list-style:none;
   padding:0.3rem 0;
@@ -902,9 +858,6 @@ html,body {
   #sidebar li .text {
     opacity: 1;
     max-width: 200px;
-  }
-  #sidebarIndicator {
-    display: none;
   }
 }
 
@@ -1042,8 +995,8 @@ html,body {
 
 #searchContainer {
   flex: 1;
-  max-width: 500px;
-  min-width: 200px;
+  max-width: 350px;
+  min-width: 160px;
   position: relative;
 }
 
@@ -1056,23 +1009,23 @@ html,body {
 
 #searchIcon {
   position: absolute;
-  left: 1rem;
+  left: 0.8rem;
   top: 50%;
   transform: translateY(-50%);
   color: rgba(255, 255, 255, 0.5);
   pointer-events: none;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
 }
 
 #searchBar {
   width: 100%;
-  padding: 0.8rem 1.2rem 0.8rem 3rem;
+  padding: 0.5rem 1rem 0.5rem 2.4rem;
   border: 2px solid rgba(255, 102, 255, 0.3);
-  border-radius: 25px;
+  border-radius: 20px;
   background: rgba(0, 0, 0, 0.4);
   color: #fff;
   font-family: var(--font-main);
-  font-size: 1rem;
+  font-size: 0.9rem;
   outline: none;
   transition: all .3s ease;
 }
@@ -1162,7 +1115,7 @@ html,body {
 }
 
 .content-wrapper {
-  padding: 0.2rem 1.5rem 1.5rem 1.5rem;
+  padding: 0 1.5rem 1.5rem 1.5rem;
 }
 
 /* Controls (buttons) */
@@ -1442,7 +1395,7 @@ button:active {
   contain-intrinsic-size: auto 500px; /* Reserve space to prevent layout shift */
 }
 .category:first-of-type {
-  margin-top: 0.5rem;
+  margin-top: 0.2rem;
 }
 .category h2 {
   color:#ffccff;
