@@ -272,6 +272,7 @@ function searchGames(query) {
   document.querySelectorAll('.game-card[data-folder]').forEach(card => {
     const gameName = card.getAttribute('data-name') || '';
     const gameFolder = card.getAttribute('data-folder');
+    const gameAliases = card.getAttribute('data-aliases') || '';
     const gameTitle = card.querySelector('.card-title')?.textContent || '';
     const thumbImg = card.querySelector('.thumb');
 
@@ -295,7 +296,11 @@ function searchGames(query) {
       thumbSrc = 'assets/logo.webp';
     }
 
-    if (gameName.includes(searchTerm) && !seenFolders.has(gameFolder)) {
+    // Check if name or any alias matches the search term
+    const nameMatches = gameName.includes(searchTerm);
+    const aliasMatches = gameAliases && gameAliases.split(',').some(alias => alias.includes(searchTerm));
+
+    if ((nameMatches || aliasMatches) && !seenFolders.has(gameFolder)) {
       seenFolders.add(gameFolder);
       matchingGames.push({
         folder: gameFolder,

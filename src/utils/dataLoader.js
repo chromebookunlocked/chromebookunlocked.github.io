@@ -40,9 +40,19 @@ function loadGames(dataDir, gamesDir) {
           return null;
         }
 
+        // Support otherNames for search aliases (can be string or array)
+        let otherNames = json.otherNames || [];
+        if (typeof otherNames === 'string') {
+          otherNames = otherNames.split(',').map(n => n.trim()).filter(n => n);
+        }
+        if (!Array.isArray(otherNames)) {
+          otherNames = [];
+        }
+
         return {
           folder: folder,
           name: json.displayName || json.name || folder,
+          otherNames: otherNames, // Array of alternative names for search
           categories: gameCategories, // Array of categories
           thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.webp", "thumbnail.png", "thumbnail.jpg"]
         };
