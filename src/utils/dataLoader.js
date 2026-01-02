@@ -42,7 +42,7 @@ function loadGames(dataDir, gamesDir) {
 
         return {
           folder: folder,
-          name: json.name || f.replace(".json", ""),
+          name: json.displayName || json.name || folder,
           categories: gameCategories, // Array of categories
           thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.webp", "thumbnail.png", "thumbnail.jpg"]
         };
