@@ -41,9 +41,13 @@
           We use cookies to improve your experience.
           <a href="/important-pages/cookie-policy.html">Learn more</a>
         </p>
-        <div class="cookie-consent-buttons">
-          <button id="cookieDecline" class="cookie-btn cookie-btn-decline">Decline</button>
+        <div class="cookie-consent-buttons" id="cookieMainButtons">
+          <button id="cookieOptions" class="cookie-btn cookie-btn-options">More options</button>
           <button id="cookieAccept" class="cookie-btn cookie-btn-accept">Accept</button>
+        </div>
+        <div class="cookie-consent-buttons" id="cookieExpandedButtons" style="display: none;">
+          <button id="cookieDecline" class="cookie-btn cookie-btn-decline">Decline</button>
+          <button id="cookieAcceptAll" class="cookie-btn cookie-btn-accept">Accept</button>
         </div>
       </div>
     `;
@@ -55,9 +59,19 @@
       hideBanner();
     });
 
+    document.getElementById('cookieAcceptAll').addEventListener('click', function() {
+      setCookie(COOKIE_NAME, 'accepted', COOKIE_EXPIRY_DAYS);
+      hideBanner();
+    });
+
     document.getElementById('cookieDecline').addEventListener('click', function() {
       setCookie(COOKIE_NAME, 'declined', COOKIE_EXPIRY_DAYS);
       hideBanner();
+    });
+
+    document.getElementById('cookieOptions').addEventListener('click', function() {
+      document.getElementById('cookieMainButtons').style.display = 'none';
+      document.getElementById('cookieExpandedButtons').style.display = 'flex';
     });
 
     requestAnimationFrame(() => {

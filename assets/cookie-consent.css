@@ -84,6 +84,16 @@
   background: rgba(0, 0, 0, 0.04);
 }
 
+.cookie-btn-options {
+  background: transparent;
+  color: #6b7280;
+  padding: 10px 16px;
+}
+
+.cookie-btn-options:hover {
+  color: #374151;
+}
+
 /* Mobile */
 @media (max-width: 640px) {
   .cookie-consent-banner {
@@ -136,6 +146,14 @@
   .cookie-btn-decline:hover {
     color: #e5e7eb;
     background: rgba(255, 255, 255, 0.06);
+  }
+
+  .cookie-btn-options {
+    color: #9ca3af;
+  }
+
+  .cookie-btn-options:hover {
+    color: #e5e7eb;
   }
 }
 
