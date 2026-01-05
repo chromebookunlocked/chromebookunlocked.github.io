@@ -184,7 +184,7 @@ function generateIndexStructuredData(games = []) {
       "item": {
         "@type": "VideoGame",
         "name": game.name,
-        "url": `${BASE_URL}/pages/${game.folder}.html`,
+        "url": `${BASE_URL}/${game.folder}.html`,
         "playMode": "SinglePlayer",
         "gamePlatform": "Web Browser",
         "applicationCategory": "Game",
@@ -287,8 +287,8 @@ function generateGameMetaTags(game, thumbPath) {
   // Rich, keyword-dense description with unrestricted, online, chromebook, school keywords
   const gameDescription = `Play ${gameName} unblocked online free! Enjoy ${gameName} unrestricted on your Chromebook or school computer with no downloads required. ${gameName} is a popular ${categoryText.toLowerCase()} game that works at school. Play ${gameName} online free now - unblocked and unrestricted!`;
 
-  const gameUrl = `${BASE_URL}/pages/${game.folder}.html`;
-  const imageUrl = `${BASE_URL}/${thumbPath.replace('../', '')}`;
+  const gameUrl = `${BASE_URL}/${game.folder}.html`;
+  const imageUrl = `${BASE_URL}/${thumbPath}`;
   const keywords = generateGameKeywords(game);
 
   return `<meta charset="UTF-8">
@@ -331,13 +331,13 @@ function generateGameMetaTags(game, thumbPath) {
   <meta property="game:platform" content="Web Browser">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="../assets/logo.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="../assets/logo.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="../assets/logo.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="../assets/logo.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="../assets/logo.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="../assets/logo.png">
-  <link rel="shortcut icon" type="image/png" href="../assets/logo.png">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/logo.png">
+  <link rel="shortcut icon" type="image/png" href="assets/logo.png">
 
   <!-- Additional SEO -->
   <meta name="theme-color" content="#ff66ff">
@@ -355,8 +355,8 @@ function generateGameMetaTags(game, thumbPath) {
 function generateGameStructuredData(game, thumbPath) {
   const gameName = game.name;
   const categories = game.categories || [];
-  const gameUrl = `${BASE_URL}/pages/${game.folder}.html`;
-  const imageUrl = `${BASE_URL}/${thumbPath.replace('../', '')}`;
+  const gameUrl = `${BASE_URL}/${game.folder}.html`;
+  const imageUrl = `${BASE_URL}/${thumbPath}`;
 
   // VideoGame Schema - primary game data
   const gameSchema = {

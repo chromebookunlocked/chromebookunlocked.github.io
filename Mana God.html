@@ -1,0 +1,2205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-4QZLTDX504');
+  </script>
+
+  
+<script>
+  // Enhanced Analytics Tracking
+  (function() {
+    // Generate or retrieve session ID
+    function getSessionId() {
+      const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes
+      let sessionData = sessionStorage.getItem('ga_session_data');
+
+      if (sessionData) {
+        try {
+          const data = JSON.parse(sessionData);
+          const now = Date.now();
+
+          // Check if session is still valid
+          if (now - data.lastActivity < SESSION_DURATION) {
+            data.lastActivity = now;
+            sessionStorage.setItem('ga_session_data', JSON.stringify(data));
+            return data.sessionId;
+          }
+        } catch (e) {
+          console.error('Error parsing session data:', e);
+        }
+      }
+
+      // Create new session
+      const newSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      const newSessionData = {
+        sessionId: newSessionId,
+        startTime: Date.now(),
+        lastActivity: Date.now()
+      };
+      sessionStorage.setItem('ga_session_data', JSON.stringify(newSessionData));
+
+      // Track session start
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'session_start', {
+          session_id: newSessionId,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      return newSessionId;
+    }
+
+    // Get or create user ID for tracking across sessions
+    function getUserId() {
+      let userId = localStorage.getItem('ga_user_id');
+      if (!userId) {
+        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('ga_user_id', userId);
+      }
+      return userId;
+    }
+
+    // Initialize session tracking
+    window.analyticsSession = {
+      sessionId: getSessionId(),
+      userId: getUserId(),
+      pageViewStartTime: Date.now(),
+      engagementInterval: null
+    };
+
+    // Track page engagement every 15 seconds
+    function startEngagementTracking() {
+      if (window.analyticsSession.engagementInterval) {
+        clearInterval(window.analyticsSession.engagementInterval);
+      }
+
+      window.analyticsSession.engagementInterval = setInterval(function() {
+        const timeOnPage = Math.floor((Date.now() - window.analyticsSession.pageViewStartTime) / 1000);
+
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'user_engagement', {
+            session_id: window.analyticsSession.sessionId,
+            engagement_time_msec: timeOnPage * 1000,
+            page_location: window.location.href,
+            page_title: document.title
+          });
+        }
+      }, 15000); // Every 15 seconds
+    }
+
+    // Track page view with enhanced parameters
+    function trackEnhancedPageView(pageType, pageName, additionalParams) {
+      const sessionData = JSON.parse(sessionStorage.getItem('ga_session_data') || '{}');
+      const params = {
+        page_type: pageType,
+        page_name: pageName,
+        session_id: window.analyticsSession.sessionId,
+        user_id: window.analyticsSession.userId,
+        timestamp: new Date().toISOString(),
+        session_start_time: sessionData.startTime ? new Date(sessionData.startTime).toISOString() : new Date().toISOString(),
+        ...additionalParams
+      };
+
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'page_view', params);
+
+        // Also send as custom event for better tracking in realtime
+        gtag('event', 'page_visited', params);
+      }
+
+      // Reset page view start time
+      window.analyticsSession.pageViewStartTime = Date.now();
+
+      // Start engagement tracking
+      startEngagementTracking();
+    }
+
+    // Track when user leaves page
+    function trackPageExit() {
+      const timeOnPage = Math.floor((Date.now() - window.analyticsSession.pageViewStartTime) / 1000);
+
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'page_exit', {
+          session_id: window.analyticsSession.sessionId,
+          time_on_page_seconds: timeOnPage,
+          page_location: window.location.href,
+          page_title: document.title,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Clear engagement interval
+      if (window.analyticsSession.engagementInterval) {
+        clearInterval(window.analyticsSession.engagementInterval);
+      }
+    }
+
+    // Expose tracking functions globally
+    window.trackEnhancedPageView = trackEnhancedPageView;
+    window.trackPageExit = trackPageExit;
+
+    // Track page exit on beforeunload
+    window.addEventListener('beforeunload', trackPageExit);
+
+    // Track visibility changes (tab switching)
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        if (window.analyticsSession.engagementInterval) {
+          clearInterval(window.analyticsSession.engagementInterval);
+        }
+      } else {
+        startEngagementTracking();
+      }
+    });
+  })();
+</script>
+  
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Primary Meta Tags -->
+  <title>Mana God Unblocked - Play Online Free | Chromebook Unlocked Games</title>
+  <meta name="title" content="Mana God Unblocked - Play Online Free | Chromebook Unlocked Games">
+  <meta name="description" content="Play Mana God unblocked online free! Enjoy Mana God unrestricted on your Chromebook or school computer with no downloads required. Mana God is a popular clicker, strategy, tower defence game that works at school. Play Mana God online free now - unblocked and unrestricted!">
+  <meta name="keywords" content="Mana God, Mana God unblocked, Mana God online, Mana God free, Mana God unblocked play online free, play Mana God online free, Mana God play online free, play Mana God, play Mana God online, play Mana God free, Mana God game, Mana God game online, Mana God game unblocked, Mana God unblocked games, Mana God free online, Mana God play free, Mana God at school, Mana God school unblocked, Mana God chromebook, Mana God browser game, Mana God no download, free Mana God game, unblocked Mana God, Mana God unrestricted, Mana God unrestricted game, play Mana God unrestricted, clicker games unblocked, strategy games unblocked, tower defence games unblocked, free clicker games, free strategy games, free tower defence games, clicker games online, strategy games online, tower defence games online, clicker games unrestricted, strategy games unrestricted, tower defence games unrestricted, unblocked games, free online games, school games, chromebook games, unblocked games at school, play games at school, browser games free, games not blocked, unrestricted games, chromebook unlocked games, play online free, games online free, unrestricted school games">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="language" content="English">
+  <meta name="author" content="Chromebook Unlocked Games">
+  <meta name="revisit-after" content="7 days">
+  <meta name="rating" content="general">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="game">
+  <meta property="og:url" content="https://chromebookunlocked.github.io/Mana God.html">
+  <meta property="og:title" content="Mana God Unblocked - Play Online Free | Chromebook Unlocked Games">
+  <meta property="og:description" content="Play Mana God unblocked online free! Enjoy Mana God unrestricted on your Chromebook or school computer with no downloads required. Mana God is a popular clicker, strategy, tower defence game that works at school. Play Mana God online free now - unblocked and unrestricted!">
+  <meta property="og:image" content="https://chromebookunlocked.github.io/assets/logo.webp">
+  <meta property="og:image:alt" content="Mana God Unblocked - Play Online Free">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="Chromebook Unlocked Games">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://chromebookunlocked.github.io/Mana God.html">
+  <meta name="twitter:title" content="Mana God Unblocked - Play Online Free | Chromebook Unlocked Games">
+  <meta name="twitter:description" content="Play Mana God unblocked online free! Enjoy Mana God unrestricted on your Chromebook or school computer with no downloads required. Mana God is a popular clicker, strategy, tower defence game that works at school. Play Mana God online free now - unblocked and unrestricted!">
+  <meta name="twitter:image" content="https://chromebookunlocked.github.io/assets/logo.webp">
+  <meta name="twitter:image:alt" content="Mana God Unblocked - Play Online Free">
+
+  <!-- Game-specific meta -->
+  <meta property="game:name" content="Mana God">
+  <meta property="game:category" content="Clicker, Strategy, Tower Defence">
+  <meta property="game:platform" content="Web Browser">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="assets/logo.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/logo.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/logo.png">
+  <link rel="shortcut icon" type="image/png" href="assets/logo.png">
+
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#ff66ff">
+  <link rel="canonical" href="https://chromebookunlocked.github.io/Mana God.html">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================================
+   CHROMEBOOK UNLOCKED GAMES - MODERN GAME PAGE STYLES
+   Version: 2.1.0
+   Description: Modern, user-friendly design for game pages
+============================================================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Color Palette */
+  --primary-color: #ff66ff;
+  --primary-dark: #cc00ff;
+  --primary-light: #ff99ff;
+  --secondary-color: #6366f1;
+  --accent-color: #8b5cf6;
+
+  /* Backgrounds */
+  --bg-dark: #0d001a;
+  --bg-darker: #080012;
+  --bg-medium: #1c0033;
+  --bg-light: #2d0052;
+
+  /* UI Elements */
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-hover: rgba(255, 255, 255, 0.1);
+  --border-color: rgba(255, 102, 255, 0.3);
+  --shadow-color: rgba(255, 102, 255, 0.2);
+
+  /* Typography */
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --text-muted: rgba(255, 255, 255, 0.6);
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* Consistent Button Sizing */
+  --btn-icon-size: clamp(40px, 4vw, 56px);
+  --btn-icon-svg: clamp(18px, 1.8vw, 26px);
+}
+
+/* ============================================================================
+   BASE STYLES
+============================================================================ */
+
+body {
+  font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(135deg,
+    var(--bg-dark) 0%,
+    var(--bg-medium) 50%,
+    var(--bg-light) 100%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Animated background particles */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(255, 102, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: particleFloat 20s ease-in-out infinite;
+}
+
+@keyframes particleFloat {
+  0%, 100% { opacity: 1; transform: translateY(0); }
+  50% { opacity: 0.8; transform: translateY(-20px); }
+}
+
+/* ============================================================================
+   HEADER - Fixed height with responsive scaling
+============================================================================ */
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: clamp(48px, 6vw, 64px);
+  background: rgba(13, 0, 26, 0.95);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+.header-left {
+  height: 100%;
+  padding: 0 var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1.5vw, 16px);
+  cursor: pointer;
+  transition: var(--transition-medium);
+}
+
+.header-left:hover {
+  opacity: 0.9;
+}
+
+.header-logo {
+  width: clamp(28px, 4vw, 40px);
+  height: clamp(28px, 4vw, 40px);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  padding: 2px;
+  box-shadow: 0 2px 10px var(--shadow-color);
+  transition: var(--transition-medium);
+  object-fit: contain;
+}
+
+.header-logo:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 25px var(--shadow-color);
+}
+
+h1 {
+  font-size: clamp(0.85rem, 2vw, 1.3rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light), var(--secondary-color));
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease infinite;
+  letter-spacing: -0.3px;
+  white-space: nowrap;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ============================================================================
+   GAME CONTAINER
+============================================================================ */
+
+.game-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) var(--spacing-lg) var(--spacing-xs);
+  position: relative;
+  z-index: 1;
+}
+
+/* Back Button - Fixed to left edge of screen */
+.back-button {
+  position: fixed;
+  left: var(--spacing-md);
+  top: calc(clamp(48px, 6vw, 64px) + var(--spacing-md) + 0.5rem);
+  width: var(--btn-icon-size);
+  height: var(--btn-icon-size);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100;
+}
+
+.back-button:hover {
+  transform: translateY(-2px) scale(1.05);
+  background: rgba(255, 102, 255, 0.15);
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 15px rgba(255, 102, 255, 0.25);
+}
+
+.back-button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.back-button svg {
+  width: var(--btn-icon-svg);
+  height: var(--btn-icon-svg);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.game-frame-wrapper {
+  aspect-ratio: 16 / 9;
+  width: min(85vw, calc(78vh * 16 / 9));
+  max-width: 1500px;
+  max-height: 82vh;
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(255, 102, 255, 0.1), rgba(99, 102, 241, 0.1));
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 0 0 1px var(--border-color),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  /* Performance & fullscreen safety */
+  transform: translateZ(0);
+  will-change: transform;
+  contain: layout paint size;
+  container-type: size;
+  container-name: game-window;
+
+  transition: transform 0.3s ease;
+}
+
+/* FULLSCREEN — no transitions, no lag */
+.game-frame-wrapper:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+  border-radius: 0;
+  transition: none !important;
+}
+
+/* ============================================================================
+   CONTROLS BAR
+============================================================================ */
+
+.controls {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: var(--spacing-md);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.controls > * {
+  pointer-events: auto;
+}
+
+/* Icon Button - Consistent with back button */
+.icon-btn {
+  width: var(--btn-icon-size);
+  height: var(--btn-icon-size);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.icon-btn:hover {
+  background: rgba(255, 102, 255, 0.15);
+  border-color: var(--primary-color);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 15px rgba(255, 102, 255, 0.25);
+}
+
+.icon-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.icon-btn svg {
+  width: var(--btn-icon-svg);
+  height: var(--btn-icon-svg);
+}
+
+/* ============================================================================
+   PLAY OVERLAY
+============================================================================ */
+
+.play-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(13, 0, 26, 0.96), rgba(44, 0, 82, 0.96));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.5rem, 3cqh, 3rem);
+  z-index: 5;
+  cursor: pointer;
+
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.play-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.92);
+}
+
+/* 1:1 Thumbnail */
+.play-overlay img {
+  width: clamp(220px, 28cqw, 420px);
+  aspect-ratio: 1 / 1;
+  height: auto;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px var(--border-color);
+
+  transition: transform 0.3s ease;
+}
+
+.play-overlay:hover img {
+  transform: scale(1.06);
+}
+
+.play-overlay h2 {
+  font-size: clamp(1.5rem, 3.5cqw, 2.6rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+  text-shadow: 0 4px 25px rgba(255, 102, 255, 0.35);
+}
+
+/* Play Button - Consistent scaling with other buttons */
+.play-btn {
+  padding: clamp(0.8rem, 2cqh, 1.4rem) clamp(1.6rem, 4cqw, 2.8rem);
+  font-size: clamp(1rem, 2cqw, 1.5rem);
+  font-weight: 700;
+  font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.4rem, 1cqw, 0.8rem);
+  box-shadow: 0 8px 24px rgba(255, 102, 255, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.play-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 12px 32px rgba(255, 102, 255, 0.4);
+}
+
+.play-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ============================================================================
+   IFRAME
+============================================================================ */
+
+iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: var(--bg-darker);
+  opacity: 0;
+
+  /* Unity / WebGL performance */
+  transform: translateZ(0);
+  will-change: opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  contain: strict;
+  touch-action: none;
+
+  transition: opacity 0.35s ease;
+}
+
+.game-frame-wrapper:fullscreen iframe {
+  transition: none;
+}
+
+iframe.active {
+  opacity: 1;
+}
+
+/* ============================================================================
+   CATEGORY TAGS
+============================================================================ */
+
+.category-tags-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-md) var(--spacing-lg) var(--spacing-sm);
+}
+
+.category-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  justify-content: center;
+}
+
+.category-tag {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: var(--transition-fast);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.category-tag:hover {
+  background: var(--primary-color);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--shadow-color);
+  border-color: var(--primary-color);
+}
+/* ============================================================================
+   GAME INFO SECTION (SEO/Description/Keywords)
+============================================================================ */
+
+.game-info-section {
+  width: 100%;
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-xl);
+  background: transparent;
+}
+
+.game-info-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.info-card {
+  background: linear-gradient(135deg, rgba(255, 102, 255, 0.08), rgba(99, 102, 241, 0.06));
+  border: 1px solid rgba(255, 102, 255, 0.2);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl) var(--spacing-lg);
+  animation: fadeIn 0.6s ease both;
+}
+
+.info-card.full-width {
+  width: 100%;
+}
+
+.info-card-icon {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-sm);
+  filter: drop-shadow(0 2px 8px rgba(255, 102, 255, 0.3));
+}
+
+.info-card h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.description-content p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.8;
+  margin-bottom: var(--spacing-md);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.description-preview {
+  display: block;
+}
+
+.description-full {
+  display: none;
+  margin-top: var(--spacing-md);
+}
+
+.game-info-section.expanded .description-full {
+  display: block;
+}
+
+.game-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-sm);
+  margin: var(--spacing-lg) 0;
+  padding: var(--spacing-md);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--primary-color);
+}
+
+.meta-item {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.meta-item strong {
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.keywords-section {
+  margin-top: var(--spacing-lg);
+}
+
+.keywords-section > strong {
+  color: var(--text-primary);
+  font-size: 1rem;
+  display: block;
+  margin-bottom: var(--spacing-sm);
+}
+
+.keywords-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: var(--spacing-sm);
+}
+
+.keyword {
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  background: rgba(255, 102, 255, 0.1);
+  border: 1px solid rgba(255, 102, 255, 0.25);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  transition: all var(--transition-fast);
+}
+
+.keyword:hover {
+  background: rgba(255, 102, 255, 0.2);
+  border-color: var(--primary-color);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+}
+
+.show-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.3rem, 0.5vw, 0.5rem);
+  width: 100%;
+  padding: clamp(0.6rem, 1.2vw, 0.9rem) clamp(1rem, 2vw, 1.5rem);
+  margin-top: var(--spacing-lg);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  color: rgba(255, 255, 255, 0.7);
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.75rem, 1vw, 0.9rem);
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.show-more-btn:hover {
+  background: rgba(255, 102, 255, 0.12);
+  border-color: rgba(255, 102, 255, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+}
+
+.show-more-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.show-more-icon {
+  transition: transform var(--transition-medium);
+}
+
+@media (max-width: 768px) {
+  .info-card {
+    padding: var(--spacing-md);
+  }
+
+  .info-card h3 {
+    font-size: 1.2rem;
+  }
+
+  .description-content p {
+    font-size: 0.95rem;
+  }
+
+  .game-meta {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .keywords-list {
+    gap: 0.4rem;
+  }
+
+  .keyword {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* ============================================================================
+   RECOMMENDATIONS SECTION
+============================================================================ */
+
+.recommendations {
+  width: 90%;
+  max-width: min(1400px, 95vw);
+  padding: var(--spacing-xs) var(--spacing-lg) var(--spacing-md);
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease 0.1s both;
+}
+
+/* Thin separator line between game and recommendations */
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 102, 255, 0.3), transparent);
+  margin-bottom: var(--spacing-sm);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: clamp(0.6rem, 1.2vw, 1rem);
+  width: 100%;
+  justify-items: center;
+  min-height: 0;
+}
+
+.game-card {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, var(--card-bg), #5a0077);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: var(--transition-medium);
+  border: 2px solid rgba(255, 102, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+  cursor: pointer;
+}
+
+.game-card:hover {
+  transform: translateY(-5px) scale(1.03);
+  background: linear-gradient(135deg, var(--card-hover), #7700aa);
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 8px 30px rgba(255, 102, 255, 0.5);
+}
+
+.thumb-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-darker);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.thumb-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px) brightness(0.5);
+  z-index: 0;
+  transition: transform var(--transition-medium);
+  background-image: var(--thumb-url);
+}
+
+.game-card:hover .thumb-container::before {
+  transform: scale(1.1);
+}
+
+.thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform var(--transition-medium);
+}
+
+.game-card:hover .thumb {
+  transform: scale(1.08);
+}
+
+.card-title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.6rem 0.4rem;
+  font-family: var(--font-main);
+  font-weight: 600;
+  font-size: clamp(0.7rem, 0.85vw, 0.85rem);
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0);
+  width: 100%;
+  line-height: 1.2;
+  z-index: 2;
+  transition: all var(--transition-medium);
+  opacity: 0;
+  transform: translateY(10px);
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+  text-align: center;
+}
+
+.game-card:hover .card-title {
+  opacity: 1;
+  transform: translateY(0);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+/* ============================================================================
+   FOOTER
+============================================================================ */
+
+/* ============================================================================
+   FOOTER - CENTERED & BALANCED LAYOUT
+============================================================================ */
+
+footer {
+  background: linear-gradient(180deg, rgba(13, 0, 26, 0.95) 0%, rgba(8, 0, 18, 0.98) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 2px solid rgba(255, 102, 255, 0.3);
+  margin-top: auto;
+  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4);
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.footer-brand h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.footer-url {
+  font-family: 'Courier New', monospace;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(255, 102, 255, 0.08);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 102, 255, 0.15);
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+}
+
+.footer-links a {
+  color: rgba(255, 255, 255, 0.65);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  position: relative;
+  font-weight: 500;
+  padding: 0.5rem 0;
+  display: inline-block;
+  text-align: center;
+}
+
+.footer-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+  transition: width 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: var(--primary-color);
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.footer-links a:hover::after {
+  width: 100%;
+}
+
+.footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.footer-bottom p {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.75rem;
+  margin: 0;
+  opacity: 0.8;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+/* ============================================================================
+   FULLSCREEN STYLES
+============================================================================ */
+
+.game-frame-wrapper:-webkit-full-screen,
+.game-frame-wrapper:-moz-full-screen,
+.game-frame-wrapper:fullscreen {
+  /* Maintain 16:9 aspect ratio in fullscreen, scale to fit screen */
+  aspect-ratio: 16 / 9;
+  width: 100vw;
+  height: 100vh;
+  max-width: calc(100vh * 16 / 9); /* Limit width to maintain aspect ratio */
+  max-height: calc(100vw * 9 / 16); /* Limit height to maintain aspect ratio */
+  margin: auto; /* Center the game window */
+  border-radius: 0;
+  border: none;
+  /* Optimize fullscreen performance */
+  background: #000;
+  box-shadow: none;
+  /* Force GPU acceleration in fullscreen */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Disable animations in fullscreen for better performance */
+  animation: none;
+}
+
+.game-frame-wrapper:-webkit-full-screen::before,
+.game-frame-wrapper:-moz-full-screen::before,
+.game-frame-wrapper:fullscreen::before {
+  display: none;
+}
+
+.game-frame-wrapper:-webkit-full-screen .controls,
+.game-frame-wrapper:-moz-full-screen .controls,
+.game-frame-wrapper:fullscreen .controls {
+  opacity: 1;
+}
+
+/* Optimize iframe in fullscreen mode */
+.game-frame-wrapper:-webkit-full-screen iframe,
+.game-frame-wrapper:-moz-full-screen iframe,
+.game-frame-wrapper:fullscreen iframe {
+  /* Force hardware acceleration and optimize rendering */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* Use native scaling for best performance */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* ============================================================================
+   RESPONSIVE DESIGN
+============================================================================ */
+
+@media (min-width: 1200px) {
+  .grid { grid-template-columns: repeat(6, 1fr); }
+}
+@media (min-width: 900px) and (max-width: 1199px) {
+  .grid { grid-template-columns: repeat(5, 1fr); }
+}
+@media (min-width: 600px) and (max-width: 899px) {
+  .grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.25rem;
+    --spacing-xl: 2rem;
+  }
+
+  .header-left {
+    padding: 0 var(--spacing-md);
+  }
+
+  .game-container {
+    padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) var(--spacing-md) var(--spacing-xs);
+  }
+
+  .back-button {
+    left: var(--spacing-md);
+  }
+
+  .game-frame-wrapper {
+    /* Maintain 16:9 aspect ratio on tablets */
+    width: min(92vw, calc(74vh * 16 / 9));
+    max-height: 76vh;
+  }
+
+  .play-overlay img {
+    width: clamp(220px, 40cqw, 400px); /* Slightly larger on tablets */
+  }
+
+  /* Buttons use CSS variables - no overrides needed */
+
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+  }
+
+  .recommendations {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .category-tag {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  footer {
+    padding: 2rem 1rem;
+  }
+
+  .footer-content {
+    gap: 1.5rem;
+  }
+
+  .footer-links {
+    gap: 1.5rem;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .footer-links a {
+    font-size: 0.85rem;
+  }
+
+  .footer-bottom {
+    padding-top: 1.5rem;
+  }
+
+  .footer-url {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .game-frame-wrapper {
+    /* Maintain 16:9 aspect ratio on mobile */
+    width: min(95vw, calc(72vh * 16 / 9));
+    max-height: 74vh;
+  }
+
+  .play-overlay img {
+    width: clamp(200px, 45cqw, 350px); /* Larger on mobile for better visibility */
+  }
+
+  /* Play button uses clamp() for consistent scaling */
+
+  .controls {
+    opacity: 1; /* Always show on mobile */
+  }
+
+  .footer-links {
+    gap: 1.2rem;
+  }
+
+  .footer-links a {
+    font-size: 0.8rem;
+  }
+}
+
+/* ============================================================================
+   LOADING STATES
+============================================================================ */
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.loading {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ============================================================================
+   ACCESSIBILITY
+============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  :root {
+    --border-color: rgba(255, 102, 255, 0.8);
+    --card-bg: rgba(255, 255, 255, 0.15);
+  }
+}
+
+/* Focus visible for keyboard navigation */
+.icon-btn:focus-visible,
+.back-button:focus-visible,
+.play-btn:focus-visible,
+.show-more-btn:focus-visible,
+.category-tag:focus-visible,
+.game-card:focus-visible,
+.more-games-hint:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 3px;
+}
+
+/* ============================================================================
+   MORE GAMES HINT BOX - Minimalistic Design
+============================================================================ */
+
+.more-games-hint {
+  display: none;
+}
+
+.more-games-hint:hover {
+  background: rgba(255, 102, 255, 0.12);
+  border-color: rgba(255, 102, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.more-games-hint:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.more-games-hint.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(15px);
+}
+
+.more-games-hint-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.65rem, 1vw, 0.8rem);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.more-games-hint:hover .more-games-hint-text {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.more-games-hint-arrow {
+  width: clamp(14px, 1.5vw, 18px);
+  height: clamp(14px, 1.5vw, 18px);
+  color: rgba(255, 255, 255, 0.5);
+  animation: bounceDown 2s ease-in-out infinite;
+}
+
+.more-games-hint:hover .more-games-hint-arrow {
+  color: var(--primary-color);
+}
+
+@keyframes bounceDown {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .more-games-hint-arrow {
+    animation: none;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <!-- Header with Logo -->
+  <header>
+    <div class="header-left">
+      <img src="assets/logo.webp" alt="Chromebook Unlocked Games - Free Unblocked Games for School" class="header-logo" onclick="window.location.href='/'">
+      <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
+    </div>
+  </header>
+
+  <!-- Back Button (fixed to left edge of screen) -->
+  <button class="back-button" onclick="window.location.href='/'" title="Back to Unblocked Games" aria-label="Back to Free Unblocked Games">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  </button>
+
+  <!-- Main Game Content -->
+  <main itemscope itemtype="https://schema.org/VideoGame">
+    <meta itemprop="name" content="Mana God">
+    <meta itemprop="gamePlatform" content="Web Browser">
+    <meta itemprop="applicationCategory" content="Game">
+
+    <!-- Game Viewer -->
+    <div class="game-container">
+      <div class="game-frame-wrapper" id="gameWrapper">
+        <!-- Controls Bar (sticky to top of game) -->
+        <div class="controls">
+          <button id="fullscreenBtn" class="icon-btn" onclick="toggleFullscreen()" title="Play Mana God Fullscreen" aria-label="Toggle Fullscreen Mode">
+            <svg id="fullscreenIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+          </button>
+        </div>
+
+        <div class="play-overlay" id="playOverlay">
+          <img src="games/Mana God/thumbnail.webp" alt="Play Mana God Unblocked - Free Online clicker Game" itemprop="image">
+          <h2 itemprop="headline">Mana God</h2>
+          <button class="play-btn" onclick="startGame(); gtag('event', 'play_button_clicked', {game_name: 'Mana God', game_folder: 'Mana God'});" aria-label="Play Mana God Free Online">▶ Play</button>
+        </div>
+        <iframe
+          id="gameFrame"
+          src=""
+          title="Mana God Unblocked - Play Free Online Game at School"
+          allow="fullscreen; autoplay; encrypted-media"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </div>
+  </main>
+
+  <!-- More Games Hint Box -->
+  <div class="more-games-hint" id="moreGamesHint" onclick="scrollToMoreGames()" role="button" aria-label="Scroll to more games" tabindex="0">
+    <span class="more-games-hint-text">More Games</span>
+    <svg class="more-games-hint-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  </div>
+
+  <!-- More Games Section -->
+  <section class="recommendations" id="moreGamesSection" aria-label="More Unblocked Games">
+    <div class="section-divider"></div>
+    <div class="grid">
+      <a href="/Adventure Capitalist.html" class="game-card" title="Play Adventure Capitalist Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Adventure Capitalist/thumbnail.webp')">
+        <img class="thumb" src="games/Adventure Capitalist/thumbnail.webp" alt="Play Adventure Capitalist Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Adventure Capitalist</div>
+    </a><a href="/Portal Flash.html" class="game-card" title="Play Portal Flash Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Portal Flash/thumbnail.webp')">
+        <img class="thumb" src="games/Portal Flash/thumbnail.webp" alt="Play Portal Flash Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Portal Flash</div>
+    </a><a href="/FNAF 2.html" class="game-card" title="Play FNAF 2 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/FNAF 2/thumbnail.webp')">
+        <img class="thumb" src="games/FNAF 2/thumbnail.webp" alt="Play FNAF 2 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">FNAF 2</div>
+    </a><a href="/Ace Combat 3.html" class="game-card" title="Play Ace Combat 3 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Ace Combat 3/thumbnail.webp')">
+        <img class="thumb" src="games/Ace Combat 3/thumbnail.webp" alt="Play Ace Combat 3 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Ace Combat 3</div>
+    </a><a href="/Ages of Conflict.html" class="game-card" title="Play Ages of Conflict Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Ages of Conflict/thumbnail.webp')">
+        <img class="thumb" src="games/Ages of Conflict/thumbnail.webp" alt="Play Ages of Conflict Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Ages of Conflict</div>
+    </a><a href="/A Dance of Fire and Ice.html" class="game-card" title="Play A Dance of Fire and Ice Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/A Dance of Fire and Ice/thumbnail.webp')">
+        <img class="thumb" src="games/A Dance of Fire and Ice/thumbnail.webp" alt="Play A Dance of Fire and Ice Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">A Dance of Fire and Ice</div>
+    </a><a href="/Block the Pig.html" class="game-card" title="Play Block the Pig Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Block the Pig/thumbnail.webp')">
+        <img class="thumb" src="games/Block the Pig/thumbnail.webp" alt="Play Block the Pig Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Block the Pig</div>
+    </a><a href="/Bowmasters.html" class="game-card" title="Play Bowmasters Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Bowmasters/thumbnail.webp')">
+        <img class="thumb" src="games/Bowmasters/thumbnail.webp" alt="Play Bowmasters Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Bowmasters</div>
+    </a><a href="/Plants vs Zombies 2.html" class="game-card" title="Play Plants vs Zombies 2 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Plants vs Zombies 2/thumbnail.webp')">
+        <img class="thumb" src="games/Plants vs Zombies 2/thumbnail.webp" alt="Play Plants vs Zombies 2 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Plants vs Zombies 2</div>
+    </a><a href="/Fireboy and Watergirl 1.html" class="game-card" title="Play Fireboy and Watergirl 1 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Fireboy and Watergirl 1/thumbnail.webp')">
+        <img class="thumb" src="games/Fireboy and Watergirl 1/thumbnail.webp" alt="Play Fireboy and Watergirl 1 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Fireboy and Watergirl 1</div>
+    </a><a href="/1on1 Soccer.html" class="game-card" title="Play 1on1 Soccer Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/1on1 Soccer/thumbnail.webp')">
+        <img class="thumb" src="games/1on1 Soccer/thumbnail.webp" alt="Play 1on1 Soccer Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">1on1 Soccer</div>
+    </a><a href="/Infinite Craft.html" class="game-card" title="Play Infinite Craft Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Infinite Craft/thumbnail.webp')">
+        <img class="thumb" src="games/Infinite Craft/thumbnail.webp" alt="Play Infinite Craft Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Infinite Craft</div>
+    </a><a href="/Fall Guys.html" class="game-card" title="Play Fall Guys Mini Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Fall Guys/thumbnail.webp')">
+        <img class="thumb" src="games/Fall Guys/thumbnail.webp" alt="Play Fall Guys Mini Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Fall Guys Mini</div>
+    </a><a href="/Gun Spin.html" class="game-card" title="Play Gun Spin Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Gun Spin/thumbnail.webp')">
+        <img class="thumb" src="games/Gun Spin/thumbnail.webp" alt="Play Gun Spin Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Gun Spin</div>
+    </a><a href="/Little Alchemy 2.html" class="game-card" title="Play Little Alchemy 2 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Little Alchemy 2/thumbnail.webp')">
+        <img class="thumb" src="games/Little Alchemy 2/thumbnail.webp" alt="Play Little Alchemy 2 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Little Alchemy 2</div>
+    </a><a href="/Hanger 2.html" class="game-card" title="Play Hanger 2 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Hanger 2/thumbnail.webp')">
+        <img class="thumb" src="games/Hanger 2/thumbnail.webp" alt="Play Hanger 2 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Hanger 2</div>
+    </a><a href="/Bloxorz.html" class="game-card" title="Play Bloxorz Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Bloxorz/thumbnail.webp')">
+        <img class="thumb" src="games/Bloxorz/thumbnail.webp" alt="Play Bloxorz Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Bloxorz</div>
+    </a><a href="/Yellow.html" class="game-card" title="Play Yellow Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Yellow/thumbnail.webp')">
+        <img class="thumb" src="games/Yellow/thumbnail.webp" alt="Play Yellow Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Yellow</div>
+    </a><a href="/Going Balls.html" class="game-card" title="Play Going Balls Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Going Balls/thumbnail.webp')">
+        <img class="thumb" src="games/Going Balls/thumbnail.webp" alt="Play Going Balls Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Going Balls</div>
+    </a><a href="/Gobble.html" class="game-card" title="Play Gobble Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Gobble/thumbnail.webp')">
+        <img class="thumb" src="games/Gobble/thumbnail.webp" alt="Play Gobble Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Gobble</div>
+    </a><a href="/Polytrack.html" class="game-card" title="Play Polytrack Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Polytrack/thumbnail.webp')">
+        <img class="thumb" src="games/Polytrack/thumbnail.webp" alt="Play Polytrack Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Polytrack</div>
+    </a><a href="/Achilles 2.html" class="game-card" title="Play Achilles 2 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Achilles 2/thumbnail.webp')">
+        <img class="thumb" src="games/Achilles 2/thumbnail.webp" alt="Play Achilles 2 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Achilles 2</div>
+    </a><a href="/Hungry Lamu.html" class="game-card" title="Play Hungry Lamu Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Hungry Lamu/thumbnail.webp')">
+        <img class="thumb" src="games/Hungry Lamu/thumbnail.webp" alt="Play Hungry Lamu Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Hungry Lamu</div>
+    </a><a href="/Minecraft.html" class="game-card" title="Play Minecraft Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Minecraft/thumbnail.webp')">
+        <img class="thumb" src="games/Minecraft/thumbnail.webp" alt="Play Minecraft Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Minecraft</div>
+    </a><a href="/Get Yoked.html" class="game-card" title="Play Get Yoked Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Get Yoked/thumbnail.webp')">
+        <img class="thumb" src="games/Get Yoked/thumbnail.webp" alt="Play Get Yoked Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Get Yoked</div>
+    </a><a href="/Sea Mongrel.html" class="game-card" title="Play Sea Mongrel Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Sea Mongrel/thumbnail.webp')">
+        <img class="thumb" src="games/Sea Mongrel/thumbnail.webp" alt="Play Sea Mongrel Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Sea Mongrel</div>
+    </a><a href="/Henry Stickmin Escaping The Prison.html" class="game-card" title="Play Henry Stickmin Escaping The Prison Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Henry Stickmin Escaping The Prison/thumbnail.webp')">
+        <img class="thumb" src="games/Henry Stickmin Escaping The Prison/thumbnail.webp" alt="Play Henry Stickmin Escaping The Prison Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Henry Stickmin Escaping The Prison</div>
+    </a><a href="/Smash Carts.html" class="game-card" title="Play Smash Carts Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Smash Carts/thumbnail.webp')">
+        <img class="thumb" src="games/Smash Carts/thumbnail.webp" alt="Play Smash Carts Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Smash Carts</div>
+    </a><a href="/10 Minutes Till Dawn.html" class="game-card" title="Play 10 Minutes Till Dawn Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/10 Minutes Till Dawn/thumbnail.webp')">
+        <img class="thumb" src="games/10 Minutes Till Dawn/thumbnail.webp" alt="Play 10 Minutes Till Dawn Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">10 Minutes Till Dawn</div>
+    </a><a href="/Blaze Drifter.html" class="game-card" title="Play Blaze Drifter Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Blaze Drifter/thumbnail.webp')">
+        <img class="thumb" src="games/Blaze Drifter/thumbnail.webp" alt="Play Blaze Drifter Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Blaze Drifter</div>
+    </a><a href="/Bouncy Basketball.html" class="game-card" title="Play Bouncy Basketball Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Bouncy Basketball/thumbnail.webp')">
+        <img class="thumb" src="games/Bouncy Basketball/thumbnail.webp" alt="Play Bouncy Basketball Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Bouncy Basketball</div>
+    </a><a href="/Bitlife.html" class="game-card" title="Play Bitlife Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Bitlife/thumbnail.webp')">
+        <img class="thumb" src="games/Bitlife/thumbnail.webp" alt="Play Bitlife Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Bitlife</div>
+    </a><a href="/Slope.html" class="game-card" title="Play Slope Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Slope/thumbnail.webp')">
+        <img class="thumb" src="games/Slope/thumbnail.webp" alt="Play Slope Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Slope</div>
+    </a><a href="/The Last Stand.html" class="game-card" title="Play The Last Stand Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/The Last Stand/thumbnail.webp')">
+        <img class="thumb" src="games/The Last Stand/thumbnail.webp" alt="Play The Last Stand Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">The Last Stand</div>
+    </a><a href="/234 Player Games.html" class="game-card" title="Play 234 Player Games Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/234 Player Games/thumbnail.webp')">
+        <img class="thumb" src="games/234 Player Games/thumbnail.webp" alt="Play 234 Player Games Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">234 Player Games</div>
+    </a><a href="/Drive Mad.html" class="game-card" title="Play Drive Mad Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Drive Mad/thumbnail.webp')">
+        <img class="thumb" src="games/Drive Mad/thumbnail.webp" alt="Play Drive Mad Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Drive Mad</div>
+    </a><a href="/Elastic Face.html" class="game-card" title="Play Elastic Face Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Elastic Face/thumbnail.webp')">
+        <img class="thumb" src="games/Elastic Face/thumbnail.webp" alt="Play Elastic Face Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Elastic Face</div>
+    </a><a href="/Swordfight.html" class="game-card" title="Play Swordfight Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Swordfight/thumbnail.webp')">
+        <img class="thumb" src="games/Swordfight/thumbnail.webp" alt="Play Swordfight Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Swordfight</div>
+    </a><a href="/Douchebag Life.html" class="game-card" title="Play Douchebag Life Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Douchebag Life/thumbnail.webp')">
+        <img class="thumb" src="games/Douchebag Life/thumbnail.webp" alt="Play Douchebag Life Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Douchebag Life</div>
+    </a><a href="/The Binding of Isaac - Wrath of the Lamb.html" class="game-card" title="Play The Binding of Isaac - Wrath of the Lamb Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/The Binding of Isaac - Wrath of the Lamb/thumbnail.webp')">
+        <img class="thumb" src="games/The Binding of Isaac - Wrath of the Lamb/thumbnail.webp" alt="Play The Binding of Isaac - Wrath of the Lamb Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">The Binding of Isaac - Wrath of the Lamb</div>
+    </a><a href="/Hover Race Drive.html" class="game-card" title="Play Hover Race Drive Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Hover Race Drive/thumbnail.webp')">
+        <img class="thumb" src="games/Hover Race Drive/thumbnail.webp" alt="Play Hover Race Drive Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Hover Race Drive</div>
+    </a><a href="/Dead Zed 2.html" class="game-card" title="Play Dead Zed 2 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Dead Zed 2/thumbnail.webp')">
+        <img class="thumb" src="games/Dead Zed 2/thumbnail.webp" alt="Play Dead Zed 2 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Dead Zed 2</div>
+    </a>
+    </div>
+  </section>
+
+  <!-- Category Tags (above About section) -->
+  <div class="category-tags-section">
+    <div class="category-tags" role="navigation" aria-label="Game Categories">
+      <a href="/#/category/Clicker" class="category-tag" title="Play Free Clicker Games Unblocked">Clicker</a><a href="/#/category/Strategy" class="category-tag" title="Play Free Strategy Games Unblocked">Strategy</a><a href="/#/category/Tower%20Defence" class="category-tag" title="Play Free Tower Defence Games Unblocked">Tower Defence</a>
+    </div>
+  </div>
+
+  <!-- Enhanced SEO Section -->
+  <section class="game-info-section" id="gameInfoSection" aria-label="About Mana God">
+    <div class="game-info-container">
+      <div class="info-card full-width">
+        <div class="info-card-icon">📝</div>
+        <h3>About Mana God</h3>
+        <div class="description-content">
+          <p class="description-preview" itemprop="description">
+            Play Mana God unblocked online free! This clicker game works unrestricted on Chromebook and school computers. This free online game is perfect for playing at school on your Chromebook or any computer.
+          </p>
+          <div class="description-full">
+            <p>
+               No downloads - play Mana God online free instantly!
+              Mana God is one of the best clicker games available on our unblocked games site.
+              No downloads needed - just click play and enjoy Mana God instantly in your browser!
+            </p>
+            <p>
+              <strong>How to Play:</strong> Click the play button above to start Mana God. The game works on all devices including Chromebooks, laptops, and desktop computers.
+              Use the fullscreen mode for the best gaming experience! All controls are explained in-game.
+              Mana God is completely free to play with no registration required.
+            </p>
+            <div class="game-meta">
+              <div class="meta-item">
+                <strong>Categories:</strong> Clicker, Strategy, Tower Defence
+              </div>
+              <div class="meta-item">
+                <strong>Platform:</strong> Web Browser (HTML5)
+              </div>
+              <div class="meta-item">
+                <strong>Status:</strong> Unblocked & Free to Play
+              </div>
+            </div>
+            <div class="keywords-section">
+              <strong>Popular Searches:</strong>
+              <div class="keywords-list">
+                <span class="keyword">Mana God unblocked</span>
+                <span class="keyword">Mana God online</span>
+                <span class="keyword">play Mana God</span>
+                <span class="keyword">Mana God free</span>
+                <span class="keyword">clicker games</span>
+                <span class="keyword">unblocked games</span>
+                <span class="keyword">chromebook games</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="show-more-btn" onclick="toggleGameInfo()" aria-label="Show more information">
+          <span class="show-more-text">Show More</span>
+          <svg class="show-more-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3>Chromebook Unlocked Games</h3>
+        <span class="footer-url">chromebookunlocked.github.io</span>
+      </div>
+      <div class="footer-links">
+        <a href="/important-pages/privacy-policy.html">Privacy Policy</a>
+        <a href="/important-pages/cookie-policy.html">Cookie Policy</a>
+        <a href="/important-pages/terms-of-service.html">Terms of Service</a>
+        <a href="/important-pages/contact.html">Contact</a>
+        <a href="/important-pages/dmca.html">DMCA</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Chromebook Unlocked Games. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Mana God",
+  "alternateName": [
+    "Mana God Unblocked",
+    "Mana God Online",
+    "Mana God Free",
+    "Mana God Unrestricted",
+    "Play Mana God Online Free"
+  ],
+  "url": "https://chromebookunlocked.github.io/Mana God.html",
+  "description": "Play Mana God unblocked online free! Enjoy this popular clicker, strategy, tower defence game unrestricted on your Chromebook or school computer. No downloads required - play online free instantly!",
+  "image": "https://chromebookunlocked.github.io/assets/logo.webp",
+  "thumbnailUrl": "https://chromebookunlocked.github.io/games/Mana God/thumbnail.webp",
+  "genre": [
+    "Clicker",
+    "Strategy",
+    "Tower Defence"
+  ],
+  "gamePlatform": [
+    "Web Browser",
+    "Chromebook",
+    "PC",
+    "Mac"
+  ],
+  "operatingSystem": "Any",
+  "applicationCategory": "Game",
+  "playMode": "SinglePlayer",
+  "numberOfPlayers": {
+    "@type": "QuantitativeValue",
+    "minValue": 1,
+    "maxValue": 1
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock",
+    "category": "Free"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Chromebook Unlocked Games",
+    "url": "https://chromebookunlocked.github.io/",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://chromebookunlocked.github.io/assets/logo.webp"
+    }
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.5",
+    "ratingCount": "100",
+    "bestRating": "5",
+    "worstRating": "1"
+  }
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://chromebookunlocked.github.io/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Clicker",
+      "item": "https://chromebookunlocked.github.io/#/category/Clicker"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Mana God",
+      "item": "https://chromebookunlocked.github.io/Mana God.html"
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Mana God Unblocked - Play Online Free",
+  "description": "Play Mana God unblocked online free at school on your Chromebook - unrestricted games",
+  "url": "https://chromebookunlocked.github.io/Mana God.html",
+  "image": "https://chromebookunlocked.github.io/assets/logo.webp",
+  "inLanguage": "en-US",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Chromebook Unlocked Games",
+    "url": "https://chromebookunlocked.github.io/"
+  },
+  "about": {
+    "@type": "VideoGame",
+    "name": "Mana God"
+  },
+  "mainEntity": {
+    "@type": "VideoGame",
+    "name": "Mana God",
+    "url": "https://chromebookunlocked.github.io/Mana God.html"
+  }
+}
+  </script>
+
+  <script>
+    let gameStartTime = null;
+    let gamePlayDuration = 0;
+    let gameDurationInterval = null;
+
+    // Track initial game page view
+    if (typeof trackEnhancedPageView !== 'undefined') {
+      trackEnhancedPageView('game_page', 'Mana God', {
+        game_name: 'Mana God',
+        game_folder: 'Mana God',
+        game_categories: 'Clicker, Strategy, Tower Defence',
+        from_page: document.referrer || 'direct'
+      });
+    }
+
+    function startGame() {
+      const overlay = document.getElementById('playOverlay');
+      const frame = document.getElementById('gameFrame');
+
+      frame.src = 'games/Mana God/index.html';
+      frame.classList.add('active');
+      overlay.classList.add('hidden');
+
+      // Track game start time and send analytics event
+      gameStartTime = Date.now();
+      gamePlayDuration = 0;
+
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'game_started', {
+          game_name: 'Mana God',
+          game_folder: 'Mana God',
+          game_categories: 'Clicker, Strategy, Tower Defence',
+          session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Track game duration every 30 seconds while playing
+      if (gameDurationInterval) {
+        clearInterval(gameDurationInterval);
+      }
+
+      gameDurationInterval = setInterval(function() {
+        if (gameStartTime && !document.hidden) {
+          const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
+          gamePlayDuration = currentDuration;
+
+          if (typeof gtag !== 'undefined') {
+            gtag('event', 'game_playing', {
+              game_name: 'Mana God',
+              game_folder: 'Mana God',
+              duration_seconds: currentDuration,
+              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
+              timestamp: new Date().toISOString()
+            });
+          }
+        }
+      }, 30000); // Every 30 seconds
+
+      // Track in Recently Played
+      saveToRecentlyPlayed();
+    }
+
+    function saveToRecentlyPlayed() {
+      const gameData = {
+        folder: 'Mana God',
+        name: 'Mana God',
+        thumb: 'games/Mana God/thumbnail.webp',
+        lastPlayed: Date.now()
+      };
+
+      let recentlyPlayed = [];
+      try {
+        recentlyPlayed = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+      } catch(e) {
+        recentlyPlayed = [];
+      }
+
+      // Remove existing entry if present
+      recentlyPlayed = recentlyPlayed.filter(g => g.folder !== gameData.folder);
+
+      // Add to beginning
+      recentlyPlayed.unshift(gameData);
+
+      // Keep max 25
+      if (recentlyPlayed.length > 25) {
+        recentlyPlayed = recentlyPlayed.slice(0, 25);
+      }
+
+      localStorage.setItem('recentlyPlayed', JSON.stringify(recentlyPlayed));
+    }
+
+    function toggleFullscreen() {
+      const wrapper = document.getElementById('gameWrapper');
+      const isEnteringFullscreen = !document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement;
+
+      if (isEnteringFullscreen) {
+        // Enter fullscreen
+        if (wrapper.requestFullscreen) {
+          wrapper.requestFullscreen();
+        } else if (wrapper.webkitRequestFullscreen) {
+          wrapper.webkitRequestFullscreen();
+        } else if (wrapper.mozRequestFullScreen) {
+          wrapper.mozRequestFullScreen();
+        }
+
+        // Track fullscreen enter
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'fullscreen_enter', {
+            game_name: 'Mana God',
+            game_folder: 'Mana God',
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          });
+        }
+      } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        }
+
+        // Track fullscreen exit
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'fullscreen_exit', {
+            game_name: 'Mana God',
+            game_folder: 'Mana God',
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          });
+        }
+      }
+    }
+
+    function updateFullscreenIcon() {
+      const icon = document.getElementById('fullscreenIcon');
+      const btn = document.getElementById('fullscreenBtn');
+
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+        // In fullscreen - show X icon
+        icon.innerHTML = '<path d="M18 6L6 18M6 6l12 12"/>';
+        btn.title = 'Exit Fullscreen';
+        btn.setAttribute('aria-label', 'Exit Fullscreen');
+      } else {
+        // Not in fullscreen - show expand icon
+        icon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>';
+        btn.title = 'Fullscreen';
+        btn.setAttribute('aria-label', 'Toggle Fullscreen');
+      }
+    }
+
+    // Listen for fullscreen changes
+    document.addEventListener('fullscreenchange', updateFullscreenIcon);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+    document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
+    document.addEventListener('MSFullscreenChange', updateFullscreenIcon);
+
+    // Prevent arrow keys from scrolling the page on game pages
+    window.addEventListener('keydown', (e) => {
+      const blocked = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+      if (blocked.includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+
+    // More Games Hint Box - Scroll behavior and click handler
+    function scrollToMoreGames() {
+      const moreGamesSection = document.getElementById('moreGamesSection');
+      if (moreGamesSection) {
+        moreGamesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Track analytics
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'more_games_hint_clicked', {
+            game_name: 'Mana God',
+            game_folder: 'Mana God',
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          });
+        }
+      }
+    }
+
+    // Handle keyboard accessibility for More Games hint
+    document.getElementById('moreGamesHint').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        scrollToMoreGames();
+      }
+    });
+
+    // Scroll listener to hide/show More Games hint
+    (function() {
+      const moreGamesHint = document.getElementById('moreGamesHint');
+      const moreGamesSection = document.getElementById('moreGamesSection');
+      let ticking = false;
+
+      function updateHintVisibility() {
+        if (!moreGamesHint || !moreGamesSection) return;
+
+        const sectionRect = moreGamesSection.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+
+        // Hide hint when the More Games section is visible in viewport
+        // (when top of section is within 200px of viewport bottom or already visible)
+        if (sectionRect.top < viewportHeight - 100) {
+          moreGamesHint.classList.add('hidden');
+        } else {
+          moreGamesHint.classList.remove('hidden');
+        }
+
+        ticking = false;
+      }
+
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          window.requestAnimationFrame(updateHintVisibility);
+          ticking = true;
+        }
+      }, { passive: true });
+
+      // Initial check
+      updateHintVisibility();
+    })();
+
+    // Toggle game info section
+    function toggleGameInfo() {
+      const section = document.getElementById('gameInfoSection');
+      const btn = document.querySelector('.show-more-btn');
+      const btnText = btn.querySelector('.show-more-text');
+      const btnIcon = btn.querySelector('.show-more-icon');
+
+      if (section.classList.contains('expanded')) {
+        section.classList.remove('expanded');
+        btnText.textContent = 'Show More';
+        btnIcon.style.transform = 'rotate(0deg)';
+        section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        // Track collapse
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'game_info_collapse', {
+            game_name: 'Mana God',
+            game_folder: 'Mana God',
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          });
+        }
+      } else {
+        section.classList.add('expanded');
+        btnText.textContent = 'Show Less';
+        btnIcon.style.transform = 'rotate(180deg)';
+
+        // Track expand
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'game_info_expand', {
+            game_name: 'Mana God',
+            game_folder: 'Mana God',
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          });
+        }
+      }
+    }
+
+    // Track game session end when user leaves the page
+    window.addEventListener('beforeunload', () => {
+      // Clear duration tracking interval
+      if (gameDurationInterval) {
+        clearInterval(gameDurationInterval);
+      }
+
+      if (gameStartTime) {
+        const playDuration = Math.round((Date.now() - gameStartTime) / 1000);
+
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'game_session_end', {
+            game_name: 'Mana God',
+            game_folder: 'Mana God',
+            game_categories: 'Clicker, Strategy, Tower Defence',
+            duration_seconds: playDuration,
+            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
+            timestamp: new Date().toISOString()
+          });
+        }
+      }
+    });
+
+    // Track visibility changes (when user switches tabs while game is running)
+    document.addEventListener('visibilitychange', function() {
+      if (gameStartTime) {
+        if (document.hidden) {
+          // User switched away - pause duration tracking
+          if (gameDurationInterval) {
+            clearInterval(gameDurationInterval);
+          }
+
+          if (typeof gtag !== 'undefined') {
+            const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
+            gtag('event', 'game_paused', {
+              game_name: 'Mana God',
+              game_folder: 'Mana God',
+              duration_seconds: currentDuration,
+              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+            });
+          }
+        } else {
+          // User returned - resume duration tracking
+          if (typeof gtag !== 'undefined') {
+            const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
+            gtag('event', 'game_resumed', {
+              game_name: 'Mana God',
+              game_folder: 'Mana God',
+              duration_seconds: currentDuration,
+              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+            });
+          }
+
+          // Restart the duration tracking interval
+          if (gameDurationInterval) {
+            clearInterval(gameDurationInterval);
+          }
+
+          gameDurationInterval = setInterval(function() {
+            if (gameStartTime && !document.hidden) {
+              const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
+              gamePlayDuration = currentDuration;
+
+              if (typeof gtag !== 'undefined') {
+                gtag('event', 'game_playing', {
+                  game_name: 'Mana God',
+                  game_folder: 'Mana God',
+                  duration_seconds: currentDuration,
+                  session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
+                  timestamp: new Date().toISOString()
+                });
+              }
+            }
+          }, 30000);
+        }
+      }
+    });
+  </script>
+
+  <!-- Cookie Consent Banner -->
+  <link rel="stylesheet" href="assets/cookie-consent.css">
+  <script src="assets/cookie-consent.js"></script>
+</body>
+</html>

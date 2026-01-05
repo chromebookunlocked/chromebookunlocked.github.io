@@ -270,7 +270,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
             const srcAttr = isFirstRow ? \`src="\${thumbUrl}"\` : \`data-src="\${thumbUrl}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E"\`;
             const loadingAttr = isFirstRow ? 'eager' : 'lazy';
 
-            return \`<div class="card game-card" data-index="\${i}" data-folder="\${g.folder}" data-name="\${g.name.toLowerCase()}" onclick="window.location.href='/pages/\${g.folder}.html'">
+            return \`<div class="card game-card" data-index="\${i}" data-folder="\${g.folder}" data-name="\${g.name.toLowerCase()}" onclick="window.location.href='/\${g.folder}.html'">
               <div class="thumb-container" style="--thumb-url: url('\${thumbUrl}')">
                 <img class="thumb" \${srcAttr} alt="\${g.name}" loading="\${loadingAttr}" decoding="async" width="300" height="300" onerror="this.src='assets/logo.webp'">
               </div>

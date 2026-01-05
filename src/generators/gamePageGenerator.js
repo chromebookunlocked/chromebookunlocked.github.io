@@ -13,10 +13,9 @@ const { generateAnalyticsScript } = require("../utils/analyticsEnhanced");
  */
 function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) {
   const thumb = chooseThumb(game, gamesDir);
-  // Game pages are in /pages/ folder, so paths need to go up one level
-  const gameUrl = `../games/${game.folder}/index.html`;
+  const gameUrl = `games/${game.folder}/index.html`;
   const categoryList = game.categories.join(", ");
-  const thumbPath = `../${getAssetPath(game.folder, thumb)}`;
+  const thumbPath = getAssetPath(game.folder, thumb);
 
   // Get similar games for "You Might Also Like" section (no duplicates)
   const sameCategory = allGames.filter((g) =>
@@ -74,10 +73,10 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   const recommendedGamesHTML = shuffled
     .map((g) => {
       const gThumb = chooseThumb(g, gamesDir);
-      const gThumbPath = `../${getAssetPath(g.folder, gThumb)}`;
+      const gThumbPath = getAssetPath(g.folder, gThumb);
       // SEO-optimized alt text with keywords
       const altText = `Play ${g.name} Unblocked - Free Online Game`;
-      return `<a href="/pages/${g.folder}.html" class="game-card" title="Play ${g.name} Unblocked Free Online">
+      return `<a href="/${g.folder}.html" class="game-card" title="Play ${g.name} Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('${gThumbPath}')">
         <img class="thumb" src="${gThumbPath}" alt="${altText}" loading="lazy">
       </div>
@@ -124,7 +123,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   <!-- Header with Logo -->
   <header>
     <div class="header-left">
-      <img src="../assets/logo.webp" alt="Chromebook Unlocked Games - Free Unblocked Games for School" class="header-logo" onclick="window.location.href='/'">
+      <img src="assets/logo.webp" alt="Chromebook Unlocked Games - Free Unblocked Games for School" class="header-logo" onclick="window.location.href='/'">
       <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
     </div>
   </header>
@@ -151,7 +150,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         </div>
 
         <div class="play-overlay" id="playOverlay">
-          <img src="../games/${game.folder}/${thumb}" alt="Play ${game.name} Unblocked - Free Online ${categoryText} Game" itemprop="image">
+          <img src="games/${game.folder}/${thumb}" alt="Play ${game.name} Unblocked - Free Online ${categoryText} Game" itemprop="image">
           <h2 itemprop="headline">${game.name}</h2>
           <button class="play-btn" onclick="startGame(); gtag('event', 'play_button_clicked', {game_name: '${game.name}', game_folder: '${game.folder}'});" aria-label="Play ${game.name} Free Online">▶ Play</button>
         </div>
@@ -613,8 +612,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   </script>
 
   <!-- Cookie Consent Banner -->
-  <link rel="stylesheet" href="../assets/cookie-consent.css">
-  <script src="../assets/cookie-consent.js"></script>
+  <link rel="stylesheet" href="assets/cookie-consent.css">
+  <script src="assets/cookie-consent.js"></script>
 </body>
 </html>`;
 }
