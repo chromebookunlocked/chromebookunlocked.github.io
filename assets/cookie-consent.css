@@ -21,7 +21,6 @@
   transition: transform 0.35s ease;
 }
 
-
 .cookie-consent-banner.cookie-consent-visible {
   transform: translateX(-50%) translateY(0);
 }
@@ -40,32 +39,52 @@
   padding-right: 24px;
 }
 
+/* ——— X CLOSE BUTTON ——— */
 .cookie-close-btn {
   position: absolute;
   top: 16px;
   right: 16px;
+  width: 18px;
+  height: 18px;
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.4);
   cursor: pointer;
   padding: 0;
-  transition: color 0.2s ease, transform 0.2s ease;
+  outline: none;
+  transition: transform 0.2s ease;
 }
 
-.cookie-close-btn:hover {
-  color: #ff66ff;
-  transform: rotate(90deg);
+.cookie-close-btn::before,
+.cookie-close-btn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+  transform-origin: center;
+  transition: background 0.2s ease;
+}
+
+.cookie-close-btn::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.cookie-close-btn::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.cookie-close-btn:hover::before,
+.cookie-close-btn:hover::after {
+  background: #ff66ff;
 }
 
 .cookie-close-btn:active {
-  transform: rotate(90deg) scale(0.9);
+  transform: scale(0.9);
 }
-
-.cookie-close-btn svg {
-  display: block;
-  width: 16px;
-  height: 16px;
-}
+/* ——— END CLOSE BUTTON ——— */
 
 .cookie-consent-text {
   font-size: 14px;

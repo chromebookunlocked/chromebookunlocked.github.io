@@ -36,24 +36,22 @@
     banner.className = 'cookie-consent-banner';
 
     banner.innerHTML = `
-      <button class="cookie-close-btn" id="cookieClose" aria-label="Accept and close">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
+      <button class="cookie-close-btn" id="cookieClose" aria-label="Accept and close"></button>
+
       <div class="cookie-consent-content">
         <h3 class="cookie-consent-title">Cookie Settings</h3>
         <p class="cookie-consent-text">
           We use cookies to enhance your experience. By clicking "Accept" or closing this window, you agree to our use of cookies.
           <a href="/important-pages/cookie-policy.html">Learn more</a>
         </p>
+
         <div id="cookieMainView">
           <div class="cookie-consent-buttons">
             <button id="cookieOptions" class="cookie-btn cookie-btn-options">More options</button>
             <button id="cookieAccept" class="cookie-btn cookie-btn-accept">Accept</button>
           </div>
         </div>
+
         <div id="cookieOptionsView" style="display: none;">
           <div class="cookie-categories">
             <div class="cookie-category">
@@ -66,6 +64,7 @@
                 <span class="cookie-toggle-slider"></span>
               </label>
             </div>
+
             <div class="cookie-category">
               <div class="cookie-category-info">
                 <p class="cookie-category-name">Analytics</p>
@@ -76,6 +75,7 @@
                 <span class="cookie-toggle-slider"></span>
               </label>
             </div>
+
             <div class="cookie-category">
               <div class="cookie-category-info">
                 <p class="cookie-category-name">Marketing</p>
@@ -87,6 +87,7 @@
               </label>
             </div>
           </div>
+
           <div class="cookie-consent-buttons">
             <button id="cookieDecline" class="cookie-btn cookie-btn-decline">Decline all</button>
             <button id="cookieSave" class="cookie-btn cookie-btn-save">Save preferences</button>
