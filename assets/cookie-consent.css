@@ -42,29 +42,40 @@
 
 .cookie-close-btn {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.4);
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   padding: 0;
-  transition: color 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
 }
 
 .cookie-close-btn:hover {
+  background: rgba(255, 102, 255, 0.2);
   color: #ff66ff;
-  transform: rotate(90deg);
+  border-color: rgba(255, 102, 255, 0.5);
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 0 12px rgba(255, 102, 255, 0.3);
 }
 
 .cookie-close-btn:active {
-  transform: rotate(90deg) scale(0.9);
+  transform: scale(0.95) rotate(90deg);
 }
 
 .cookie-close-btn svg {
   display: block;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
 }
 
 .cookie-consent-text {
