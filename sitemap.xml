@@ -431,19 +431,6 @@
     </image:image>
   </url>
 
-  <!-- Bob The Robber  - Free Unblocked Game -->
-  <url>
-    <loc>https://chromebookunlocked.github.io/Bob%20The%20Robber%20.html</loc>
-    <lastmod>2026-01-05</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
-      <image:title>Bob The Robber  Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Bob The Robber  unblocked for free at school. Stealth, Adventure game that works on Chromebook and school computers.</image:caption>
-    </image:image>
-  </url>
-
   <!-- Bob The Robber 2 - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Bob%20The%20Robber%202.html</loc>
@@ -467,6 +454,19 @@
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Bob The Robber 5 Unblocked - Play Free Online Game</image:title>
       <image:caption>Play Bob The Robber 5 unblocked for free at school. Stealth, Adventure game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Bob The Robber - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Bob%20The%20Robber.html</loc>
+    <lastmod>2026-01-05</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Bob The Robber Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Bob The Robber unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
