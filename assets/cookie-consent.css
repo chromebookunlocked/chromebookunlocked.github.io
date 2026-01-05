@@ -55,19 +55,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.2s ease-out;
   z-index: 10;
 }
 
 .cookie-close-btn:hover {
   background: rgba(255, 102, 255, 0.1);
   color: #ff66ff;
-  transform: scale(1.15) rotate(90deg);
+  transform: scale(1.1);
   filter: drop-shadow(0 0 5px rgba(255, 102, 255, 0.8));
 }
 
 .cookie-close-btn:active {
-  transform: scale(0.95) rotate(90deg);
+  transform: scale(0.95);
   filter: drop-shadow(0 0 2px rgba(255, 102, 255, 0.8));
 }
 

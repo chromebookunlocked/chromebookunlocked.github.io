@@ -3,7 +3,7 @@
  * With cookie category preferences
  */
 
-(function() {
+(function () {
   'use strict';
 
   const COOKIE_NAME = 'cookieConsent';
@@ -36,12 +36,12 @@
     banner.className = 'cookie-consent-banner';
 
     banner.innerHTML = `
-      <button class="cookie-close-btn" id="cookieClose" aria-label="Accept and close">
+      <div class="cookie-close-btn" id="cookieClose" role="button" aria-label="Accept and close" tabindex="0">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
-      </button>
+      </div>
       <div class="cookie-consent-content">
         <h3 class="cookie-consent-title">Cookie Settings</h3>
         <p class="cookie-consent-text">
@@ -98,28 +98,28 @@
     document.body.appendChild(banner);
 
     // Close button accepts all
-    document.getElementById('cookieClose').addEventListener('click', function() {
+    document.getElementById('cookieClose').addEventListener('click', function () {
       saveConsent({ essential: true, analytics: true, marketing: true });
     });
 
     // Accept button accepts all
-    document.getElementById('cookieAccept').addEventListener('click', function() {
+    document.getElementById('cookieAccept').addEventListener('click', function () {
       saveConsent({ essential: true, analytics: true, marketing: true });
     });
 
     // More options shows categories
-    document.getElementById('cookieOptions').addEventListener('click', function() {
+    document.getElementById('cookieOptions').addEventListener('click', function () {
       document.getElementById('cookieMainView').style.display = 'none';
       document.getElementById('cookieOptionsView').style.display = 'block';
     });
 
     // Decline all
-    document.getElementById('cookieDecline').addEventListener('click', function() {
+    document.getElementById('cookieDecline').addEventListener('click', function () {
       saveConsent({ essential: true, analytics: false, marketing: false });
     });
 
     // Save preferences
-    document.getElementById('cookieSave').addEventListener('click', function() {
+    document.getElementById('cookieSave').addEventListener('click', function () {
       const analytics = document.getElementById('cookieAnalytics').checked;
       const marketing = document.getElementById('cookieMarketing').checked;
       saveConsent({ essential: true, analytics: analytics, marketing: marketing });
@@ -159,20 +159,20 @@
   init();
 
   window.cookieConsent = {
-    accept: function() {
+    accept: function () {
       saveConsent({ essential: true, analytics: true, marketing: true });
     },
-    decline: function() {
+    decline: function () {
       saveConsent({ essential: true, analytics: false, marketing: false });
     },
-    reset: function() {
+    reset: function () {
       document.cookie = `${COOKIE_NAME}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;`;
       if (!document.getElementById('cookieConsentBanner')) {
         createBanner();
       }
     },
     hasConsent: hasConsent,
-    getConsent: function() {
+    getConsent: function () {
       const consent = getCookie(COOKIE_NAME);
       if (consent) {
         try {
