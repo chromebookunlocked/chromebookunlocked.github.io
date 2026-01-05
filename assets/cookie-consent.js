@@ -36,16 +36,14 @@
     banner.className = 'cookie-consent-banner';
 
     banner.innerHTML = `
+      <button class="cookie-close-btn" id="cookieClose" aria-label="Accept and close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
       <div class="cookie-consent-content">
-        <div class="cookie-consent-header">
-          <h3 class="cookie-consent-title">Cookie Settings</h3>
-          <button class="cookie-close-btn" id="cookieClose" aria-label="Accept and close">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
+        <h3 class="cookie-consent-title">Cookie Settings</h3>
         <p class="cookie-consent-text">
           We use cookies to enhance your experience. By clicking "Accept" or closing this window, you agree to our use of cookies.
           <a href="/important-pages/cookie-policy.html">Learn more</a>
