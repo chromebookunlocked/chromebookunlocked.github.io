@@ -21,6 +21,7 @@
   transition: transform 0.35s ease;
 }
 
+
 .cookie-consent-banner.cookie-consent-visible {
   transform: translateX(-50%) translateY(0);
 }
@@ -39,52 +40,43 @@
   padding-right: 24px;
 }
 
-/* ——— X CLOSE BUTTON ——— */
 .cookie-close-btn {
   position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 18px;
-  height: 18px;
-  background: none;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  background: transparent;
   border: none;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
   padding: 0;
-  outline: none;
-  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-out;
+  z-index: 10;
 }
 
-.cookie-close-btn::before,
-.cookie-close-btn::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 18px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 2px;
-  transform-origin: center;
-  transition: background 0.2s ease;
-}
-
-.cookie-close-btn::before {
-  transform: translate(-50%, -50%) rotate(45deg);
-}
-
-.cookie-close-btn::after {
-  transform: translate(-50%, -50%) rotate(-45deg);
-}
-
-.cookie-close-btn:hover::before,
-.cookie-close-btn:hover::after {
-  background: #ff66ff;
+.cookie-close-btn:hover {
+  background: rgba(255, 102, 255, 0.1);
+  color: #ff66ff;
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 5px rgba(255, 102, 255, 0.8));
 }
 
 .cookie-close-btn:active {
-  transform: scale(0.9);
+  transform: scale(0.95);
+  filter: drop-shadow(0 0 2px rgba(255, 102, 255, 0.8));
 }
-/* ——— END CLOSE BUTTON ——— */
+
+.cookie-close-btn svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
 
 .cookie-consent-text {
   font-size: 14px;
@@ -174,15 +166,15 @@
   transition: transform 0.2s ease;
 }
 
-.cookie-toggle input:checked + .cookie-toggle-slider {
+.cookie-toggle input:checked+.cookie-toggle-slider {
   background: #ff66ff;
 }
 
-.cookie-toggle input:checked + .cookie-toggle-slider:before {
+.cookie-toggle input:checked+.cookie-toggle-slider:before {
   transform: translateX(20px);
 }
 
-.cookie-toggle input:disabled + .cookie-toggle-slider {
+.cookie-toggle input:disabled+.cookie-toggle-slider {
   cursor: not-allowed;
   opacity: 0.6;
 }
@@ -259,6 +251,7 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
+
   .cookie-consent-banner,
   .cookie-toggle-slider,
   .cookie-toggle-slider:before,
