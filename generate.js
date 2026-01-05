@@ -24,8 +24,7 @@ const { generateGamePage } = require("./src/generators/gamePageGenerator");
 // Configuration
 const dataDir = path.join(__dirname, "data");
 const gamesDir = path.join(__dirname, "games");
-const outputDir = __dirname; // Root directory for index.html, sitemap, robots.txt
-const pagesDir = path.join(__dirname, "pages"); // Game pages go here to reduce root clutter
+const outputDir = __dirname; // Output directly to root directory
 const templatesDir = path.join(__dirname, "templates");
 
 console.log("🚀 Starting build process...\n");
@@ -56,17 +55,11 @@ console.log(`✅ Created ${indexPath}\n`);
 
 // Step 5: Generate individual game pages
 console.log("🎮 Generating game pages...");
-
-// Create pages directory if it doesn't exist
-if (!fs.existsSync(pagesDir)) {
-  fs.mkdirSync(pagesDir, { recursive: true });
-}
-
 let generatedCount = 0;
 
 games.forEach(game => {
   const gameHTML = generateGamePage(game, games, categories, gamePageStyles, gamesDir);
-  const gamePagePath = path.join(pagesDir, `${game.folder}.html`);
+  const gamePagePath = path.join(outputDir, `${game.folder}.html`);
   fs.writeFileSync(gamePagePath, gameHTML);
   generatedCount++;
 
@@ -89,5 +82,4 @@ console.log(`   - Games: ${games.length}`);
 console.log(`   - Categories: ${Object.keys(categories).length}`);
 console.log(`   - Total pages: ${games.length + 1} (index + games)`);
 console.log(`   - SEO files: sitemap.xml, robots.txt`);
-console.log(`   - Root directory: ${outputDir}`);
-console.log(`   - Game pages: ${pagesDir}\n`);
+console.log(`   - Output directory: ${outputDir}\n`);

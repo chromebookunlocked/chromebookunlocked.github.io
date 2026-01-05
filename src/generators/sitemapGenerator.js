@@ -56,7 +56,7 @@ function generateSitemap(games, outputDir, gamesDir = './games') {
       // Use logo as fallback if thumbnail can't be determined
     }
 
-    const gameUrl = `${baseUrl}/pages/${encodeURIComponent(game.folder)}.html`;
+    const gameUrl = `${baseUrl}/${encodeURIComponent(game.folder)}.html`;
     const imageUrl = `${baseUrl}/${thumbPath}`;
     const categories = game.categories ? game.categories.join(', ') : 'Games';
 

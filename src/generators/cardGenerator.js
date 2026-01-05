@@ -27,7 +27,7 @@ function generateGameCard(game, idx, gamesDir, loadEagerly = false) {
     ? ` data-aliases="${game.otherNames.map(n => n.toLowerCase()).join(',')}"`
     : '';
 
-  return `<div class="card game-card" data-index="${idx}" data-folder="${game.folder}" data-name="${game.name.toLowerCase()}"${aliasesAttr} onclick="window.location.href='/pages/${game.folder}.html'">
+  return `<div class="card game-card" data-index="${idx}" data-folder="${game.folder}" data-name="${game.name.toLowerCase()}"${aliasesAttr} onclick="window.location.href='/${game.folder}.html'">
     <div class="thumb-container" style="--thumb-url: url('${thumbPath}')">
       <img class="thumb" ${srcAttr}${placeholderSrc} alt="${game.name}" loading="${loadingAttr}" decoding="async" width="300" height="300"${fetchPriorityAttr}>
     </div>
