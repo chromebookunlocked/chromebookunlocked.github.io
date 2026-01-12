@@ -423,13 +423,19 @@ function filterCategory(cat, updateURL = true) {
       // Skip special sections
       if (c.id === 'searchResultsSection' || category === 'All Games') return;
 
-      // Show recently played, trending games, and all categories on home (except those with less than 4 games)
+      // Show recently played, trending games, newly added, and all categories on home (except those with less than 4 games)
       if (category === 'Recently Played') {
         const recentGrid = document.getElementById('recentlyPlayedGrid');
         c.style.display = (recentGrid && recentGrid.children.length > 0) ? 'block' : 'none';
       } else if (category === 'Trending Games') {
         // Always show Trending Games on home page
         c.style.display = 'block';
+      } else if (category === 'Newly Added') {
+        // Always show Newly Added on home page
+        c.style.display = 'block';
+      } else if (category === 'Trading Games') {
+        // Hide Trading Games on home page (only accessible via sidebar)
+        c.style.display = 'none';
       } else if (hideOnHome === 'true') {
         // Hide categories with less than 4 games on home view
         c.style.display = 'none';
