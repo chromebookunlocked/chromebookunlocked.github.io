@@ -49,12 +49,29 @@ function loadGames(dataDir, gamesDir) {
           otherNames = [];
         }
 
+        // Get createdAt date - use JSON value if present, otherwise use file birthtime/mtime
+        let createdAt = json.createdAt;
+        if (!createdAt) {
+          const stats = fs.statSync(filePath);
+          // Use birthtime if available (file creation time), otherwise use mtime (modification time)
+          createdAt = stats.birthtime ? stats.birthtime.toISOString() : stats.mtime.toISOString();
+
+          // Update the JSON file to include the createdAt date for future builds
+          json.createdAt = createdAt;
+          fs.writeFileSync(filePath, JSON.stringify(json, null, 2) + '\n');
+        }
+
+        // Support priority value (higher priority = shown first in lists)
+        const priority = typeof json.priority === 'number' ? json.priority : 0;
+
         return {
           folder: folder,
           name: json.displayName || json.name || folder,
           otherNames: otherNames, // Array of alternative names for search
           categories: gameCategories, // Array of categories
-          thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.webp", "thumbnail.png", "thumbnail.jpg"]
+          thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.webp", "thumbnail.png", "thumbnail.jpg"],
+          createdAt: createdAt, // ISO date string for when game was added
+          priority: priority // Priority value for sorting (higher = first)
         };
       } catch (error) {
         console.error(`❌ Error processing ${f}: ${error.message}`);

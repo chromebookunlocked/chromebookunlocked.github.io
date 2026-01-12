@@ -7,6 +7,7 @@ const categoryIcons = {
   'Home': '🏠',
   'All Games': '🎮',
   'Trending Games': '🔥',
+  'Newly Added': '✨',
   'Action': '⚔️',
   'Puzzle': '🧩',
   'Shooter': '🔫',
@@ -52,9 +53,9 @@ function getCategoryIcon(category) {
  */
 function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.') {
   // Generate sidebar categories - sorted by game count (largest first)
-  // Extract "Trending Games" to place it right after "All Games"
+  // Extract "Trending Games" and "Newly Added" to place them right after "All Games"
   const sidebarCategories = Object.keys(categories)
-    .filter(cat => cat !== "Recently Played" && cat !== "Trending Games")
+    .filter(cat => cat !== "Recently Played" && cat !== "Trending Games" && cat !== "Newly Added")
     .sort((a, b) => categories[b].length - categories[a].length) // Sort by count, largest first
     .map(cat => `<li role="menuitem" tabindex="0" onclick="filterCategory('${cat}')" onkeypress="if(event.key==='Enter')filterCategory('${cat}')"><span class="icon">${getCategoryIcon(cat)}</span><span class="text">${cat}</span></li>`)
     .join("");
@@ -64,16 +65,26 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     ? `<li role="menuitem" tabindex="0" onclick="filterCategory('Trending Games')" onkeypress="if(event.key==='Enter')filterCategory('Trending Games')"><span class="icon">${getCategoryIcon('Trending Games')}</span><span class="text">Trending Games</span></li>`
     : '';
 
-  const finalSidebarCategories = trendingGamesItem + sidebarCategories;
+  // Add Newly Added after Trending Games in the sidebar
+  const newlyAddedItem = `<li role="menuitem" tabindex="0" onclick="filterCategory('Newly Added')" onkeypress="if(event.key==='Enter')filterCategory('Newly Added')"><span class="icon">${getCategoryIcon('Newly Added')}</span><span class="text">Newly Added</span></li>`;
+
+  const finalSidebarCategories = trendingGamesItem + newlyAddedItem + sidebarCategories;
 
   // Generate category sections with games - hide categories with less than 4 games on homepage
+  // Exclude special sections and Trading Games (only shown in sidebar, not on home page)
   const sortedCategories = Object.keys(categories)
-    .filter(cat => cat !== "Recently Played" && cat !== "Trending Games") // Exclude special sections
+    .filter(cat => cat !== "Recently Played" && cat !== "Trending Games" && cat !== "Newly Added" && cat !== "Trading Games")
     .sort((a, b) => categories[b].length - categories[a].length); // Sort by game count
 
   const categorySections = sortedCategories
     .map((cat, catIndex) => {
-      const list = categories[cat];
+      // Sort games in category by priority first, then by name
+      const list = [...categories[cat]].sort((a, b) => {
+        // Higher priority first
+        if (b.priority !== a.priority) return b.priority - a.priority;
+        // Then alphabetically by name
+        return a.name.localeCompare(b.name);
+      });
       const isSmallCategory = list.length < 4;
       const hideOnHome = isSmallCategory ? ' data-hide-on-home="true" style="display:none;"' : '';
       // Eagerly load first 4 of each category to ensure first row is ready on homepage
@@ -84,6 +95,39 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
           </div>
         </div>`;
     }).join('');
+
+  // Generate Trading Games section (only visible when accessed via sidebar)
+  const tradingGamesSection = categories["Trading Games"]
+    ? (() => {
+        const list = [...categories["Trading Games"]].sort((a, b) => {
+          if (b.priority !== a.priority) return b.priority - a.priority;
+          return a.name.localeCompare(b.name);
+        });
+        return `<div class="category" data-category="Trading Games" style="display:none;">
+          <h2>Trading Games</h2>
+          <div class="grid">
+            ${list.map((g, i) => generateGameCard(g, i, gamesDir, true)).join('')}
+          </div>
+        </div>`;
+      })()
+    : '';
+
+  // Generate Newly Added section - 12 most recently added games
+  const newlyAddedGames = [...games]
+    .sort((a, b) => {
+      // Sort by createdAt date (newest first)
+      const dateA = new Date(a.createdAt || 0);
+      const dateB = new Date(b.createdAt || 0);
+      return dateB - dateA;
+    })
+    .slice(0, 12); // Take only 12 newest games
+
+  const newlyAddedSection = `<div class="category" data-category="Newly Added">
+    <h2>Newly Added</h2>
+    <div class="grid">
+      ${newlyAddedGames.map((g, i) => generateGameCard(g, i, gamesDir, true)).join('')}
+    </div>
+  </div>`;
 
   // Get SEO meta tags and structured data (pass games for ItemList schema)
   const metaTags = generateIndexMetaTags();
@@ -202,13 +246,16 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       <div class="category" data-category="All Games" style="display:none;">
         <h2>All Games</h2>
         <div class="grid">
-          ${games.sort((a, b) => {
-            // Sort trending games first
-            const aIsTrending = (a.category || '').includes('Trending Games');
-            const bIsTrending = (b.category || '').includes('Trending Games');
+          ${[...games].sort((a, b) => {
+            // Sort by priority first (higher priority first)
+            if (b.priority !== a.priority) return b.priority - a.priority;
+            // Then trending games
+            const aIsTrending = (a.categories || []).includes('Trending Games');
+            const bIsTrending = (b.categories || []).includes('Trending Games');
             if (aIsTrending && !bIsTrending) return -1;
             if (!aIsTrending && bIsTrending) return 1;
-            return 0; // Keep original order otherwise
+            // Then alphabetically by name
+            return a.name.localeCompare(b.name);
           }).map((g, i) => generateGameCard(g, i, gamesDir, false)).join('')}
         </div>
       </div>
@@ -294,9 +341,18 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       <div class="category" data-category="Trending Games">
         <h2>Trending Games</h2>
         <div class="grid">
-          ${(categories['Trending Games'] || []).map((g, i) => generateGameCard(g, i, gamesDir, true)).join('')}
+          ${(categories['Trending Games'] || []).sort((a, b) => {
+            if (b.priority !== a.priority) return b.priority - a.priority;
+            return a.name.localeCompare(b.name);
+          }).map((g, i) => generateGameCard(g, i, gamesDir, true)).join('')}
         </div>
       </div>
+
+      <!-- Newly Added Games (fixed position, like Trending Games) -->
+      ${newlyAddedSection}
+
+      <!-- Trading Games (hidden on home page, only accessible via sidebar) -->
+      ${tradingGamesSection}
 
       <!-- All category sections (including games for home view) -->
       ${categorySections}
