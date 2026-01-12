@@ -129,9 +129,20 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   </header>
 
   <!-- Back Button (fixed to left edge of screen) -->
-  <button class="back-button" onclick="window.location.href='/'" title="Back to Unblocked Games" aria-label="Back to Free Unblocked Games">
+  <button class="back-button" onclick="goBack()" title="Back to Unblocked Games" aria-label="Back to Free Unblocked Games">
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
   </button>
+
+  <script>
+    function goBack() {
+      // Check if there's a previous page in history from the same site
+      if (document.referrer && document.referrer.includes(window.location.host)) {
+        history.back();
+      } else {
+        window.location.href = '/';
+      }
+    }
+  </script>
 
   <!-- Main Game Content -->
   <main itemscope itemtype="https://schema.org/VideoGame">

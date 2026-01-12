@@ -168,8 +168,8 @@
   <!-- Primary Meta Tags -->
   <title>Flappy Bird Unblocked - Play Online Free | Chromebook Unlocked Games</title>
   <meta name="title" content="Flappy Bird Unblocked - Play Online Free | Chromebook Unlocked Games">
-  <meta name="description" content="Play Flappy Bird unblocked online free! Enjoy Flappy Bird unrestricted on your Chromebook or school computer with no downloads required. Flappy Bird is a popular uncategorized game that works at school. Play Flappy Bird online free now - unblocked and unrestricted!">
-  <meta name="keywords" content="Flappy Bird, Flappy Bird unblocked, Flappy Bird online, Flappy Bird free, Flappy Bird unblocked play online free, play Flappy Bird online free, Flappy Bird play online free, play Flappy Bird, play Flappy Bird online, play Flappy Bird free, Flappy Bird game, Flappy Bird game online, Flappy Bird game unblocked, Flappy Bird unblocked games, Flappy Bird free online, Flappy Bird play free, Flappy Bird at school, Flappy Bird school unblocked, Flappy Bird chromebook, Flappy Bird browser game, Flappy Bird no download, free Flappy Bird game, unblocked Flappy Bird, Flappy Bird unrestricted, Flappy Bird unrestricted game, play Flappy Bird unrestricted, uncategorized games unblocked, free uncategorized games, uncategorized games online, uncategorized games unrestricted, unblocked games, free online games, school games, chromebook games, unblocked games at school, play games at school, browser games free, games not blocked, unrestricted games, chromebook unlocked games, play online free, games online free, unrestricted school games">
+  <meta name="description" content="Play Flappy Bird unblocked online free! Enjoy Flappy Bird unrestricted on your Chromebook or school computer with no downloads required. Flappy Bird is a popular arcade, retro game that works at school. Play Flappy Bird online free now - unblocked and unrestricted!">
+  <meta name="keywords" content="Flappy Bird, Flappy Bird unblocked, Flappy Bird online, Flappy Bird free, Flappy Bird unblocked play online free, play Flappy Bird online free, Flappy Bird play online free, play Flappy Bird, play Flappy Bird online, play Flappy Bird free, Flappy Bird game, Flappy Bird game online, Flappy Bird game unblocked, Flappy Bird unblocked games, Flappy Bird free online, Flappy Bird play free, Flappy Bird at school, Flappy Bird school unblocked, Flappy Bird chromebook, Flappy Bird browser game, Flappy Bird no download, free Flappy Bird game, unblocked Flappy Bird, Flappy Bird unrestricted, Flappy Bird unrestricted game, play Flappy Bird unrestricted, arcade games unblocked, retro games unblocked, free arcade games, free retro games, arcade games online, retro games online, arcade games unrestricted, retro games unrestricted, unblocked games, free online games, school games, chromebook games, unblocked games at school, play games at school, browser games free, games not blocked, unrestricted games, chromebook unlocked games, play online free, games online free, unrestricted school games">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="language" content="English">
   <meta name="author" content="Chromebook Unlocked Games">
@@ -180,7 +180,7 @@
   <meta property="og:type" content="game">
   <meta property="og:url" content="https://chromebookunlocked.github.io/Flappy Bird.html">
   <meta property="og:title" content="Flappy Bird Unblocked - Play Online Free | Chromebook Unlocked Games">
-  <meta property="og:description" content="Play Flappy Bird unblocked online free! Enjoy Flappy Bird unrestricted on your Chromebook or school computer with no downloads required. Flappy Bird is a popular uncategorized game that works at school. Play Flappy Bird online free now - unblocked and unrestricted!">
+  <meta property="og:description" content="Play Flappy Bird unblocked online free! Enjoy Flappy Bird unrestricted on your Chromebook or school computer with no downloads required. Flappy Bird is a popular arcade, retro game that works at school. Play Flappy Bird online free now - unblocked and unrestricted!">
   <meta property="og:image" content="https://chromebookunlocked.github.io/assets/logo.webp">
   <meta property="og:image:alt" content="Flappy Bird Unblocked - Play Online Free">
   <meta property="og:image:width" content="1200">
@@ -192,13 +192,13 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://chromebookunlocked.github.io/Flappy Bird.html">
   <meta name="twitter:title" content="Flappy Bird Unblocked - Play Online Free | Chromebook Unlocked Games">
-  <meta name="twitter:description" content="Play Flappy Bird unblocked online free! Enjoy Flappy Bird unrestricted on your Chromebook or school computer with no downloads required. Flappy Bird is a popular uncategorized game that works at school. Play Flappy Bird online free now - unblocked and unrestricted!">
+  <meta name="twitter:description" content="Play Flappy Bird unblocked online free! Enjoy Flappy Bird unrestricted on your Chromebook or school computer with no downloads required. Flappy Bird is a popular arcade, retro game that works at school. Play Flappy Bird online free now - unblocked and unrestricted!">
   <meta name="twitter:image" content="https://chromebookunlocked.github.io/assets/logo.webp">
   <meta name="twitter:image:alt" content="Flappy Bird Unblocked - Play Online Free">
 
   <!-- Game-specific meta -->
   <meta property="game:name" content="Flappy Bird">
-  <meta property="game:category" content="Uncategorized">
+  <meta property="game:category" content="Arcade, Retro">
   <meta property="game:platform" content="Web Browser">
 
   <!-- Favicon -->
@@ -1401,9 +1401,20 @@ footer {
   </header>
 
   <!-- Back Button (fixed to left edge of screen) -->
-  <button class="back-button" onclick="window.location.href='/'" title="Back to Unblocked Games" aria-label="Back to Free Unblocked Games">
+  <button class="back-button" onclick="goBack()" title="Back to Unblocked Games" aria-label="Back to Free Unblocked Games">
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
   </button>
+
+  <script>
+    function goBack() {
+      // Check if there's a previous page in history from the same site
+      if (document.referrer && document.referrer.includes(window.location.host)) {
+        history.back();
+      } else {
+        window.location.href = '/';
+      }
+    }
+  </script>
 
   <!-- Main Game Content -->
   <main itemscope itemtype="https://schema.org/VideoGame">
@@ -1422,7 +1433,7 @@ footer {
         </div>
 
         <div class="play-overlay" id="playOverlay">
-          <img src="games/Flappy Bird/thumbnail.webp" alt="Play Flappy Bird Unblocked - Free Online uncategorized Game" itemprop="image">
+          <img src="games/Flappy Bird/thumbnail.webp" alt="Play Flappy Bird Unblocked - Free Online arcade Game" itemprop="image">
           <h2 itemprop="headline">Flappy Bird</h2>
           <button class="play-btn" onclick="startGame(); gtag('event', 'play_button_clicked', {game_name: 'Flappy Bird', game_folder: 'Flappy Bird'});" aria-label="Play Flappy Bird Free Online">▶ Play</button>
         </div>
@@ -1449,216 +1460,216 @@ footer {
   <section class="recommendations" id="moreGamesSection" aria-label="More Unblocked Games">
     <div class="section-divider"></div>
     <div class="grid">
-      <a href="/Airline Tycoon Idle.html" class="game-card" title="Play Airline Tycoon Idle Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Airline Tycoon Idle/thumbnail.webp')">
-        <img class="thumb" src="games/Airline Tycoon Idle/thumbnail.webp" alt="Play Airline Tycoon Idle Unblocked - Free Online Game" loading="lazy">
+      <a href="/Bouncy Motors.html" class="game-card" title="Play Bouncy Motors Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Bouncy Motors/thumbnail.webp')">
+        <img class="thumb" src="games/Bouncy Motors/thumbnail.webp" alt="Play Bouncy Motors Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Airline Tycoon Idle</div>
-    </a><a href="/Geometry Dash Lite.html" class="game-card" title="Play Geometry Dash Lite Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Geometry Dash Lite/thumbnail.webp')">
-        <img class="thumb" src="games/Geometry Dash Lite/thumbnail.webp" alt="Play Geometry Dash Lite Unblocked - Free Online Game" loading="lazy">
+      <div class="card-title">Bouncy Motors</div>
+    </a><a href="/Henry Stickmin Fleeing The Complex.html" class="game-card" title="Play Henry Stickmin Fleeing The Complex Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Henry Stickmin Fleeing The Complex/thumbnail.webp')">
+        <img class="thumb" src="games/Henry Stickmin Fleeing The Complex/thumbnail.webp" alt="Play Henry Stickmin Fleeing The Complex Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Geometry Dash Lite</div>
-    </a><a href="/Hill Climb Racing 2.html" class="game-card" title="Play Hill Climb Racing 2 Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Hill Climb Racing 2/thumbnail.webp')">
-        <img class="thumb" src="games/Hill Climb Racing 2/thumbnail.webp" alt="Play Hill Climb Racing 2 Unblocked - Free Online Game" loading="lazy">
+      <div class="card-title">Henry Stickmin Fleeing The Complex</div>
+    </a><a href="/Super Falling Fred.html" class="game-card" title="Play Super Falling Fred Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Super Falling Fred/thumbnail.webp')">
+        <img class="thumb" src="games/Super Falling Fred/thumbnail.webp" alt="Play Super Falling Fred Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Hill Climb Racing 2</div>
-    </a><a href="/Whack Your Boss.html" class="game-card" title="Play Whack Your Boss Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Whack Your Boss/thumbnail.webp')">
-        <img class="thumb" src="games/Whack Your Boss/thumbnail.webp" alt="Play Whack Your Boss Unblocked - Free Online Game" loading="lazy">
+      <div class="card-title">Super Falling Fred</div>
+    </a><a href="/Zen Word.html" class="game-card" title="Play Zen Word Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Zen Word/thumbnail.webp')">
+        <img class="thumb" src="games/Zen Word/thumbnail.webp" alt="Play Zen Word Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Whack Your Boss</div>
-    </a><a href="/Zombie Exploder.html" class="game-card" title="Play Zombie Exploder Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Zombie Exploder/thumbnail.webp')">
-        <img class="thumb" src="games/Zombie Exploder/thumbnail.webp" alt="Play Zombie Exploder Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Zombie Exploder</div>
-    </a><a href="/1v1.lol.html" class="game-card" title="Play 1v1.lol Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/1v1.lol/thumbnail.webp')">
-        <img class="thumb" src="games/1v1.lol/thumbnail.webp" alt="Play 1v1.lol Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">1v1.lol</div>
-    </a><a href="/Bloodmoney.html" class="game-card" title="Play Bloodmoney Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Bloodmoney/thumbnail.webp')">
-        <img class="thumb" src="games/Bloodmoney/thumbnail.webp" alt="Play Bloodmoney Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Bloodmoney</div>
-    </a><a href="/Clear Vision 1.html" class="game-card" title="Play Clear Vision 1 Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 1/thumbnail.webp')">
-        <img class="thumb" src="games/Clear Vision 1/thumbnail.webp" alt="Play Clear Vision 1 Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Clear Vision 1</div>
-    </a><a href="/Bob The Robber.html" class="game-card" title="Play Bob The Robber Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber/thumbnail.webp')">
-        <img class="thumb" src="games/Bob The Robber/thumbnail.webp" alt="Play Bob The Robber Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Bob The Robber</div>
-    </a><a href="/Capybara Clicker.html" class="game-card" title="Play Capybara Clicker Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Capybara Clicker/thumbnail.webp')">
-        <img class="thumb" src="games/Capybara Clicker/thumbnail.webp" alt="Play Capybara Clicker Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Capybara Clicker</div>
-    </a><a href="/The Last Stand.html" class="game-card" title="Play The Last Stand Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/The Last Stand/thumbnail.webp')">
-        <img class="thumb" src="games/The Last Stand/thumbnail.webp" alt="Play The Last Stand Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">The Last Stand</div>
-    </a><a href="/Little Alchemy 2.html" class="game-card" title="Play Little Alchemy 2 Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Little Alchemy 2/thumbnail.webp')">
-        <img class="thumb" src="games/Little Alchemy 2/thumbnail.webp" alt="Play Little Alchemy 2 Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Little Alchemy 2</div>
-    </a><a href="/Blackjack.html" class="game-card" title="Play Blackjack Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Blackjack/thumbnail.webp')">
-        <img class="thumb" src="games/Blackjack/thumbnail.webp" alt="Play Blackjack Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Blackjack</div>
-    </a><a href="/Wrassling.html" class="game-card" title="Play Wrassling Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Wrassling/thumbnail.webp')">
-        <img class="thumb" src="games/Wrassling/thumbnail.webp" alt="Play Wrassling Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Wrassling</div>
-    </a><a href="/BTD5.html" class="game-card" title="Play BTD5 Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/BTD5/thumbnail.webp')">
-        <img class="thumb" src="games/BTD5/thumbnail.webp" alt="Play BTD5 Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">BTD5</div>
-    </a><a href="/Friday Night Funkin.html" class="game-card" title="Play Friday Night Funkin Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Friday Night Funkin/thumbnail.webp')">
-        <img class="thumb" src="games/Friday Night Funkin/thumbnail.webp" alt="Play Friday Night Funkin Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Friday Night Funkin</div>
-    </a><a href="/Hanger 2.html" class="game-card" title="Play Hanger 2 Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Hanger 2/thumbnail.webp')">
-        <img class="thumb" src="games/Hanger 2/thumbnail.webp" alt="Play Hanger 2 Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Hanger 2</div>
-    </a><a href="/Gobble.html" class="game-card" title="Play Gobble Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Gobble/thumbnail.webp')">
-        <img class="thumb" src="games/Gobble/thumbnail.webp" alt="Play Gobble Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Gobble</div>
-    </a><a href="/FNAF Pizzeria Simulator.html" class="game-card" title="Play FNAF Pizzeria Simulator Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/FNAF Pizzeria Simulator/thumbnail.webp')">
-        <img class="thumb" src="games/FNAF Pizzeria Simulator/thumbnail.webp" alt="Play FNAF Pizzeria Simulator Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">FNAF Pizzeria Simulator</div>
-    </a><a href="/Ages of Conflict.html" class="game-card" title="Play Ages of Conflict Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Ages of Conflict/thumbnail.webp')">
-        <img class="thumb" src="games/Ages of Conflict/thumbnail.webp" alt="Play Ages of Conflict Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Ages of Conflict</div>
-    </a><a href="/Bad Ice Cream.html" class="game-card" title="Play Bad Ice Cream Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Bad Ice Cream/thumbnail.webp')">
-        <img class="thumb" src="games/Bad Ice Cream/thumbnail.webp" alt="Play Bad Ice Cream Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Bad Ice Cream</div>
-    </a><a href="/Superhot.html" class="game-card" title="Play Superhot Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Superhot/thumbnail.webp')">
-        <img class="thumb" src="games/Superhot/thumbnail.webp" alt="Play Superhot Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Superhot</div>
-    </a><a href="/Crazy Cattle 3D.html" class="game-card" title="Play Crazy Cattle 3D Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Crazy Cattle 3D/thumbnail.webp')">
-        <img class="thumb" src="games/Crazy Cattle 3D/thumbnail.webp" alt="Play Crazy Cattle 3D Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Crazy Cattle 3D</div>
-    </a><a href="/Happy Wheels.html" class="game-card" title="Play Happy Wheels Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Happy Wheels/thumbnail.webp')">
-        <img class="thumb" src="games/Happy Wheels/thumbnail.webp" alt="Play Happy Wheels Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Happy Wheels</div>
-    </a><a href="/Henry Stickmin Escaping The Prison.html" class="game-card" title="Play Henry Stickmin Escaping The Prison Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Henry Stickmin Escaping The Prison/thumbnail.webp')">
-        <img class="thumb" src="games/Henry Stickmin Escaping The Prison/thumbnail.webp" alt="Play Henry Stickmin Escaping The Prison Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Henry Stickmin Escaping The Prison</div>
-    </a><a href="/The Deadset.html" class="game-card" title="Play The Deadset Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/The Deadset/thumbnail.webp')">
-        <img class="thumb" src="games/The Deadset/thumbnail.webp" alt="Play The Deadset Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">The Deadset</div>
-    </a><a href="/Gun Spin.html" class="game-card" title="Play Gun Spin Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Gun Spin/thumbnail.webp')">
-        <img class="thumb" src="games/Gun Spin/thumbnail.webp" alt="Play Gun Spin Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Gun Spin</div>
-    </a><a href="/Vapmpire Survivors.html" class="game-card" title="Play Vapmpire Survivors Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Vapmpire Survivors/thumbnail.webp')">
-        <img class="thumb" src="games/Vapmpire Survivors/thumbnail.webp" alt="Play Vapmpire Survivors Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Vapmpire Survivors</div>
-    </a><a href="/The Visitor.html" class="game-card" title="Play The Visitor Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/The Visitor/thumbnail.webp')">
-        <img class="thumb" src="games/The Visitor/thumbnail.webp" alt="Play The Visitor Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">The Visitor</div>
-    </a><a href="/Blaze Drifter.html" class="game-card" title="Play Blaze Drifter Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Blaze Drifter/thumbnail.webp')">
-        <img class="thumb" src="games/Blaze Drifter/thumbnail.webp" alt="Play Blaze Drifter Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Blaze Drifter</div>
-    </a><a href="/10 Minutes Till Dawn.html" class="game-card" title="Play 10 Minutes Till Dawn Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/10 Minutes Till Dawn/thumbnail.webp')">
-        <img class="thumb" src="games/10 Minutes Till Dawn/thumbnail.webp" alt="Play 10 Minutes Till Dawn Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">10 Minutes Till Dawn</div>
-    </a><a href="/Rocket Soccer Derby.html" class="game-card" title="Play Rocket Soccer Derby Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Rocket Soccer Derby/thumbnail.webp')">
-        <img class="thumb" src="games/Rocket Soccer Derby/thumbnail.webp" alt="Play Rocket Soccer Derby Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Rocket Soccer Derby</div>
-    </a><a href="/OvO.html" class="game-card" title="Play OvO Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/OvO/thumbnail.webp')">
-        <img class="thumb" src="games/OvO/thumbnail.webp" alt="Play OvO Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">OvO</div>
-    </a><a href="/Bloxorz.html" class="game-card" title="Play Bloxorz Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Bloxorz/thumbnail.webp')">
-        <img class="thumb" src="games/Bloxorz/thumbnail.webp" alt="Play Bloxorz Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Bloxorz</div>
-    </a><a href="/Henry Stickmin Infiltrating The Airship.html" class="game-card" title="Play Henry Stickmin Infiltrating The Airship Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Henry Stickmin Infiltrating The Airship/thumbnail.webp')">
-        <img class="thumb" src="games/Henry Stickmin Infiltrating The Airship/thumbnail.webp" alt="Play Henry Stickmin Infiltrating The Airship Unblocked - Free Online Game" loading="lazy">
-      </div>
-      <div class="card-title">Henry Stickmin Infiltrating The Airship</div>
+      <div class="card-title">Zen Word</div>
     </a><a href="/Gladdihoppers.html" class="game-card" title="Play Gladdihoppers Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('games/Gladdihoppers/thumbnail.webp')">
         <img class="thumb" src="games/Gladdihoppers/thumbnail.webp" alt="Play Gladdihoppers Unblocked - Free Online Game" loading="lazy">
       </div>
       <div class="card-title">Gladdihoppers</div>
-    </a><a href="/Retro Bowl.html" class="game-card" title="Play Retro Bowl Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Retro Bowl/thumbnail.webp')">
-        <img class="thumb" src="games/Retro Bowl/thumbnail.webp" alt="Play Retro Bowl Unblocked - Free Online Game" loading="lazy">
+    </a><a href="/Crazy Cars.html" class="game-card" title="Play Crazy Cars Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Crazy Cars/thumbnail.webp')">
+        <img class="thumb" src="games/Crazy Cars/thumbnail.webp" alt="Play Crazy Cars Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Retro Bowl</div>
-    </a><a href="/Adventure Capitalist.html" class="game-card" title="Play Adventure Capitalist Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Adventure Capitalist/thumbnail.webp')">
-        <img class="thumb" src="games/Adventure Capitalist/thumbnail.webp" alt="Play Adventure Capitalist Unblocked - Free Online Game" loading="lazy">
+      <div class="card-title">Crazy Cars</div>
+    </a><a href="/Gun Spin.html" class="game-card" title="Play Gun Spin Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Gun Spin/thumbnail.webp')">
+        <img class="thumb" src="games/Gun Spin/thumbnail.webp" alt="Play Gun Spin Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Adventure Capitalist</div>
+      <div class="card-title">Gun Spin</div>
+    </a><a href="/Portal Flash.html" class="game-card" title="Play Portal Flash Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Portal Flash/thumbnail.webp')">
+        <img class="thumb" src="games/Portal Flash/thumbnail.webp" alt="Play Portal Flash Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Portal Flash</div>
+    </a><a href="/Fall Guys.html" class="game-card" title="Play Fall Guys Mini Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Fall Guys/thumbnail.webp')">
+        <img class="thumb" src="games/Fall Guys/thumbnail.webp" alt="Play Fall Guys Mini Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Fall Guys Mini</div>
+    </a><a href="/Ages of Conflict.html" class="game-card" title="Play Ages of Conflict Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Ages of Conflict/thumbnail.webp')">
+        <img class="thumb" src="games/Ages of Conflict/thumbnail.webp" alt="Play Ages of Conflict Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Ages of Conflict</div>
+    </a><a href="/Five Nights at Wilsons.html" class="game-card" title="Play Five Nights at Wilsons Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Five Nights at Wilsons/thumbnail.webp')">
+        <img class="thumb" src="games/Five Nights at Wilsons/thumbnail.webp" alt="Play Five Nights at Wilsons Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Five Nights at Wilsons</div>
+    </a><a href="/Zombotron Reboot.html" class="game-card" title="Play Zombotron Reboot Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Zombotron Reboot/thumbnail.webp')">
+        <img class="thumb" src="games/Zombotron Reboot/thumbnail.webp" alt="Play Zombotron Reboot Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Zombotron Reboot</div>
+    </a><a href="/Crazy Motorcycle.html" class="game-card" title="Play Crazy Motorcycle Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Crazy Motorcycle/thumbnail.webp')">
+        <img class="thumb" src="games/Crazy Motorcycle/thumbnail.webp" alt="Play Crazy Motorcycle Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Crazy Motorcycle</div>
+    </a><a href="/Hover Race Drive.html" class="game-card" title="Play Hover Race Drive Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Hover Race Drive/thumbnail.webp')">
+        <img class="thumb" src="games/Hover Race Drive/thumbnail.webp" alt="Play Hover Race Drive Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Hover Race Drive</div>
+    </a><a href="/Hill Climb Racing 2.html" class="game-card" title="Play Hill Climb Racing 2 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Hill Climb Racing 2/thumbnail.webp')">
+        <img class="thumb" src="games/Hill Climb Racing 2/thumbnail.webp" alt="Play Hill Climb Racing 2 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Hill Climb Racing 2</div>
+    </a><a href="/Basketball Legends.html" class="game-card" title="Play Basketball Legends Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Basketball Legends/thumbnail.webp')">
+        <img class="thumb" src="games/Basketball Legends/thumbnail.webp" alt="Play Basketball Legends Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Basketball Legends</div>
+    </a><a href="/3Dash.html" class="game-card" title="Play 3Dash Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/3Dash/thumbnail.webp')">
+        <img class="thumb" src="games/3Dash/thumbnail.webp" alt="Play 3Dash Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">3Dash</div>
+    </a><a href="/Highway Racer.html" class="game-card" title="Play Highway Racer Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Highway Racer/thumbnail.webp')">
+        <img class="thumb" src="games/Highway Racer/thumbnail.webp" alt="Play Highway Racer Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Highway Racer</div>
+    </a><a href="/Deltarune.html" class="game-card" title="Play Deltarune Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Deltarune/thumbnail.webp')">
+        <img class="thumb" src="games/Deltarune/thumbnail.webp" alt="Play Deltarune Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Deltarune</div>
+    </a><a href="/They Are Coming.html" class="game-card" title="Play They Are Coming Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/They Are Coming/thumbnail.webp')">
+        <img class="thumb" src="games/They Are Coming/thumbnail.webp" alt="Play They Are Coming Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">They Are Coming</div>
+    </a><a href="/Tower Wizzard.html" class="game-card" title="Play Tower Wizzard Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Tower Wizzard/thumbnail.webp')">
+        <img class="thumb" src="games/Tower Wizzard/thumbnail.webp" alt="Play Tower Wizzard Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Tower Wizzard</div>
+    </a><a href="/Bob The Robber 2.html" class="game-card" title="Play Bob The Robber 2 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber 2/thumbnail.webp')">
+        <img class="thumb" src="games/Bob The Robber 2/thumbnail.webp" alt="Play Bob The Robber 2 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Bob The Robber 2</div>
+    </a><a href="/Lone Wolf.html" class="game-card" title="Play Lone Wolf Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Lone Wolf/thumbnail.webp')">
+        <img class="thumb" src="games/Lone Wolf/thumbnail.webp" alt="Play Lone Wolf Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Lone Wolf</div>
+    </a><a href="/Cookie Clicker.html" class="game-card" title="Play Cookie Clicker Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Cookie Clicker/thumbnail.webp')">
+        <img class="thumb" src="games/Cookie Clicker/thumbnail.webp" alt="Play Cookie Clicker Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Cookie Clicker</div>
+    </a><a href="/Plants vs Zombies 2.html" class="game-card" title="Play Plants vs Zombies 2 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Plants vs Zombies 2/thumbnail.webp')">
+        <img class="thumb" src="games/Plants vs Zombies 2/thumbnail.webp" alt="Play Plants vs Zombies 2 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Plants vs Zombies 2</div>
+    </a><a href="/Yellow.html" class="game-card" title="Play Yellow Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Yellow/thumbnail.webp')">
+        <img class="thumb" src="games/Yellow/thumbnail.webp" alt="Play Yellow Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Yellow</div>
+    </a><a href="/Self.html" class="game-card" title="Play Self Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Self/thumbnail.webp')">
+        <img class="thumb" src="games/Self/thumbnail.webp" alt="Play Self Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Self</div>
+    </a><a href="/Blackjack.html" class="game-card" title="Play Blackjack Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Blackjack/thumbnail.webp')">
+        <img class="thumb" src="games/Blackjack/thumbnail.webp" alt="Play Blackjack Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Blackjack</div>
+    </a><a href="/Granny.html" class="game-card" title="Play Granny Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Granny/thumbnail.webp')">
+        <img class="thumb" src="games/Granny/thumbnail.webp" alt="Play Granny Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Granny</div>
+    </a><a href="/1on1 Soccer.html" class="game-card" title="Play 1on1 Soccer Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/1on1 Soccer/thumbnail.webp')">
+        <img class="thumb" src="games/1on1 Soccer/thumbnail.webp" alt="Play 1on1 Soccer Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">1on1 Soccer</div>
+    </a><a href="/Bounty of One.html" class="game-card" title="Play Bounty of One Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Bounty of One/thumbnail.webp')">
+        <img class="thumb" src="games/Bounty of One/thumbnail.webp" alt="Play Bounty of One Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Bounty of One</div>
+    </a><a href="/Cut the Rope.html" class="game-card" title="Play Cut the Rope Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Cut the Rope/thumbnail.webp')">
+        <img class="thumb" src="games/Cut the Rope/thumbnail.webp" alt="Play Cut the Rope Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Cut the Rope</div>
+    </a><a href="/Smash Carts.html" class="game-card" title="Play Smash Carts Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Smash Carts/thumbnail.webp')">
+        <img class="thumb" src="games/Smash Carts/thumbnail.webp" alt="Play Smash Carts Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Smash Carts</div>
+    </a><a href="/FNAF 1.html" class="game-card" title="Play FNAF 1 Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/FNAF 1/thumbnail.webp')">
+        <img class="thumb" src="games/FNAF 1/thumbnail.webp" alt="Play FNAF 1 Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">FNAF 1</div>
+    </a><a href="/Superhot.html" class="game-card" title="Play Superhot Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Superhot/thumbnail.webp')">
+        <img class="thumb" src="games/Superhot/thumbnail.webp" alt="Play Superhot Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Superhot</div>
+    </a><a href="/Airline Tycoon Idle.html" class="game-card" title="Play Airline Tycoon Idle Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Airline Tycoon Idle/thumbnail.webp')">
+        <img class="thumb" src="games/Airline Tycoon Idle/thumbnail.webp" alt="Play Airline Tycoon Idle Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Airline Tycoon Idle</div>
+    </a><a href="/Infinite Craft.html" class="game-card" title="Play Infinite Craft Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Infinite Craft/thumbnail.webp')">
+        <img class="thumb" src="games/Infinite Craft/thumbnail.webp" alt="Play Infinite Craft Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Infinite Craft</div>
     </a><a href="/Block the Pig.html" class="game-card" title="Play Block the Pig Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('games/Block the Pig/thumbnail.webp')">
         <img class="thumb" src="games/Block the Pig/thumbnail.webp" alt="Play Block the Pig Unblocked - Free Online Game" loading="lazy">
       </div>
       <div class="card-title">Block the Pig</div>
-    </a><a href="/Bob The Robber 5.html" class="game-card" title="Play Bob The Robber 5 Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber 5/thumbnail.webp')">
-        <img class="thumb" src="games/Bob The Robber 5/thumbnail.webp" alt="Play Bob The Robber 5 Unblocked - Free Online Game" loading="lazy">
+    </a><a href="/Drift Hunters.html" class="game-card" title="Play Drift Hunters Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Drift Hunters/thumbnail.webp')">
+        <img class="thumb" src="games/Drift Hunters/thumbnail.webp" alt="Play Drift Hunters Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">Bob The Robber 5</div>
-    </a><a href="/1on1 Tennis.html" class="game-card" title="Play 1on1 Tennis Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/1on1 Tennis/thumbnail.webp')">
-        <img class="thumb" src="games/1on1 Tennis/thumbnail.webp" alt="Play 1on1 Tennis Unblocked - Free Online Game" loading="lazy">
+      <div class="card-title">Drift Hunters</div>
+    </a><a href="/The Last Stand.html" class="game-card" title="Play The Last Stand Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/The Last Stand/thumbnail.webp')">
+        <img class="thumb" src="games/The Last Stand/thumbnail.webp" alt="Play The Last Stand Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">1on1 Tennis</div>
-    </a><a href="/234 Player Games.html" class="game-card" title="Play 234 Player Games Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/234 Player Games/thumbnail.webp')">
-        <img class="thumb" src="games/234 Player Games/thumbnail.webp" alt="Play 234 Player Games Unblocked - Free Online Game" loading="lazy">
+      <div class="card-title">The Last Stand</div>
+    </a><a href="/Zombie Exploder.html" class="game-card" title="Play Zombie Exploder Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Zombie Exploder/thumbnail.webp')">
+        <img class="thumb" src="games/Zombie Exploder/thumbnail.webp" alt="Play Zombie Exploder Unblocked - Free Online Game" loading="lazy">
       </div>
-      <div class="card-title">234 Player Games</div>
+      <div class="card-title">Zombie Exploder</div>
+    </a><a href="/Perfect Hotel.html" class="game-card" title="Play Perfect Hotel Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Perfect Hotel/thumbnail.webp')">
+        <img class="thumb" src="games/Perfect Hotel/thumbnail.webp" alt="Play Perfect Hotel Unblocked - Free Online Game" loading="lazy">
+      </div>
+      <div class="card-title">Perfect Hotel</div>
     </a>
     </div>
   </section>
@@ -1666,7 +1677,7 @@ footer {
   <!-- Category Tags (above About section) -->
   <div class="category-tags-section">
     <div class="category-tags" role="navigation" aria-label="Game Categories">
-      <a href="/#/category/Uncategorized" class="category-tag" title="Play Free Uncategorized Games Unblocked">Uncategorized</a>
+      <a href="/#/category/Arcade" class="category-tag" title="Play Free Arcade Games Unblocked">Arcade</a><a href="/#/category/Retro" class="category-tag" title="Play Free Retro Games Unblocked">Retro</a>
     </div>
   </div>
 
@@ -1678,12 +1689,12 @@ footer {
         <h3>About Flappy Bird</h3>
         <div class="description-content">
           <p class="description-preview" itemprop="description">
-            Play Flappy Bird unblocked online free! This uncategorized game works unrestricted on Chromebook and school computers. This free online game is perfect for playing at school on your Chromebook or any computer.
+            Play Flappy Bird unblocked online free! This arcade game works unrestricted on Chromebook and school computers. This free online game is perfect for playing at school on your Chromebook or any computer.
           </p>
           <div class="description-full">
             <p>
                No downloads - play Flappy Bird online free instantly!
-              Flappy Bird is one of the best uncategorized games available on our unblocked games site.
+              Flappy Bird is one of the best arcade games available on our unblocked games site.
               No downloads needed - just click play and enjoy Flappy Bird instantly in your browser!
             </p>
             <p>
@@ -1693,7 +1704,7 @@ footer {
             </p>
             <div class="game-meta">
               <div class="meta-item">
-                <strong>Categories:</strong> Uncategorized
+                <strong>Categories:</strong> Arcade, Retro
               </div>
               <div class="meta-item">
                 <strong>Platform:</strong> Web Browser (HTML5)
@@ -1709,7 +1720,7 @@ footer {
                 <span class="keyword">Flappy Bird online</span>
                 <span class="keyword">play Flappy Bird</span>
                 <span class="keyword">Flappy Bird free</span>
-                <span class="keyword">uncategorized games</span>
+                <span class="keyword">arcade games</span>
                 <span class="keyword">unblocked games</span>
                 <span class="keyword">chromebook games</span>
               </div>
@@ -1758,11 +1769,12 @@ footer {
     "Play Flappy Bird Online Free"
   ],
   "url": "https://chromebookunlocked.github.io/Flappy Bird.html",
-  "description": "Play Flappy Bird unblocked online free! Enjoy this popular uncategorized game unrestricted on your Chromebook or school computer. No downloads required - play online free instantly!",
+  "description": "Play Flappy Bird unblocked online free! Enjoy this popular arcade, retro game unrestricted on your Chromebook or school computer. No downloads required - play online free instantly!",
   "image": "https://chromebookunlocked.github.io/assets/logo.webp",
   "thumbnailUrl": "https://chromebookunlocked.github.io/games/Flappy Bird/thumbnail.webp",
   "genre": [
-    "Uncategorized"
+    "Arcade",
+    "Retro"
   ],
   "gamePlatform": [
     "Web Browser",
@@ -1817,8 +1829,8 @@ footer {
     {
       "@type": "ListItem",
       "position": 2,
-      "name": "Uncategorized",
-      "item": "https://chromebookunlocked.github.io/#/category/Uncategorized"
+      "name": "Arcade",
+      "item": "https://chromebookunlocked.github.io/#/category/Arcade"
     },
     {
       "@type": "ListItem",
@@ -1865,7 +1877,7 @@ footer {
       trackEnhancedPageView('game_page', 'Flappy Bird', {
         game_name: 'Flappy Bird',
         game_folder: 'Flappy Bird',
-        game_categories: 'Uncategorized',
+        game_categories: 'Arcade, Retro',
         from_page: document.referrer || 'direct'
       });
     }
@@ -1886,7 +1898,7 @@ footer {
         gtag('event', 'game_started', {
           game_name: 'Flappy Bird',
           game_folder: 'Flappy Bird',
-          game_categories: 'Uncategorized',
+          game_categories: 'Arcade, Retro',
           session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
           timestamp: new Date().toISOString()
         });
@@ -2131,7 +2143,7 @@ footer {
           gtag('event', 'game_session_end', {
             game_name: 'Flappy Bird',
             game_folder: 'Flappy Bird',
-            game_categories: 'Uncategorized',
+            game_categories: 'Arcade, Retro',
             duration_seconds: playDuration,
             session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
             timestamp: new Date().toISOString()
