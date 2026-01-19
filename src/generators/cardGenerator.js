@@ -1,4 +1,6 @@
 const { chooseThumb, getAssetPath } = require("../utils/assetManager");
+const { escapeHtml, escapeHtmlAttr } = require("../utils/htmlEscape");
+const { EAGER_LOAD_CARDS } = require("../utils/constants");
 
 /**
  * Generate HTML for a single game card
@@ -12,26 +14,32 @@ function generateGameCard(game, idx, gamesDir, loadEagerly = false) {
   const thumb = chooseThumb(game, gamesDir);
   const thumbPath = getAssetPath(game.folder, thumb);
 
-  // Eagerly load first 4 images of each category to ensure first row is ready
+  // Eagerly load first N images of each category to ensure first row is ready
   // All other images use data-src and load when they become visible
-  const shouldEagerLoad = loadEagerly && idx < 4;
+  const shouldEagerLoad = loadEagerly && idx < EAGER_LOAD_CARDS;
   const loadingAttr = shouldEagerLoad ? 'eager' : 'lazy';
   const fetchPriorityAttr = shouldEagerLoad ? ' fetchpriority="high"' : '';
 
+  // Escape file paths for use in HTML attributes
+  const escapedFolder = escapeHtmlAttr(game.folder);
+  const escapedThumbPath = escapeHtmlAttr(thumbPath);
+  const escapedGameName = escapeHtmlAttr(game.name);
+  const escapedGameNameLower = escapeHtml(game.name.toLowerCase());
+
   // For lazy-loaded images, use data-src instead of src to prevent loading until needed
-  const srcAttr = shouldEagerLoad ? `src="${thumbPath}"` : `data-src="${thumbPath}"`;
+  const srcAttr = shouldEagerLoad ? `src="${escapedThumbPath}"` : `data-src="${escapedThumbPath}"`;
   const placeholderSrc = shouldEagerLoad ? '' : ' src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'300\'%3E%3C/svg%3E"';
 
-  // Add aliases for search (otherNames)
+  // Add aliases for search (otherNames) - escape each alias
   const aliasesAttr = game.otherNames && game.otherNames.length > 0
-    ? ` data-aliases="${game.otherNames.map(n => n.toLowerCase()).join(',')}"`
+    ? ` data-aliases="${escapeHtmlAttr(game.otherNames.map(n => n.toLowerCase()).join(','))}"`
     : '';
 
-  return `<div class="card game-card" data-index="${idx}" data-folder="${game.folder}" data-name="${game.name.toLowerCase()}"${aliasesAttr} onclick="window.location.href='/${game.folder}.html'">
-    <div class="thumb-container" style="--thumb-url: url('${thumbPath}')">
-      <img class="thumb" ${srcAttr}${placeholderSrc} alt="${game.name}" loading="${loadingAttr}" decoding="async" width="300" height="300"${fetchPriorityAttr}>
+  return `<div class="card game-card" data-index="${idx}" data-folder="${escapedFolder}" data-name="${escapedGameNameLower}"${aliasesAttr} onclick="window.location.href='/${escapedFolder}.html'">
+    <div class="thumb-container" style="--thumb-url: url('${escapedThumbPath}')">
+      <img class="thumb" ${srcAttr}${placeholderSrc} alt="${escapedGameName}" loading="${loadingAttr}" decoding="async" width="300" height="300"${fetchPriorityAttr}>
     </div>
-    <div class="card-title">${game.name}</div>
+    <div class="card-title">${escapeHtml(game.name)}</div>
   </div>`;
 }
 
@@ -46,7 +54,7 @@ function generateSidebar(categories) {
     .sort((a, b) => categories[b].length - categories[a].length);
 
   return sidebarCategories
-    .map(cat => `<button class="sidebar-button" onclick="filterCategory('${cat}')">${cat} (${categories[cat].length})</button>`)
+    .map(cat => `<button class="sidebar-button" onclick="filterCategory('${escapeHtmlAttr(cat)}')">${escapeHtml(cat)} (${categories[cat].length})</button>`)
     .join('\n');
 }
 

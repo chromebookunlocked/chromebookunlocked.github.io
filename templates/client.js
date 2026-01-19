@@ -2,6 +2,24 @@ const MAX_RECENT = 25;
 const offsets = {}; // offsets[category] = number of revealed rows - 1
 let currentViewMode = 'home'; // Track current view: 'home' or 'category'
 
+// Escape HTML to prevent XSS
+function escapeHtml(str) {
+  if (str == null) return '';
+  if (typeof str !== 'string') str = String(str);
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// Escape HTML attribute value
+function escapeHtmlAttr(str) {
+  if (str == null) return '';
+  if (typeof str !== 'string') str = String(str);
+  return escapeHtml(str)
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 // Get all valid game folders
 function getValidGameFolders() {
   const folders = new Set();
@@ -229,13 +247,17 @@ function loadRecentlyPlayed() {
 
     // Eagerly load first 6 thumbnails, lazy load the rest
     const isFirstRow = i < 6;
-    const srcAttr = isFirstRow ? `src="${thumbUrl}"` : `data-src="${thumbUrl}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E"`;
+    const escapedThumbUrl = escapeHtmlAttr(thumbUrl);
+    const escapedName = escapeHtmlAttr(g.name);
+    const escapedNameText = escapeHtml(g.name);
+    const escapedFolder = escapeHtmlAttr(g.folder);
+    const srcAttr = isFirstRow ? `src="${escapedThumbUrl}"` : `data-src="${escapedThumbUrl}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E"`;
     const loadingAttr = isFirstRow ? 'eager' : 'lazy';
 
-    card.innerHTML = `<div class="thumb-container" style="--thumb-url: url('${thumbUrl}')">
-      <img class="thumb" ${srcAttr} alt="${g.name}" loading="${loadingAttr}" decoding="async" width="300" height="300" onerror="this.src='assets/logo.webp'">
+    card.innerHTML = `<div class="thumb-container" style="--thumb-url: url('${escapedThumbUrl}')">
+      <img class="thumb" ${srcAttr} alt="${escapedName}" loading="${loadingAttr}" decoding="async" width="300" height="300" onerror="this.src='assets/logo.webp'">
     </div>
-    <div class="card-title">${g.name}</div>`;
+    <div class="card-title">${escapedNameText}</div>`;
     fragment.appendChild(card);
   });
 
@@ -335,9 +357,13 @@ function searchGames(query) {
     searchDropdown.innerHTML = '<div class="search-no-results">No games found</div>';
   } else {
     searchDropdown.innerHTML = topResults.map(game => {
-      return `<div class="search-result-item" onclick="window.location.href='/${game.folder}.html'">
-        <img class="search-result-thumb" src="${game.thumb}" alt="${game.name}" loading="lazy" decoding="async" width="60" height="60">
-        <div class="search-result-name">${game.name}</div>
+      const escapedFolder = escapeHtmlAttr(game.folder);
+      const escapedThumb = escapeHtmlAttr(game.thumb);
+      const escapedName = escapeHtmlAttr(game.name);
+      const escapedNameText = escapeHtml(game.name);
+      return `<div class="search-result-item" onclick="window.location.href='/${escapedFolder}.html'">
+        <img class="search-result-thumb" src="${escapedThumb}" alt="${escapedName}" loading="lazy" decoding="async" width="60" height="60">
+        <div class="search-result-name">${escapedNameText}</div>
       </div>`;
     }).join('');
   }

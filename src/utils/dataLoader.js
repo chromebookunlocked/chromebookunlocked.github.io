@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { DEFAULT_THUMBNAILS } = require("./constants");
 
 /**
  * Load and validate games from JSON files
@@ -52,13 +53,19 @@ function loadGames(dataDir, gamesDir) {
         // Get createdAt date - use JSON value if present, otherwise use file birthtime/mtime
         let createdAt = json.createdAt;
         if (!createdAt) {
-          const stats = fs.statSync(filePath);
-          // Use birthtime if available (file creation time), otherwise use mtime (modification time)
-          createdAt = stats.birthtime ? stats.birthtime.toISOString() : stats.mtime.toISOString();
+          try {
+            const stats = fs.statSync(filePath);
+            // Use birthtime if available (file creation time), otherwise use mtime (modification time)
+            createdAt = stats.birthtime ? stats.birthtime.toISOString() : stats.mtime.toISOString();
 
-          // Update the JSON file to include the createdAt date for future builds
-          json.createdAt = createdAt;
-          fs.writeFileSync(filePath, JSON.stringify(json, null, 2) + '\n');
+            // Update the JSON file to include the createdAt date for future builds
+            json.createdAt = createdAt;
+            fs.writeFileSync(filePath, JSON.stringify(json, null, 2) + '\n');
+          } catch (statError) {
+            // If we can't get file stats, use current time as fallback
+            createdAt = new Date().toISOString();
+            console.warn(`⚠️  Could not get file stats for ${f}, using current time for createdAt`);
+          }
         }
 
         // Support priority value (higher priority = shown first in lists)
@@ -69,7 +76,7 @@ function loadGames(dataDir, gamesDir) {
           name: json.displayName || json.name || folder,
           otherNames: otherNames, // Array of alternative names for search
           categories: gameCategories, // Array of categories
-          thumbs: json.thumbs && json.thumbs.length ? json.thumbs : ["thumbnail.webp", "thumbnail.png", "thumbnail.jpg"],
+          thumbs: json.thumbs && json.thumbs.length ? json.thumbs : DEFAULT_THUMBNAILS,
           createdAt: createdAt, // ISO date string for when game was added
           priority: priority // Priority value for sorting (higher = first)
         };

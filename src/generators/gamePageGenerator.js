@@ -1,6 +1,21 @@
 const { chooseThumb, getAssetPath } = require("../utils/assetManager");
 const { generateGameMetaTags, generateGameStructuredData, generateGameSEOTitle, generateGameSEODescription } = require("../utils/seoBuilder");
 const { generateAnalyticsScript } = require("../utils/analyticsEnhanced");
+const { escapeHtml, escapeHtmlAttr } = require("../utils/htmlEscape");
+const { RECOMMENDED_GAMES_COUNT, MAX_RELATED_GAMES, GAME_DURATION_TRACKING_INTERVAL } = require("../utils/constants");
+
+// Helper to escape JavaScript string for use in HTML script tags
+function escapeJs(str) {
+  if (str == null) return '';
+  if (typeof str !== 'string') str = String(str);
+  return str
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\t/g, '\\t');
+}
 
 /**
  * Generate HTML for an individual game page
@@ -16,6 +31,13 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   const gameUrl = `games/${game.folder}/index.html`;
   const categoryList = game.categories.join(", ");
   const thumbPath = getAssetPath(game.folder, thumb);
+  
+  // Escape game data for safe HTML insertion
+  const escapedGameName = escapeHtml(game.name);
+  const escapedGameNameAttr = escapeHtmlAttr(game.name);
+  const escapedGameFolder = escapeHtmlAttr(game.folder);
+  const escapedCategoryList = escapeHtml(categoryList);
+  const escapedCategoryListJs = escapeJs(categoryList);
 
   // Get similar games for "You Might Also Like" section (no duplicates)
   const sameCategory = allGames.filter((g) =>
@@ -36,15 +58,15 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   // Shuffle other games
   const shuffledOtherGames = otherGames.sort(() => Math.random() - 0.5);
 
-  // New pattern: alternate 1 related, 1 random, until 5 related used or no more available
-  // Then fill rest with random games (total 42 games for 7 rows x 6 columns)
+  // New pattern: alternate 1 related, 1 random, until MAX_RELATED_GAMES used or no more available
+  // Then fill rest with random games (total RECOMMENDED_GAMES_COUNT games for 7 rows x 6 columns)
   const shuffled = [];
-  const maxRelated = Math.min(5, shuffledSameCategory.length);
+  const maxRelated = Math.min(MAX_RELATED_GAMES, shuffledSameCategory.length);
   let relatedIndex = 0;
   let randomIndex = 0;
 
   // Alternate pattern: related, random, related, random...
-  while (shuffled.length < 42 && (relatedIndex < maxRelated || randomIndex < shuffledOtherGames.length)) {
+  while (shuffled.length < RECOMMENDED_GAMES_COUNT && (relatedIndex < maxRelated || randomIndex < shuffledOtherGames.length)) {
     // Add related game if available and under limit
     if (relatedIndex < maxRelated && relatedIndex < shuffledSameCategory.length) {
       shuffled.push(shuffledSameCategory[relatedIndex]);
@@ -52,20 +74,20 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     }
 
     // Add random game if available
-    if (shuffled.length < 42 && randomIndex < shuffledOtherGames.length) {
+    if (shuffled.length < RECOMMENDED_GAMES_COUNT && randomIndex < shuffledOtherGames.length) {
       shuffled.push(shuffledOtherGames[randomIndex]);
       randomIndex++;
     }
   }
 
   // If we still need more games and have more related games available
-  while (shuffled.length < 42 && relatedIndex < shuffledSameCategory.length) {
+  while (shuffled.length < RECOMMENDED_GAMES_COUNT && relatedIndex < shuffledSameCategory.length) {
     shuffled.push(shuffledSameCategory[relatedIndex]);
     relatedIndex++;
   }
 
   // Fill any remaining slots with random games
-  while (shuffled.length < 42 && randomIndex < shuffledOtherGames.length) {
+  while (shuffled.length < RECOMMENDED_GAMES_COUNT && randomIndex < shuffledOtherGames.length) {
     shuffled.push(shuffledOtherGames[randomIndex]);
     randomIndex++;
   }
@@ -74,13 +96,17 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     .map((g) => {
       const gThumb = chooseThumb(g, gamesDir);
       const gThumbPath = getAssetPath(g.folder, gThumb);
+      const escapedFolder = escapeHtmlAttr(g.folder);
+      const escapedThumbPath = escapeHtmlAttr(gThumbPath);
+      const escapedName = escapeHtmlAttr(g.name);
+      const escapedNameText = escapeHtml(g.name);
       // SEO-optimized alt text with keywords
-      const altText = `Play ${g.name} Unblocked - Free Online Game`;
-      return `<a href="/${g.folder}.html" class="game-card" title="Play ${g.name} Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('${gThumbPath}')">
-        <img class="thumb" src="${gThumbPath}" alt="${altText}" loading="lazy">
+      const altText = `Play ${escapedNameText} Unblocked - Free Online Game`;
+      return `<a href="/${escapedFolder}.html" class="game-card" title="Play ${escapedNameText} Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('${escapedThumbPath}')">
+        <img class="thumb" src="${escapedThumbPath}" alt="${altText}" loading="lazy">
       </div>
-      <div class="card-title">${g.name}</div>
+      <div class="card-title">${escapedNameText}</div>
     </a>`;
     })
     .join("");
@@ -146,7 +172,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
   <!-- Main Game Content -->
   <main itemscope itemtype="https://schema.org/VideoGame">
-    <meta itemprop="name" content="${game.name}">
+    <meta itemprop="name" content="${escapedGameNameAttr}">
     <meta itemprop="gamePlatform" content="Web Browser">
     <meta itemprop="applicationCategory" content="Game">
 
@@ -155,20 +181,20 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
       <div class="game-frame-wrapper" id="gameWrapper">
         <!-- Controls Bar (sticky to top of game) -->
         <div class="controls">
-          <button id="fullscreenBtn" class="icon-btn" onclick="toggleFullscreen()" title="Play ${game.name} Fullscreen" aria-label="Toggle Fullscreen Mode">
+          <button id="fullscreenBtn" class="icon-btn" onclick="toggleFullscreen()" title="Play ${escapedGameNameAttr} Fullscreen" aria-label="Toggle Fullscreen Mode">
             <svg id="fullscreenIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
           </button>
         </div>
 
         <div class="play-overlay" id="playOverlay">
-          <img src="games/${game.folder}/${thumb}" alt="Play ${game.name} Unblocked - Free Online ${categoryText} Game" itemprop="image">
-          <h2 itemprop="headline">${game.name}</h2>
-          <button class="play-btn" onclick="startGame(); gtag('event', 'play_button_clicked', {game_name: '${game.name}', game_folder: '${game.folder}'});" aria-label="Play ${game.name} Free Online">▶ Play</button>
+          <img src="games/${escapedGameFolder}/${thumb}" alt="Play ${escapedGameNameAttr} Unblocked - Free Online ${escapeHtmlAttr(categoryText)} Game" itemprop="image">
+          <h2 itemprop="headline">${escapedGameName}</h2>
+          <button class="play-btn" onclick="startGame(); gtag('event', 'play_button_clicked', {game_name: '${escapeJs(game.name)}', game_folder: '${escapeJs(game.folder)}'});" aria-label="Play ${escapedGameNameAttr} Free Online">▶ Play</button>
         </div>
         <iframe
           id="gameFrame"
           src=""
-          title="${game.name} Unblocked - Play Free Online Game at School"
+          title="${escapedGameNameAttr} Unblocked - Play Free Online Game at School"
           allow="fullscreen; autoplay; encrypted-media"
           allowfullscreen>
         </iframe>
@@ -197,19 +223,22 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     <div class="category-tags" role="navigation" aria-label="Game Categories">
       ${game.categories
         .map(
-          (cat) =>
-            `<a href="/#/category/${encodeURIComponent(cat)}" class="category-tag" title="Play Free ${cat} Games Unblocked">${cat}</a>`
+          (cat) => {
+            const escapedCat = escapeHtmlAttr(cat);
+            const escapedCatText = escapeHtml(cat);
+            return `<a href="/#/category/${encodeURIComponent(cat)}" class="category-tag" title="Play Free ${escapedCatText} Games Unblocked">${escapedCatText}</a>`;
+          }
         )
         .join("")}
     </div>
   </div>
 
   <!-- Enhanced SEO Section -->
-  <section class="game-info-section" id="gameInfoSection" aria-label="About ${game.name}">
+  <section class="game-info-section" id="gameInfoSection" aria-label="About ${escapedGameNameAttr}">
     <div class="game-info-container">
       <div class="info-card full-width">
         <div class="info-card-icon">📝</div>
-        <h3>About ${game.name}</h3>
+        <h3>About ${escapedGameName}</h3>
         <div class="description-content">
           <p class="description-preview" itemprop="description">
             ${seoDescription.split('.')[0]}. This free online game is perfect for playing at school on your Chromebook or any computer.
@@ -217,17 +246,17 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
           <div class="description-full">
             <p>
               ${seoDescription.substring(seoDescription.indexOf('.') + 1)}
-              ${game.name} is one of the best ${categoryText} games available on our unblocked games site.
-              No downloads needed - just click play and enjoy ${game.name} instantly in your browser!
+              ${escapedGameName} is one of the best ${escapeHtml(categoryText)} games available on our unblocked games site.
+              No downloads needed - just click play and enjoy ${escapedGameName} instantly in your browser!
             </p>
             <p>
-              <strong>How to Play:</strong> Click the play button above to start ${game.name}. The game works on all devices including Chromebooks, laptops, and desktop computers.
+              <strong>How to Play:</strong> Click the play button above to start ${escapedGameName}. The game works on all devices including Chromebooks, laptops, and desktop computers.
               Use the fullscreen mode for the best gaming experience! All controls are explained in-game.
-              ${game.name} is completely free to play with no registration required.
+              ${escapedGameName} is completely free to play with no registration required.
             </p>
             <div class="game-meta">
               <div class="meta-item">
-                <strong>Categories:</strong> ${categoryList}
+                <strong>Categories:</strong> ${escapedCategoryList}
               </div>
               <div class="meta-item">
                 <strong>Platform:</strong> Web Browser (HTML5)
@@ -239,11 +268,11 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
             <div class="keywords-section">
               <strong>Popular Searches:</strong>
               <div class="keywords-list">
-                <span class="keyword">${game.name} unblocked</span>
-                <span class="keyword">${game.name} online</span>
-                <span class="keyword">play ${game.name}</span>
-                <span class="keyword">${game.name} free</span>
-                <span class="keyword">${categoryText} games</span>
+                <span class="keyword">${escapedGameName} unblocked</span>
+                <span class="keyword">${escapedGameName} online</span>
+                <span class="keyword">play ${escapedGameName}</span>
+                <span class="keyword">${escapedGameName} free</span>
+                <span class="keyword">${escapeHtml(categoryText)} games</span>
                 <span class="keyword">unblocked games</span>
                 <span class="keyword">chromebook games</span>
               </div>
@@ -288,10 +317,10 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
     // Track initial game page view
     if (typeof trackEnhancedPageView !== 'undefined') {
-      trackEnhancedPageView('game_page', '${game.name}', {
-        game_name: '${game.name}',
-        game_folder: '${game.folder}',
-        game_categories: '${categoryList}',
+      trackEnhancedPageView('game_page', '${escapeJs(game.name)}', {
+        game_name: '${escapeJs(game.name)}',
+        game_folder: '${escapeJs(game.folder)}',
+        game_categories: '${escapedCategoryListJs}',
         from_page: document.referrer || 'direct'
       });
     }
@@ -310,9 +339,9 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
       if (typeof gtag !== 'undefined') {
         gtag('event', 'game_started', {
-          game_name: '${game.name}',
-          game_folder: '${game.folder}',
-          game_categories: '${categoryList}',
+          game_name: '${escapeJs(game.name)}',
+          game_folder: '${escapeJs(game.folder)}',
+          game_categories: '${escapedCategoryListJs}',
           session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
           timestamp: new Date().toISOString()
         });
@@ -330,15 +359,15 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
           if (typeof gtag !== 'undefined') {
             gtag('event', 'game_playing', {
-              game_name: '${game.name}',
-              game_folder: '${game.folder}',
+              game_name: '${escapeJs(game.name)}',
+              game_folder: '${escapeJs(game.folder)}',
               duration_seconds: currentDuration,
               session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
               timestamp: new Date().toISOString()
             });
           }
         }
-      }, 30000); // Every 30 seconds
+      }, GAME_DURATION_TRACKING_INTERVAL); // Every N milliseconds
 
       // Track in Recently Played
       saveToRecentlyPlayed();
@@ -346,9 +375,9 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
     function saveToRecentlyPlayed() {
       const gameData = {
-        folder: '${game.folder}',
-        name: '${game.name}',
-        thumb: '${thumbPath}',
+        folder: '${escapeJs(game.folder)}',
+        name: '${escapeJs(game.name)}',
+        thumb: '${escapeJs(thumbPath)}',
         lastPlayed: Date.now()
       };
 
@@ -390,8 +419,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         // Track fullscreen enter
         if (typeof gtag !== 'undefined') {
           gtag('event', 'fullscreen_enter', {
-            game_name: '${game.name}',
-            game_folder: '${game.folder}',
+            game_name: '${escapeJs(game.name)}',
+            game_folder: '${escapeJs(game.folder)}',
             session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
           });
         }
@@ -408,8 +437,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         // Track fullscreen exit
         if (typeof gtag !== 'undefined') {
           gtag('event', 'fullscreen_exit', {
-            game_name: '${game.name}',
-            game_folder: '${game.folder}',
+            game_name: '${escapeJs(game.name)}',
+            game_folder: '${escapeJs(game.folder)}',
             session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
           });
         }
@@ -456,8 +485,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         // Track analytics
         if (typeof gtag !== 'undefined') {
           gtag('event', 'more_games_hint_clicked', {
-            game_name: '${game.name}',
-            game_folder: '${game.folder}',
+            game_name: '${escapeJs(game.name)}',
+            game_folder: '${escapeJs(game.folder)}',
             session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
           });
         }
@@ -522,8 +551,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         // Track collapse
         if (typeof gtag !== 'undefined') {
           gtag('event', 'game_info_collapse', {
-            game_name: '${game.name}',
-            game_folder: '${game.folder}',
+            game_name: '${escapeJs(game.name)}',
+            game_folder: '${escapeJs(game.folder)}',
             session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
           });
         }
@@ -535,8 +564,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         // Track expand
         if (typeof gtag !== 'undefined') {
           gtag('event', 'game_info_expand', {
-            game_name: '${game.name}',
-            game_folder: '${game.folder}',
+            game_name: '${escapeJs(game.name)}',
+            game_folder: '${escapeJs(game.folder)}',
             session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
           });
         }
@@ -555,9 +584,9 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
         if (typeof gtag !== 'undefined') {
           gtag('event', 'game_session_end', {
-            game_name: '${game.name}',
-            game_folder: '${game.folder}',
-            game_categories: '${categoryList}',
+            game_name: '${escapeJs(game.name)}',
+            game_folder: '${escapeJs(game.folder)}',
+            game_categories: '${escapedCategoryListJs}',
             duration_seconds: playDuration,
             session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
             timestamp: new Date().toISOString()

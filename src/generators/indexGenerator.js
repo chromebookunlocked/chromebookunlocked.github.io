@@ -1,6 +1,8 @@
 const { generateGameCard } = require('./cardGenerator');
 const { generateIndexMetaTags, generateIndexStructuredData } = require('../utils/seoBuilder');
 const { generateAnalyticsScript } = require('../utils/analyticsEnhanced');
+const { escapeHtml, escapeHtmlAttr } = require('../utils/htmlEscape');
+const { NEWLY_ADDED_GAMES_COUNT, EAGER_LOAD_CARDS, MIN_CATEGORY_SIZE } = require('../utils/constants');
 
 // Category to icon mapping
 const categoryIcons = {
@@ -57,7 +59,11 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   const sidebarCategories = Object.keys(categories)
     .filter(cat => cat !== "Recently Played" && cat !== "Trending Games" && cat !== "Newly Added")
     .sort((a, b) => categories[b].length - categories[a].length) // Sort by count, largest first
-    .map(cat => `<li role="menuitem" tabindex="0" onclick="filterCategory('${cat}')" onkeypress="if(event.key==='Enter')filterCategory('${cat}')"><span class="icon">${getCategoryIcon(cat)}</span><span class="text">${cat}</span></li>`)
+    .map(cat => {
+      const escapedCat = escapeHtmlAttr(cat);
+      const escapedCatText = escapeHtml(cat);
+      return `<li role="menuitem" tabindex="0" onclick="filterCategory('${escapedCat}')" onkeypress="if(event.key==='Enter')filterCategory('${escapedCat}')"><span class="icon">${getCategoryIcon(cat)}</span><span class="text">${escapedCatText}</span></li>`;
+    })
     .join("");
 
   // Add Trending Games right after All Games in the sidebar
@@ -85,11 +91,13 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         // Then alphabetically by name
         return a.name.localeCompare(b.name);
       });
-      const isSmallCategory = list.length < 4;
+      const isSmallCategory = list.length < MIN_CATEGORY_SIZE;
       const hideOnHome = isSmallCategory ? ' data-hide-on-home="true" style="display:none;"' : '';
+      const escapedCat = escapeHtmlAttr(cat);
+      const escapedCatText = escapeHtml(cat);
       // Eagerly load first 4 of each category to ensure first row is ready on homepage
-      return `<div class="category" data-category="${cat}"${hideOnHome}>
-          <h2>${cat}</h2>
+      return `<div class="category" data-category="${escapedCat}"${hideOnHome}>
+          <h2>${escapedCatText}</h2>
           <div class="grid">
             ${list.map((g, i) => generateGameCard(g, i, gamesDir, true)).join('')}
           </div>
@@ -120,7 +128,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       const dateB = new Date(b.createdAt || 0);
       return dateB - dateA;
     })
-    .slice(0, 12); // Take only 12 newest games
+    .slice(0, NEWLY_ADDED_GAMES_COUNT); // Take only N newest games
 
   const newlyAddedSection = `<div class="category" data-category="Newly Added">
     <h2>Newly Added</h2>
