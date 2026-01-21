@@ -155,7 +155,7 @@ jsonFiles.forEach((file, index) => {
   });
 
   if (!foundThumbnail) {
-    error(`${file} - No thumbnail found. Looking for: ${thumbnails.join(', ')}`);
+    warn(`${file} - No thumbnail found (will use fallback). Looking for: ${thumbnails.join(', ')}`);
   }
 
   // 8. Check for common issues

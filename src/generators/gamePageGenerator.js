@@ -1,4 +1,4 @@
-const { chooseThumb, getAssetPath } = require("../utils/assetManager");
+const { getThumbPath, FALLBACK_THUMBNAIL } = require("../utils/assetManager");
 const { generateGameMetaTags, generateGameStructuredData, generateGameSEOTitle, generateGameSEODescription } = require("../utils/seoBuilder");
 const { generateAnalyticsScript } = require("../utils/analyticsEnhanced");
 const { escapeHtml, escapeHtmlAttr } = require("../utils/htmlEscape");
@@ -27,10 +27,10 @@ function escapeJs(str) {
  * @returns {string} Complete HTML document for game page
  */
 function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) {
-  const thumb = chooseThumb(game, gamesDir);
+  const thumbInfo = getThumbPath(game, gamesDir);
+  const thumbPath = thumbInfo.path;
   const gameUrl = `games/${game.folder}/index.html`;
   const categoryList = game.categories.join(", ");
-  const thumbPath = getAssetPath(game.folder, thumb);
   
   // Escape game data for safe HTML insertion
   const escapedGameName = escapeHtml(game.name);
@@ -94,8 +94,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
   const recommendedGamesHTML = shuffled
     .map((g) => {
-      const gThumb = chooseThumb(g, gamesDir);
-      const gThumbPath = getAssetPath(g.folder, gThumb);
+      const gThumbInfo = getThumbPath(g, gamesDir);
+      const gThumbPath = gThumbInfo.path;
       const escapedFolder = escapeHtmlAttr(g.folder);
       const escapedThumbPath = escapeHtmlAttr(gThumbPath);
       const escapedName = escapeHtmlAttr(g.name);
@@ -187,7 +187,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         </div>
 
         <div class="play-overlay" id="playOverlay">
-          <img src="games/${escapedGameFolder}/${thumb}" alt="Play ${escapedGameNameAttr} Unblocked - Free Online ${escapeHtmlAttr(categoryText)} Game" itemprop="image">
+          <img src="${escapeHtmlAttr(thumbPath)}" alt="Play ${escapedGameNameAttr} Unblocked - Free Online ${escapeHtmlAttr(categoryText)} Game" itemprop="image">
           <h2 itemprop="headline">${escapedGameName}</h2>
           <button class="play-btn" onclick="startGame(); gtag('event', 'play_button_clicked', {game_name: '${escapeJs(game.name)}', game_folder: '${escapeJs(game.folder)}'});" aria-label="Play ${escapedGameNameAttr} Free Online">▶ Play</button>
         </div>
