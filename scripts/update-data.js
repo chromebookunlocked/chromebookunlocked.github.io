@@ -50,21 +50,24 @@ function hasValidThumbnail(gamePath) {
 
 /**
  * Validate a game folder
+ * Returns validation result with separate flags for critical vs warning issues
  */
 function validateGameFolder(gamePath, folderName) {
-  const issues = [];
+  const errors = [];   // Critical - game cannot be added
+  const warnings = []; // Non-critical - game can still be added
 
   if (!hasValidIndexHTML(gamePath)) {
-    issues.push('missing or empty index.html');
+    errors.push('missing or empty index.html');
   }
 
   if (!hasValidThumbnail(gamePath)) {
-    issues.push(`missing thumbnail (must be named "thumbnail" with extension: ${validThumbnailExts.join(', ')})`);
+    warnings.push(`missing thumbnail (will use fallback)`);
   }
 
   return {
-    valid: issues.length === 0,
-    issues: issues
+    valid: errors.length === 0,  // Only errors prevent adding the game
+    errors: errors,
+    warnings: warnings
   };
 }
 
@@ -108,10 +111,19 @@ function syncGames() {
     // Validate game folder
     const validation = validateGameFolder(gamePath, game);
 
+    // Show warnings (non-critical issues)
+    if (validation.warnings.length > 0) {
+      console.log(`⚠️  Warning for ${game}:`);
+      validation.warnings.forEach(warning => {
+        console.log(`   - ${warning}`);
+      });
+    }
+
+    // Skip if there are critical errors
     if (!validation.valid) {
-      console.log(`⚠️  Skipped ${game}:`);
-      validation.issues.forEach(issue => {
-        console.log(`   - ${issue}`);
+      console.log(`❌ Skipped ${game}:`);
+      validation.errors.forEach(error => {
+        console.log(`   - ${error}`);
       });
       skipped++;
       return;
