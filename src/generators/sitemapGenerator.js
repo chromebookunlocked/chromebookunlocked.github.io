@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const { chooseThumb, getAssetPath } = require("../utils/assetManager");
+const { getThumbPath } = require("../utils/assetManager");
 
 /**
  * Generate XML sitemap with image sitemap support for SEO
@@ -47,14 +47,9 @@ function generateSitemap(games, outputDir, gamesDir = './games') {
 
   // Add all game pages with image information for rich search results
   games.forEach(game => {
-    // Get thumbnail path for image sitemap
-    let thumbPath = 'assets/logo.png'; // fallback
-    try {
-      const thumb = chooseThumb(game, gamesDir);
-      thumbPath = getAssetPath(game.folder, thumb);
-    } catch (e) {
-      // Use logo as fallback if thumbnail can't be determined
-    }
+    // Get thumbnail path for image sitemap (with fallback support)
+    const thumbInfo = getThumbPath(game, gamesDir);
+    const thumbPath = thumbInfo.path;
 
     const gameUrl = `${baseUrl}/${encodeURIComponent(game.folder)}.html`;
     const imageUrl = `${baseUrl}/${thumbPath}`;

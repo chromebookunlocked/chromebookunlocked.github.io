@@ -8,6 +8,7 @@
     "sync-data": "node scripts/update-data.js",
     "cleanup": "node scripts/cleanup-orphaned-pages.js",
     "convert-thumbnails": "node scripts/convert-thumbnails-webp.js",
+    "generate-fallback-thumb": "node scripts/generate-fallback-thumbnail.js",
     "update-all": "npm run sync-data && npm run cleanup && npm run validate && npm run build",
     "clean": "rm -rf dist/",
     "prebuild": "npm run validate",

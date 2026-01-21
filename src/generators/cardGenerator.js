@@ -1,4 +1,4 @@
-const { chooseThumb, getAssetPath } = require("../utils/assetManager");
+const { getThumbPath } = require("../utils/assetManager");
 const { escapeHtml, escapeHtmlAttr } = require("../utils/htmlEscape");
 const { EAGER_LOAD_CARDS } = require("../utils/constants");
 
@@ -11,8 +11,8 @@ const { EAGER_LOAD_CARDS } = require("../utils/constants");
  * @returns {string} HTML string for game card
  */
 function generateGameCard(game, idx, gamesDir, loadEagerly = false) {
-  const thumb = chooseThumb(game, gamesDir);
-  const thumbPath = getAssetPath(game.folder, thumb);
+  const thumbInfo = getThumbPath(game, gamesDir);
+  const thumbPath = thumbInfo.path;
 
   // Eagerly load first N images of each category to ensure first row is ready
   // All other images use data-src and load when they become visible
