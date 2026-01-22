@@ -1,5 +1,7 @@
 {
   "name": "Whack Your Computer",
   "category": "Point and Click",
-  "createdAt": "1970-01-01T00:00:00.000Z"
+  "createdAt": "1970-01-01T00:00:00.000Z",
+  "description": "",
+  "displayName": "Whack Your Computer"
 }

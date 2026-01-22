@@ -71,6 +71,28 @@ function loadGames(dataDir, gamesDir) {
         // Support priority value (higher priority = shown first in lists)
         const priority = typeof json.priority === 'number' ? json.priority : 0;
 
+        // Track if JSON needs to be updated
+        let jsonNeedsUpdate = false;
+
+        // Support displayName field - auto-generate from name if not present
+        if (json.displayName === undefined) {
+          json.displayName = json.name || folder;
+          jsonNeedsUpdate = true;
+        }
+
+        // Support game description field
+        // If description is not present in JSON, add it as empty string
+        if (json.description === undefined) {
+          json.description = "";
+          jsonNeedsUpdate = true;
+        }
+        const description = json.description || ""; // Use the description from JSON (can be empty)
+
+        // Update JSON file if any fields were added
+        if (jsonNeedsUpdate) {
+          fs.writeFileSync(filePath, JSON.stringify(json, null, 2) + '\n');
+        }
+
         return {
           folder: folder,
           name: json.displayName || json.name || folder,
@@ -78,7 +100,8 @@ function loadGames(dataDir, gamesDir) {
           categories: gameCategories, // Array of categories
           thumbs: json.thumbs && json.thumbs.length ? json.thumbs : DEFAULT_THUMBNAILS,
           createdAt: createdAt, // ISO date string for when game was added
-          priority: priority // Priority value for sorting (higher = first)
+          priority: priority, // Priority value for sorting (higher = first)
+          description: description // Custom game description (empty string = auto-generate)
         };
       } catch (error) {
         console.error(`❌ Error processing ${f}: ${error.message}`);

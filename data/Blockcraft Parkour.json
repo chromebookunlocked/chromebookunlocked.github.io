@@ -1,5 +1,7 @@
 {
   "name": "Blockcraft Parkour",
   "category": "Parkour, Adventure, 3D",
-  "createdAt": "1970-01-01T00:00:00.000Z"
+  "createdAt": "1970-01-01T00:00:00.000Z",
+  "description": "",
+  "displayName": "Blockcraft Parkour"
 }
