@@ -476,10 +476,17 @@ function generateGameSEOTitle(game) {
 
 /**
  * Generate SEO-friendly description for game
+ * Uses custom description if provided, otherwise generates a default one
  * @param {Object} game - Game object
  * @returns {string} SEO description
  */
 function generateGameSEODescription(game) {
+  // If game has a custom description, use it
+  if (game.description && game.description.trim()) {
+    return game.description.trim();
+  }
+
+  // Otherwise, generate default description
   const categories = game.categories || [];
   const categoryText = categories.length > 0 ? categories[0].toLowerCase() : 'action';
   return `Play ${game.name} unblocked online free! This ${categoryText} game works unrestricted on Chromebook and school computers. No downloads - play ${game.name} online free instantly!`;
