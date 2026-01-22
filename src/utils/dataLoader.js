@@ -71,17 +71,25 @@ function loadGames(dataDir, gamesDir) {
         // Support priority value (higher priority = shown first in lists)
         const priority = typeof json.priority === 'number' ? json.priority : 0;
 
+        // Track if JSON needs to be updated
+        let jsonNeedsUpdate = false;
+
+        // Support displayName field - auto-generate from name if not present
+        if (json.displayName === undefined) {
+          json.displayName = json.name || folder;
+          jsonNeedsUpdate = true;
+        }
+
         // Support game description field
         // If description is not present in JSON, add it as empty string
-        let descriptionUpdated = false;
         if (json.description === undefined) {
           json.description = "";
-          descriptionUpdated = true;
+          jsonNeedsUpdate = true;
         }
         const description = json.description || ""; // Use the description from JSON (can be empty)
 
-        // Update JSON file if description field was added
-        if (descriptionUpdated) {
+        // Update JSON file if any fields were added
+        if (jsonNeedsUpdate) {
           fs.writeFileSync(filePath, JSON.stringify(json, null, 2) + '\n');
         }
 
