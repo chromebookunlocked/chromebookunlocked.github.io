@@ -353,6 +353,10 @@
       <li>Reject non-essential cookies</li>
       <li>Customize your preferences</li>
     </ul>
+    <p>
+      You can change your cookie preferences at any time by clicking
+      <a href="#" onclick="event.preventDefault(); if(window.cookieConsent) window.cookieConsent.reset();" style="color: var(--primary-color); text-decoration: underline;">Cookie Settings</a>.
+    </p>
 
     <h2>Third-Party Cookie Providers</h2>
     <p>Third parties may set cookies through our Site, including:</p>
@@ -398,11 +402,15 @@
         <a href="/important-pages/terms-of-service.html">Terms of Service</a>
         <a href="/important-pages/contact.html">Contact</a>
         <a href="/important-pages/dmca.html">DMCA</a>
+        <a href="#" onclick="event.preventDefault(); if(window.cookieConsent) window.cookieConsent.reset();">Cookie Settings</a>
       </div>
     </div>
     <div class="footer-bottom">
       <p>&copy; 2025 Chromebook Unlocked Games. All rights reserved.</p>
     </div>
   </footer>
+
+  <link rel="stylesheet" href="/assets/cookie-consent.css">
+  <script src="/assets/cookie-consent.js"></script>
 </body>
 </html>
