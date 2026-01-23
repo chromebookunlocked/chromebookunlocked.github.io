@@ -301,6 +301,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         <a href="/important-pages/terms-of-service.html">Terms of Service</a>
         <a href="/important-pages/contact.html">Contact</a>
         <a href="/important-pages/dmca.html">DMCA</a>
+        <a href="#" onclick="event.preventDefault(); if(window.cookieConsent) window.cookieConsent.reset();">Cookie Settings</a>
       </div>
     </div>
     <div class="footer-bottom">
