@@ -68,9 +68,9 @@ html,body {
 /* Sidebar */
 #sidebar {
   width: var(--sidebar-width);
-  background: rgba(13, 0, 26, 0.95);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(13, 0, 26, 0.97);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   padding:0;
   padding-top: 0;
   height: calc(100vh - clamp(48px, 6vw, 64px)); /* Full height minus header */
@@ -263,11 +263,11 @@ html,body {
   right: 0;
   z-index: 1001;
   height: clamp(48px, 6vw, 64px);
-  background: rgba(13, 0, 26, 0.95);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(13, 0, 26, 0.97);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -309,18 +309,11 @@ html,body {
   font-size: clamp(0.85rem, 2vw, 1.3rem);
   font-weight: 700;
   background: linear-gradient(135deg, var(--accent), var(--accent-light), #6366f1);
-  background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradientShift 3s ease infinite;
   letter-spacing: -0.3px;
   white-space: nowrap;
-}
-
-@keyframes gradientShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
 }
 
 @media (max-width: 768px) {
@@ -405,14 +398,15 @@ html,body {
   left: 0;
   right: 0;
   background: rgba(26, 0, 51, 0.98);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 102, 255, 0.4);
   border-radius: 15px;
   max-height: 400px;
   overflow-y: auto;
   display: none;
   z-index: 1000;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 102, 255, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
 #searchDropdown.show {
@@ -867,34 +861,21 @@ button:active {
 .card:hover .card-title {
   opacity: 1;
   transform: translateY(0);
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.75);
 }
 
 /* "more" card - same size as game cards */
 .card.more {
   background: linear-gradient(135deg, rgba(102, 0, 153, 0.3), rgba(77, 0, 102, 0.3));
-  backdrop-filter: blur(10px);
   display:flex;
   justify-content:center;
   align-items:center;
   flex-direction:column;
   color: #ffccff;
-  border: 2px dashed rgba(255, 102, 255, 0.4);
+  border: 2px dashed rgba(255, 102, 255, 0.5);
   aspect-ratio: 1 / 1;
   transition: all .3s ease;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    border-color: rgba(255, 102, 255, 0.4);
-    box-shadow: 0 4px 15px rgba(255, 102, 255, 0.2);
-  }
-  50% {
-    border-color: rgba(255, 102, 255, 0.7);
-    box-shadow: 0 4px 25px rgba(255, 102, 255, 0.4);
-  }
+  box-shadow: 0 4px 15px rgba(255, 102, 255, 0.2);
 }
 
 .card.more:hover {
@@ -902,7 +883,6 @@ button:active {
   border: 2px dashed var(--accent);
   transform:translateY(-5px) scale(1.03);
   box-shadow: 0 8px 30px rgba(255, 102, 255, 0.6);
-  animation: none;
 }
 
 .card.more .dots {
@@ -927,12 +907,10 @@ button:active {
 
 /* Footer */
 #siteFooter {
-  background: linear-gradient(180deg, rgba(13, 0, 26, 0.95) 0%, rgba(8, 0, 18, 0.98) 100%);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: linear-gradient(180deg, rgba(13, 0, 26, 0.98) 0%, rgba(8, 0, 18, 0.99) 100%);
   border-top: 2px solid rgba(255, 102, 255, 0.3);
   margin-top: 4rem;
-  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
   padding: 2.5rem 1.5rem;
   text-align: center;
 }

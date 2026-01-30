@@ -2,6 +2,32 @@ const MAX_RECENT = 25;
 const offsets = {}; // offsets[category] = number of revealed rows - 1
 let currentViewMode = 'home'; // Track current view: 'home' or 'category'
 
+// Cached DOM elements for performance
+let cachedElements = null;
+function getCachedElements() {
+  if (!cachedElements) {
+    cachedElements = {
+      searchBar: document.getElementById('searchBar'),
+      searchDropdown: document.getElementById('searchDropdown'),
+      searchContainer: document.getElementById('searchContainer'),
+      content: document.getElementById('content'),
+      recentSection: document.getElementById('recentlyPlayedSection'),
+      recentGrid: document.getElementById('recentlyPlayedGrid'),
+      categories: null // Will be populated on first use
+    };
+  }
+  return cachedElements;
+}
+
+// Get categories (cached after first call)
+function getCachedCategories() {
+  const elements = getCachedElements();
+  if (!elements.categories) {
+    elements.categories = Array.from(document.querySelectorAll('.category'));
+  }
+  return elements.categories;
+}
+
 // Escape HTML to prevent XSS
 function escapeHtml(str) {
   if (str == null) return '';
@@ -278,7 +304,7 @@ function loadRecentlyPlayed() {
 // Search functionality with dropdown
 function searchGames(query) {
   const searchTerm = query.toLowerCase().trim();
-  const searchDropdown = document.getElementById('searchDropdown');
+  const { searchDropdown } = getCachedElements();
 
   if (!searchTerm) {
     // Hide dropdown when search is empty
@@ -372,16 +398,14 @@ function searchGames(query) {
 }
 
 function hideSearchDropdown() {
-  const searchDropdown = document.getElementById('searchDropdown');
-  const searchBar = document.getElementById('searchBar');
+  const { searchDropdown, searchBar } = getCachedElements();
   searchDropdown.classList.remove('show');
   searchBar.value = '';
 }
 
 // Close dropdown when clicking outside
 document.addEventListener('click', (e) => {
-  const searchContainer = document.getElementById('searchContainer');
-  const searchDropdown = document.getElementById('searchDropdown');
+  const { searchContainer, searchDropdown } = getCachedElements();
   if (searchContainer && !searchContainer.contains(e.target)) {
     searchDropdown.classList.remove('show');
   }
@@ -390,7 +414,7 @@ document.addEventListener('click', (e) => {
 // Navigate to home page
 function goToHome() {
   window.history.pushState(null, '', '/');
-  const searchBar = document.getElementById('searchBar');
+  const { searchBar } = getCachedElements();
   if (searchBar) searchBar.value = '';
   hideSearchDropdown();
   filterCategory('Home', false); // Don't update URL again since we just did
@@ -420,8 +444,8 @@ function saveRecentlyPlayed(game) {
 
 // Category filtering (clicking sidebar)
 function filterCategory(cat, updateURL = true) {
-  const all = document.querySelectorAll('.category');
-  const searchBar = document.getElementById('searchBar');
+  const all = getCachedCategories();
+  const { searchBar, content } = getCachedElements();
 
   // Update URL if requested
   if (updateURL) {
@@ -498,7 +522,7 @@ function filterCategory(cat, updateURL = true) {
     });
   }
 
-  document.getElementById('content').scrollTop = 0;
+  if (content) content.scrollTop = 0;
   updateAllCategories();
 }
 
