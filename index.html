@@ -937,14 +937,10 @@ html,body {
   background: linear-gradient(135deg, var(--accent), #8b5cf6);
   padding: 2px;
   box-shadow: 0 2px 10px rgba(255, 102, 255, 0.2);
-  transition: all .3s ease;
   object-fit: contain;
 }
 
-.header-logo:hover {
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 6px 25px rgba(255, 102, 255, 0.6);
-}
+/* Logo hover animation removed for performance */
 
 #topHeader h1 {
   margin: 0;
@@ -1040,8 +1036,6 @@ html,body {
   left: 0;
   right: 0;
   background: rgba(26, 0, 51, 0.98);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 102, 255, 0.4);
   border-radius: 15px;
   max-height: 400px;
@@ -1053,18 +1047,6 @@ html,body {
 
 #searchDropdown.show {
   display: block;
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .search-result-item {
@@ -1408,8 +1390,8 @@ button:active {
   gap: var(--grid-gap);
   justify-items: center;
   width: 100%;
-  /* Prevent layout shifts by reserving grid height */
-  min-height: 0;
+  /* CLS optimization: contain layout and prevent shifts */
+  contain: layout style;
 }
 
 .card {
@@ -1419,7 +1401,7 @@ button:active {
   border-radius:15px;
   overflow:hidden;
   cursor:pointer;
-  transition: all .3s ease;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
   text-align:center;
   display:flex;
   flex-direction:column;
@@ -1428,6 +1410,8 @@ button:active {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  /* CLS prevention */
+  contain: layout paint;
 }
 .card:hover {
   transform:translateY(-5px) scale(1.03);
@@ -1458,12 +1442,9 @@ button:active {
   background-position:center;
   filter: blur(20px) brightness(0.5);
   z-index:0;
-  transition:transform .3s ease;
   background-image: var(--thumb-url);
 }
-.card:hover .thumb-container::before {
-  transform: scale(1.1);
-}
+/* Removed hover scale on blurred background for performance */
 .thumb {
   position:absolute;
   top: 0;
@@ -1473,8 +1454,7 @@ button:active {
   height:100%;
   object-fit:cover;
   object-position: center;
-  transition:transform .3s ease;
-  loading:lazy;
+  transition:transform .2s ease;
 }
 .card:hover .thumb {
   transform:scale(1.08);
