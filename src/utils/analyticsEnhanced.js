@@ -67,7 +67,7 @@ function generateAnalyticsScript() {
       engagementInterval: null
     };
 
-    // Track page engagement every 15 seconds
+    // Track page engagement every 60 seconds (reduced for performance)
     function startEngagementTracking() {
       if (window.analyticsSession.engagementInterval) {
         clearInterval(window.analyticsSession.engagementInterval);
@@ -84,7 +84,7 @@ function generateAnalyticsScript() {
             page_title: document.title
           });
         }
-      }, 15000); // Every 15 seconds
+      }, 60000); // Every 60 seconds (reduced from 15s for performance)
     }
 
     // Track page view with enhanced parameters

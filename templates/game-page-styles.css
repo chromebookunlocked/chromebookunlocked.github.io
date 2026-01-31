@@ -76,7 +76,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Animated background particles */
+/* Static background overlay - performance optimized */
 body::before {
   content: '';
   position: fixed;
@@ -85,17 +85,10 @@ body::before {
   width: 100%;
   height: 100%;
   background-image:
-    radial-gradient(circle at 20% 50%, rgba(255, 102, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+    radial-gradient(circle at 20% 50%, rgba(255, 102, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
   pointer-events: none;
   z-index: 0;
-  animation: particleFloat 20s ease-in-out infinite;
-}
-
-@keyframes particleFloat {
-  0%, 100% { opacity: 1; transform: translateY(0); }
-  50% { opacity: 0.8; transform: translateY(-20px); }
 }
 
 /* ============================================================================
@@ -109,11 +102,11 @@ header {
   right: 0;
   z-index: 1000;
   height: clamp(48px, 6vw, 64px);
-  background: rgba(13, 0, 26, 0.95);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background: rgba(13, 0, 26, 0.97);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
 }
 
 .header-left {
@@ -150,18 +143,11 @@ h1 {
   font-size: clamp(0.85rem, 2vw, 1.3rem);
   font-weight: 700;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-light), var(--secondary-color));
-  background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradientShift 3s ease infinite;
   letter-spacing: -0.3px;
   white-space: nowrap;
-}
-
-@keyframes gradientShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
 }
 
 /* ============================================================================
@@ -763,8 +749,7 @@ iframe.active {
 .game-card:hover .card-title {
   opacity: 1;
   transform: translateY(0);
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.75);
 }
 
 /* ============================================================================
@@ -776,12 +761,10 @@ iframe.active {
 ============================================================================ */
 
 footer {
-  background: linear-gradient(180deg, rgba(13, 0, 26, 0.95) 0%, rgba(8, 0, 18, 0.98) 100%);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: linear-gradient(180deg, rgba(13, 0, 26, 0.98) 0%, rgba(8, 0, 18, 0.99) 100%);
   border-top: 2px solid rgba(255, 102, 255, 0.3);
   margin-top: auto;
-  box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
   padding: 2.5rem 1.5rem;
   text-align: center;
 }
@@ -1142,25 +1125,9 @@ footer {
   width: clamp(14px, 1.5vw, 18px);
   height: clamp(14px, 1.5vw, 18px);
   color: rgba(255, 255, 255, 0.5);
-  animation: bounceDown 2s ease-in-out infinite;
+  transition: color var(--transition-fast);
 }
 
 .more-games-hint:hover .more-games-hint-arrow {
   color: var(--primary-color);
-}
-
-@keyframes bounceDown {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(3px);
-  }
-}
-
-/* Respect reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  .more-games-hint-arrow {
-    animation: none;
-  }
 }
