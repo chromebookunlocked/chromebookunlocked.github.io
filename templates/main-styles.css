@@ -80,7 +80,7 @@ html,body {
   left:0;
   top: clamp(48px, 6vw, 64px); /* Start below header */
   z-index:999;
-  transition: width .25s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Removed width transition to prevent CLS - sidebar overlays content instead */
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3);
   display: flex;
@@ -178,7 +178,7 @@ html,body {
   margin-left: var(--sidebar-width);
   margin-top: clamp(48px, 6vw, 64px); /* Space for fixed header */
   width: calc(100% - var(--sidebar-width));
-  transition: margin-left .3s;
+  /* Removed margin-left transition to prevent CLS */
   height: calc(100vh - clamp(48px, 6vw, 64px));
   -webkit-overflow-scrolling: touch;
 }

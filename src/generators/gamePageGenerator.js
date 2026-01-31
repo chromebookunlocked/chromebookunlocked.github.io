@@ -104,7 +104,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
       const altText = `Play ${escapedNameText} Unblocked - Free Online Game`;
       return `<a href="/${escapedFolder}.html" class="game-card" title="Play ${escapedNameText} Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('${escapedThumbPath}')">
-        <img class="thumb" src="${escapedThumbPath}" alt="${altText}" loading="lazy">
+        <img class="thumb" src="${escapedThumbPath}" alt="${altText}" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">${escapedNameText}</div>
     </a>`;
