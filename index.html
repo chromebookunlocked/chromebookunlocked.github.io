@@ -2606,7 +2606,18 @@ button:active {
 
           // Clean invalid entries
           const validFolders = getValidGameFolders();
-          list = list.filter(game => validFolders.has(game.folder));
+          const originalLength = list.length;
+          list = list.filter(game => game && game.folder && validFolders.has(game.folder));
+
+          // Update localStorage if we removed invalid entries
+          if (list.length !== originalLength) {
+            localStorage.setItem('recentlyPlayed', JSON.stringify(list));
+          }
+
+          // Return early if no valid games remain
+          if (list.length === 0) {
+            return;
+          }
 
           // Sort by lastPlayed timestamp (most recent first)
           list.sort((a, b) => {
@@ -2617,19 +2628,27 @@ button:active {
 
           const displayList = list.slice(0, MAX_RECENT);
 
+          // Helper to escape HTML special characters
+          function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+          }
+
           // Build cards HTML
           const cardsHTML = displayList.map((g, i) => {
-            const thumbUrl = g.thumb || 'assets/logo.webp';
+            const thumbUrl = escapeHtml(g.thumb || 'assets/logo.webp');
+            const folder = escapeHtml(g.folder || '');
+            const name = escapeHtml(g.name || 'Unknown Game');
             // Eagerly load first 6 thumbnails, lazy load the rest
             const isFirstRow = i < 6;
             const srcAttr = isFirstRow ? `src="${thumbUrl}"` : `data-src="${thumbUrl}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E"`;
             const loadingAttr = isFirstRow ? 'eager' : 'lazy';
 
-            return `<div class="card game-card" data-index="${i}" data-folder="${g.folder}" data-name="${g.name.toLowerCase()}" onclick="window.location.href='/${g.folder}.html'">
+            return `<div class="card game-card" data-index="${i}" data-folder="${folder}" data-name="${name.toLowerCase()}" onclick="window.location.href='/${folder}.html'">
               <div class="thumb-container" style="--thumb-url: url('${thumbUrl}')">
-                <img class="thumb" ${srcAttr} alt="${g.name}" loading="${loadingAttr}" decoding="async" width="300" height="300" onerror="this.src='assets/logo.webp'">
+                <img class="thumb" ${srcAttr} alt="${name}" loading="${loadingAttr}" decoding="async" width="300" height="300" onerror="this.src='assets/logo.webp'">
               </div>
-              <div class="card-title">${g.name}</div>
+              <div class="card-title">${name}</div>
             </div>`;
           }).join('');
 
@@ -4979,8 +4998,15 @@ function cleanRecentlyPlayed() {
     list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
   } catch(e) { list = []; }
 
-  // Filter out games whose folders don't exist anymore
-  const cleaned = list.filter(game => validFolders.has(game.folder));
+  // Ensure list is an array
+  if (!Array.isArray(list)) {
+    list = [];
+    localStorage.setItem('recentlyPlayed', '[]');
+    return list;
+  }
+
+  // Filter out invalid entries and games whose folders don't exist anymore
+  const cleaned = list.filter(game => game && game.folder && validFolders.has(game.folder));
 
   // Only update if something was removed
   if (cleaned.length !== list.length) {

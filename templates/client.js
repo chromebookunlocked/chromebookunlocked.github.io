@@ -63,8 +63,15 @@ function cleanRecentlyPlayed() {
     list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
   } catch(e) { list = []; }
 
-  // Filter out games whose folders don't exist anymore
-  const cleaned = list.filter(game => validFolders.has(game.folder));
+  // Ensure list is an array
+  if (!Array.isArray(list)) {
+    list = [];
+    localStorage.setItem('recentlyPlayed', '[]');
+    return list;
+  }
+
+  // Filter out invalid entries and games whose folders don't exist anymore
+  const cleaned = list.filter(game => game && game.folder && validFolders.has(game.folder));
 
   // Only update if something was removed
   if (cleaned.length !== list.length) {
