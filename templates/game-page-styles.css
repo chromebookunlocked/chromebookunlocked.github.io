@@ -130,14 +130,10 @@ header {
   background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
   padding: 2px;
   box-shadow: 0 2px 10px var(--shadow-color);
-  transition: var(--transition-medium);
   object-fit: contain;
 }
 
-.header-logo:hover {
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 6px 25px var(--shadow-color);
-}
+/* Logo hover animation removed for performance */
 
 h1 {
   font-size: clamp(0.85rem, 2vw, 1.3rem);
@@ -201,10 +197,7 @@ h1 {
   height: var(--btn-icon-svg);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+/* fadeIn animation removed for performance - content appears immediately */
 
 .game-frame-wrapper {
   aspect-ratio: 16 / 9;
@@ -434,9 +427,7 @@ iframe.active {
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 600;
-  transition: var(--transition-fast);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  transition: transform .2s ease, background .2s ease;
 }
 
 .category-tag:hover {
@@ -466,7 +457,6 @@ iframe.active {
   border: 1px solid rgba(255, 102, 255, 0.2);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl) var(--spacing-lg);
-  animation: fadeIn 0.6s ease both;
 }
 
 .info-card.full-width {
@@ -640,7 +630,6 @@ iframe.active {
   max-width: min(1400px, 95vw);
   padding: var(--spacing-xs) var(--spacing-lg) var(--spacing-md);
   margin: 0 auto;
-  animation: fadeIn 0.4s ease 0.1s both;
 }
 
 /* Thin separator line between game and recommendations */
@@ -657,7 +646,8 @@ iframe.active {
   gap: clamp(0.6rem, 1.2vw, 1rem);
   width: 100%;
   justify-items: center;
-  min-height: 0;
+  /* CLS optimization: contain layout and prevent shifts */
+  contain: layout style;
 }
 
 .game-card {
@@ -670,11 +660,13 @@ iframe.active {
   background: linear-gradient(135deg, var(--card-bg), #5a0077);
   border-radius: var(--radius-md);
   overflow: hidden;
-  transition: var(--transition-medium);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
   border: 2px solid rgba(255, 102, 255, 0.2);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   position: relative;
   cursor: pointer;
+  /* CLS prevention */
+  contain: layout paint;
 }
 
 .game-card:hover {
@@ -701,13 +693,10 @@ iframe.active {
   background-position: center;
   filter: blur(20px) brightness(0.5);
   z-index: 0;
-  transition: transform var(--transition-medium);
   background-image: var(--thumb-url);
 }
 
-.game-card:hover .thumb-container::before {
-  transform: scale(1.1);
-}
+/* Removed hover scale on blurred background for performance */
 
 .thumb {
   position: absolute;
@@ -718,7 +707,7 @@ iframe.active {
   height: 100%;
   object-fit: cover;
   object-position: center;
-  transition: transform var(--transition-medium);
+  transition: transform .2s ease;
 }
 
 .game-card:hover .thumb {
@@ -1037,17 +1026,9 @@ footer {
   }
 }
 
-/* ============================================================================
-   LOADING STATES
-============================================================================ */
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
+/* Loading states simplified - reduced animation for performance */
 .loading {
-  animation: pulse 2s ease-in-out infinite;
+  opacity: 0.6;
 }
 
 /* ============================================================================
