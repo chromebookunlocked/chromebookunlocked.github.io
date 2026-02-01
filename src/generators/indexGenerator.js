@@ -284,13 +284,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
           if (!recentGrid) return;
 
           // Get all valid game folders from pre-rendered game cards
-          function getValidGameFolders() {
-            const folders = new Set();
-            document.querySelectorAll('.game-card[data-folder]').forEach(card => {
-              folders.add(card.getAttribute('data-folder'));
-            });
-            return folders;
-          }
+
 
           // Clean recently played list
           let list = [];
@@ -305,13 +299,13 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
           }
 
           // Clean invalid entries
-          const validFolders = getValidGameFolders();
+          // We can't validate against DOM here because the rest of the page hasn't loaded yet
+          // Validation will happen in the main client.js on DOMContentLoaded if needed
           const originalLength = list.length;
-          list = list.filter(game => game && game.folder && validFolders.has(game.folder));
-
-          // Update localStorage if we removed invalid entries
-          if (list.length !== originalLength) {
-            localStorage.setItem('recentlyPlayed', JSON.stringify(list));
+          
+          // Return early if no games
+          if (list.length === 0) {
+            return;
           }
 
           // Return early if no valid games remain

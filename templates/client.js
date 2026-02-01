@@ -58,10 +58,20 @@ function getValidGameFolders() {
 // Clean recently played - remove games that no longer exist
 function cleanRecentlyPlayed() {
   const validFolders = getValidGameFolders();
+
+  // Safety check: if we found NO valid folders, something is wrong with the DOM.
+  // Don't clean anything to avoid wiping the user's history accidentally.
+  if (validFolders.size === 0) {
+    console.warn('Recently Played: No valid game folders found in DOM. Skipping cleanup.');
+    try {
+      return JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+    } catch (e) { return []; }
+  }
+
   let list = [];
   try {
     list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
-  } catch(e) { list = []; }
+  } catch (e) { list = []; }
 
   // Ensure list is an array
   if (!Array.isArray(list)) {
@@ -604,7 +614,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Add error handlers to all thumbnails
   document.querySelectorAll('img.thumb').forEach(img => {
-    img.onerror = function() {
+    img.onerror = function () {
       this.onerror = null; // Prevent infinite loop
       this.src = 'assets/logo.webp';
       const container = this.closest('.thumb-container');
