@@ -7,6 +7,7 @@ const { RECOMMENDED_GAMES_COUNT, MAX_RELATED_GAMES, GAME_DURATION_TRACKING_INTER
 // Ad tile configuration (same as index page)
 const AD_FIRST_POSITION = 13; // 0-indexed (position 14 in 1-indexed)
 const AD_INTERVAL = 20; // Insert ad every 20 game tiles after first
+const TOTAL_GRID_ITEMS = 42; // 7 rows × 6 columns
 
 /**
  * Check if an ad should be inserted after a given game index
@@ -20,12 +21,37 @@ function shouldInsertAdAfter(gameIndex) {
 }
 
 /**
- * Generate HTML for an ad tile card
+ * Calculate how many ads will be inserted for a given number of games
+ */
+function calculateAdCount(gameCount) {
+  let adCount = 0;
+  for (let i = 0; i < gameCount; i++) {
+    if (shouldInsertAdAfter(i)) adCount++;
+  }
+  return adCount;
+}
+
+/**
+ * Calculate how many games needed to fill grid with ads
+ * For 42 total items with ads at positions 14 and 34, we need 40 games
+ */
+function getGamesNeededForGrid() {
+  let games = TOTAL_GRID_ITEMS;
+  while (games + calculateAdCount(games) > TOTAL_GRID_ITEMS && games > 0) {
+    games--;
+  }
+  return games;
+}
+
+const GAMES_FOR_RECOMMENDATIONS = getGamesNeededForGrid(); // Should be 40
+
+/**
+ * Generate HTML for an ad tile card (for game page recommendations)
  * @param {number} adIndex - Unique index for this ad tile
  * @returns {string} HTML string for ad tile card
  */
 function generateAdTile(adIndex) {
-  return `<div class="card ad-tile" data-ad-index="${adIndex}">
+  return `<div class="ad-tile" data-ad-index="${adIndex}">
     <div class="ad-content">
       <ins class="adsbygoogle"
         style="display:block"
@@ -73,62 +99,57 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   const escapedCategoryListJs = escapeJs(categoryList);
 
   // Get similar games for "You Might Also Like" section (no duplicates)
+  // Shuffle only if SHUFFLE_RECOMMENDATIONS env var is set (for manual builds)
+  const shouldShuffle = process.env.SHUFFLE_RECOMMENDATIONS === 'true';
+
   const sameCategory = allGames.filter((g) =>
     g.folder !== game.folder &&
     g.categories.some((cat) => game.categories.includes(cat))
   );
 
-  // Shuffle same category games
-  const shuffledSameCategory = sameCategory.sort(() => Math.random() - 0.5);
+  // Sort by name for stable order, or shuffle for manual builds
+  if (shouldShuffle) {
+    sameCategory.sort(() => Math.random() - 0.5);
+  } else {
+    sameCategory.sort((a, b) => a.name.localeCompare(b.name));
+  }
 
-  // Get other games, excluding already selected same-category games
-  const sameCategoryFolders = new Set(shuffledSameCategory.map(g => g.folder));
+  // Get other games, excluding same-category games
+  const sameCategoryFolders = new Set(sameCategory.map(g => g.folder));
   const otherGames = allGames.filter((g) =>
     g.folder !== game.folder &&
     !sameCategoryFolders.has(g.folder)
   );
 
-  // Shuffle other games
-  const shuffledOtherGames = otherGames.sort(() => Math.random() - 0.5);
-
-  // New pattern: alternate 1 related, 1 random, until MAX_RELATED_GAMES used or no more available
-  // Then fill rest with random games (total RECOMMENDED_GAMES_COUNT games for 7 rows x 6 columns)
-  const shuffled = [];
-  const maxRelated = Math.min(MAX_RELATED_GAMES, shuffledSameCategory.length);
-  let relatedIndex = 0;
-  let randomIndex = 0;
-
-  // Alternate pattern: related, random, related, random...
-  while (shuffled.length < RECOMMENDED_GAMES_COUNT && (relatedIndex < maxRelated || randomIndex < shuffledOtherGames.length)) {
-    // Add related game if available and under limit
-    if (relatedIndex < maxRelated && relatedIndex < shuffledSameCategory.length) {
-      shuffled.push(shuffledSameCategory[relatedIndex]);
-      relatedIndex++;
-    }
-
-    // Add random game if available
-    if (shuffled.length < RECOMMENDED_GAMES_COUNT && randomIndex < shuffledOtherGames.length) {
-      shuffled.push(shuffledOtherGames[randomIndex]);
-      randomIndex++;
-    }
+  if (shouldShuffle) {
+    otherGames.sort(() => Math.random() - 0.5);
+  } else {
+    otherGames.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  // If we still need more games and have more related games available
-  while (shuffled.length < RECOMMENDED_GAMES_COUNT && relatedIndex < shuffledSameCategory.length) {
-    shuffled.push(shuffledSameCategory[relatedIndex]);
-    relatedIndex++;
-  }
+  // Build recommendations: first related games, then fill with other games
+  // Use GAMES_FOR_RECOMMENDATIONS to account for ad tiles (40 games + 2 ads = 42 items)
+  const recommendations = [];
 
-  // Fill any remaining slots with random games
-  while (shuffled.length < RECOMMENDED_GAMES_COUNT && randomIndex < shuffledOtherGames.length) {
-    shuffled.push(shuffledOtherGames[randomIndex]);
-    randomIndex++;
+  // Add related games first (up to MAX_RELATED_GAMES)
+  const relatedToAdd = sameCategory.slice(0, MAX_RELATED_GAMES);
+  recommendations.push(...relatedToAdd);
+
+  // Fill remaining slots with other games
+  const remainingSlots = GAMES_FOR_RECOMMENDATIONS - recommendations.length;
+  const othersToAdd = otherGames.slice(0, remainingSlots);
+  recommendations.push(...othersToAdd);
+
+  // If we still need more games, add more from same category
+  if (recommendations.length < GAMES_FOR_RECOMMENDATIONS && sameCategory.length > MAX_RELATED_GAMES) {
+    const moreRelated = sameCategory.slice(MAX_RELATED_GAMES, MAX_RELATED_GAMES + (GAMES_FOR_RECOMMENDATIONS - recommendations.length));
+    recommendations.push(...moreRelated);
   }
 
   // Generate recommended games HTML with ad tiles
   let adCount = 0;
   let recommendedGamesHTML = '';
-  shuffled.forEach((g, idx) => {
+  recommendations.forEach((g, idx) => {
     const gThumbInfo = getThumbPath(g, gamesDir);
     const gThumbPath = gThumbInfo.path;
     const escapedFolder = escapeHtmlAttr(g.folder);
@@ -702,7 +723,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   <!-- Initialize AdSense Ads -->
   <script>
     (function() {
-      var ads = document.querySelectorAll('.ad-tile ins.adsbygoogle');
+      var ads = document.querySelectorAll('.ad-tile .adsbygoogle');
       for (var i = 0; i < ads.length; i++) {
         try {
           (adsbygoogle = window.adsbygoogle || []).push({});
