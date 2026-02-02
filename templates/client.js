@@ -1,6 +1,8 @@
-const MAX_RECENT = 25;
-const offsets = {}; // offsets[category] = number of revealed rows - 1
-let currentViewMode = 'home'; // Track current view: 'home' or 'category'
+// Lazy Loading State
+let renderedCount = window.__renderedCount || 0;
+let isLoading = false;
+let allGamesLoaded = false;
+let currentCategory = null; // null = home (all games), or category name
 
 // Cached DOM elements for performance
 let cachedElements = null;
@@ -11,21 +13,13 @@ function getCachedElements() {
       searchDropdown: document.getElementById('searchDropdown'),
       searchContainer: document.getElementById('searchContainer'),
       content: document.getElementById('content'),
-      recentSection: document.getElementById('recentlyPlayedSection'),
-      recentGrid: document.getElementById('recentlyPlayedGrid'),
-      categories: null // Will be populated on first use
+      gamesGrid: document.getElementById('gamesGrid'),
+      loadingIndicator: document.getElementById('loadingIndicator'),
+      scrollSentinel: document.getElementById('scrollSentinel'),
+      allGamesSection: document.getElementById('allGamesSection')
     };
   }
   return cachedElements;
-}
-
-// Get categories (cached after first call)
-function getCachedCategories() {
-  const elements = getCachedElements();
-  if (!elements.categories) {
-    elements.categories = Array.from(document.querySelectorAll('.category'));
-  }
-  return elements.categories;
 }
 
 // Escape HTML to prevent XSS
@@ -46,356 +40,291 @@ function escapeHtmlAttr(str) {
     .replace(/'/g, '&#x27;');
 }
 
-// Get all valid game folders
-function getValidGameFolders() {
-  const folders = new Set();
-  document.querySelectorAll('.game-card[data-folder]').forEach(card => {
-    folders.add(card.getAttribute('data-folder'));
+/**
+ * Create a game card element
+ * @param {Object} game - Game data object {n: name, f: folder, t: thumb, a: aliases, c: categories}
+ * @param {number} idx - Card index
+ * @param {boolean} eagerLoad - Whether to eager load the thumbnail
+ * @returns {HTMLElement} Card element
+ */
+function createGameCard(game, idx, eagerLoad = false) {
+  const card = document.createElement('div');
+  card.className = 'card game-card';
+  card.setAttribute('data-index', idx);
+  card.setAttribute('data-folder', game.f);
+  card.setAttribute('data-name', game.n.toLowerCase());
+
+  if (game.a && game.a.length > 0) {
+    card.setAttribute('data-aliases', game.a.map(a => a.toLowerCase()).join(','));
+  }
+
+  if (game.c && game.c.length > 0) {
+    card.setAttribute('data-categories', game.c.join(','));
+  }
+
+  card.onclick = () => {
+    window.location.href = '/' + game.f + '.html';
+  };
+
+  const thumbUrl = escapeHtmlAttr(game.t);
+  const gameName = escapeHtml(game.n);
+  const gameNameAttr = escapeHtmlAttr(game.n);
+
+  // Use data-src for lazy loading, src for eager loading
+  const srcAttr = eagerLoad
+    ? `src="${thumbUrl}"`
+    : `data-src="${thumbUrl}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E"`;
+  const loadingAttr = eagerLoad ? 'eager' : 'lazy';
+
+  card.innerHTML = `<div class="thumb-container" style="--thumb-url: url('${thumbUrl}')">
+    <img class="thumb" ${srcAttr} alt="${gameNameAttr}" loading="${loadingAttr}" decoding="async" width="300" height="300" onerror="this.src='assets/logo.webp'">
+  </div>
+  <div class="card-title">${gameName}</div>`;
+
+  return card;
+}
+
+/**
+ * Get filtered games based on current category
+ * @returns {Array} Filtered game data array
+ */
+function getFilteredGames() {
+  const allGames = window.__gameData || [];
+
+  if (!currentCategory) {
+    return allGames; // Home - show all games
+  }
+
+  return allGames.filter(game => {
+    return game.c && game.c.includes(currentCategory);
   });
-  return folders;
 }
 
-// Clean recently played - remove games that no longer exist
-function cleanRecentlyPlayed() {
-  const validFolders = getValidGameFolders();
+/**
+ * Load more games into the grid
+ * @param {number} count - Number of games to load
+ */
+function loadMoreGames(count) {
+  if (isLoading || allGamesLoaded) return;
 
-  // Safety check: if we found NO valid folders, something is wrong with the DOM.
-  // Don't clean anything to avoid wiping the user's history accidentally.
-  if (validFolders.size === 0) {
-    console.warn('Recently Played: No valid game folders found in DOM. Skipping cleanup.');
-    try {
-      return JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
-    } catch (e) { return []; }
+  const { gamesGrid, loadingIndicator } = getCachedElements();
+  if (!gamesGrid) return;
+
+  const filteredGames = getFilteredGames();
+  const totalGames = filteredGames.length;
+
+  if (renderedCount >= totalGames) {
+    allGamesLoaded = true;
+    return;
   }
 
-  let list = [];
-  try {
-    list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
-  } catch (e) { list = []; }
+  isLoading = true;
+  if (loadingIndicator) loadingIndicator.style.display = 'block';
 
-  // Ensure list is an array
-  if (!Array.isArray(list)) {
-    list = [];
-    localStorage.setItem('recentlyPlayed', '[]');
-    return list;
-  }
+  // Use requestAnimationFrame for smooth rendering
+  requestAnimationFrame(() => {
+    const fragment = document.createDocumentFragment();
+    const endIndex = Math.min(renderedCount + count, totalGames);
 
-  // Filter out invalid entries and games whose folders don't exist anymore
-  const cleaned = list.filter(game => game && game.folder && validFolders.has(game.folder));
+    for (let i = renderedCount; i < endIndex; i++) {
+      const game = filteredGames[i];
+      const card = createGameCard(game, i, false);
+      fragment.appendChild(card);
 
-  // Only update if something was removed
-  if (cleaned.length !== list.length) {
-    localStorage.setItem('recentlyPlayed', JSON.stringify(cleaned));
-    console.log('Cleaned recently played:', list.length - cleaned.length, 'games removed');
-    return cleaned;
-  }
-  return list;
+      // Setup lazy loading for the image
+      const img = card.querySelector('img.thumb[data-src]');
+      if (img && imageObserver) {
+        imageObserver.observe(img);
+      }
+    }
+
+    gamesGrid.appendChild(fragment);
+    renderedCount = endIndex;
+
+    if (renderedCount >= totalGames) {
+      allGamesLoaded = true;
+    }
+
+    isLoading = false;
+    if (loadingIndicator) loadingIndicator.style.display = 'none';
+  });
 }
 
-// Validate game exists before showing
-function gameExists(folder) {
-  const validFolders = getValidGameFolders();
-  return validFolders.has(folder);
-}
+/**
+ * Reset and reload the grid with optional category filter
+ * @param {string|null} category - Category to filter by, or null for all games
+ */
+function resetAndReloadGrid(category) {
+  const { gamesGrid, content } = getCachedElements();
+  if (!gamesGrid) return;
 
-// Helper: get grid element for a category
-function gridForCategory(cat) {
-  return Array.from(document.querySelectorAll('.category'))
-    .find(el => el.getAttribute('data-category') === cat)
-    ?.querySelector('.grid');
-}
+  currentCategory = category;
+  renderedCount = 0;
+  allGamesLoaded = false;
+  isLoading = false;
 
-// Cache for grid column counts to avoid forced reflows
-const columnCountCache = new WeakMap();
+  // Clear existing cards
+  gamesGrid.innerHTML = '';
 
-// Helper: compute number of columns currently active for a grid
-function getColumnCount(grid) {
-  if (!grid) return 1;
+  // Calculate initial load based on viewport
+  const columnsPerRow = getColumnCount();
+  const rowsToLoad = window.__rowsPerLoad ? window.__rowsPerLoad + 2 : 5;
+  const initialCount = columnsPerRow * rowsToLoad;
 
-  // Check cache first
-  if (columnCountCache.has(grid)) {
-    return columnCountCache.get(grid);
+  // Load initial games
+  loadMoreGames(initialCount);
+
+  // Scroll to top
+  if (content) content.scrollTop = 0;
+
+  // Update section title
+  const { allGamesSection } = getCachedElements();
+  if (allGamesSection) {
+    const h2 = allGamesSection.querySelector('h2');
+    if (h2) {
+      h2.textContent = category || 'All Games';
+    }
   }
+}
 
-  const style = window.getComputedStyle(grid);
+// Get number of columns in grid
+function getColumnCount() {
+  const { gamesGrid } = getCachedElements();
+  if (!gamesGrid) return 6;
+
+  const style = window.getComputedStyle(gamesGrid);
   const cols = style.gridTemplateColumns;
-  if (!cols) return 1;
-  const count = cols.split(' ').filter(Boolean).length;
+  if (!cols) return 6;
 
-  // Cache the result
-  columnCountCache.set(grid, count);
-  return count;
+  return cols.split(' ').filter(Boolean).length || 6;
 }
 
-// Clear column count cache (call on resize)
-function clearColumnCountCache() {
-  columnCountCache.clear();
-}
+// Intersection Observer for lazy loading images
+let imageObserver = null;
 
-// Load thumbnail from data-src to src
-function loadThumbnail(card) {
-  const img = card.querySelector('img.thumb[data-src]');
-  if (img && img.hasAttribute('data-src')) {
-    const src = img.getAttribute('data-src');
-    img.src = src;
-    img.removeAttribute('data-src');
-  }
-}
-
-// Create a "more" element
-function createMoreCard(cat) {
-  const more = document.createElement('div');
-  more.className = 'card more';
-  more.innerHTML = '<div class="dots">⋯</div><div class="label">Show More</div>';
-  more.addEventListener('click', (e) => {
-    offsets[cat] = (offsets[cat] || 0) + 1;
-    updateCategoryView(cat);
-  });
-  return more;
-}
-
-// Show/hide cards for a category grid based on offset and current columns
-function updateCategoryView(cat) {
-  const grid = gridForCategory(cat);
-  if (!grid) return;
-
-  // Remove any existing .card.more
-  const existingMore = grid.querySelector('.card.more');
-  if (existingMore) existingMore.remove();
-
-  // Gather game-card elements
-  const cards = Array.from(grid.querySelectorAll('.game-card'));
-  const total = cards.length;
-
-  // If viewing specific category, show all cards and load thumbnails
-  if (currentViewMode === 'category') {
-    cards.forEach(c => {
-      c.style.display = '';
-      loadThumbnail(c);
+function setupImageObserver() {
+  if (!('IntersectionObserver' in window)) {
+    // Fallback: load all images with data-src
+    document.querySelectorAll('img.thumb[data-src]').forEach(img => {
+      img.src = img.getAttribute('data-src');
+      img.removeAttribute('data-src');
     });
     return;
   }
 
-  const cols = getColumnCount(grid);
-
-  // Number of rows currently revealed
-  const rowsRevealed = (offsets[cat] || 0) + 1;
-  const slots = rowsRevealed * cols;
-
-  // Check if we need a "more" card (only on home page)
-  const showMore = total > slots && currentViewMode === 'home';
-
-  // Number of actual game items to show
-  const showCount = showMore ? (slots - 1) : Math.min(total, slots);
-
-  // Show/hide cards and load thumbnails for visible cards
-  cards.forEach((c, idx) => {
-    const shouldShow = idx < showCount;
-    c.style.display = shouldShow ? '' : 'none';
-
-    // Load thumbnail when card becomes visible
-    if (shouldShow) {
-      loadThumbnail(c);
-    }
-  });
-
-  // If we should show a More card, append it at the end
-  if (showMore) {
-    const moreCard = createMoreCard(cat);
-    grid.appendChild(moreCard);
-  }
-}
-
-// Update all categories
-function updateAllCategories() {
-  const cats = Array.from(document.querySelectorAll('.category')).map(c => c.getAttribute('data-category'));
-  cats.forEach(cat => {
-    if (offsets[cat] === undefined) offsets[cat] = 0;
-
-    const grid = gridForCategory(cat);
-    if (!grid) return;
-
-    const cards = Array.from(grid.querySelectorAll('.game-card'));
-    const total = cards.length;
-    const cols = getColumnCount(grid) || 1;
-    const maxRows = Math.ceil(total / cols);
-    const maxOffset = Math.max(0, maxRows - 1);
-
-    if (offsets[cat] > maxOffset) offsets[cat] = maxOffset;
-
-    updateCategoryView(cat);
-  });
-}
-
-// Populate Recently Played grid (optimized to prevent layout shifts)
-function loadRecentlyPlayed() {
-  // Skip if already loaded by inline script
-  if (window.__recentlyPlayedLoaded) {
-    // Still need to set up offset and update view
-    if (offsets['Recently Played'] === undefined) offsets['Recently Played'] = 0;
-    updateCategoryView('Recently Played');
-    return;
-  }
-
-  let list = cleanRecentlyPlayed(); // Clean before loading
-
-  const recentSection = document.getElementById('recentlyPlayedSection');
-  const recentGrid = document.getElementById('recentlyPlayedGrid');
-  if (!recentGrid) return;
-
-  // Use DocumentFragment to batch DOM updates (prevents layout thrashing)
-  const fragment = document.createDocumentFragment();
-
-  if (!list.length) {
-    // Keep section hidden, don't modify DOM
-    return;
-  }
-
-  // Sort by lastPlayed timestamp (most recent first)
-  list.sort((a, b) => {
-    const timeA = a.lastPlayed || 0;
-    const timeB = b.lastPlayed || 0;
-    return timeB - timeA; // Descending order (newest first)
-  });
-
-  const displayList = list.slice(0, MAX_RECENT);
-
-  // Build cards in memory first
-  displayList.forEach((g, i) => {
-    // Verify game still exists
-    if (!gameExists(g.folder)) {
-      console.log('Skipping deleted game:', g.folder);
-      return;
-    }
-
-    const card = document.createElement('div');
-    card.className = 'card game-card';
-    card.setAttribute('data-index', i);
-    card.setAttribute('data-folder', g.folder);
-    card.setAttribute('data-name', g.name.toLowerCase());
-
-    // Add error handling for broken images
-    const thumbUrl = g.thumb || 'assets/logo.webp';
-
-    card.onclick = () => {
-      // Verify game exists before opening
-      if (!gameExists(g.folder)) {
-        alert('This game is no longer available.');
-        cleanRecentlyPlayed();
-        loadRecentlyPlayed();
-        return;
+  imageObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const img = entry.target;
+        if (img.hasAttribute('data-src')) {
+          img.src = img.getAttribute('data-src');
+          img.removeAttribute('data-src');
+        }
+        observer.unobserve(img);
       }
-      window.location.href = '/' + g.folder + '.html';
-    };
-
-    // Eagerly load first 6 thumbnails, lazy load the rest
-    const isFirstRow = i < 6;
-    const escapedThumbUrl = escapeHtmlAttr(thumbUrl);
-    const escapedName = escapeHtmlAttr(g.name);
-    const escapedNameText = escapeHtml(g.name);
-    const escapedFolder = escapeHtmlAttr(g.folder);
-    const srcAttr = isFirstRow ? `src="${escapedThumbUrl}"` : `data-src="${escapedThumbUrl}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E"`;
-    const loadingAttr = isFirstRow ? 'eager' : 'lazy';
-
-    card.innerHTML = `<div class="thumb-container" style="--thumb-url: url('${escapedThumbUrl}')">
-      <img class="thumb" ${srcAttr} alt="${escapedName}" loading="${loadingAttr}" decoding="async" width="300" height="300" onerror="this.src='assets/logo.webp'">
-    </div>
-    <div class="card-title">${escapedNameText}</div>`;
-    fragment.appendChild(card);
+    });
+  }, {
+    rootMargin: '100px 0px',
+    threshold: 0.01
   });
 
-  // If we have cards, do a single DOM update
-  if (fragment.children.length > 0) {
-    // Clear and append all at once
-    recentGrid.innerHTML = '';
-    recentGrid.appendChild(fragment);
+  // Observe existing images
+  document.querySelectorAll('img.thumb[data-src]').forEach(img => {
+    imageObserver.observe(img);
+  });
+}
 
-    // Show section only after content is ready
-    if (recentSection) recentSection.style.display = 'block';
+// Intersection Observer for infinite scroll
+let scrollObserver = null;
 
-    if (offsets['Recently Played'] === undefined) offsets['Recently Played'] = 0;
-    updateCategoryView('Recently Played');
+function setupScrollObserver() {
+  if (!('IntersectionObserver' in window)) {
+    // Fallback: use scroll event
+    const { content } = getCachedElements();
+    if (content) {
+      content.addEventListener('scroll', handleScrollFallback);
+    }
+    return;
+  }
+
+  const { scrollSentinel } = getCachedElements();
+  if (!scrollSentinel) return;
+
+  scrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !isLoading && !allGamesLoaded) {
+        const columnsPerRow = getColumnCount();
+        const rowsToLoad = window.__rowsPerLoad || 3;
+        loadMoreGames(columnsPerRow * rowsToLoad);
+      }
+    });
+  }, {
+    rootMargin: `${window.__scrollThreshold || 300}px 0px`,
+    threshold: 0
+  });
+
+  scrollObserver.observe(scrollSentinel);
+}
+
+// Fallback scroll handler for browsers without IntersectionObserver
+function handleScrollFallback() {
+  const { content } = getCachedElements();
+  if (!content || isLoading || allGamesLoaded) return;
+
+  const scrollTop = content.scrollTop;
+  const scrollHeight = content.scrollHeight;
+  const clientHeight = content.clientHeight;
+  const threshold = window.__scrollThreshold || 300;
+
+  if (scrollHeight - scrollTop - clientHeight < threshold) {
+    const columnsPerRow = getColumnCount();
+    const rowsToLoad = window.__rowsPerLoad || 3;
+    loadMoreGames(columnsPerRow * rowsToLoad);
   }
 }
 
-// Search functionality with dropdown
+// Search functionality
 function searchGames(query) {
   const searchTerm = query.toLowerCase().trim();
   const { searchDropdown } = getCachedElements();
 
   if (!searchTerm) {
-    // Hide dropdown when search is empty
     searchDropdown.classList.remove('show');
     searchDropdown.innerHTML = '';
     return;
   }
 
-  // Collect all matching games
+  const allGames = window.__gameData || [];
   const matchingGames = [];
-  const seenFolders = new Set();
 
-  document.querySelectorAll('.game-card[data-folder]').forEach(card => {
-    const gameName = card.getAttribute('data-name') || '';
-    const gameFolder = card.getAttribute('data-folder');
-    const gameAliases = card.getAttribute('data-aliases') || '';
-    const gameTitle = card.querySelector('.card-title')?.textContent || '';
-    const thumbImg = card.querySelector('.thumb');
+  for (const game of allGames) {
+    const nameLower = game.n.toLowerCase();
+    const nameMatches = nameLower.includes(searchTerm);
+    const aliasMatches = game.a && game.a.some(alias =>
+      alias.toLowerCase().includes(searchTerm)
+    );
 
-    // Get thumbnail URL - check data-src first (for lazy-loaded images), then src, then fallback to logo
-    let thumbSrc = '';
-    if (thumbImg) {
-      thumbSrc = thumbImg.getAttribute('data-src') || thumbImg.src || 'assets/logo.webp';
-      // If src is still the placeholder SVG, try to get from thumb-container CSS variable
-      if (thumbSrc.startsWith('data:image/svg+xml')) {
-        const thumbContainer = card.querySelector('.thumb-container');
-        if (thumbContainer) {
-          const cssVar = thumbContainer.style.getPropertyValue('--thumb-url');
-          if (cssVar) {
-            // Extract URL from url('...') format
-            const match = cssVar.match(/url\(['"]?([^'"]+)['"]?\)/);
-            if (match) thumbSrc = match[1];
-          }
-        }
-      }
-    } else {
-      thumbSrc = 'assets/logo.webp';
-    }
-
-    // Check if name or any alias matches the search term
-    const nameMatches = gameName.includes(searchTerm);
-    const aliasMatches = gameAliases && gameAliases.split(',').some(alias => alias.includes(searchTerm));
-
-    if ((nameMatches || aliasMatches) && !seenFolders.has(gameFolder)) {
-      seenFolders.add(gameFolder);
+    if (nameMatches || aliasMatches) {
       matchingGames.push({
-        folder: gameFolder,
-        name: gameTitle,
-        thumb: thumbSrc
+        folder: game.f,
+        name: game.n,
+        thumb: game.t,
+        // Score for sorting
+        score: nameLower === searchTerm ? 3 :
+               nameLower.startsWith(searchTerm) ? 2 : 1
       });
     }
-  });
+  }
 
-  // Sort by relevance (exact matches first, then starts with, then contains)
+  // Sort by relevance
   matchingGames.sort((a, b) => {
-    const aName = a.name.toLowerCase();
-    const bName = b.name.toLowerCase();
-
-    // Exact match
-    if (aName === searchTerm) return -1;
-    if (bName === searchTerm) return 1;
-
-    // Starts with search term
-    if (aName.startsWith(searchTerm) && !bName.startsWith(searchTerm)) return -1;
-    if (!aName.startsWith(searchTerm) && bName.startsWith(searchTerm)) return 1;
-
-    // Alphabetical
-    return aName.localeCompare(bName);
+    if (b.score !== a.score) return b.score - a.score;
+    return a.name.localeCompare(b.name);
   });
 
   // Limit to top 8 results
   const topResults = matchingGames.slice(0, 8);
 
-  // Display results in dropdown
   if (topResults.length === 0) {
     searchDropdown.innerHTML = '<div class="search-no-results">No games found</div>';
   } else {
@@ -405,7 +334,7 @@ function searchGames(query) {
       const escapedName = escapeHtmlAttr(game.name);
       const escapedNameText = escapeHtml(game.name);
       return `<div class="search-result-item" onclick="window.location.href='/${escapedFolder}.html'">
-        <img class="search-result-thumb" src="${escapedThumb}" alt="${escapedName}" loading="lazy" decoding="async" width="60" height="60">
+        <img class="search-result-thumb" src="${escapedThumb}" alt="${escapedName}" loading="lazy" decoding="async" width="60" height="60" onerror="this.src='assets/logo.webp'">
         <div class="search-result-name">${escapedNameText}</div>
       </div>`;
     }).join('');
@@ -416,131 +345,48 @@ function searchGames(query) {
 
 function hideSearchDropdown() {
   const { searchDropdown, searchBar } = getCachedElements();
-  searchDropdown.classList.remove('show');
-  searchBar.value = '';
+  if (searchDropdown) searchDropdown.classList.remove('show');
+  if (searchBar) searchBar.value = '';
 }
 
 // Close dropdown when clicking outside
 document.addEventListener('click', (e) => {
   const { searchContainer, searchDropdown } = getCachedElements();
-  if (searchContainer && !searchContainer.contains(e.target)) {
+  if (searchContainer && searchDropdown && !searchContainer.contains(e.target)) {
     searchDropdown.classList.remove('show');
   }
 });
 
-// Navigate to home page
-function goToHome() {
-  window.history.pushState(null, '', '/');
+// Category filtering
+function filterCategory(cat, updateURL = true) {
   const { searchBar } = getCachedElements();
+
+  // Clear search
   if (searchBar) searchBar.value = '';
   hideSearchDropdown();
-  filterCategory('Home', false); // Don't update URL again since we just did
-}
-
-// Recently played storage helpers - called from individual game pages
-function saveRecentlyPlayed(game) {
-  let list = cleanRecentlyPlayed(); // Clean before saving
-
-  // Remove existing entry if present
-  list = list.filter(g => g.folder !== game.folder);
-
-  // Add timestamp to track when game was played
-  const gameWithTimestamp = {
-    ...game,
-    lastPlayed: Date.now()
-  };
-
-  list.unshift(gameWithTimestamp);
-  if (list.length > MAX_RECENT) list = list.slice(0, MAX_RECENT);
-  localStorage.setItem('recentlyPlayed', JSON.stringify(list));
-
-  // Reset flag to force reload with new data
-  window.__recentlyPlayedLoaded = false;
-  loadRecentlyPlayed();
-}
-
-// Category filtering (clicking sidebar)
-function filterCategory(cat, updateURL = true) {
-  const all = getCachedCategories();
-  const { searchBar, content } = getCachedElements();
 
   // Update URL if requested
   if (updateURL) {
-    if (cat === 'Home') {
+    if (cat === 'Home' || !cat) {
       window.history.pushState(null, '', '/');
     } else {
       window.history.pushState(null, '', '#/category/' + encodeURIComponent(cat));
     }
   }
 
-  // Clear search when changing categories
-  if (searchBar) searchBar.value = '';
-  hideSearchDropdown();
-
-  // Hide search section
-  const searchResults = document.getElementById('searchResultsSection');
-  if (searchResults) searchResults.style.display = 'none';
-
+  // Reset and reload with category filter
   if (cat === 'Home') {
-    currentViewMode = 'home';
-    all.forEach(c => {
-      const category = c.getAttribute('data-category');
-      const hideOnHome = c.getAttribute('data-hide-on-home');
-
-      // Skip special sections
-      if (c.id === 'searchResultsSection' || category === 'All Games') return;
-
-      // Show recently played, trending games, newly added, and all categories on home (except those with less than 4 games)
-      if (category === 'Recently Played') {
-        const recentGrid = document.getElementById('recentlyPlayedGrid');
-        c.style.display = (recentGrid && recentGrid.children.length > 0) ? 'block' : 'none';
-      } else if (category === 'Trending Games') {
-        // Always show Trending Games on home page
-        c.style.display = 'block';
-      } else if (category === 'Newly Added') {
-        // Always show Newly Added on home page
-        c.style.display = 'block';
-      } else if (category === 'Trading Games') {
-        // Hide Trading Games on home page (only accessible via sidebar)
-        c.style.display = 'none';
-      } else if (hideOnHome === 'true') {
-        // Hide categories with less than 4 games on home view
-        c.style.display = 'none';
-      } else {
-        c.style.display = 'block';
-      }
-    });
-  } else if (cat === 'All Games') {
-    currentViewMode = 'category';
-    all.forEach(c => {
-      const category = c.getAttribute('data-category');
-
-      // Show only the All Games section
-      if (category === 'All Games') {
-        c.style.display = 'block';
-      } else {
-        c.style.display = 'none';
-      }
-    });
+    resetAndReloadGrid(null);
   } else {
-    currentViewMode = 'category';
-    all.forEach(c => {
-      const category = c.getAttribute('data-category');
-
-      // Skip special sections
-      if (c.id === 'searchResultsSection') return;
-      if (category === 'All Games') {
-        c.style.display = 'none';
-        return;
-      }
-
-      // Show only selected category (show all games at once, even if it has less than 4 games)
-      c.style.display = (category === cat) ? 'block' : 'none';
-    });
+    resetAndReloadGrid(cat);
   }
+}
 
-  if (content) content.scrollTop = 0;
-  updateAllCategories();
+// Navigate to home
+function goToHome() {
+  window.history.pushState(null, '', '/');
+  hideSearchDropdown();
+  filterCategory('Home', false);
 }
 
 // Routing & deep links
@@ -549,73 +395,33 @@ function handleRouting() {
 
   if (hash.startsWith('#/category/')) {
     const category = decodeURIComponent(hash.replace('#/category/', ''));
-    filterCategory(category, false); // Don't update URL since we're already routing
+    filterCategory(category, false);
   } else {
-    filterCategory('Home', false); // Don't update URL since we're already routing
+    // Home - show all games
+    filterCategory('Home', false);
   }
 }
 
-// On window resize - debounced and batched
+// Handle window resize - recalculate columns
 let resizeTimeout = null;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(() => {
-    // Use requestAnimationFrame to batch layout reads
-    requestAnimationFrame(() => {
-      clearColumnCountCache();
-      updateAllCategories();
-    });
-  }, 120);
+    // Column count might have changed, but we don't need to reload
+    // The grid handles responsiveness via CSS
+  }, 150);
 });
-
-// Intersection Observer for better lazy loading (progressive loading of images)
-function setupIntersectionObserver() {
-  // Only setup if browser supports Intersection Observer
-  if (!('IntersectionObserver' in window)) {
-    return; // Fallback to native lazy loading only
-  }
-
-  const imageObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const img = entry.target;
-        // Image is now in viewport, browser will load it due to loading="lazy"
-        // We can add preloading for next images here if needed
-        observer.unobserve(img);
-      }
-    });
-  }, {
-    rootMargin: '50px 0px', // Start loading 50px before image enters viewport
-    threshold: 0.01
-  });
-
-  // Observe all thumbnail images
-  document.querySelectorAll('img.thumb').forEach(img => {
-    imageObserver.observe(img);
-  });
-}
 
 // Initial load
 document.addEventListener('DOMContentLoaded', () => {
-  // Load recently played FIRST to minimize layout shift
-  loadRecentlyPlayed();
+  // Setup observers
+  setupImageObserver();
+  setupScrollObserver();
 
-  document.querySelectorAll('.category').forEach(c => {
-    const cat = c.getAttribute('data-category');
-    if (offsets[cat] === undefined) offsets[cat] = 0;
-  });
-
-  document.querySelectorAll('.thumb-container').forEach(tc => {
-    const img = tc.querySelector('img.thumb');
-    if (img && (!tc.style.getPropertyValue('--thumb-url') || tc.style.getPropertyValue('--thumb-url') === '')) {
-      tc.style.setProperty('--thumb-url', "url('" + img.src + "')");
-    }
-  });
-
-  // Add error handlers to all thumbnails
+  // Add error handlers to existing thumbnails
   document.querySelectorAll('img.thumb').forEach(img => {
-    img.onerror = function () {
-      this.onerror = null; // Prevent infinite loop
+    img.onerror = function() {
+      this.onerror = null;
       this.src = 'assets/logo.webp';
       const container = this.closest('.thumb-container');
       if (container) {
@@ -624,10 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   });
 
-  // Setup Intersection Observer for progressive loading
-  setupIntersectionObserver();
-
-  updateAllCategories();
+  // Handle routing
   handleRouting();
   window.addEventListener('hashchange', handleRouting);
 });

@@ -13,6 +13,11 @@ const MAX_RELATED_GAMES = 5; // Maximum related games in recommendations before 
 const EAGER_LOAD_CARDS = 4; // First N cards to eagerly load in each category
 const EAGER_LOAD_RECENT = 6; // First N cards to eagerly load in recently played
 
+// Home page lazy loading constants
+const INITIAL_ROWS = 4; // Number of rows to render on initial page load
+const ROWS_PER_LOAD = 3; // Number of rows to load when user scrolls near bottom
+const SCROLL_THRESHOLD = 300; // Pixels from bottom to trigger loading more rows
+
 // Category display constants
 const MIN_CATEGORY_SIZE = 4; // Minimum games in category to show on homepage
 
@@ -32,6 +37,9 @@ module.exports = {
   MAX_RELATED_GAMES,
   EAGER_LOAD_CARDS,
   EAGER_LOAD_RECENT,
+  INITIAL_ROWS,
+  ROWS_PER_LOAD,
+  SCROLL_THRESHOLD,
   MIN_CATEGORY_SIZE,
   GAME_DURATION_TRACKING_INTERVAL,
   DEFAULT_THUMBNAILS,
