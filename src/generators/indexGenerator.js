@@ -223,7 +223,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         <!-- Game Viewer -->
         <div class="viewer" id="viewer">
           <div id="startOverlay">
-            <img id="startThumb" src="" alt="Game Thumbnail">
+            <img id="startThumb" src="" alt="Game Thumbnail" width="300" height="300" loading="eager">
             <h1 id="startName"></h1>
             <button id="startButton" onclick="startGame()">▶ Play</button>
           </div>
