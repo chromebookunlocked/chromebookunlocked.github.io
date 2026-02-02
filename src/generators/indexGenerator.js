@@ -1,4 +1,23 @@
-const { generateGameCard } = require('./cardGenerator');
+const { generateGameCard, generateAdTile } = require('./cardGenerator');
+
+// Ad tile configuration
+// First ad appears at position 14 (3rd row, 2nd tile at 6 columns)
+// Then every 20 game tiles after that
+const AD_FIRST_POSITION = 13; // 0-indexed (position 14 in 1-indexed)
+const AD_INTERVAL = 20; // Insert ad every 20 game tiles after first
+
+/**
+ * Check if an ad should be inserted after a given game index
+ * @param {number} gameIndex - The 0-indexed position in the game list
+ * @returns {boolean} Whether an ad should be inserted after this game
+ */
+function shouldInsertAdAfter(gameIndex) {
+  if (gameIndex < AD_FIRST_POSITION - 1) return false;
+  // First ad after index 12 (13th game, position 14)
+  // Then after index 32, 52, 72, etc.
+  const positionFromFirst = gameIndex - (AD_FIRST_POSITION - 1);
+  return positionFromFirst >= 0 && positionFromFirst % AD_INTERVAL === 0;
+}
 const { generateIndexMetaTags, generateIndexStructuredData } = require('../utils/seoBuilder');
 const { generateAnalyticsScript } = require('../utils/analyticsEnhanced');
 const { escapeHtml, escapeHtmlAttr } = require('../utils/htmlEscape');
@@ -121,10 +140,17 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     };
   });
 
-  // Generate initial game cards HTML
-  const initialCardsHTML = initialGames.map((game, idx) =>
-    generateGameCard(game, idx, gamesDir, true)
-  ).join('');
+  // Generate initial game cards HTML with ad tiles
+  let adCount = 0;
+  let initialCardsHTML = '';
+  initialGames.forEach((game, idx) => {
+    initialCardsHTML += generateGameCard(game, idx, gamesDir, true);
+    // Check if we should insert an ad tile after this game
+    if (shouldInsertAdAfter(idx)) {
+      initialCardsHTML += generateAdTile(adCount);
+      adCount++;
+    }
+  });
 
   // Get SEO meta tags and structured data
   const metaTags = generateIndexMetaTags();
@@ -137,6 +163,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <!-- Resource Hints for Performance -->
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
 
   <!-- Optimize Google Fonts loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -164,6 +192,9 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
 
     gtag('config', 'G-4QZLTDX504');
   </script>
+
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705" crossorigin="anonymous"></script>
 
   ${generateAnalyticsScript()}
 
@@ -277,6 +308,23 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     window.__renderedCount = ${initialGameCount};
     window.__rowsPerLoad = ${ROWS_PER_LOAD};
     window.__scrollThreshold = ${SCROLL_THRESHOLD};
+    // Ad tile configuration
+    window.__adFirstPosition = ${AD_FIRST_POSITION};
+    window.__adInterval = ${AD_INTERVAL};
+    window.__adCount = ${adCount};
+  </script>
+
+  <!-- Initialize AdSense Ads -->
+  <script>
+    (function() {
+      // Initialize all existing ad tiles
+      var ads = document.querySelectorAll('.ad-tile ins.adsbygoogle');
+      for (var i = 0; i < ads.length; i++) {
+        try {
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {}
+      }
+    })();
   </script>
 
   <script>

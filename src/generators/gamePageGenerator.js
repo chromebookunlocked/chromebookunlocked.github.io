@@ -4,6 +4,39 @@ const { generateAnalyticsScript } = require("../utils/analyticsEnhanced");
 const { escapeHtml, escapeHtmlAttr } = require("../utils/htmlEscape");
 const { RECOMMENDED_GAMES_COUNT, MAX_RELATED_GAMES, GAME_DURATION_TRACKING_INTERVAL } = require("../utils/constants");
 
+// Ad tile configuration (same as index page)
+const AD_FIRST_POSITION = 13; // 0-indexed (position 14 in 1-indexed)
+const AD_INTERVAL = 20; // Insert ad every 20 game tiles after first
+
+/**
+ * Check if an ad should be inserted after a given game index
+ * @param {number} gameIndex - The 0-indexed position in the game list
+ * @returns {boolean} Whether an ad should be inserted after this game
+ */
+function shouldInsertAdAfter(gameIndex) {
+  if (gameIndex < AD_FIRST_POSITION - 1) return false;
+  const positionFromFirst = gameIndex - (AD_FIRST_POSITION - 1);
+  return positionFromFirst >= 0 && positionFromFirst % AD_INTERVAL === 0;
+}
+
+/**
+ * Generate HTML for an ad tile card
+ * @param {number} adIndex - Unique index for this ad tile
+ * @returns {string} HTML string for ad tile card
+ */
+function generateAdTile(adIndex) {
+  return `<div class="card ad-tile" data-ad-index="${adIndex}">
+    <div class="ad-content">
+      <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-1033412505744705"
+        data-ad-slot="7257160873"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    </div>
+  </div>`;
+}
+
 // Helper to escape JavaScript string for use in HTML script tags
 function escapeJs(str) {
   if (str == null) return '';
@@ -92,24 +125,31 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     randomIndex++;
   }
 
-  const recommendedGamesHTML = shuffled
-    .map((g) => {
-      const gThumbInfo = getThumbPath(g, gamesDir);
-      const gThumbPath = gThumbInfo.path;
-      const escapedFolder = escapeHtmlAttr(g.folder);
-      const escapedThumbPath = escapeHtmlAttr(gThumbPath);
-      const escapedName = escapeHtmlAttr(g.name);
-      const escapedNameText = escapeHtml(g.name);
-      // SEO-optimized alt text with keywords
-      const altText = `Play ${escapedNameText} Unblocked - Free Online Game`;
-      return `<a href="/${escapedFolder}.html" class="game-card" title="Play ${escapedNameText} Unblocked Free Online">
+  // Generate recommended games HTML with ad tiles
+  let adCount = 0;
+  let recommendedGamesHTML = '';
+  shuffled.forEach((g, idx) => {
+    const gThumbInfo = getThumbPath(g, gamesDir);
+    const gThumbPath = gThumbInfo.path;
+    const escapedFolder = escapeHtmlAttr(g.folder);
+    const escapedThumbPath = escapeHtmlAttr(gThumbPath);
+    const escapedName = escapeHtmlAttr(g.name);
+    const escapedNameText = escapeHtml(g.name);
+    // SEO-optimized alt text with keywords
+    const altText = `Play ${escapedNameText} Unblocked - Free Online Game`;
+    recommendedGamesHTML += `<a href="/${escapedFolder}.html" class="game-card" title="Play ${escapedNameText} Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('${escapedThumbPath}')">
         <img class="thumb" src="${escapedThumbPath}" alt="${altText}" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">${escapedNameText}</div>
     </a>`;
-    })
-    .join("");
+
+    // Check if we should insert an ad tile after this game
+    if (shouldInsertAdAfter(idx)) {
+      recommendedGamesHTML += generateAdTile(adCount);
+      adCount++;
+    }
+  });
 
   // Get SEO meta tags and structured data
   const metaTags = generateGameMetaTags(game, thumbPath);
@@ -122,6 +162,10 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Resource Hints for Performance -->
+  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
   <script>
@@ -131,6 +175,9 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
     gtag('config', 'G-4QZLTDX504');
   </script>
+
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705" crossorigin="anonymous"></script>
 
   ${generateAnalyticsScript()}
 
@@ -650,6 +697,18 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         }
       }
     });
+  </script>
+
+  <!-- Initialize AdSense Ads -->
+  <script>
+    (function() {
+      var ads = document.querySelectorAll('.ad-tile ins.adsbygoogle');
+      for (var i = 0; i < ads.length; i++) {
+        try {
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {}
+      }
+    })();
   </script>
 
   <!-- Cookie Consent Banner -->

@@ -971,6 +971,39 @@ button:active {
   letter-spacing: 1px;
 }
 
+/* Ad Tile Cards - same size as game cards */
+.card.ad-tile {
+  background: linear-gradient(135deg, rgba(26, 0, 51, 0.9), rgba(45, 0, 82, 0.9));
+  border: 2px solid rgba(255, 102, 255, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  padding: 0;
+}
+
+.card.ad-tile:hover {
+  transform: none;
+  border-color: rgba(255, 102, 255, 0.35);
+  box-shadow: 0 4px 20px rgba(255, 102, 255, 0.3);
+}
+
+.card.ad-tile .ad-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.card.ad-tile .ad-content ins {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
 /* Loading spinner for infinite scroll */
 .loading-spinner {
   width: 40px;
