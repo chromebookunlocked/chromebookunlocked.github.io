@@ -976,20 +976,30 @@ html,body {
   #topHeader {
     height: var(--header-height-mobile);
     min-height: var(--header-height-mobile);
+    max-height: var(--header-height-mobile);
     flex-direction: column;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
+    /* Prevent CLS from content changes */
+    contain: layout size style;
   }
   .header-left {
     width: 100%;
     justify-content: center;
+    /* Fixed height for header row */
+    height: 40px;
+    min-height: 40px;
   }
   .header-logo {
     width: 32px;
     height: 32px;
+    min-width: 32px;
+    min-height: 32px;
   }
   #topHeader h1 {
     font-size: 0.9rem;
+    /* Prevent font CLS */
+    min-height: 1.2rem;
   }
   #sidebar {
     top: var(--header-height-mobile);
@@ -998,6 +1008,11 @@ html,body {
   #content {
     margin-top: var(--header-height-mobile);
     height: calc(100vh - var(--header-height-mobile));
+  }
+  /* Mobile search container fixed height */
+  #searchContainer {
+    height: 40px;
+    min-height: 40px;
   }
 }
 
@@ -1048,7 +1063,7 @@ html,body {
   background: rgba(0, 0, 0, 0.6);
 }
 
-/* Search Results Dropdown */
+/* Search Results Dropdown - positioned absolutely to prevent CLS */
 #searchDropdown {
   position: absolute;
   top: calc(100% + 0.5rem);
@@ -1059,13 +1074,22 @@ html,body {
   border-radius: 15px;
   max-height: 400px;
   overflow-y: auto;
-  display: none;
+  /* Use visibility + opacity instead of display for CLS prevention */
+  visibility: hidden;
+  opacity: 0;
   z-index: 1000;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  /* Prevent layout shifts - dropdown overlays content */
+  pointer-events: none;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  /* Contain layout to prevent shifts */
+  contain: layout style;
 }
 
 #searchDropdown.show {
-  display: block;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .search-result-item {
@@ -1088,11 +1112,17 @@ html,body {
 }
 
 .search-result-thumb {
+  /* Fixed dimensions to prevent CLS */
   width: 50px;
   height: 50px;
+  min-width: 50px;
+  min-height: 50px;
+  flex-shrink: 0;
+  aspect-ratio: 1 / 1;
   border-radius: 8px;
   object-fit: cover;
   border: 2px solid rgba(255, 102, 255, 0.3);
+  background: rgba(77, 0, 102, 0.5);
 }
 
 .search-result-name {
@@ -1229,6 +1259,8 @@ button:active {
   position: relative;
   width: 100%;
   margin-bottom: 1rem;
+  /* Prevent CLS when viewer appears */
+  contain: layout style;
 }
 .viewer {
   position:relative;
@@ -1243,7 +1275,10 @@ button:active {
   overflow:hidden;
   margin:0 auto;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  transition: all 0.3s ease;
+  /* Use opacity + visibility for CLS-free show/hide */
+  transition: opacity 0.3s ease;
+  /* Prevent CLS */
+  contain: layout paint size;
 }
 
 @media (max-width: 1600px) {
@@ -1346,6 +1381,9 @@ button:active {
 #startOverlay img {
   width:clamp(200px,40vw,350px);
   max-width:80%;
+  /* Fixed aspect ratio to prevent CLS */
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
   border-radius:15px;
   box-shadow:0 10px 40px rgba(255, 102, 255, 0.4);
   border: 2px solid rgba(255, 102, 255, 0.3);
@@ -1357,6 +1395,10 @@ button:active {
   font-family:var(--font-main);
   text-shadow: 0 0 20px var(--accent);
   font-weight: 900;
+  /* Fixed min-height to prevent CLS from font loading */
+  min-height: 2.5rem;
+  line-height: 1.2;
+  text-align: center;
 }
 #startButton {
   padding:1rem 2.5rem;
@@ -1415,6 +1457,25 @@ button:active {
   width: 100%;
   /* CLS optimization: contain layout and prevent shifts */
   contain: layout style;
+  /* Prevent grid from shifting on load */
+  min-height: 0;
+}
+
+/* Responsive grid columns - use CSS Grid auto-fill for stability */
+@media (min-width: 1200px) {
+  .grid { grid-template-columns: repeat(6, 1fr); }
+}
+@media (min-width: 900px) and (max-width: 1199px) {
+  .grid { grid-template-columns: repeat(5, 1fr); }
+}
+@media (min-width: 600px) and (max-width: 899px) {
+  .grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 400px) and (max-width: 599px) {
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 399px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 .card {
@@ -1478,6 +1539,8 @@ button:active {
   object-fit:cover;
   object-position: center;
   transition:transform .2s ease;
+  /* Placeholder background to prevent CLS */
+  background: rgba(77, 0, 102, 0.5);
 }
 .card:hover .thumb {
   transform:scale(1.08);
@@ -1777,7 +1840,7 @@ button:active {
         <!-- Game Viewer -->
         <div class="viewer" id="viewer">
           <div id="startOverlay">
-            <img id="startThumb" src="" alt="Game Thumbnail">
+            <img id="startThumb" src="" alt="Game Thumbnail" width="300" height="300" loading="eager">
             <h1 id="startName"></h1>
             <button id="startButton" onclick="startGame()">▶ Play</button>
           </div>

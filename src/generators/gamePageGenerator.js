@@ -149,7 +149,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   <!-- Header with Logo -->
   <header>
     <div class="header-left">
-      <img src="assets/logo.webp" alt="Chromebook Unlocked Games - Free Unblocked Games for School" class="header-logo" onclick="window.location.href='/'">
+      <img src="assets/logo.webp" alt="Chromebook Unlocked Games - Free Unblocked Games for School" class="header-logo" onclick="window.location.href='/'" width="40" height="40" loading="eager" fetchpriority="high">
       <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
     </div>
   </header>
@@ -187,7 +187,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         </div>
 
         <div class="play-overlay" id="playOverlay">
-          <img src="${escapeHtmlAttr(thumbPath)}" alt="Play ${escapedGameNameAttr} Unblocked - Free Online ${escapeHtmlAttr(categoryText)} Game" itemprop="image">
+          <img src="${escapeHtmlAttr(thumbPath)}" alt="Play ${escapedGameNameAttr} Unblocked - Free Online ${escapeHtmlAttr(categoryText)} Game" itemprop="image" width="300" height="300" loading="eager" fetchpriority="high">
           <h2 itemprop="headline">${escapedGameName}</h2>
           <button class="play-btn" onclick="startGame(); gtag('event', 'play_button_clicked', {game_name: '${escapeJs(game.name)}', game_folder: '${escapeJs(game.folder)}'});" aria-label="Play ${escapedGameNameAttr} Free Online">▶ Play</button>
         </div>
