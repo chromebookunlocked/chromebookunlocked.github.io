@@ -2,9 +2,10 @@ const { generateGameCard } = require('./cardGenerator');
 const { generateIndexMetaTags, generateIndexStructuredData } = require('../utils/seoBuilder');
 const { generateAnalyticsScript } = require('../utils/analyticsEnhanced');
 const { escapeHtml, escapeHtmlAttr } = require('../utils/htmlEscape');
-const { NEWLY_ADDED_GAMES_COUNT, EAGER_LOAD_CARDS, MIN_CATEGORY_SIZE } = require('../utils/constants');
+const { getThumbPath } = require('../utils/assetManager');
+const { INITIAL_ROWS, ROWS_PER_LOAD, SCROLL_THRESHOLD, EAGER_LOAD_CARDS } = require('../utils/constants');
 
-// Category to icon mapping
+// Category to icon mapping (kept for sidebar)
 const categoryIcons = {
   'Home': '🏠',
   'All Games': '🎮',
@@ -45,6 +46,36 @@ function getCategoryIcon(category) {
 }
 
 /**
+ * Seeded random number generator for consistent shuffling
+ * Uses a simple LCG (Linear Congruential Generator)
+ */
+function seededRandom(seed) {
+  let state = seed;
+  return function() {
+    state = (state * 1664525 + 1013904223) % 4294967296;
+    return state / 4294967296;
+  };
+}
+
+/**
+ * Shuffle array using Fisher-Yates with seeded random
+ * @param {Array} array - Array to shuffle
+ * @param {number} seed - Random seed
+ * @returns {Array} Shuffled array (new array, doesn't mutate original)
+ */
+function shuffleArray(array, seed) {
+  const shuffled = [...array];
+  const random = seededRandom(seed);
+
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  return shuffled;
+}
+
+/**
  * Generate the full HTML for the index page
  * @param {Array} games - Array of game objects
  * @param {Object} categories - Object with category keys and game arrays
@@ -55,10 +86,9 @@ function getCategoryIcon(category) {
  */
 function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.') {
   // Generate sidebar categories - sorted by game count (largest first)
-  // Extract "Trending Games" and "Newly Added" to place them right after "All Games"
   const sidebarCategories = Object.keys(categories)
     .filter(cat => cat !== "Recently Played" && cat !== "Trending Games" && cat !== "Newly Added")
-    .sort((a, b) => categories[b].length - categories[a].length) // Sort by count, largest first
+    .sort((a, b) => categories[b].length - categories[a].length)
     .map(cat => {
       const escapedCat = escapeHtmlAttr(cat);
       const escapedCatText = escapeHtml(cat);
@@ -66,78 +96,37 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     })
     .join("");
 
-  // Add Trending Games right after All Games in the sidebar
-  const trendingGamesItem = categories["Trending Games"]
-    ? `<li role="menuitem" tabindex="0" onclick="filterCategory('Trending Games')" onkeypress="if(event.key==='Enter')filterCategory('Trending Games')"><span class="icon">${getCategoryIcon('Trending Games')}</span><span class="text">Trending Games</span></li>`
-    : '';
+  // Use current date as seed for daily randomization
+  const today = new Date();
+  const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
 
-  // Add Newly Added after Trending Games in the sidebar
-  const newlyAddedItem = `<li role="menuitem" tabindex="0" onclick="filterCategory('Newly Added')" onkeypress="if(event.key==='Enter')filterCategory('Newly Added')"><span class="icon">${getCategoryIcon('Newly Added')}</span><span class="text">Newly Added</span></li>`;
+  // Shuffle all games with seeded random for consistent daily order
+  const shuffledGames = shuffleArray(games, seed);
 
-  const finalSidebarCategories = trendingGamesItem + newlyAddedItem + sidebarCategories;
+  // Calculate how many games to render initially (INITIAL_ROWS * 6 columns)
+  const columnsPerRow = 6;
+  const initialGameCount = INITIAL_ROWS * columnsPerRow;
+  const initialGames = shuffledGames.slice(0, initialGameCount);
 
-  // Generate category sections with games - hide categories with less than 4 games on homepage
-  // Exclude special sections and Trading Games (only shown in sidebar, not on home page)
-  const sortedCategories = Object.keys(categories)
-    .filter(cat => cat !== "Recently Played" && cat !== "Trending Games" && cat !== "Newly Added" && cat !== "Trading Games")
-    .sort((a, b) => categories[b].length - categories[a].length); // Sort by game count
+  // Prepare game data for client-side lazy loading
+  // Only include necessary fields to minimize payload
+  const gameDataForClient = shuffledGames.map(game => {
+    const thumbInfo = getThumbPath(game, gamesDir);
+    return {
+      n: game.name,                    // name
+      f: game.folder,                  // folder
+      t: thumbInfo.path,               // thumbnail path
+      a: game.otherNames || [],        // aliases for search
+      c: game.categories || []         // categories for filtering
+    };
+  });
 
-  const categorySections = sortedCategories
-    .map((cat, catIndex) => {
-      // Sort games in category by priority first, then by name
-      const list = [...categories[cat]].sort((a, b) => {
-        // Higher priority first
-        if (b.priority !== a.priority) return b.priority - a.priority;
-        // Then alphabetically by name
-        return a.name.localeCompare(b.name);
-      });
-      const isSmallCategory = list.length < MIN_CATEGORY_SIZE;
-      const hideOnHome = isSmallCategory ? ' data-hide-on-home="true" style="display:none;"' : '';
-      const escapedCat = escapeHtmlAttr(cat);
-      const escapedCatText = escapeHtml(cat);
-      // Eagerly load first 4 of each category to ensure first row is ready on homepage
-      return `<div class="category" data-category="${escapedCat}"${hideOnHome}>
-          <h2>${escapedCatText}</h2>
-          <div class="grid">
-            ${list.map((g, i) => generateGameCard(g, i, gamesDir, true)).join('')}
-          </div>
-        </div>`;
-    }).join('');
+  // Generate initial game cards HTML
+  const initialCardsHTML = initialGames.map((game, idx) =>
+    generateGameCard(game, idx, gamesDir, true)
+  ).join('');
 
-  // Generate Trading Games section (only visible when accessed via sidebar)
-  const tradingGamesSection = categories["Trading Games"]
-    ? (() => {
-        const list = [...categories["Trading Games"]].sort((a, b) => {
-          if (b.priority !== a.priority) return b.priority - a.priority;
-          return a.name.localeCompare(b.name);
-        });
-        return `<div class="category" data-category="Trading Games" style="display:none;">
-          <h2>Trading Games</h2>
-          <div class="grid">
-            ${list.map((g, i) => generateGameCard(g, i, gamesDir, true)).join('')}
-          </div>
-        </div>`;
-      })()
-    : '';
-
-  // Generate Newly Added section - 12 most recently added games
-  const newlyAddedGames = [...games]
-    .sort((a, b) => {
-      // Sort by createdAt date (newest first)
-      const dateA = new Date(a.createdAt || 0);
-      const dateB = new Date(b.createdAt || 0);
-      return dateB - dateA;
-    })
-    .slice(0, NEWLY_ADDED_GAMES_COUNT); // Take only N newest games
-
-  const newlyAddedSection = `<div class="category" data-category="Newly Added">
-    <h2>Newly Added</h2>
-    <div class="grid">
-      ${newlyAddedGames.map((g, i) => generateGameCard(g, i, gamesDir, true)).join('')}
-    </div>
-  </div>`;
-
-  // Get SEO meta tags and structured data (pass games for ItemList schema)
+  // Get SEO meta tags and structured data
   const metaTags = generateIndexMetaTags();
   const structuredData = generateIndexStructuredData(games);
 
@@ -196,8 +185,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <nav id="sidebar" role="navigation" aria-label="Game categories">
     <ul id="categoryList" role="menu">
       <li role="menuitem" tabindex="0" onclick="window.location.href='/'" onkeypress="if(event.key==='Enter')window.location.href='/'"><span class="icon">🏠</span><span class="text">Home</span></li>
-      <li role="menuitem" tabindex="0" onclick="filterCategory('All Games')" onkeypress="if(event.key==='Enter')filterCategory('All Games')"><span class="icon">🎮</span><span class="text">All Games</span></li>
-      ${finalSidebarCategories}
+      ${sidebarCategories}
     </ul>
   </nav>
   <div id="sidebarIndicator" aria-hidden="true"></div>
@@ -250,133 +238,17 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         </div>
       </div>
 
-      <!-- All Games section (all games without categories) -->
-      <div class="category" data-category="All Games" style="display:none;">
+      <!-- All Games Grid -->
+      <div class="category" data-category="All Games" id="allGamesSection">
         <h2>All Games</h2>
-        <div class="grid">
-          ${[...games].sort((a, b) => {
-            // Sort by priority first (higher priority first)
-            if (b.priority !== a.priority) return b.priority - a.priority;
-            // Then trending games
-            const aIsTrending = (a.categories || []).includes('Trending Games');
-            const bIsTrending = (b.categories || []).includes('Trending Games');
-            if (aIsTrending && !bIsTrending) return -1;
-            if (!aIsTrending && bIsTrending) return 1;
-            // Then alphabetically by name
-            return a.name.localeCompare(b.name);
-          }).map((g, i) => generateGameCard(g, i, gamesDir, false)).join('')}
+        <div class="grid" id="gamesGrid">
+          ${initialCardsHTML}
         </div>
-      </div>
-
-      <!-- Recently Played -->
-      <div class="category" data-category="Recently Played" id="recentlyPlayedSection" style="display:none;">
-        <h2>Recently Played</h2>
-        <div class="grid" id="recentlyPlayedGrid"></div>
-      </div>
-
-      <!-- Load Recently Played Games Synchronously to Prevent Layout Shift -->
-      <script>
-        (function() {
-          const MAX_RECENT = 25;
-          const recentSection = document.getElementById('recentlyPlayedSection');
-          const recentGrid = document.getElementById('recentlyPlayedGrid');
-
-          if (!recentGrid) return;
-
-          // Get all valid game folders from pre-rendered game cards
-
-
-          // Clean recently played list
-          let list = [];
-          try {
-            list = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
-          } catch(e) {
-            list = [];
-          }
-
-          if (list.length === 0) {
-            return; // Keep section hidden
-          }
-
-          // Clean invalid entries
-          // We can't validate against DOM here because the rest of the page hasn't loaded yet
-          // Validation will happen in the main client.js on DOMContentLoaded if needed
-          const originalLength = list.length;
-          
-          // Return early if no games
-          if (list.length === 0) {
-            return;
-          }
-
-          // Return early if no valid games remain
-          if (list.length === 0) {
-            return;
-          }
-
-          // Sort by lastPlayed timestamp (most recent first)
-          list.sort((a, b) => {
-            const timeA = a.lastPlayed || 0;
-            const timeB = b.lastPlayed || 0;
-            return timeB - timeA;
-          });
-
-          const displayList = list.slice(0, MAX_RECENT);
-
-          // Helper to escape HTML special characters
-          function escapeHtml(str) {
-            if (!str) return '';
-            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-          }
-
-          // Build cards HTML
-          const cardsHTML = displayList.map((g, i) => {
-            const thumbUrl = escapeHtml(g.thumb || 'assets/logo.webp');
-            const folder = escapeHtml(g.folder || '');
-            const name = escapeHtml(g.name || 'Unknown Game');
-            // Eagerly load first 6 thumbnails, lazy load the rest
-            const isFirstRow = i < 6;
-            const srcAttr = isFirstRow ? \`src="\${thumbUrl}"\` : \`data-src="\${thumbUrl}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E"\`;
-            const loadingAttr = isFirstRow ? 'eager' : 'lazy';
-
-            return \`<div class="card game-card" data-index="\${i}" data-folder="\${folder}" data-name="\${name.toLowerCase()}" onclick="window.location.href='/\${folder}.html'">
-              <div class="thumb-container" style="--thumb-url: url('\${thumbUrl}')">
-                <img class="thumb" \${srcAttr} alt="\${name}" loading="\${loadingAttr}" decoding="async" width="300" height="300" onerror="this.src='assets/logo.webp'">
-              </div>
-              <div class="card-title">\${name}</div>
-            </div>\`;
-          }).join('');
-
-          // Set grid content and show section
-          if (cardsHTML) {
-            recentGrid.innerHTML = cardsHTML;
-            if (recentSection) {
-              recentSection.style.display = 'block';
-            }
-            // Mark as loaded for client.js
-            window.__recentlyPlayedLoaded = true;
-          }
-        })();
-      </script>
-
-      <!-- Trending Games -->
-      <div class="category" data-category="Trending Games">
-        <h2>Trending Games</h2>
-        <div class="grid">
-          ${(categories['Trending Games'] || []).sort((a, b) => {
-            if (b.priority !== a.priority) return b.priority - a.priority;
-            return a.name.localeCompare(b.name);
-          }).map((g, i) => generateGameCard(g, i, gamesDir, true)).join('')}
+        <div id="loadingIndicator" style="display:none;text-align:center;padding:2rem;">
+          <div class="loading-spinner"></div>
         </div>
+        <div id="scrollSentinel" style="height:1px;"></div>
       </div>
-
-      <!-- Newly Added Games (fixed position, like Trending Games) -->
-      ${newlyAddedSection}
-
-      <!-- Trading Games (hidden on home page, only accessible via sidebar) -->
-      ${tradingGamesSection}
-
-      <!-- All category sections (including games for home view) -->
-      ${categorySections}
 
       <footer id="siteFooter">
         <div class="footer-content">
@@ -398,6 +270,14 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       </footer>
     </div>
   </div>
+
+  <!-- Game Data for Lazy Loading -->
+  <script>
+    window.__gameData = ${JSON.stringify(gameDataForClient)};
+    window.__renderedCount = ${initialGameCount};
+    window.__rowsPerLoad = ${ROWS_PER_LOAD};
+    window.__scrollThreshold = ${SCROLL_THRESHOLD};
+  </script>
 
   <script>
     ${clientJS}
