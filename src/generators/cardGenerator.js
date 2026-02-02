@@ -58,7 +58,26 @@ function generateSidebar(categories) {
     .join('\n');
 }
 
+/**
+ * Generate HTML for an ad tile card
+ * @param {number} adIndex - Unique index for this ad tile
+ * @returns {string} HTML string for ad tile card
+ */
+function generateAdTile(adIndex) {
+  return `<div class="card ad-tile" data-ad-index="${adIndex}">
+    <div class="ad-content">
+      <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-1033412505744705"
+        data-ad-slot="7257160873"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    </div>
+  </div>`;
+}
+
 module.exports = {
   generateGameCard,
-  generateSidebar
+  generateSidebar,
+  generateAdTile
 };

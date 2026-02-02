@@ -4,6 +4,52 @@ let isLoading = false;
 let allGamesLoaded = false;
 let currentCategory = null; // null = home (all games), or category name
 
+// Ad tile configuration
+const AD_FIRST_POSITION = window.__adFirstPosition || 13;
+const AD_INTERVAL = window.__adInterval || 20;
+let adCount = window.__adCount || 0;
+
+/**
+ * Check if an ad should be inserted after a given game index
+ * @param {number} gameIndex - The 0-indexed position in the game list
+ * @returns {boolean} Whether an ad should be inserted after this game
+ */
+function shouldInsertAdAfter(gameIndex) {
+  if (gameIndex < AD_FIRST_POSITION - 1) return false;
+  const positionFromFirst = gameIndex - (AD_FIRST_POSITION - 1);
+  return positionFromFirst >= 0 && positionFromFirst % AD_INTERVAL === 0;
+}
+
+/**
+ * Create an ad tile element
+ * @param {number} adIndex - Unique index for this ad tile
+ * @returns {HTMLElement} Ad tile element
+ */
+function createAdTile(adIndex) {
+  const tile = document.createElement('div');
+  tile.className = 'card ad-tile';
+  tile.setAttribute('data-ad-index', adIndex);
+  tile.innerHTML = `<div class="ad-content">
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="7257160873"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+  </div>`;
+  return tile;
+}
+
+/**
+ * Initialize an ad tile
+ * @param {HTMLElement} tile - The ad tile element
+ */
+function initializeAdTile(tile) {
+  try {
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  } catch (e) {}
+}
+
 // Cached DOM elements for performance
 let cachedElements = null;
 function getCachedElements() {
@@ -125,6 +171,7 @@ function loadMoreGames(count) {
   requestAnimationFrame(() => {
     const fragment = document.createDocumentFragment();
     const endIndex = Math.min(renderedCount + count, totalGames);
+    const newAdTiles = [];
 
     for (let i = renderedCount; i < endIndex; i++) {
       const game = filteredGames[i];
@@ -136,10 +183,21 @@ function loadMoreGames(count) {
       if (img && imageObserver) {
         imageObserver.observe(img);
       }
+
+      // Check if we should insert an ad tile after this game
+      if (shouldInsertAdAfter(i)) {
+        const adTile = createAdTile(adCount);
+        fragment.appendChild(adTile);
+        newAdTiles.push(adTile);
+        adCount++;
+      }
     }
 
     gamesGrid.appendChild(fragment);
     renderedCount = endIndex;
+
+    // Initialize new ad tiles after they're in the DOM
+    newAdTiles.forEach(initializeAdTile);
 
     if (renderedCount >= totalGames) {
       allGamesLoaded = true;
@@ -162,6 +220,7 @@ function resetAndReloadGrid(category) {
   renderedCount = 0;
   allGamesLoaded = false;
   isLoading = false;
+  adCount = 0; // Reset ad count for new grid
 
   // Clear existing cards
   gamesGrid.innerHTML = '';
