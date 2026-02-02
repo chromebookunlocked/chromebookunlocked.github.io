@@ -59,6 +59,7 @@ function generateAdTile(adIndex) {
         data-ad-slot="7257160873"
         data-ad-format="auto"
         data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
   </div>`;
 }
@@ -718,18 +719,6 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         }
       }
     });
-  </script>
-
-  <!-- Initialize AdSense Ads -->
-  <script>
-    (function() {
-      var ads = document.querySelectorAll('.ad-tile .adsbygoogle');
-      for (var i = 0; i < ads.length; i++) {
-        try {
-          (adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {}
-      }
-    })();
   </script>
 
   <!-- Cookie Consent Banner -->
