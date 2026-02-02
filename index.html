@@ -4,6 +4,8 @@
   <!-- Resource Hints for Performance -->
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
 
   <!-- Optimize Google Fonts loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,6 +33,9 @@
 
     gtag('config', 'G-4QZLTDX504');
   </script>
+
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705" crossorigin="anonymous"></script>
 
   
 <script>
@@ -1613,6 +1618,39 @@ button:active {
   letter-spacing: 1px;
 }
 
+/* Ad Tile Cards - same size as game cards */
+.card.ad-tile {
+  background: linear-gradient(135deg, rgba(26, 0, 51, 0.9), rgba(45, 0, 82, 0.9));
+  border: 2px solid rgba(255, 102, 255, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  padding: 0;
+}
+
+.card.ad-tile:hover {
+  transform: none;
+  border-color: rgba(255, 102, 255, 0.35);
+  box-shadow: 0 4px 20px rgba(255, 102, 255, 0.3);
+}
+
+.card.ad-tile .ad-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.card.ad-tile .ad-content ins {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
 /* Loading spinner for infinite scroll */
 .loading-spinner {
   width: 40px;
@@ -1924,6 +1962,15 @@ button:active {
       <img class="thumb" data-src="games/Fall Guys/thumbnail.webp" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E" alt="Fall Guys Mini" loading="lazy" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">Fall Guys Mini</div>
+  </div><div class="card ad-tile" data-ad-index="0">
+    <div class="ad-content">
+      <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-1033412505744705"
+        data-ad-slot="7257160873"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    </div>
   </div><div class="card game-card" data-index="13" data-folder="2048" data-name="2048" onclick="window.location.href='/2048.html'">
     <div class="thumb-container" style="--thumb-url: url('games/2048/thumbnail.webp')">
       <img class="thumb" data-src="games/2048/thumbnail.webp" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E" alt="2048" loading="lazy" decoding="async" width="300" height="300">
@@ -2014,6 +2061,23 @@ button:active {
     window.__renderedCount = 24;
     window.__rowsPerLoad = 3;
     window.__scrollThreshold = 300;
+    // Ad tile configuration
+    window.__adFirstPosition = 13;
+    window.__adInterval = 20;
+    window.__adCount = 1;
+  </script>
+
+  <!-- Initialize AdSense Ads -->
+  <script>
+    (function() {
+      // Initialize all existing ad tiles
+      var ads = document.querySelectorAll('.ad-tile ins.adsbygoogle');
+      for (var i = 0; i < ads.length; i++) {
+        try {
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {}
+      }
+    })();
   </script>
 
   <script>
@@ -2022,6 +2086,52 @@ let renderedCount = window.__renderedCount || 0;
 let isLoading = false;
 let allGamesLoaded = false;
 let currentCategory = null; // null = home (all games), or category name
+
+// Ad tile configuration
+const AD_FIRST_POSITION = window.__adFirstPosition || 13;
+const AD_INTERVAL = window.__adInterval || 20;
+let adCount = window.__adCount || 0;
+
+/**
+ * Check if an ad should be inserted after a given game index
+ * @param {number} gameIndex - The 0-indexed position in the game list
+ * @returns {boolean} Whether an ad should be inserted after this game
+ */
+function shouldInsertAdAfter(gameIndex) {
+  if (gameIndex < AD_FIRST_POSITION - 1) return false;
+  const positionFromFirst = gameIndex - (AD_FIRST_POSITION - 1);
+  return positionFromFirst >= 0 && positionFromFirst % AD_INTERVAL === 0;
+}
+
+/**
+ * Create an ad tile element
+ * @param {number} adIndex - Unique index for this ad tile
+ * @returns {HTMLElement} Ad tile element
+ */
+function createAdTile(adIndex) {
+  const tile = document.createElement('div');
+  tile.className = 'card ad-tile';
+  tile.setAttribute('data-ad-index', adIndex);
+  tile.innerHTML = `<div class="ad-content">
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="7257160873"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+  </div>`;
+  return tile;
+}
+
+/**
+ * Initialize an ad tile
+ * @param {HTMLElement} tile - The ad tile element
+ */
+function initializeAdTile(tile) {
+  try {
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  } catch (e) {}
+}
 
 // Cached DOM elements for performance
 let cachedElements = null;
@@ -2144,6 +2254,7 @@ function loadMoreGames(count) {
   requestAnimationFrame(() => {
     const fragment = document.createDocumentFragment();
     const endIndex = Math.min(renderedCount + count, totalGames);
+    const newAdTiles = [];
 
     for (let i = renderedCount; i < endIndex; i++) {
       const game = filteredGames[i];
@@ -2155,10 +2266,21 @@ function loadMoreGames(count) {
       if (img && imageObserver) {
         imageObserver.observe(img);
       }
+
+      // Check if we should insert an ad tile after this game
+      if (shouldInsertAdAfter(i)) {
+        const adTile = createAdTile(adCount);
+        fragment.appendChild(adTile);
+        newAdTiles.push(adTile);
+        adCount++;
+      }
     }
 
     gamesGrid.appendChild(fragment);
     renderedCount = endIndex;
+
+    // Initialize new ad tiles after they're in the DOM
+    newAdTiles.forEach(initializeAdTile);
 
     if (renderedCount >= totalGames) {
       allGamesLoaded = true;
@@ -2181,6 +2303,7 @@ function resetAndReloadGrid(category) {
   renderedCount = 0;
   allGamesLoaded = false;
   isLoading = false;
+  adCount = 0; // Reset ad count for new grid
 
   // Clear existing cards
   gamesGrid.innerHTML = '';
