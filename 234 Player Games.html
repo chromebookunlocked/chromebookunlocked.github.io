@@ -1009,6 +1009,8 @@ iframe.active {
 .ad-tile {
   width: 100%;
   aspect-ratio: 1 / 1;
+  /* Prevent AdSense from collapsing the container with height: auto !important */
+  min-height: 150px;
   background: linear-gradient(135deg, rgba(26, 0, 51, 0.9), rgba(45, 0, 82, 0.9));
   border: 2px solid rgba(255, 102, 255, 0.25);
   border-radius: var(--radius-md);
@@ -1017,6 +1019,7 @@ iframe.active {
   align-items: center;
   overflow: hidden;
   padding: 0;
+  position: relative;
   /* CLS prevention */
   contain: layout paint;
 }
@@ -1029,16 +1032,23 @@ iframe.active {
 .ad-tile .ad-content {
   width: 100%;
   height: 100%;
+  min-height: 150px;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .ad-tile .ad-content ins {
   display: block !important;
   width: 100% !important;
   height: 100% !important;
+  min-height: 150px !important;
 }
 
 /* ============================================================================
