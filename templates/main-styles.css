@@ -276,10 +276,8 @@ html,body {
   left: 0;
   right: 0;
   z-index: 1001;
-  /* Fixed height prevents CLS on all screen sizes */
   height: var(--header-height);
   min-height: var(--header-height);
-  max-height: var(--header-height);
   background: rgba(13, 0, 26, 0.97);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -289,8 +287,6 @@ html,body {
   align-items: center;
   justify-content: space-between;
   padding-right: 1.5rem;
-  /* Prevent CLS from header content on PC */
-  contain: layout size style;
 }
 
 .header-left {
@@ -436,14 +432,22 @@ html,body {
   border-radius: 15px;
   max-height: 400px;
   overflow-y: auto;
-  /* Use display:none to completely remove from layout - prevents CLS */
-  display: none;
+  /* Use visibility + opacity instead of display for CLS prevention */
+  visibility: hidden;
+  opacity: 0;
   z-index: 1000;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  /* Prevent layout shifts - dropdown overlays content */
+  pointer-events: none;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  /* Contain layout to prevent shifts */
+  contain: layout style;
 }
 
 #searchDropdown.show {
-  display: block;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .search-result-item {
@@ -613,8 +617,8 @@ button:active {
   position: relative;
   width: 100%;
   margin-bottom: 1rem;
-  /* Use style containment only - layout containment breaks sizing */
-  contain: style;
+  /* Prevent CLS when viewer appears */
+  contain: layout style;
 }
 .viewer {
   position:relative;
@@ -805,23 +809,27 @@ button:active {
 }
 .grid {
   display: grid;
+  grid-template-columns: repeat(6, 1fr);
   gap: var(--grid-gap);
   justify-items: center;
   width: 100%;
-  /* Default 6 columns for large screens - defined here to prevent CLS */
-  grid-template-columns: repeat(6, 1fr);
-  /* CLS optimization: only contain style, not layout (layout breaks grid sizing) */
-  contain: style;
+  /* CLS optimization: contain layout and prevent shifts */
+  contain: layout style;
+  /* Prevent grid from shifting on load */
+  min-height: 0;
 }
 
-/* Responsive grid columns - mobile-first approach to prevent PC CLS */
-@media (max-width: 1199px) {
+/* Responsive grid columns - use CSS Grid auto-fill for stability */
+@media (min-width: 1200px) {
+  .grid { grid-template-columns: repeat(6, 1fr); }
+}
+@media (min-width: 900px) and (max-width: 1199px) {
   .grid { grid-template-columns: repeat(5, 1fr); }
 }
-@media (max-width: 899px) {
+@media (min-width: 600px) and (max-width: 899px) {
   .grid { grid-template-columns: repeat(4, 1fr); }
 }
-@media (max-width: 599px) {
+@media (min-width: 400px) and (max-width: 599px) {
   .grid { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 399px) {
