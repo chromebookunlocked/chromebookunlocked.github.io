@@ -1482,7 +1482,8 @@ footer {
           src=""
           title="Henry Stickmin Fleeing The Complex Unblocked - Play Free Online Game at School"
           allow="fullscreen; autoplay; encrypted-media"
-          allowfullscreen>
+          allowfullscreen
+          tabindex="0">
         </iframe>
       </div>
     </div>
@@ -1941,6 +1942,12 @@ footer {
       frame.classList.add('active');
       overlay.classList.add('hidden');
 
+      // Enable keyboard focus locking
+      gameIsActive = true;
+
+      // Focus the game frame after a short delay for iframe to initialize
+      setTimeout(focusGameFrame, 100);
+
       // Track game start time and send analytics event
       gameStartTime = Date.now();
       gamePlayDuration = 0;
@@ -2070,17 +2077,113 @@ footer {
       }
     }
 
-    // Listen for fullscreen changes
-    document.addEventListener('fullscreenchange', updateFullscreenIcon);
-    document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
-    document.addEventListener('mozfullscreenchange', updateFullscreenIcon);
-    document.addEventListener('MSFullscreenChange', updateFullscreenIcon);
+    // ========================================
+    // KEYBOARD FOCUS LOCKING FOR GAME IFRAME
+    // ========================================
+    // Ensures keyboard input always goes to the game, not the page
 
-    // Prevent arrow keys from scrolling the page on game pages
+    let gameIsActive = false;
+
+    // Focus the game iframe to capture keyboard input
+    function focusGameFrame() {
+      const frame = document.getElementById('gameFrame');
+      if (frame && gameIsActive) {
+        // Focus the iframe itself
+        frame.focus();
+
+        // Also try to focus content inside iframe (if same-origin)
+        try {
+          if (frame.contentWindow) {
+            frame.contentWindow.focus();
+          }
+        } catch (e) {
+          // Cross-origin iframe - can't access contentWindow, but iframe.focus() still works
+        }
+      }
+    }
+
+    // Prevent all game-related keys from affecting the page while game is active
     window.addEventListener('keydown', (e) => {
-      const blocked = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-      if (blocked.includes(e.key)) {
+      if (!gameIsActive) return;
+
+      // Block these keys from affecting the page (scrolling, navigation, etc.)
+      const blockedKeys = [
+        'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',  // Arrow keys
+        ' ', 'Space',  // Spacebar (page scroll)
+        'Tab',  // Tab navigation (keep focus in game)
+        'Enter',  // Prevent form submissions
+        'Escape',  // Keep in game (fullscreen exit handled separately)
+        'w', 'W', 'a', 'A', 's', 'S', 'd', 'D',  // WASD movement
+        'q', 'Q', 'e', 'E', 'r', 'R', 'f', 'F',  // Common game keys
+        'Shift', 'Control', 'Alt',  // Modifier keys
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',  // Number keys
+        'z', 'Z', 'x', 'X', 'c', 'C', 'v', 'V',  // Common action keys
+        'p', 'P', 'm', 'M', 'i', 'I',  // Pause, mute, inventory
+      ];
+
+      if (blockedKeys.includes(e.key)) {
         e.preventDefault();
+        e.stopPropagation();
+        // Re-focus the game frame to ensure key goes to game
+        focusGameFrame();
+      }
+    }, true);  // Use capture phase to intercept before other handlers
+
+    // Also block keyup to prevent any residual page interactions
+    window.addEventListener('keyup', (e) => {
+      if (!gameIsActive) return;
+
+      const blockedKeys = [
+        'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+        ' ', 'Space', 'Tab', 'Enter',
+        'w', 'W', 'a', 'A', 's', 'S', 'd', 'D',
+        'q', 'Q', 'e', 'E', 'r', 'R', 'f', 'F',
+        'Shift', 'Control', 'Alt',
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+        'z', 'Z', 'x', 'X', 'c', 'C', 'v', 'V',
+        'p', 'P', 'm', 'M', 'i', 'I',
+      ];
+
+      if (blockedKeys.includes(e.key)) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+
+    // Re-focus game frame when clicking on the game wrapper area
+    document.getElementById('gameWrapper').addEventListener('click', () => {
+      if (gameIsActive) {
+        focusGameFrame();
+      }
+    });
+
+    // Re-focus game frame after fullscreen changes
+    function handleFullscreenChange() {
+      updateFullscreenIcon();
+
+      // Re-focus game after fullscreen transition completes
+      if (gameIsActive) {
+        setTimeout(focusGameFrame, 150);
+      }
+    }
+
+    // Listen for fullscreen changes (also updates icon and re-focuses game)
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    // Re-focus game after clicking fullscreen button
+    document.getElementById('fullscreenBtn').addEventListener('click', () => {
+      if (gameIsActive) {
+        setTimeout(focusGameFrame, 200);
+      }
+    });
+
+    // When iframe loads, focus it
+    document.getElementById('gameFrame').addEventListener('load', () => {
+      if (gameIsActive) {
+        focusGameFrame();
       }
     });
 
