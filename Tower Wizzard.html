@@ -623,10 +623,10 @@ h1 {
 }
 
 /* ============================================================================
-   IFRAME
+   IFRAME - Scoped to game frame only (not ad iframes)
 ============================================================================ */
 
-iframe {
+.game-frame-wrapper iframe {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -650,7 +650,7 @@ iframe {
   transition: none;
 }
 
-iframe.active {
+.game-frame-wrapper iframe.active {
   opacity: 1;
 }
 
