@@ -272,6 +272,19 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     </div>
   </main>
 
+  <!-- Vertical Display Ad (Right Side) -->
+  <div class="vertical-ad-container">
+    <div class="ad-content">
+      <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-1033412505744705"
+        data-ad-slot="9122283604"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+  </div>
+
   <!-- More Games Hint Box -->
   <div class="more-games-hint" id="moreGamesHint" onclick="scrollToMoreGames()" role="button" aria-label="Scroll to more games" tabindex="0">
     <span class="more-games-hint-text">More Games</span>
