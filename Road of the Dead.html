@@ -397,12 +397,13 @@ h1 {
   flex: 1;
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   align-items: flex-start;
-  padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) var(--spacing-lg) var(--spacing-xs);
+  padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) var(--spacing-sm) var(--spacing-xs);
   position: relative;
   z-index: 1;
-  gap: var(--spacing-md);
+  width: 100%;
+  max-width: 100vw;
 }
 
 /* Back Button - Fixed to left edge of screen */
@@ -1360,15 +1361,18 @@ footer {
 }
 
 /* ============================================================================
-   VERTICAL SIDE ADS - Positioned beside game window, scrolls with content
+   VERTICAL SIDE ADS - Positioned at screen edges, aligned with game window
 ============================================================================ */
 
 .vertical-ad-container {
   display: none;
   width: 160px;
-  max-height: 600px;
   flex-shrink: 0;
-  align-self: center;
+  /* Align to top of game, don't extend below it */
+  align-self: flex-start;
+  /* Match game window height */
+  height: min(85vw * 9 / 16, calc(78vh));
+  max-height: 82vh;
 }
 
 /* Order the elements: left-ad, game, right-ad */
@@ -1382,6 +1386,8 @@ footer {
 
 .game-frame-wrapper {
   order: 0;
+  /* Center the game */
+  margin: 0 auto;
 }
 
 /* Show vertical ads when there's enough space beside the game */
