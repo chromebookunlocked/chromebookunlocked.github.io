@@ -406,11 +406,9 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
       // Enable keyboard focus locking
       gameIsActive = true;
-      startFocusMonitoring();
 
       // Focus the game frame after a short delay for iframe to initialize
       setTimeout(focusGameFrame, 100);
-      setTimeout(focusGameFrame, 500);
 
       // Track game start time and send analytics event
       gameStartTime = Date.now();
@@ -625,10 +623,9 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     function handleFullscreenChange() {
       updateFullscreenIcon();
 
-      // Re-focus game after a short delay to ensure fullscreen transition completes
+      // Re-focus game after fullscreen transition completes
       if (gameIsActive) {
-        setTimeout(focusGameFrame, 100);
-        setTimeout(focusGameFrame, 300);  // Double-check focus after transition
+        setTimeout(focusGameFrame, 150);
       }
     }
 
@@ -638,35 +635,12 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
-    // Periodically check and re-focus game iframe while playing
-    // This handles cases where focus is lost due to browser behavior
-    let focusCheckInterval = null;
-
-    function startFocusMonitoring() {
-      if (focusCheckInterval) clearInterval(focusCheckInterval);
-
-      focusCheckInterval = setInterval(() => {
-        if (gameIsActive && !document.hidden) {
-          const frame = document.getElementById('gameFrame');
-          // Check if focus is outside the game frame
-          if (document.activeElement !== frame) {
-            // Only re-focus if user hasn't clicked outside intentionally
-            // (check if active element is part of game wrapper)
-            const wrapper = document.getElementById('gameWrapper');
-            if (wrapper && wrapper.contains(document.activeElement)) {
-              focusGameFrame();
-            }
-          }
-        }
-      }, 500);  // Check every 500ms
-    }
-
-    function stopFocusMonitoring() {
-      if (focusCheckInterval) {
-        clearInterval(focusCheckInterval);
-        focusCheckInterval = null;
+    // Re-focus game after clicking fullscreen button
+    document.getElementById('fullscreenBtn').addEventListener('click', () => {
+      if (gameIsActive) {
+        setTimeout(focusGameFrame, 200);
       }
-    }
+    });
 
     // When iframe loads, focus it
     document.getElementById('gameFrame').addEventListener('load', () => {
