@@ -1315,19 +1315,6 @@
     </image:image>
   </url>
 
-  <!-- Growmi - Free Unblocked Game -->
-  <url>
-    <loc>https://chromebookunlocked.github.io/Growmi.html</loc>
-    <lastmod>2026-02-03</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
-      <image:title>Growmi Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play Growmi unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
-    </image:image>
-  </url>
-
   <!-- Gun Spin - Free Unblocked Game -->
   <url>
     <loc>https://chromebookunlocked.github.io/Gun%20Spin.html</loc>
@@ -1585,6 +1572,19 @@
       <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
       <image:title>Mr Mine Unblocked - Play Free Online Game</image:title>
       <image:caption>Play Mr Mine unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Nautilus OS - Free Unblocked Game -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/Nautilus%20OS.html</loc>
+    <lastmod>2026-02-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/assets/logo.png</image:loc>
+      <image:title>Nautilus OS Unblocked - Play Free Online Game</image:title>
+      <image:caption>Play Nautilus OS unblocked for free at school. Uncategorized game that works on Chromebook and school computers.</image:caption>
     </image:image>
   </url>
 
