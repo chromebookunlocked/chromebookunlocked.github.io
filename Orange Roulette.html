@@ -623,10 +623,10 @@ h1 {
 }
 
 /* ============================================================================
-   IFRAME
+   IFRAME - Scoped to game frame only (not ad iframes)
 ============================================================================ */
 
-iframe {
+.game-frame-wrapper iframe {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -650,7 +650,7 @@ iframe {
   transition: none;
 }
 
-iframe.active {
+.game-frame-wrapper iframe.active {
   opacity: 1;
 }
 
@@ -1377,6 +1377,22 @@ footer {
   .vertical-ad-container {
     left: calc(50% + 750px + var(--spacing-md));
   }
+}
+
+/* Styling for vertical ad content */
+.vertical-ad-container .ad-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.vertical-ad-container .ad-content ins {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* ============================================================================
