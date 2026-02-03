@@ -72,6 +72,7 @@ function generateAdTile(adIndex) {
         data-ad-slot="7257160873"
         data-ad-format="auto"
         data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
   </div>`;
 }
