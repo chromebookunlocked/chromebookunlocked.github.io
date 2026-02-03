@@ -1057,6 +1057,16 @@ h1 {
   height: 100% !important;
 }
 
+/* Ensure ad iframes are always visible */
+.card.ad-tile iframe,
+.card.ad-tile .ad-content iframe,
+.card.ad-tile ins iframe {
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  display: block !important;
+}
+
 /* ============================================================================
    FOOTER
 ============================================================================ */
@@ -1409,6 +1419,16 @@ footer {
   display: block !important;
   width: 100% !important;
   height: 100% !important;
+}
+
+/* Ensure vertical ad iframes are always visible */
+.vertical-ad-container iframe,
+.vertical-ad-container .ad-content iframe,
+.vertical-ad-container ins iframe {
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  display: block !important;
 }
 
 /* ============================================================================
