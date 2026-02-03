@@ -1117,6 +1117,51 @@ footer {
 }
 
 /* ============================================================================
+   VERTICAL SIDE AD - Right side of game window
+============================================================================ */
+
+.vertical-ad-container {
+  display: none;
+  position: fixed;
+  top: calc(clamp(48px, 6vw, 64px) + var(--spacing-md) + 0.5rem);
+  right: var(--spacing-md);
+  width: 160px;
+  max-height: calc(100vh - clamp(48px, 6vw, 64px) - var(--spacing-md) * 2 - 1rem);
+  z-index: 50;
+  overflow: hidden;
+}
+
+.vertical-ad-container .ad-content {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+/* Only show vertical ad on screens wide enough to have space beside the game */
+@media (min-width: 1400px) {
+  .vertical-ad-container {
+    display: block;
+  }
+}
+
+/* Adjust for very wide screens - position relative to game area */
+@media (min-width: 1800px) {
+  .vertical-ad-container {
+    right: calc(50% - 750px - 160px - var(--spacing-lg) - var(--spacing-md));
+  }
+}
+
+/* Hide during fullscreen */
+.game-frame-wrapper:fullscreen ~ .vertical-ad-container,
+.game-frame-wrapper:-webkit-full-screen ~ .vertical-ad-container,
+.game-frame-wrapper:-moz-full-screen ~ .vertical-ad-container {
+  display: none !important;
+}
+
+/* ============================================================================
    ACCESSIBILITY
 ============================================================================ */
 
