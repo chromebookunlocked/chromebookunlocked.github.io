@@ -51,7 +51,7 @@ const GAMES_FOR_RECOMMENDATIONS = getGamesNeededForGrid(); // Should be 40
  * @returns {string} HTML string for ad tile card
  */
 function generateAdTile(adIndex) {
-  return `<div class="ad-tile" data-ad-index="${adIndex}">
+  return `<div class="card ad-tile" data-ad-index="${adIndex}">
     <div class="ad-content">
       <ins class="adsbygoogle"
         style="display:block"
@@ -59,7 +59,6 @@ function generateAdTile(adIndex) {
         data-ad-slot="7257160873"
         data-ad-format="auto"
         data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
   </div>`;
 }
@@ -719,6 +718,19 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         }
       }
     });
+  </script>
+
+  <!-- Initialize AdSense Ads -->
+  <script>
+    (function() {
+      // Initialize all existing ad tiles
+      var ads = document.querySelectorAll('.ad-tile ins.adsbygoogle');
+      for (var i = 0; i < ads.length; i++) {
+        try {
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {}
+      }
+    })();
   </script>
 
   <!-- Cookie Consent Banner -->

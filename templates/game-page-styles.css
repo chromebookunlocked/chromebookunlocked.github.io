@@ -678,6 +678,25 @@ iframe.active {
   contain: layout style;
 }
 
+/* Base card class for grid items */
+.card {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(135deg, var(--card-bg), #5a0077);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: 2px solid rgba(255, 102, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  /* CLS prevention */
+  contain: layout paint;
+}
+
 .game-card {
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -775,49 +794,36 @@ iframe.active {
    AD TILE CARDS
 ============================================================================ */
 
-.ad-tile {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  /* Prevent AdSense from collapsing the container with height: auto !important */
-  min-height: 150px;
+.card.ad-tile {
   background: linear-gradient(135deg, rgba(26, 0, 51, 0.9), rgba(45, 0, 82, 0.9));
   border: 2px solid rgba(255, 102, 255, 0.25);
-  border-radius: var(--radius-md);
   display: flex;
   justify-content: center;
   align-items: center;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   padding: 0;
-  position: relative;
-  /* CLS prevention */
-  contain: layout paint;
 }
 
-.ad-tile:hover {
+.card.ad-tile:hover {
+  transform: none;
   border-color: rgba(255, 102, 255, 0.35);
   box-shadow: 0 4px 20px rgba(255, 102, 255, 0.3);
 }
 
-.ad-tile .ad-content {
+.card.ad-tile .ad-content {
   width: 100%;
   height: 100%;
-  min-height: 150px;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 }
 
-.ad-tile .ad-content ins {
+.card.ad-tile .ad-content ins {
   display: block !important;
   width: 100% !important;
   height: 100% !important;
-  min-height: 150px !important;
 }
 
 /* ============================================================================
