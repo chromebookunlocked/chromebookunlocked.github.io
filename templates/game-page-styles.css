@@ -165,11 +165,13 @@ h1 {
 .game-container {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
   padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) var(--spacing-lg) var(--spacing-xs);
   position: relative;
   z-index: 1;
+  gap: var(--spacing-md);
 }
 
 /* Back Button - Fixed to left edge of screen */
@@ -1127,50 +1129,34 @@ footer {
 }
 
 /* ============================================================================
-   VERTICAL SIDE ADS - Fixed to both sides of game window
+   VERTICAL SIDE ADS - Positioned beside game window, scrolls with content
 ============================================================================ */
 
 .vertical-ad-container {
   display: none;
-  position: fixed;
-  /* Vertically centered */
-  top: 50%;
-  transform: translateY(-50%);
-  /* Flexible width that fits available space */
-  max-width: 160px;
-  max-height: calc(100vh - clamp(48px, 6vw, 64px) * 2 - var(--spacing-md) * 4);
-  z-index: 50;
-  padding: var(--spacing-xs);
+  width: 160px;
+  max-height: 600px;
+  flex-shrink: 0;
+  align-self: center;
 }
 
-/* Right side ad - anchored to right edge, extends to game window */
-.vertical-ad-container.right-ad {
-  right: var(--spacing-sm);
-  /* Width stretches from right edge to game window */
-  left: calc(50% + min(42.5vw, calc(39vh * 16 / 9)) + var(--spacing-sm));
-}
-
-/* Left side ad - anchored to left edge, extends to game window */
+/* Order the elements: left-ad, game, right-ad */
 .vertical-ad-container.left-ad {
-  left: var(--spacing-sm);
-  /* Width stretches from left edge to game window */
-  right: calc(50% + min(42.5vw, calc(39vh * 16 / 9)) + var(--spacing-sm));
+  order: -1;
 }
 
-/* Show vertical ads when there's at least 80px space on sides */
-@media (min-width: 1100px) {
+.vertical-ad-container.right-ad {
+  order: 1;
+}
+
+.game-frame-wrapper {
+  order: 0;
+}
+
+/* Show vertical ads when there's enough space beside the game */
+@media (min-width: 1200px) {
   .vertical-ad-container {
     display: block;
-  }
-}
-
-/* Cap position when game reaches max-width (1500px) */
-@media (min-width: 1800px) {
-  .vertical-ad-container.right-ad {
-    left: calc(50% + 750px + var(--spacing-sm));
-  }
-  .vertical-ad-container.left-ad {
-    right: calc(50% + 750px + var(--spacing-sm));
   }
 }
 
