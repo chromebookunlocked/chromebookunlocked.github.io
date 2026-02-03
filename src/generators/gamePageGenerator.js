@@ -3,6 +3,7 @@ const { generateGameMetaTags, generateGameStructuredData, generateGameSEOTitle, 
 const { generateAnalyticsScript } = require("../utils/analyticsEnhanced");
 const { escapeHtml, escapeHtmlAttr } = require("../utils/htmlEscape");
 const { RECOMMENDED_GAMES_COUNT, MAX_RELATED_GAMES, GAME_DURATION_TRACKING_INTERVAL } = require("../utils/constants");
+const { generateAdTile } = require("./cardGenerator");
 
 // Ad tile configuration (same as index page)
 const AD_FIRST_POSITION = 13; // 0-indexed (position 14 in 1-indexed)
@@ -44,25 +45,6 @@ function getGamesNeededForGrid() {
 }
 
 const GAMES_FOR_RECOMMENDATIONS = getGamesNeededForGrid(); // Should be 40
-
-/**
- * Generate HTML for an ad tile card (for game page recommendations)
- * @param {number} adIndex - Unique index for this ad tile
- * @returns {string} HTML string for ad tile card
- */
-function generateAdTile(adIndex) {
-  return `<div class="card ad-tile" data-ad-index="${adIndex}">
-    <div class="ad-content">
-      <ins class="adsbygoogle"
-        style="display:block"
-        data-ad-client="ca-pub-1033412505744705"
-        data-ad-slot="1961978889"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </div>
-  </div>`;
-}
 
 // Helper to escape JavaScript string for use in HTML script tags
 function escapeJs(str) {
@@ -147,7 +129,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     recommendations.push(...moreRelated);
   }
 
-  // Generate recommended games HTML with ad tiles
+  // Generate recommended games HTML with ad tiles (same structure as main page)
   let adCount = 0;
   let recommendedGamesHTML = '';
   recommendations.forEach((g, idx) => {
@@ -157,14 +139,14 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     const escapedThumbPath = escapeHtmlAttr(gThumbPath);
     const escapedName = escapeHtmlAttr(g.name);
     const escapedNameText = escapeHtml(g.name);
-    // SEO-optimized alt text with keywords
-    const altText = `Play ${escapedNameText} Unblocked - Free Online Game`;
-    recommendedGamesHTML += `<a href="/${escapedFolder}.html" class="game-card" title="Play ${escapedNameText} Unblocked Free Online">
+    const escapedNameLower = escapeHtml(g.name.toLowerCase());
+    // Use same card structure as main page for consistent sizing
+    recommendedGamesHTML += `<div class="card game-card" data-index="${idx}" data-folder="${escapedFolder}" data-name="${escapedNameLower}" onclick="window.location.href='/${escapedFolder}.html'">
       <div class="thumb-container" style="--thumb-url: url('${escapedThumbPath}')">
-        <img class="thumb" src="${escapedThumbPath}" alt="${altText}" loading="lazy" width="300" height="300">
+        <img class="thumb" src="${escapedThumbPath}" alt="${escapedName}" loading="lazy" decoding="async" width="300" height="300">
       </div>
       <div class="card-title">${escapedNameText}</div>
-    </a>`;
+    </div>`;
 
     // Check if we should insert an ad tile after this game
     if (shouldInsertAdAfter(idx)) {

@@ -759,7 +759,8 @@ iframe.active {
   background: rgba(77, 0, 102, 0.5);
 }
 
-.game-card:hover .thumb {
+.game-card:hover .thumb,
+.card:hover .thumb {
   transform: scale(1.08);
 }
 
@@ -1117,7 +1118,7 @@ footer {
 }
 
 /* ============================================================================
-   VERTICAL SIDE AD - Fixed to the right of game window
+   VERTICAL SIDE AD - Fixed to the right of game window (scalable)
 ============================================================================ */
 
 .vertical-ad-container {
@@ -1129,7 +1130,9 @@ footer {
   /* Game width is min(85vw, calc(78vh * 16 / 9)) with max-width 1500px */
   /* Left edge = 50% + half of game width + small gap */
   left: calc(50% + min(42.5vw, calc(39vh * 16 / 9)) + var(--spacing-md));
-  width: 160px;
+  /* Scalable width based on available space - min 120px, scales with viewport, max 200px */
+  width: clamp(120px, 10vw, 200px);
+  /* Height scales with viewport */
   max-height: calc(100vh - clamp(48px, 6vw, 64px) - var(--spacing-md) * 2 - 1rem);
   z-index: 50;
 }
@@ -1141,10 +1144,25 @@ footer {
   }
 }
 
+/* Larger ad on wider screens */
+@media (min-width: 1600px) {
+  .vertical-ad-container {
+    width: clamp(160px, 12vw, 250px);
+  }
+}
+
 /* Cap position when game reaches max-width (1500px) */
 @media (min-width: 1800px) {
   .vertical-ad-container {
     left: calc(50% + 750px + var(--spacing-md));
+    width: clamp(180px, 14vw, 300px);
+  }
+}
+
+/* Extra large screens */
+@media (min-width: 2000px) {
+  .vertical-ad-container {
+    width: clamp(200px, 15vw, 336px);
   }
 }
 
