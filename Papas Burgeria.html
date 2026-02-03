@@ -909,6 +909,25 @@ iframe.active {
   contain: layout style;
 }
 
+/* Base card class for grid items */
+.card {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(135deg, var(--card-bg), #5a0077);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: 2px solid rgba(255, 102, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  /* CLS prevention */
+  contain: layout paint;
+}
+
 .game-card {
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -1006,49 +1025,36 @@ iframe.active {
    AD TILE CARDS
 ============================================================================ */
 
-.ad-tile {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  /* Prevent AdSense from collapsing the container with height: auto !important */
-  min-height: 150px;
+.card.ad-tile {
   background: linear-gradient(135deg, rgba(26, 0, 51, 0.9), rgba(45, 0, 82, 0.9));
   border: 2px solid rgba(255, 102, 255, 0.25);
-  border-radius: var(--radius-md);
   display: flex;
   justify-content: center;
   align-items: center;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   padding: 0;
-  position: relative;
-  /* CLS prevention */
-  contain: layout paint;
 }
 
-.ad-tile:hover {
+.card.ad-tile:hover {
+  transform: none;
   border-color: rgba(255, 102, 255, 0.35);
   box-shadow: 0 4px 20px rgba(255, 102, 255, 0.3);
 }
 
-.ad-tile .ad-content {
+.card.ad-tile .ad-content {
   width: 100%;
   height: 100%;
-  min-height: 150px;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 }
 
-.ad-tile .ad-content ins {
+.card.ad-tile .ad-content ins {
   display: block !important;
   width: 100% !important;
   height: 100% !important;
-  min-height: 150px !important;
 }
 
 /* ============================================================================
@@ -1495,8 +1501,8 @@ footer {
     <div class="section-divider"></div>
     <div class="grid">
       <a href="/Bad Ice Cream 2.html" class="game-card" title="Play Bad Ice Cream 2 Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Bad Ice Cream 2/thumbnail.png')">
-        <img class="thumb" src="games/Bad Ice Cream 2/thumbnail.png" alt="Play Bad Ice Cream 2 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+      <div class="thumb-container" style="--thumb-url: url('games/Bad Ice Cream 2/thumbnail.webp')">
+        <img class="thumb" src="games/Bad Ice Cream 2/thumbnail.webp" alt="Play Bad Ice Cream 2 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Bad Ice Cream 2</div>
     </a><a href="/Basketball Super Stars.html" class="game-card" title="Play Basketball Super Stars Unblocked Free Online">
@@ -1505,20 +1511,20 @@ footer {
       </div>
       <div class="card-title">Basketball Super Stars</div>
     </a><a href="/Exit Path.html" class="game-card" title="Play Exit Path Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Exit Path/thumbnail.png')">
-        <img class="thumb" src="games/Exit Path/thumbnail.png" alt="Play Exit Path Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+      <div class="thumb-container" style="--thumb-url: url('games/Exit Path/thumbnail.webp')">
+        <img class="thumb" src="games/Exit Path/thumbnail.webp" alt="Play Exit Path Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Exit Path</div>
-    </a><a href="/Obby Bike.html" class="game-card" title="Play Obby Bike Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Obby Bike/thumbnail.webp')">
-        <img class="thumb" src="games/Obby Bike/thumbnail.webp" alt="Play Obby Bike Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Growmi.html" class="game-card" title="Play Growmi Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Growmi/thumbnail.webp')">
+        <img class="thumb" src="games/Growmi/thumbnail.webp" alt="Play Growmi Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Obby Bike</div>
-    </a><a href="/Orange Roulette.html" class="game-card" title="Play Orange Roulette Unblocked Free Online">
-      <div class="thumb-container" style="--thumb-url: url('games/Orange Roulette/thumbnail.webp')">
-        <img class="thumb" src="games/Orange Roulette/thumbnail.webp" alt="Play Orange Roulette Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+      <div class="card-title">Growmi</div>
+    </a><a href="/Meme Soundboard.html" class="game-card" title="Play Meme Soundboard Unblocked Free Online">
+      <div class="thumb-container" style="--thumb-url: url('games/Meme Soundboard/thumbnail.webp')">
+        <img class="thumb" src="games/Meme Soundboard/thumbnail.webp" alt="Play Meme Soundboard Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Orange Roulette</div>
+      <div class="card-title">Meme Soundboard</div>
     </a><a href="/10 Minutes Till Dawn.html" class="game-card" title="Play 10 Minutes Till Dawn Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('games/10 Minutes Till Dawn/thumbnail.webp')">
         <img class="thumb" src="games/10 Minutes Till Dawn/thumbnail.webp" alt="Play 10 Minutes Till Dawn Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -1559,7 +1565,7 @@ footer {
         <img class="thumb" src="games/4th and Goal/thumbnail.webp" alt="Play 4th and Goal Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">4th and Goal</div>
-    </a><div class="ad-tile" data-ad-index="0">
+    </a><div class="card ad-tile" data-ad-index="0">
     <div class="ad-content">
       <ins class="adsbygoogle"
         style="display:block"
@@ -1567,7 +1573,6 @@ footer {
         data-ad-slot="7257160873"
         data-ad-format="auto"
         data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
   </div><a href="/A Dance of Fire and Ice.html" class="game-card" title="Play A Dance of Fire and Ice Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('games/A Dance of Fire and Ice/thumbnail.webp')">
@@ -1669,7 +1674,7 @@ footer {
         <img class="thumb" src="games/Blockcraft Parkour/thumbnail.webp" alt="Play Blockcraft Parkour Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Blockcraft Parkour</div>
-    </a><div class="ad-tile" data-ad-index="1">
+    </a><div class="card ad-tile" data-ad-index="1">
     <div class="ad-content">
       <ins class="adsbygoogle"
         style="display:block"
@@ -1677,7 +1682,6 @@ footer {
         data-ad-slot="7257160873"
         data-ad-format="auto"
         data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
   </div><a href="/Bloodmoney.html" class="game-card" title="Play Bloodmoney Unblocked Free Online">
       <div class="thumb-container" style="--thumb-url: url('games/Bloodmoney/thumbnail.webp')">
@@ -2250,6 +2254,19 @@ footer {
         }
       }
     });
+  </script>
+
+  <!-- Initialize AdSense Ads -->
+  <script>
+    (function() {
+      // Initialize all existing ad tiles
+      var ads = document.querySelectorAll('.ad-tile ins.adsbygoogle');
+      for (var i = 0; i < ads.length; i++) {
+        try {
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {}
+      }
+    })();
   </script>
 
   <!-- Cookie Consent Banner -->
