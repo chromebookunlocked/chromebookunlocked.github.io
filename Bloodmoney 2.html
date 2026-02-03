@@ -1057,6 +1057,16 @@ h1 {
   height: 100% !important;
 }
 
+/* Ensure ad iframes are always visible */
+.card.ad-tile iframe,
+.card.ad-tile .ad-content iframe,
+.card.ad-tile ins iframe {
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  display: block !important;
+}
+
 /* ============================================================================
    FOOTER
 ============================================================================ */
@@ -1348,25 +1358,38 @@ footer {
 }
 
 /* ============================================================================
-   VERTICAL SIDE AD - Fixed to the right of game window
+   VERTICAL SIDE ADS - Fixed to both sides of game window
 ============================================================================ */
 
 .vertical-ad-container {
   display: none;
   position: fixed;
-  /* Position at same level as game window */
-  top: calc(clamp(48px, 6vw, 64px) + var(--spacing-md) + 0.5rem);
-  /* Position to the right of the centered game window */
-  /* Game width is min(85vw, calc(78vh * 16 / 9)) with max-width 1500px */
-  /* Left edge = 50% + half of game width + small gap */
-  left: calc(50% + min(42.5vw, calc(39vh * 16 / 9)) + var(--spacing-md));
-  width: 160px;
-  max-height: calc(100vh - clamp(48px, 6vw, 64px) - var(--spacing-md) * 2 - 1rem);
+  /* Vertically centered */
+  top: 50%;
+  transform: translateY(-50%);
+  /* Flexible width that fits available space */
+  max-width: 160px;
+  max-height: calc(100vh - clamp(48px, 6vw, 64px) * 2 - var(--spacing-md) * 4);
   z-index: 50;
+  padding: var(--spacing-xs);
 }
 
-/* Only show vertical ad on screens wide enough to have space beside the game */
-@media (min-width: 1400px) {
+/* Right side ad - anchored to right edge, extends to game window */
+.vertical-ad-container.right-ad {
+  right: var(--spacing-sm);
+  /* Width stretches from right edge to game window */
+  left: calc(50% + min(42.5vw, calc(39vh * 16 / 9)) + var(--spacing-sm));
+}
+
+/* Left side ad - anchored to left edge, extends to game window */
+.vertical-ad-container.left-ad {
+  left: var(--spacing-sm);
+  /* Width stretches from left edge to game window */
+  right: calc(50% + min(42.5vw, calc(39vh * 16 / 9)) + var(--spacing-sm));
+}
+
+/* Show vertical ads when there's at least 80px space on sides */
+@media (min-width: 1100px) {
   .vertical-ad-container {
     display: block;
   }
@@ -1374,8 +1397,11 @@ footer {
 
 /* Cap position when game reaches max-width (1500px) */
 @media (min-width: 1800px) {
-  .vertical-ad-container {
-    left: calc(50% + 750px + var(--spacing-md));
+  .vertical-ad-container.right-ad {
+    left: calc(50% + 750px + var(--spacing-sm));
+  }
+  .vertical-ad-container.left-ad {
+    right: calc(50% + 750px + var(--spacing-sm));
   }
 }
 
@@ -1393,6 +1419,16 @@ footer {
   display: block !important;
   width: 100% !important;
   height: 100% !important;
+}
+
+/* Ensure vertical ad iframes are always visible */
+.vertical-ad-container iframe,
+.vertical-ad-container .ad-content iframe,
+.vertical-ad-container ins iframe {
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  display: block !important;
 }
 
 /* ============================================================================
@@ -1537,8 +1573,21 @@ footer {
     </div>
   </main>
 
+  <!-- Vertical Display Ad (Left Side) -->
+  <div class="vertical-ad-container left-ad">
+    <div class="ad-content">
+      <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-1033412505744705"
+        data-ad-slot="9122283604"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+  </div>
+
   <!-- Vertical Display Ad (Right Side) -->
-  <div class="vertical-ad-container">
+  <div class="vertical-ad-container right-ad">
     <div class="ad-content">
       <ins class="adsbygoogle"
         style="display:block"
