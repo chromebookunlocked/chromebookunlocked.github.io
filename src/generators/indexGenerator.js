@@ -105,8 +105,10 @@ function shuffleArray(array, seed) {
  */
 function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.') {
   // Generate sidebar categories - sorted by game count (largest first)
+  // Filter out categories with less than 2 games, and exclude special categories
   const sidebarCategories = Object.keys(categories)
     .filter(cat => cat !== "Recently Played" && cat !== "Trending Games" && cat !== "Newly Added")
+    .filter(cat => categories[cat].length >= 2)
     .sort((a, b) => categories[b].length - categories[a].length)
     .map(cat => {
       const escapedCat = escapeHtmlAttr(cat);
@@ -114,6 +116,10 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       return `<li role="menuitem" tabindex="0" onclick="filterCategory('${escapedCat}')" onkeypress="if(event.key==='Enter')filterCategory('${escapedCat}')"><span class="icon">${getCategoryIcon(cat)}</span><span class="text">${escapedCatText}</span></li>`;
     })
     .join("");
+
+  // Fixed sidebar items for Recently Played and Newly Added
+  const recentlyPlayedItem = `<li role="menuitem" tabindex="0" id="recentlyPlayedNav" onclick="filterCategory('Recently Played')" onkeypress="if(event.key==='Enter')filterCategory('Recently Played')" style="display:none"><span class="icon">🕐</span><span class="text">Recently Played</span></li>`;
+  const newlyAddedItem = `<li role="menuitem" tabindex="0" onclick="filterCategory('Newly Added')" onkeypress="if(event.key==='Enter')filterCategory('Newly Added')"><span class="icon">✨</span><span class="text">Newly Added</span></li>`;
 
   // Use current date as seed for daily randomization
   const today = new Date();
@@ -136,9 +142,17 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       f: game.folder,                  // folder
       t: thumbInfo.path,               // thumbnail path
       a: game.otherNames || [],        // aliases for search
-      c: game.categories || []         // categories for filtering
+      c: game.categories || [],        // categories for filtering
+      d: game.createdAt || null        // createdAt date for Newly Added
     };
   });
+
+  // Calculate Newly Added games (top 30 by createdAt date, most recent first)
+  const newlyAddedFolders = [...games]
+    .filter(g => g.createdAt)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 30)
+    .map(g => g.folder);
 
   // Generate initial game cards HTML with ad tiles
   let adCount = 0;
@@ -216,6 +230,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <nav id="sidebar" role="navigation" aria-label="Game categories">
     <ul id="categoryList" role="menu">
       <li role="menuitem" tabindex="0" onclick="window.location.href='/'" onkeypress="if(event.key==='Enter')window.location.href='/'"><span class="icon">🏠</span><span class="text">Home</span></li>
+      ${recentlyPlayedItem}
+      ${newlyAddedItem}
       ${sidebarCategories}
     </ul>
   </nav>
@@ -312,6 +328,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     window.__adFirstPosition = ${AD_FIRST_POSITION};
     window.__adInterval = ${AD_INTERVAL};
     window.__adCount = ${adCount};
+    // Newly Added games (folders list)
+    window.__newlyAddedFolders = ${JSON.stringify(newlyAddedFolders)};
   </script>
 
   <!-- Initialize AdSense Ads -->
