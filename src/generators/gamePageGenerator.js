@@ -159,7 +159,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     const escapedNameText = escapeHtml(g.name);
     // SEO-optimized alt text with keywords
     const altText = `Play ${escapedNameText} Unblocked - Free Online Game`;
-    recommendedGamesHTML += `<a href="/${escapedFolder}.html" class="game-card" title="Play ${escapedNameText} Unblocked Free Online">
+    recommendedGamesHTML += `<a href="/${escapedFolder}.html" class="game-card" title="Play ${escapedNameText} Unblocked Free Online" onclick="trackRecentGame('${escapedFolder}')">
       <div class="thumb-container" style="--thumb-url: url('${escapedThumbPath}')">
         <img class="thumb" src="${escapedThumbPath}" alt="${altText}" loading="lazy" width="300" height="300">
       </div>
@@ -412,6 +412,23 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     let gamePlayDuration = 0;
     let gameDurationInterval = null;
 
+    // Track a game as recently played when clicking on recommendation
+    function trackRecentGame(folder) {
+      const MAX_RECENT_GAMES = 15;
+      let recentlyPlayed = [];
+      try {
+        recentlyPlayed = JSON.parse(localStorage.getItem('recentlyPlayed') || '[]');
+      } catch(e) {
+        recentlyPlayed = [];
+      }
+      recentlyPlayed = recentlyPlayed.filter(f => f !== folder);
+      recentlyPlayed.unshift(folder);
+      if (recentlyPlayed.length > MAX_RECENT_GAMES) {
+        recentlyPlayed = recentlyPlayed.slice(0, MAX_RECENT_GAMES);
+      }
+      localStorage.setItem('recentlyPlayed', JSON.stringify(recentlyPlayed));
+    }
+
     // Track initial game page view
     if (typeof trackEnhancedPageView !== 'undefined') {
       trackEnhancedPageView('game_page', '${escapeJs(game.name)}', {
@@ -477,12 +494,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     }
 
     function saveToRecentlyPlayed() {
-      const gameData = {
-        folder: '${escapeJs(game.folder)}',
-        name: '${escapeJs(game.name)}',
-        thumb: '${escapeJs(thumbPath)}',
-        lastPlayed: Date.now()
-      };
+      const folder = '${escapeJs(game.folder)}';
+      const MAX_RECENT_GAMES = 15;
 
       let recentlyPlayed = [];
       try {
@@ -491,15 +504,15 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         recentlyPlayed = [];
       }
 
-      // Remove existing entry if present
-      recentlyPlayed = recentlyPlayed.filter(g => g.folder !== gameData.folder);
+      // Remove existing entry if present (will re-add at front)
+      recentlyPlayed = recentlyPlayed.filter(f => f !== folder);
 
       // Add to beginning
-      recentlyPlayed.unshift(gameData);
+      recentlyPlayed.unshift(folder);
 
-      // Keep max 25
-      if (recentlyPlayed.length > 25) {
-        recentlyPlayed = recentlyPlayed.slice(0, 25);
+      // Keep max 15
+      if (recentlyPlayed.length > MAX_RECENT_GAMES) {
+        recentlyPlayed = recentlyPlayed.slice(0, MAX_RECENT_GAMES);
       }
 
       localStorage.setItem('recentlyPlayed', JSON.stringify(recentlyPlayed));

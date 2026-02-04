@@ -4,6 +4,55 @@ let isLoading = false;
 let allGamesLoaded = false;
 let currentCategory = null; // null = home (all games), or category name
 
+// Recently Played Configuration
+const MAX_RECENT_GAMES = 15;
+const RECENTLY_PLAYED_KEY = 'recentlyPlayed';
+
+/**
+ * Get recently played games from localStorage
+ * @returns {Array} Array of folder names
+ */
+function getRecentlyPlayed() {
+  try {
+    const stored = localStorage.getItem(RECENTLY_PLAYED_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+/**
+ * Add a game to recently played list
+ * @param {string} folder - Game folder name
+ */
+function addToRecentlyPlayed(folder) {
+  try {
+    let recent = getRecentlyPlayed();
+    // Remove if already exists (will re-add at front)
+    recent = recent.filter(f => f !== folder);
+    // Add to front
+    recent.unshift(folder);
+    // Keep only last MAX_RECENT_GAMES
+    recent = recent.slice(0, MAX_RECENT_GAMES);
+    localStorage.setItem(RECENTLY_PLAYED_KEY, JSON.stringify(recent));
+    // Show the nav item if we now have recent games
+    updateRecentlyPlayedNav();
+  } catch (e) {
+    // localStorage might be full or disabled
+  }
+}
+
+/**
+ * Update the Recently Played nav item visibility
+ */
+function updateRecentlyPlayedNav() {
+  const navItem = document.getElementById('recentlyPlayedNav');
+  if (navItem) {
+    const recent = getRecentlyPlayed();
+    navItem.style.display = recent.length > 0 ? '' : 'none';
+  }
+}
+
 // Ad tile configuration
 const AD_FIRST_POSITION = window.__adFirstPosition || 13;
 const AD_INTERVAL = window.__adInterval || 20;
@@ -109,6 +158,8 @@ function createGameCard(game, idx, eagerLoad = false) {
   }
 
   card.onclick = () => {
+    // Track as recently played before navigating
+    addToRecentlyPlayed(game.f);
     window.location.href = '/' + game.f + '.html';
   };
 
@@ -139,6 +190,30 @@ function getFilteredGames() {
 
   if (!currentCategory) {
     return allGames; // Home - show all games
+  }
+
+  // Special category: Recently Played
+  if (currentCategory === 'Recently Played') {
+    const recentFolders = getRecentlyPlayed();
+    // Return games in the order they were played (most recent first)
+    const recentGames = [];
+    for (const folder of recentFolders) {
+      const game = allGames.find(g => g.f === folder);
+      if (game) recentGames.push(game);
+    }
+    return recentGames;
+  }
+
+  // Special category: Newly Added
+  if (currentCategory === 'Newly Added') {
+    const newlyAddedFolders = window.__newlyAddedFolders || [];
+    // Return games in the order from server (most recent first)
+    const newlyAddedGames = [];
+    for (const folder of newlyAddedFolders) {
+      const game = allGames.find(g => g.f === folder);
+      if (game) newlyAddedGames.push(game);
+    }
+    return newlyAddedGames;
   }
 
   return allGames.filter(game => {
@@ -392,7 +467,7 @@ function searchGames(query) {
       const escapedThumb = escapeHtmlAttr(game.thumb);
       const escapedName = escapeHtmlAttr(game.name);
       const escapedNameText = escapeHtml(game.name);
-      return `<div class="search-result-item" onclick="window.location.href='/${escapedFolder}.html'">
+      return `<div class="search-result-item" onclick="addToRecentlyPlayed('${escapedFolder}'); window.location.href='/${escapedFolder}.html'">
         <img class="search-result-thumb" src="${escapedThumb}" alt="${escapedName}" loading="lazy" decoding="async" width="60" height="60" onerror="this.src='assets/logo.webp'">
         <div class="search-result-name">${escapedNameText}</div>
       </div>`;
@@ -476,6 +551,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Setup observers
   setupImageObserver();
   setupScrollObserver();
+
+  // Initialize Recently Played nav visibility
+  updateRecentlyPlayedNav();
 
   // Add error handlers to existing thumbnails
   document.querySelectorAll('img.thumb').forEach(img => {
