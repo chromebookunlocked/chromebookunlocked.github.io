@@ -5,6 +5,56 @@
 		<meta http-equiv="X-Frame-Options" content="DENY" />
 		<title>Plants vs. Zombies - MODDED Official</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<style>
+			/* Responsive scaling for iframe embedding */
+			html, body {
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+			}
+			body {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				background: #000;
+			}
+			/* Scale game content to fit viewport */
+			#dBody, .WindowFrame, #dAll, #dSurface {
+				transform-origin: center center;
+			}
+			@media screen {
+				body {
+					/* Scale based on viewport size - game is approximately 900x600 */
+					--scale-x: calc(100vw / 900);
+					--scale-y: calc(100vh / 600);
+				}
+			}
+		</style>
+		<script>
+			// Dynamic scaling to fit iframe
+			function scaleGame() {
+				const gameWidth = 900;
+				const gameHeight = 600;
+				const viewportWidth = window.innerWidth;
+				const viewportHeight = window.innerHeight;
+
+				const scaleX = viewportWidth / gameWidth;
+				const scaleY = viewportHeight / gameHeight;
+				const scale = Math.min(scaleX, scaleY);
+
+				document.body.style.transform = `scale(${scale})`;
+				document.body.style.transformOrigin = 'center center';
+				document.body.style.width = `${gameWidth}px`;
+				document.body.style.height = `${gameHeight}px`;
+				document.body.style.position = 'absolute';
+				document.body.style.left = `${(viewportWidth - gameWidth * scale) / 2}px`;
+				document.body.style.top = `${(viewportHeight - gameHeight * scale) / 2}px`;
+			}
+			window.addEventListener('load', scaleGame);
+			window.addEventListener('resize', scaleGame);
+		</script>
 		<script>
 			// Scale document to 0.9 if running in an extension (localStorage is unavailable)
 			try {
