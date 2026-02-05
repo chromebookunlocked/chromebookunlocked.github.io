@@ -43,6 +43,73 @@
 		<meta name="twitter:description" content="Play Plants vs. Zombie Modded here for Free - Mod by ROBlNET13 on Github." />
 		<meta name="twitter:image" content="https://pvzm.net/game/images/gamethumbnail5.png" />
 		<link rel="stylesheet" href="UI.css" />
+		<style>
+			/* Responsive scaling for iframe embedding */
+			html, body {
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				padding: 0;
+				overflow: hidden;
+				background: #000;
+			}
+			body {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+			/* Scale the game container to fit viewport */
+			.WindowFrame, #dAll, #dSurface, #dHandBook, #dHandBookPZ {
+				transform-origin: center center;
+			}
+			/* JavaScript will handle dynamic scaling */
+		</style>
+		<script>
+			// Dynamic scaling to fit viewport
+			function scaleGame() {
+				const gameWidth = 900;
+				const gameHeight = 600;
+				const windowWidth = window.innerWidth;
+				const windowHeight = window.innerHeight;
+
+				const scaleX = windowWidth / gameWidth;
+				const scaleY = windowHeight / gameHeight;
+				const scale = Math.min(scaleX, scaleY);
+
+				// Apply scale to all WindowFrame elements
+				const elements = document.querySelectorAll('.WindowFrame');
+				elements.forEach(el => {
+					el.style.transform = 'scale(' + scale + ')';
+					el.style.transformOrigin = 'center center';
+				});
+
+				// Also scale the main game area
+				const dAll = document.getElementById('dAll');
+				if (dAll) {
+					dAll.style.transform = 'scale(' + scale + ')';
+					dAll.style.transformOrigin = 'center center';
+					dAll.style.position = 'absolute';
+					dAll.style.left = '50%';
+					dAll.style.top = '50%';
+					dAll.style.marginLeft = -(gameWidth / 2) + 'px';
+					dAll.style.marginTop = -(gameHeight / 2) + 'px';
+				}
+
+				const dSurface = document.getElementById('dSurface');
+				if (dSurface) {
+					dSurface.style.transform = 'scale(' + scale + ')';
+					dSurface.style.transformOrigin = 'center center';
+					dSurface.style.position = 'absolute';
+					dSurface.style.left = '50%';
+					dSurface.style.top = '50%';
+					dSurface.style.marginLeft = -(gameWidth / 2) + 'px';
+					dSurface.style.marginTop = -(gameHeight / 2) + 'px';
+				}
+			}
+
+			window.addEventListener('load', scaleGame);
+			window.addEventListener('resize', scaleGame);
+		</script>
 		<!-- REMOVE THIS SCRIPT AFTER REFACTOR IS DONE -->
 		<script>
 			function replaceSingleFontTag(fontElement) {
