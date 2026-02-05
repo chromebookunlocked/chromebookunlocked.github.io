@@ -406,43 +406,6 @@ h1 {
   max-width: 100vw;
 }
 
-/* Back Button - Fixed to left edge of screen */
-.back-button {
-  position: fixed;
-  left: var(--spacing-md);
-  top: calc(clamp(48px, 6vw, 64px) + var(--spacing-md) + 0.5rem);
-  width: var(--btn-icon-size);
-  height: var(--btn-icon-size);
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  z-index: 100;
-}
-
-.back-button:hover {
-  transform: translateY(-2px) scale(1.05);
-  background: rgba(255, 102, 255, 0.15);
-  border-color: var(--primary-color);
-  box-shadow: 0 4px 15px rgba(255, 102, 255, 0.25);
-}
-
-.back-button:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.back-button svg {
-  width: var(--btn-icon-svg);
-  height: var(--btn-icon-svg);
-}
-
 /* fadeIn animation removed for performance - content appears immediately */
 
 .game-frame-wrapper {
@@ -1267,10 +1230,6 @@ footer {
     padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) var(--spacing-md) var(--spacing-xs);
   }
 
-  .back-button {
-    left: var(--spacing-md);
-  }
-
   .game-frame-wrapper {
     /* Maintain 16:9 aspect ratio on tablets */
     width: min(92vw, calc(74vh * 16 / 9));
@@ -1447,7 +1406,6 @@ footer {
 
 /* Focus visible for keyboard navigation */
 .icon-btn:focus-visible,
-.back-button:focus-visible,
 .play-btn:focus-visible,
 .show-more-btn:focus-visible,
 .category-tag:focus-visible,
@@ -1505,6 +1463,81 @@ footer {
   color: var(--primary-color);
 }
 
+
+/* ============================================================================
+   SCROLL MORE GAMES INDICATOR
+============================================================================ */
+
+.scroll-more-indicator {
+  display: none;
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: rgba(13, 0, 26, 0.9);
+  border: 1px solid rgba(255, 102, 255, 0.3);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scroll-more-indicator.visible {
+  display: flex;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.scroll-more-indicator:hover {
+  background: rgba(255, 102, 255, 0.15);
+  border-color: var(--primary-color);
+  transform: translateX(-50%) translateY(-3px);
+}
+
+.scroll-more-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.scroll-arrow {
+  color: var(--primary-color);
+  animation: bounce-arrow 1.5s ease-in-out infinite;
+}
+
+@keyframes bounce-arrow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+/* Only show on desktop when there's space between game and recommendations */
+@media (min-width: 1200px) {
+  .scroll-more-indicator {
+    display: none;
+  }
+  .scroll-more-indicator.visible {
+    display: flex;
+  }
+}
+
+@media (max-width: 1199px) {
+  .scroll-more-indicator {
+    display: none !important;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -1515,22 +1548,6 @@ footer {
       <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
     </div>
   </header>
-
-  <!-- Back Button (fixed to left edge of screen) -->
-  <button class="back-button" onclick="goBack()" title="Back to Unblocked Games" aria-label="Back to Free Unblocked Games">
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-  </button>
-
-  <script>
-    function goBack() {
-      // Check if there's a previous page in history from the same site
-      if (document.referrer && document.referrer.includes(window.location.host)) {
-        history.back();
-      } else {
-        window.location.href = '/';
-      }
-    }
-  </script>
 
   <!-- Main Game Content -->
   <main itemscope itemtype="https://schema.org/VideoGame">
@@ -1590,6 +1607,16 @@ footer {
       </div>
     </div>
   </main>
+
+  <!-- Scroll More Games Indicator -->
+  <div class="scroll-more-indicator" id="scrollMoreIndicator" onclick="scrollToMoreGames()">
+    <span class="scroll-more-text">
+      <span class="scroll-arrow">↓</span>
+      more games
+      <span class="scroll-arrow">↓</span>
+    </span>
+  </div>
+
 
   <!-- More Games Hint Box -->
   <div class="more-games-hint" id="moreGamesHint" onclick="scrollToMoreGames()" role="button" aria-label="Scroll to more games" tabindex="0">
@@ -2493,5 +2520,63 @@ footer {
   <!-- Cookie Consent Banner -->
   <link rel="stylesheet" href="assets/cookie-consent.css">
   <script src="assets/cookie-consent.js"></script>
+
+  <script>
+    // Scroll More Games Indicator Logic
+    (function() {
+      const indicator = document.getElementById('scrollMoreIndicator');
+      const gameWrapper = document.getElementById('gameWrapper');
+      const moreGamesSection = document.getElementById('moreGamesSection');
+
+      if (!indicator || !gameWrapper || !moreGamesSection) return;
+
+      function updateIndicatorVisibility() {
+        // Only show on desktop (1200px+)
+        if (window.innerWidth < 1200) {
+          indicator.classList.remove('visible');
+          return;
+        }
+
+        const gameRect = gameWrapper.getBoundingClientRect();
+        const sectionRect = moreGamesSection.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+
+        // Calculate the gap between game bottom and recommendations top
+        const gap = sectionRect.top - gameRect.bottom;
+
+        // Show indicator if there's significant gap (more than 150px) and game is visible
+        // Also hide if recommendations section is mostly visible
+        const gameVisible = gameRect.bottom > 0 && gameRect.top < viewportHeight;
+        const recsNearTop = sectionRect.top < viewportHeight * 0.7;
+
+        if (gap > 150 && gameVisible && !recsNearTop) {
+          indicator.classList.add('visible');
+          // Position it in the middle of the gap
+          const indicatorTop = gameRect.bottom + (gap / 2);
+          indicator.style.top = Math.min(indicatorTop, viewportHeight - 100) + 'px';
+        } else {
+          indicator.classList.remove('visible');
+        }
+      }
+
+      // Throttled scroll handler
+      let ticking = false;
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          requestAnimationFrame(function() {
+            updateIndicatorVisibility();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+
+      window.addEventListener('resize', updateIndicatorVisibility);
+
+      // Initial check
+      setTimeout(updateIndicatorVisibility, 100);
+    })();
+  </script>
+
 </body>
 </html>
