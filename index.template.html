@@ -126,6 +126,81 @@
     .hide-cursor {
       cursor: none;
     }
+
+/* ============================================================================
+   SCROLL MORE GAMES INDICATOR
+============================================================================ */
+
+.scroll-more-indicator {
+  display: none;
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: rgba(13, 0, 26, 0.9);
+  border: 1px solid rgba(255, 102, 255, 0.3);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scroll-more-indicator.visible {
+  display: flex;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.scroll-more-indicator:hover {
+  background: rgba(255, 102, 255, 0.15);
+  border-color: var(--primary-color);
+  transform: translateX(-50%) translateY(-3px);
+}
+
+.scroll-more-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.scroll-arrow {
+  color: var(--primary-color);
+  animation: bounce-arrow 1.5s ease-in-out infinite;
+}
+
+@keyframes bounce-arrow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+/* Only show on desktop when there's space between game and recommendations */
+@media (min-width: 1200px) {
+  .scroll-more-indicator {
+    display: none;
+  }
+  .scroll-more-indicator.visible {
+    display: flex;
+  }
+}
+
+@media (max-width: 1199px) {
+  .scroll-more-indicator {
+    display: none !important;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -148,6 +223,16 @@
 
     <div class="grid" id="grid"></div>
   </main>
+
+  <!-- Scroll More Games Indicator -->
+  <div class="scroll-more-indicator" id="scrollMoreIndicator" onclick="scrollToMoreGames()">
+    <span class="scroll-more-text">
+      <span class="scroll-arrow">↓</span>
+      more games
+      <span class="scroll-arrow">↓</span>
+    </span>
+  </div>
+
 
   <script>
     const games = __GAMES__;
@@ -243,5 +328,72 @@
 
     renderGames();
   </script>
+
+  <script>
+    function scrollToMoreGames() {
+      const section = document.getElementById('moreGamesSection');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  </script>
+
+  <script>
+    // Scroll More Games Indicator Logic
+    (function() {
+      const indicator = document.getElementById('scrollMoreIndicator');
+      const gameWrapper = document.getElementById('gameWrapper');
+      const moreGamesSection = document.getElementById('moreGamesSection');
+
+      if (!indicator || !gameWrapper || !moreGamesSection) return;
+
+      function updateIndicatorVisibility() {
+        // Only show on desktop (1200px+)
+        if (window.innerWidth < 1200) {
+          indicator.classList.remove('visible');
+          return;
+        }
+
+        const gameRect = gameWrapper.getBoundingClientRect();
+        const sectionRect = moreGamesSection.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+
+        // Calculate the gap between game bottom and recommendations top
+        const gap = sectionRect.top - gameRect.bottom;
+
+        // Show indicator if there's significant gap (more than 150px) and game is visible
+        // Also hide if recommendations section is mostly visible
+        const gameVisible = gameRect.bottom > 0 && gameRect.top < viewportHeight;
+        const recsNearTop = sectionRect.top < viewportHeight * 0.7;
+
+        if (gap > 150 && gameVisible && !recsNearTop) {
+          indicator.classList.add('visible');
+          // Position it in the middle of the gap
+          const indicatorTop = gameRect.bottom + (gap / 2);
+          indicator.style.top = Math.min(indicatorTop, viewportHeight - 100) + 'px';
+        } else {
+          indicator.classList.remove('visible');
+        }
+      }
+
+      // Throttled scroll handler
+      let ticking = false;
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          requestAnimationFrame(function() {
+            updateIndicatorVisibility();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      });
+
+      window.addEventListener('resize', updateIndicatorVisibility);
+
+      // Initial check
+      setTimeout(updateIndicatorVisibility, 100);
+    })();
+  </script>
+
 </body>
 </html>
