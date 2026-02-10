@@ -125,8 +125,18 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   const today = new Date();
   const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
 
-  // Shuffle all games with seeded random for consistent daily order
-  const shuffledGames = shuffleArray(games, seed);
+  // Separate priority games from non-priority games
+  const priorityGames = games.filter(game => game.priority > 0);
+  const nonPriorityGames = games.filter(game => !game.priority || game.priority === 0);
+
+  // Sort priority games by priority value (highest first)
+  const sortedPriorityGames = priorityGames.sort((a, b) => b.priority - a.priority);
+
+  // Shuffle non-priority games with seeded random for consistent daily order
+  const shuffledNonPriorityGames = shuffleArray(nonPriorityGames, seed);
+
+  // Combine: priority games first, then shuffled non-priority games
+  const shuffledGames = [...sortedPriorityGames, ...shuffledNonPriorityGames];
 
   // Calculate how many games to render initially (INITIAL_ROWS * 6 columns)
   const columnsPerRow = 6;
