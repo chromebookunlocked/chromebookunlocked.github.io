@@ -126,16 +126,20 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
 
   // Shuffle all games with seeded random for consistent daily order
+  // Then move priority games to the top, sorted by priority (highest first)
   const shuffledGames = shuffleArray(games, seed);
+  const priorityGames = shuffledGames.filter(g => g.priority > 0).sort((a, b) => b.priority - a.priority);
+  const normalGames = shuffledGames.filter(g => !g.priority || g.priority <= 0);
+  const sortedGames = [...priorityGames, ...normalGames];
 
   // Calculate how many games to render initially (INITIAL_ROWS * 6 columns)
   const columnsPerRow = 6;
   const initialGameCount = INITIAL_ROWS * columnsPerRow;
-  const initialGames = shuffledGames.slice(0, initialGameCount);
+  const initialGames = sortedGames.slice(0, initialGameCount);
 
   // Prepare game data for client-side lazy loading
   // Only include necessary fields to minimize payload
-  const gameDataForClient = shuffledGames.map(game => {
+  const gameDataForClient = sortedGames.map(game => {
     const thumbInfo = getThumbPath(game, gamesDir);
     return {
       n: game.name,                    // name

@@ -1,5 +1,6 @@
 {
   "name": "Smash Carts",
+  "priority": 15,
   "category": "Racing, Action, Multiplayer, Trending Games",
   "trending": true,
   "createdAt": "1970-01-01T00:00:00.000Z",
