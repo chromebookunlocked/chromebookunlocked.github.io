@@ -254,7 +254,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         <div class="play-overlay" id="playOverlay">
           <img src="${escapeHtmlAttr(thumbPath)}" alt="Play ${escapedGameNameAttr} Unblocked - Free Online ${escapeHtmlAttr(categoryText)} Game" itemprop="image" width="300" height="300" loading="eager" fetchpriority="high">
           <h2 itemprop="headline">${escapedGameName}</h2>
-          <button class="play-btn" onclick="startGame(); gtag('event', 'play_button_clicked', {game_name: '${escapeJs(game.name)}', game_folder: '${escapeJs(game.folder)}'});" aria-label="Play ${escapedGameNameAttr} Free Online">▶ Play</button>
+          <button class="play-btn" onclick="startGame();" aria-label="Play ${escapedGameNameAttr} Free Online">▶ Play</button>
         </div>
         <iframe
           id="gameFrame"
@@ -457,33 +457,9 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         gtag('event', 'game_started', {
           game_name: '${escapeJs(game.name)}',
           game_folder: '${escapeJs(game.folder)}',
-          game_categories: '${escapedCategoryListJs}',
-          session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
-          timestamp: new Date().toISOString()
+          session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
         });
       }
-
-      // Track game duration every 30 seconds while playing
-      if (gameDurationInterval) {
-        clearInterval(gameDurationInterval);
-      }
-
-      gameDurationInterval = setInterval(function() {
-        if (gameStartTime && !document.hidden) {
-          const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
-          gamePlayDuration = currentDuration;
-
-          if (typeof gtag !== 'undefined') {
-            gtag('event', 'game_playing', {
-              game_name: '${escapeJs(game.name)}',
-              game_folder: '${escapeJs(game.folder)}',
-              duration_seconds: currentDuration,
-              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
-              timestamp: new Date().toISOString()
-            });
-          }
-        }
-      }, GAME_DURATION_TRACKING_INTERVAL); // Every N milliseconds
 
       // Track in Recently Played
       saveToRecentlyPlayed();
@@ -527,15 +503,6 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         } else if (wrapper.mozRequestFullScreen) {
           wrapper.mozRequestFullScreen();
         }
-
-        // Track fullscreen enter
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'fullscreen_enter', {
-            game_name: '${escapeJs(game.name)}',
-            game_folder: '${escapeJs(game.folder)}',
-            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
-          });
-        }
       } else {
         // Exit fullscreen
         if (document.exitFullscreen) {
@@ -544,15 +511,6 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
           document.webkitExitFullscreen();
         } else if (document.mozCancelFullScreen) {
           document.mozCancelFullScreen();
-        }
-
-        // Track fullscreen exit
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'fullscreen_exit', {
-            game_name: '${escapeJs(game.name)}',
-            game_folder: '${escapeJs(game.folder)}',
-            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
-          });
         }
       }
     }
@@ -689,15 +647,6 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
       const moreGamesSection = document.getElementById('moreGamesSection');
       if (moreGamesSection) {
         moreGamesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        // Track analytics
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'more_games_hint_clicked', {
-            game_name: '${escapeJs(game.name)}',
-            game_folder: '${escapeJs(game.folder)}',
-            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
-          });
-        }
       }
     }
 
@@ -755,108 +704,21 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         btnText.textContent = 'Show More';
         btnIcon.style.transform = 'rotate(0deg)';
         section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-        // Track collapse
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'game_info_collapse', {
-            game_name: '${escapeJs(game.name)}',
-            game_folder: '${escapeJs(game.folder)}',
-            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
-          });
-        }
       } else {
         section.classList.add('expanded');
         btnText.textContent = 'Show Less';
         btnIcon.style.transform = 'rotate(180deg)';
-
-        // Track expand
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'game_info_expand', {
-            game_name: '${escapeJs(game.name)}',
-            game_folder: '${escapeJs(game.folder)}',
-            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
-          });
-        }
       }
     }
 
-    // Track game session end when user leaves the page
+    // Cleanup on page unload
     window.addEventListener('beforeunload', () => {
-      // Clear duration tracking interval
-      if (gameDurationInterval) {
+      // Clear duration tracking interval if exists
+      if (typeof gameDurationInterval !== 'undefined' && gameDurationInterval) {
         clearInterval(gameDurationInterval);
       }
-
-      if (gameStartTime) {
-        const playDuration = Math.round((Date.now() - gameStartTime) / 1000);
-
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'game_session_end', {
-            game_name: '${escapeJs(game.name)}',
-            game_folder: '${escapeJs(game.folder)}',
-            game_categories: '${escapedCategoryListJs}',
-            duration_seconds: playDuration,
-            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
-            timestamp: new Date().toISOString()
-          });
-        }
-      }
     });
 
-    // Track visibility changes (when user switches tabs while game is running)
-    document.addEventListener('visibilitychange', function() {
-      if (gameStartTime) {
-        if (document.hidden) {
-          // User switched away - pause duration tracking
-          if (gameDurationInterval) {
-            clearInterval(gameDurationInterval);
-          }
-
-          if (typeof gtag !== 'undefined') {
-            const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
-            gtag('event', 'game_paused', {
-              game_name: '${game.name}',
-              game_folder: '${game.folder}',
-              duration_seconds: currentDuration,
-              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
-            });
-          }
-        } else {
-          // User returned - resume duration tracking
-          if (typeof gtag !== 'undefined') {
-            const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
-            gtag('event', 'game_resumed', {
-              game_name: '${game.name}',
-              game_folder: '${game.folder}',
-              duration_seconds: currentDuration,
-              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
-            });
-          }
-
-          // Restart the duration tracking interval
-          if (gameDurationInterval) {
-            clearInterval(gameDurationInterval);
-          }
-
-          gameDurationInterval = setInterval(function() {
-            if (gameStartTime && !document.hidden) {
-              const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
-              gamePlayDuration = currentDuration;
-
-              if (typeof gtag !== 'undefined') {
-                gtag('event', 'game_playing', {
-                  game_name: '${game.name}',
-                  game_folder: '${game.folder}',
-                  duration_seconds: currentDuration,
-                  session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
-                  timestamp: new Date().toISOString()
-                });
-              }
-            }
-          }, 30000);
-        }
-      }
-    });
   </script>
 
   <!-- Initialize AdSense Ads -->

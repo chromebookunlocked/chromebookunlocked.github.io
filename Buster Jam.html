@@ -32,9 +32,9 @@
 
   
 <script>
-  // Enhanced Analytics Tracking
+  // Simple Analytics Tracking - Core Metrics Only
   (function() {
-    // Generate or retrieve session ID
+    // Session management (for proper user tracking, but no extra events)
     function getSessionId() {
       const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes
       let sessionData = sessionStorage.getItem('ga_session_data');
@@ -51,7 +51,7 @@
             return data.sessionId;
           }
         } catch (e) {
-          console.error('Error parsing session data:', e);
+          // Create new session on error
         }
       }
 
@@ -63,14 +63,6 @@
         lastActivity: Date.now()
       };
       sessionStorage.setItem('ga_session_data', JSON.stringify(newSessionData));
-
-      // Track session start
-      if (typeof gtag !== 'undefined') {
-        gtag('event', 'session_start', {
-          session_id: newSessionId,
-          timestamp: new Date().toISOString()
-        });
-      }
 
       return newSessionId;
     }
@@ -85,98 +77,26 @@
       return userId;
     }
 
-    // Initialize session tracking
+    // Initialize session tracking (lightweight)
     window.analyticsSession = {
       sessionId: getSessionId(),
-      userId: getUserId(),
-      pageViewStartTime: Date.now(),
-      engagementInterval: null
+      userId: getUserId()
     };
 
-    // Track page engagement every 60 seconds (reduced for performance)
-    function startEngagementTracking() {
-      if (window.analyticsSession.engagementInterval) {
-        clearInterval(window.analyticsSession.engagementInterval);
-      }
-
-      window.analyticsSession.engagementInterval = setInterval(function() {
-        const timeOnPage = Math.floor((Date.now() - window.analyticsSession.pageViewStartTime) / 1000);
-
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'user_engagement', {
-            session_id: window.analyticsSession.sessionId,
-            engagement_time_msec: timeOnPage * 1000,
-            page_location: window.location.href,
-            page_title: document.title
-          });
-        }
-      }, 60000); // Every 60 seconds (reduced from 15s for performance)
-    }
-
-    // Track page view with enhanced parameters
+    // Track page view - SINGLE EVENT ONLY (no duplicates)
     function trackEnhancedPageView(pageType, pageName, additionalParams) {
-      const sessionData = JSON.parse(sessionStorage.getItem('ga_session_data') || '{}');
-      const params = {
-        page_type: pageType,
-        page_name: pageName,
-        session_id: window.analyticsSession.sessionId,
-        user_id: window.analyticsSession.userId,
-        timestamp: new Date().toISOString(),
-        session_start_time: sessionData.startTime ? new Date(sessionData.startTime).toISOString() : new Date().toISOString(),
-        ...additionalParams
-      };
-
       if (typeof gtag !== 'undefined') {
-        gtag('event', 'page_view', params);
-
-        // Also send as custom event for better tracking in realtime
-        gtag('event', 'page_visited', params);
-      }
-
-      // Reset page view start time
-      window.analyticsSession.pageViewStartTime = Date.now();
-
-      // Start engagement tracking
-      startEngagementTracking();
-    }
-
-    // Track when user leaves page
-    function trackPageExit() {
-      const timeOnPage = Math.floor((Date.now() - window.analyticsSession.pageViewStartTime) / 1000);
-
-      if (typeof gtag !== 'undefined') {
-        gtag('event', 'page_exit', {
+        gtag('event', 'page_view', {
+          page_type: pageType,
+          page_name: pageName,
           session_id: window.analyticsSession.sessionId,
-          time_on_page_seconds: timeOnPage,
-          page_location: window.location.href,
-          page_title: document.title,
-          timestamp: new Date().toISOString()
+          ...additionalParams
         });
       }
-
-      // Clear engagement interval
-      if (window.analyticsSession.engagementInterval) {
-        clearInterval(window.analyticsSession.engagementInterval);
-      }
     }
 
-    // Expose tracking functions globally
+    // Expose tracking function globally
     window.trackEnhancedPageView = trackEnhancedPageView;
-    window.trackPageExit = trackPageExit;
-
-    // Track page exit on beforeunload
-    window.addEventListener('beforeunload', trackPageExit);
-
-    // Track visibility changes (tab switching)
-    document.addEventListener('visibilitychange', function() {
-      if (document.hidden) {
-        if (window.analyticsSession.engagementInterval) {
-          clearInterval(window.analyticsSession.engagementInterval);
-        }
-      } else {
-        startEngagementTracking();
-      }
-    });
   })();
 </script>
   
@@ -1505,7 +1425,7 @@ footer {
         <div class="play-overlay" id="playOverlay">
           <img src="games/Buster Jam/thumbnail.webp" alt="Play Buster Jam Unblocked - Free Online puzzle Game" itemprop="image" width="300" height="300" loading="eager" fetchpriority="high">
           <h2 itemprop="headline">Buster Jam</h2>
-          <button class="play-btn" onclick="startGame(); gtag('event', 'play_button_clicked', {game_name: 'Buster Jam', game_folder: 'Buster Jam'});" aria-label="Play Buster Jam Free Online">▶ Play</button>
+          <button class="play-btn" onclick="startGame();" aria-label="Play Buster Jam Free Online">▶ Play</button>
         </div>
         <iframe
           id="gameFrame"
@@ -2029,33 +1949,9 @@ footer {
         gtag('event', 'game_started', {
           game_name: 'Buster Jam',
           game_folder: 'Buster Jam',
-          game_categories: 'Puzzle, Arcade',
-          session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
-          timestamp: new Date().toISOString()
+          session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
         });
       }
-
-      // Track game duration every 30 seconds while playing
-      if (gameDurationInterval) {
-        clearInterval(gameDurationInterval);
-      }
-
-      gameDurationInterval = setInterval(function() {
-        if (gameStartTime && !document.hidden) {
-          const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
-          gamePlayDuration = currentDuration;
-
-          if (typeof gtag !== 'undefined') {
-            gtag('event', 'game_playing', {
-              game_name: 'Buster Jam',
-              game_folder: 'Buster Jam',
-              duration_seconds: currentDuration,
-              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
-              timestamp: new Date().toISOString()
-            });
-          }
-        }
-      }, GAME_DURATION_TRACKING_INTERVAL); // Every N milliseconds
 
       // Track in Recently Played
       saveToRecentlyPlayed();
@@ -2099,15 +1995,6 @@ footer {
         } else if (wrapper.mozRequestFullScreen) {
           wrapper.mozRequestFullScreen();
         }
-
-        // Track fullscreen enter
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'fullscreen_enter', {
-            game_name: 'Buster Jam',
-            game_folder: 'Buster Jam',
-            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
-          });
-        }
       } else {
         // Exit fullscreen
         if (document.exitFullscreen) {
@@ -2116,15 +2003,6 @@ footer {
           document.webkitExitFullscreen();
         } else if (document.mozCancelFullScreen) {
           document.mozCancelFullScreen();
-        }
-
-        // Track fullscreen exit
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'fullscreen_exit', {
-            game_name: 'Buster Jam',
-            game_folder: 'Buster Jam',
-            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
-          });
         }
       }
     }
@@ -2261,15 +2139,6 @@ footer {
       const moreGamesSection = document.getElementById('moreGamesSection');
       if (moreGamesSection) {
         moreGamesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        // Track analytics
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'more_games_hint_clicked', {
-            game_name: 'Buster Jam',
-            game_folder: 'Buster Jam',
-            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
-          });
-        }
       }
     }
 
@@ -2327,108 +2196,21 @@ footer {
         btnText.textContent = 'Show More';
         btnIcon.style.transform = 'rotate(0deg)';
         section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-        // Track collapse
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'game_info_collapse', {
-            game_name: 'Buster Jam',
-            game_folder: 'Buster Jam',
-            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
-          });
-        }
       } else {
         section.classList.add('expanded');
         btnText.textContent = 'Show Less';
         btnIcon.style.transform = 'rotate(180deg)';
-
-        // Track expand
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'game_info_expand', {
-            game_name: 'Buster Jam',
-            game_folder: 'Buster Jam',
-            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
-          });
-        }
       }
     }
 
-    // Track game session end when user leaves the page
+    // Cleanup on page unload
     window.addEventListener('beforeunload', () => {
-      // Clear duration tracking interval
-      if (gameDurationInterval) {
+      // Clear duration tracking interval if exists
+      if (typeof gameDurationInterval !== 'undefined' && gameDurationInterval) {
         clearInterval(gameDurationInterval);
       }
-
-      if (gameStartTime) {
-        const playDuration = Math.round((Date.now() - gameStartTime) / 1000);
-
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'game_session_end', {
-            game_name: 'Buster Jam',
-            game_folder: 'Buster Jam',
-            game_categories: 'Puzzle, Arcade',
-            duration_seconds: playDuration,
-            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
-            timestamp: new Date().toISOString()
-          });
-        }
-      }
     });
 
-    // Track visibility changes (when user switches tabs while game is running)
-    document.addEventListener('visibilitychange', function() {
-      if (gameStartTime) {
-        if (document.hidden) {
-          // User switched away - pause duration tracking
-          if (gameDurationInterval) {
-            clearInterval(gameDurationInterval);
-          }
-
-          if (typeof gtag !== 'undefined') {
-            const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
-            gtag('event', 'game_paused', {
-              game_name: 'Buster Jam',
-              game_folder: 'Buster Jam',
-              duration_seconds: currentDuration,
-              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
-            });
-          }
-        } else {
-          // User returned - resume duration tracking
-          if (typeof gtag !== 'undefined') {
-            const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
-            gtag('event', 'game_resumed', {
-              game_name: 'Buster Jam',
-              game_folder: 'Buster Jam',
-              duration_seconds: currentDuration,
-              session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
-            });
-          }
-
-          // Restart the duration tracking interval
-          if (gameDurationInterval) {
-            clearInterval(gameDurationInterval);
-          }
-
-          gameDurationInterval = setInterval(function() {
-            if (gameStartTime && !document.hidden) {
-              const currentDuration = Math.floor((Date.now() - gameStartTime) / 1000);
-              gamePlayDuration = currentDuration;
-
-              if (typeof gtag !== 'undefined') {
-                gtag('event', 'game_playing', {
-                  game_name: 'Buster Jam',
-                  game_folder: 'Buster Jam',
-                  duration_seconds: currentDuration,
-                  session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
-                  timestamp: new Date().toISOString()
-                });
-              }
-            }
-          }, 30000);
-        }
-      }
-    });
   </script>
 
   <!-- Initialize AdSense Ads -->
