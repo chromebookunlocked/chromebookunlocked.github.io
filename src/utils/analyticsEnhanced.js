@@ -1,14 +1,14 @@
 /**
- * Enhanced Google Analytics 4 tracking module
- * Provides detailed session tracking, page views, and game duration tracking
+ * Simplified Google Analytics 4 tracking module
+ * Focuses on core metrics without double counting
  */
 
 function generateAnalyticsScript() {
   return `
 <script>
-  // Enhanced Analytics Tracking
+  // Simple Analytics Tracking - Core Metrics Only
   (function() {
-    // Generate or retrieve session ID
+    // Session management (for proper user tracking, but no extra events)
     function getSessionId() {
       const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes
       let sessionData = sessionStorage.getItem('ga_session_data');
@@ -25,7 +25,7 @@ function generateAnalyticsScript() {
             return data.sessionId;
           }
         } catch (e) {
-          console.error('Error parsing session data:', e);
+          // Create new session on error
         }
       }
 
@@ -37,14 +37,6 @@ function generateAnalyticsScript() {
         lastActivity: Date.now()
       };
       sessionStorage.setItem('ga_session_data', JSON.stringify(newSessionData));
-
-      // Track session start
-      if (typeof gtag !== 'undefined') {
-        gtag('event', 'session_start', {
-          session_id: newSessionId,
-          timestamp: new Date().toISOString()
-        });
-      }
 
       return newSessionId;
     }
@@ -59,98 +51,26 @@ function generateAnalyticsScript() {
       return userId;
     }
 
-    // Initialize session tracking
+    // Initialize session tracking (lightweight)
     window.analyticsSession = {
       sessionId: getSessionId(),
-      userId: getUserId(),
-      pageViewStartTime: Date.now(),
-      engagementInterval: null
+      userId: getUserId()
     };
 
-    // Track page engagement every 60 seconds (reduced for performance)
-    function startEngagementTracking() {
-      if (window.analyticsSession.engagementInterval) {
-        clearInterval(window.analyticsSession.engagementInterval);
-      }
-
-      window.analyticsSession.engagementInterval = setInterval(function() {
-        const timeOnPage = Math.floor((Date.now() - window.analyticsSession.pageViewStartTime) / 1000);
-
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'user_engagement', {
-            session_id: window.analyticsSession.sessionId,
-            engagement_time_msec: timeOnPage * 1000,
-            page_location: window.location.href,
-            page_title: document.title
-          });
-        }
-      }, 60000); // Every 60 seconds (reduced from 15s for performance)
-    }
-
-    // Track page view with enhanced parameters
+    // Track page view - SINGLE EVENT ONLY (no duplicates)
     function trackEnhancedPageView(pageType, pageName, additionalParams) {
-      const sessionData = JSON.parse(sessionStorage.getItem('ga_session_data') || '{}');
-      const params = {
-        page_type: pageType,
-        page_name: pageName,
-        session_id: window.analyticsSession.sessionId,
-        user_id: window.analyticsSession.userId,
-        timestamp: new Date().toISOString(),
-        session_start_time: sessionData.startTime ? new Date(sessionData.startTime).toISOString() : new Date().toISOString(),
-        ...additionalParams
-      };
-
       if (typeof gtag !== 'undefined') {
-        gtag('event', 'page_view', params);
-
-        // Also send as custom event for better tracking in realtime
-        gtag('event', 'page_visited', params);
-      }
-
-      // Reset page view start time
-      window.analyticsSession.pageViewStartTime = Date.now();
-
-      // Start engagement tracking
-      startEngagementTracking();
-    }
-
-    // Track when user leaves page
-    function trackPageExit() {
-      const timeOnPage = Math.floor((Date.now() - window.analyticsSession.pageViewStartTime) / 1000);
-
-      if (typeof gtag !== 'undefined') {
-        gtag('event', 'page_exit', {
+        gtag('event', 'page_view', {
+          page_type: pageType,
+          page_name: pageName,
           session_id: window.analyticsSession.sessionId,
-          time_on_page_seconds: timeOnPage,
-          page_location: window.location.href,
-          page_title: document.title,
-          timestamp: new Date().toISOString()
+          ...additionalParams
         });
       }
-
-      // Clear engagement interval
-      if (window.analyticsSession.engagementInterval) {
-        clearInterval(window.analyticsSession.engagementInterval);
-      }
     }
 
-    // Expose tracking functions globally
+    // Expose tracking function globally
     window.trackEnhancedPageView = trackEnhancedPageView;
-    window.trackPageExit = trackPageExit;
-
-    // Track page exit on beforeunload
-    window.addEventListener('beforeunload', trackPageExit);
-
-    // Track visibility changes (tab switching)
-    document.addEventListener('visibilitychange', function() {
-      if (document.hidden) {
-        if (window.analyticsSession.engagementInterval) {
-          clearInterval(window.analyticsSession.engagementInterval);
-        }
-      } else {
-        startEngagementTracking();
-      }
-    });
   })();
 </script>
   `;

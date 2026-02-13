@@ -207,6 +207,9 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     }
   </script>
 
+  <!-- Bot Detection (must load before ads) -->
+  <script src="assets/bot-detector.js"></script>
+
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
   <script>
@@ -217,8 +220,17 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     gtag('config', 'G-4QZLTDX504');
   </script>
 
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705" crossorigin="anonymous"></script>
+  <!-- Google AdSense (conditionally loaded based on bot detection) -->
+  <script>
+    // Only load AdSense if not a bot
+    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
+      var adsScript = document.createElement('script');
+      adsScript.async = true;
+      adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705';
+      adsScript.crossOrigin = 'anonymous';
+      document.head.appendChild(adsScript);
+    }
+  </script>
 
   ${generateAnalyticsScript()}
 
@@ -369,42 +381,6 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       });
     }
 
-    // Track category navigation
-    const originalFilterCategory = window.filterCategory;
-    if (originalFilterCategory) {
-      window.filterCategory = function(category) {
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'category_navigation', {
-            category_name: category,
-            session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
-            timestamp: new Date().toISOString()
-          });
-        }
-        originalFilterCategory(category);
-      };
-    }
-
-    // Track search interactions
-    const originalSearchGames = window.searchGames;
-    if (originalSearchGames) {
-      let searchTimeout;
-      window.searchGames = function(query) {
-        // Debounce search tracking
-        clearTimeout(searchTimeout);
-        if (query && query.length >= 2) {
-          searchTimeout = setTimeout(function() {
-            if (typeof gtag !== 'undefined') {
-              gtag('event', 'search', {
-                search_term: query,
-                session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown',
-                timestamp: new Date().toISOString()
-              });
-            }
-          }, 500);
-        }
-        originalSearchGames(query);
-      };
-    }
   </script>
 
   <!-- Cookie Consent Banner - Load asynchronously -->

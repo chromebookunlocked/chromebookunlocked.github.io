@@ -94,6 +94,11 @@ function createAdTile(adIndex) {
  * @param {HTMLElement} tile - The ad tile element
  */
 function initializeAdTile(tile) {
+  // Don't initialize ads if bot is detected
+  if (window.botDetector && window.botDetector.shouldBlockAds()) {
+    return;
+  }
+
   try {
     (adsbygoogle = window.adsbygoogle || []).push({});
   } catch (e) {}
