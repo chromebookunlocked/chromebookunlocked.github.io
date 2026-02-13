@@ -55,7 +55,55 @@ Each detection check assigns a score:
 - **No Human Interaction** (after 5+ seconds): 20 points
 - **Human Interactions Detected**: -15 points (reduces score)
 
-**Bot Threshold**: 50 points or higher = Classified as bot
+### Three-Tier Classification System
+
+**🟢 Human (0-29 points)**
+- Low suspicion score
+- Full site access
+- Ads are loaded normally
+
+**🟡 Suspected Bot (30-49 points)**
+- Moderate suspicion score
+- **CAPTCHA challenge shown**
+- Must complete simple math problem to proceed
+- Pass CAPTCHA → treated as human, ads loaded
+- Fail CAPTCHA (3 attempts) → blocked
+
+**🔴 Definite Bot (50+ points)**
+- High suspicion score
+- **Immediately blocked**
+- No CAPTCHA offered
+- Ads are NOT loaded
+
+## CAPTCHA Challenge System
+
+### When CAPTCHA Appears
+
+Users with a bot score of 30-49 points will see a CAPTCHA challenge:
+
+**Challenge Type**: Simple math problem (e.g., "What is 7 + 3?")
+
+**User Experience**:
+1. Beautiful gradient overlay appears
+2. User enters answer to math problem
+3. Correct answer → Access granted, ads loaded
+4. Wrong answer → Can retry (up to 3 attempts)
+5. 3 failed attempts → Blocked as bot
+
+**Benefits**:
+- ✅ Legitimate users can easily prove they're human
+- ✅ Simple, accessible (no complex image puzzles)
+- ✅ No external dependencies or API keys needed
+- ✅ Mobile-friendly design
+- ✅ Works offline
+
+### CAPTCHA Analytics
+
+CAPTCHA events tracked in GA4:
+- `captcha_required` - When CAPTCHA is shown
+- `captcha_completed` - When user passes CAPTCHA
+- `captcha_failed` - When user fails after 3 attempts
+- `captcha_passed` - Final status after passing
 
 ## Integration
 
