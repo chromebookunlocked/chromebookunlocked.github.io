@@ -188,6 +188,9 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
   <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
 
+  <!-- Bot Detection (must load before ads) -->
+  <script src="../assets/bot-detector.js"></script>
+
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
   <script>
@@ -198,8 +201,17 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     gtag('config', 'G-4QZLTDX504');
   </script>
 
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705" crossorigin="anonymous"></script>
+  <!-- Google AdSense (conditionally loaded based on bot detection) -->
+  <script>
+    // Only load AdSense if not a bot
+    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
+      var adsScript = document.createElement('script');
+      adsScript.async = true;
+      adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705';
+      adsScript.crossOrigin = 'anonymous';
+      document.head.appendChild(adsScript);
+    }
+  </script>
 
   ${generateAnalyticsScript()}
 
