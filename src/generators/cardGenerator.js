@@ -64,7 +64,9 @@ function generateSidebar(categories) {
  * @returns {string} HTML string for ad tile card
  */
 function generateAdTile(adIndex) {
-  return `<div class="card ad-tile" data-ad-index="${adIndex}">
+  // Alternate ads between left (even indices) and right (odd indices)
+  const gridColumn = adIndex % 2 === 0 ? '1 / span 2' : '5 / span 2';
+  return `<div class="card ad-tile" data-ad-index="${adIndex}" style="grid-column: ${gridColumn};">
     <div class="ad-content">
       <ins class="adsbygoogle"
         style="display:block"
