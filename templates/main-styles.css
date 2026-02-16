@@ -971,13 +971,16 @@ button:active {
   letter-spacing: 1px;
 }
 
-/* Ad Tile Cards - same size as game cards */
+/* Ad Tile Cards - 2x2 grid tiles */
 .card.ad-tile {
   background: linear-gradient(135deg, rgba(26, 0, 51, 0.9), rgba(45, 0, 82, 0.9));
   border: 2px solid rgba(255, 102, 255, 0.25);
   display: flex;
   justify-content: center;
   align-items: center;
+  /* Span 2 columns and 2 rows to make it 2x2 */
+  grid-column: span 2;
+  grid-row: span 2;
   aspect-ratio: 1 / 1;
   overflow: hidden;
   padding: 0;
