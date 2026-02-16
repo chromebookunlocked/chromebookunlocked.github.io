@@ -617,26 +617,6 @@ html,body {
   overflow:hidden;
 }
 
-/* Accessibility - Skip Link */
-.skip-link {
-  position: absolute;
-  top: -40px;
-  left: 0;
-  background: var(--accent);
-  color: #fff;
-  padding: 8px 16px;
-  text-decoration: none;
-  border-radius: 0 0 4px 0;
-  font-family: var(--font-main);
-  font-weight: 600;
-  z-index: 10000;
-  transition: top 0.3s ease;
-}
-
-.skip-link:focus {
-  top: 0;
-}
-
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -1563,6 +1543,8 @@ button:active {
   aspect-ratio: 1 / 1;
   overflow: hidden;
   padding: 0;
+  min-height: 0;
+  min-width: 0;
 }
 
 .card.ad-tile:hover {
@@ -1578,12 +1560,24 @@ button:active {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  position: relative;
 }
 
 .card.ad-tile .ad-content ins {
   display: block !important;
   width: 100% !important;
   height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+.card.ad-tile .ad-content ins iframe,
+.card.ad-tile .ad-content ins > div {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
 }
 
 /* Loading spinner for infinite scroll */
@@ -1767,9 +1761,6 @@ button:active {
   </style>
 </head>
 <body>
-
-  <!-- Skip to main content link for accessibility -->
-  <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <!-- Sidebar -->
   <nav id="sidebar" role="navigation" aria-label="Game categories">
@@ -2031,6 +2022,12 @@ let currentCategory = null; // null = home (all games), or category name
 const MAX_RECENT_GAMES = 15;
 const RECENTLY_PLAYED_KEY = 'recentlyPlayed';
 
+// Mobile Detection
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+         (window.innerWidth <= 768);
+}
+
 /**
  * Get recently played games from localStorage
  * @returns {Array} Array of folder names
@@ -2214,10 +2211,17 @@ function createGameCard(game, idx, eagerLoad = false) {
  * @returns {Array} Filtered game data array
  */
 function getFilteredGames() {
-  const allGames = window.__gameData || [];
+  let allGames = window.__gameData || [];
+
+  // Filter by Mobile category if on mobile device
+  if (isMobileDevice()) {
+    allGames = allGames.filter(game => {
+      return game.c && game.c.includes('Mobile');
+    });
+  }
 
   if (!currentCategory) {
-    return allGames; // Home - show all games
+    return allGames; // Home - show all games (filtered by mobile if needed)
   }
 
   // Special category: Recently Played

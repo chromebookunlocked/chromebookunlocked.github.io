@@ -245,9 +245,6 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
 </head>
 <body>
 
-  <!-- Skip to main content link for accessibility -->
-  <a href="#main-content" class="skip-link">Skip to main content</a>
-
   <!-- Sidebar -->
   <nav id="sidebar" role="navigation" aria-label="Game categories">
     <ul id="categoryList" role="menu">

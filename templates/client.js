@@ -8,6 +8,12 @@ let currentCategory = null; // null = home (all games), or category name
 const MAX_RECENT_GAMES = 15;
 const RECENTLY_PLAYED_KEY = 'recentlyPlayed';
 
+// Mobile Detection
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+         (window.innerWidth <= 768);
+}
+
 /**
  * Get recently played games from localStorage
  * @returns {Array} Array of folder names
@@ -191,10 +197,17 @@ function createGameCard(game, idx, eagerLoad = false) {
  * @returns {Array} Filtered game data array
  */
 function getFilteredGames() {
-  const allGames = window.__gameData || [];
+  let allGames = window.__gameData || [];
+
+  // Filter by Mobile category if on mobile device
+  if (isMobileDevice()) {
+    allGames = allGames.filter(game => {
+      return game.c && game.c.includes('Mobile');
+    });
+  }
 
   if (!currentCategory) {
-    return allGames; // Home - show all games
+    return allGames; // Home - show all games (filtered by mobile if needed)
   }
 
   // Special category: Recently Played

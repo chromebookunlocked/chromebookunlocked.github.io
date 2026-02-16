@@ -772,6 +772,8 @@ h1 {
   aspect-ratio: 1 / 1;
   overflow: hidden;
   padding: 0;
+  min-height: 0;
+  min-width: 0;
 }
 
 .card.ad-tile:hover {
@@ -787,12 +789,24 @@ h1 {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  position: relative;
 }
 
 .card.ad-tile .ad-content ins {
   display: block !important;
   width: 100% !important;
   height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+.card.ad-tile .ad-content ins iframe,
+.card.ad-tile .ad-content ins > div {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
 }
 
 /* Ensure ad iframes are always visible */
@@ -1003,9 +1017,23 @@ footer {
   }
 
   .game-frame-wrapper {
-    /* Maintain 16:9 aspect ratio on tablets */
-    width: min(92vw, calc(74vh * 16 / 9));
-    max-height: 76vh;
+    /* Maintain 16:9 aspect ratio on tablets with improved sizing */
+    width: 92vw;
+    max-width: 92vw;
+    max-height: 65vh;
+    height: auto;
+  }
+
+  .play-overlay {
+    gap: clamp(1rem, 2.5cqh, 2rem);
+  }
+
+  .play-overlay img {
+    width: clamp(180px, 30cqw, 320px);
+  }
+
+  .play-btn {
+    min-height: 48px; /* Ensure touchable button size on tablets */
   }
 
   .play-overlay img {
@@ -1062,13 +1090,32 @@ footer {
   }
 
   .game-frame-wrapper {
-    /* Maintain 16:9 aspect ratio on mobile */
-    width: min(95vw, calc(72vh * 16 / 9));
-    max-height: 74vh;
+    /* Maintain 16:9 aspect ratio on mobile with better sizing */
+    width: 95vw;
+    max-width: 95vw;
+    max-height: 60vh;
+    height: auto;
+  }
+
+  .play-overlay {
+    gap: clamp(0.8rem, 2cqh, 1.5rem); /* Reduced gap on mobile */
+    padding: 1rem;
   }
 
   .play-overlay img {
-    width: clamp(200px, 45cqw, 350px); /* Larger on mobile for better visibility */
+    width: clamp(120px, 28cqw, 250px); /* Smaller thumbnail on mobile */
+    min-width: 120px;
+  }
+
+  .play-overlay h2 {
+    font-size: clamp(1rem, 4cqw, 1.5rem); /* Smaller title on mobile */
+    margin: 0.5rem 0;
+  }
+
+  .play-btn {
+    padding: clamp(0.6rem, 2cqh, 0.9rem) clamp(1.2rem, 4cqw, 2rem);
+    font-size: clamp(0.9rem, 3cqw, 1.1rem);
+    min-height: 44px; /* Ensure touchable button size */
   }
 
   /* Play button uses clamp() for consistent scaling */

@@ -38,26 +38,6 @@ html,body {
   overflow:hidden;
 }
 
-/* Accessibility - Skip Link */
-.skip-link {
-  position: absolute;
-  top: -40px;
-  left: 0;
-  background: var(--accent);
-  color: #fff;
-  padding: 8px 16px;
-  text-decoration: none;
-  border-radius: 0 0 4px 0;
-  font-family: var(--font-main);
-  font-weight: 600;
-  z-index: 10000;
-  transition: top 0.3s ease;
-}
-
-.skip-link:focus {
-  top: 0;
-}
-
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -984,6 +964,8 @@ button:active {
   aspect-ratio: 1 / 1;
   overflow: hidden;
   padding: 0;
+  min-height: 0;
+  min-width: 0;
 }
 
 .card.ad-tile:hover {
@@ -999,12 +981,24 @@ button:active {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  position: relative;
 }
 
 .card.ad-tile .ad-content ins {
   display: block !important;
   width: 100% !important;
   height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+.card.ad-tile .ad-content ins iframe,
+.card.ad-tile .ad-content ins > div {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
 }
 
 /* Loading spinner for infinite scroll */
