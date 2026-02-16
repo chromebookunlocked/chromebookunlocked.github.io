@@ -774,6 +774,11 @@ h1 {
   padding: 0;
 }
 
+/* Every 2nd ad tile is offset 2 tiles to the right */
+.card.ad-tile.ad-tile-offset {
+  grid-column: 3 / span 2;
+}
+
 .card.ad-tile:hover {
   transform: none;
   border-color: rgba(255, 102, 255, 0.35);
