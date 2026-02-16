@@ -76,9 +76,7 @@ function shouldInsertAdAfter(gameIndex) {
  */
 function createAdTile(adIndex) {
   const tile = document.createElement('div');
-  // Every odd-indexed ad (1, 3, 5, ...) gets offset 2 tiles to the right
-  const offsetClass = adIndex % 2 === 1 ? ' ad-tile-offset' : '';
-  tile.className = 'card ad-tile' + offsetClass;
+  tile.className = 'card ad-tile';
   tile.setAttribute('data-ad-index', adIndex);
   tile.innerHTML = `<div class="ad-content">
     <ins class="adsbygoogle"
