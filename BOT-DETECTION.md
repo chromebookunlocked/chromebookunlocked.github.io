@@ -84,18 +84,20 @@ Users with a bot score of 30-49 points will see a CAPTCHA challenge:
 **Challenge Type**: Simple math problem (e.g., "What is 7 + 3?")
 
 **User Experience**:
-1. Beautiful gradient overlay appears
+1. Professional verification modal appears
 2. User enters answer to math problem
 3. Correct answer → Access granted, ads loaded
 4. Wrong answer → Can retry (up to 3 attempts)
 5. 3 failed attempts → Blocked as bot
 
-**Benefits**:
-- ✅ Legitimate users can easily prove they're human
+**Design Features**:
+- ✅ Clean, professional interface (similar to Google/Cloudflare)
+- ✅ Standard blue/white color scheme
 - ✅ Simple, accessible (no complex image puzzles)
 - ✅ No external dependencies or API keys needed
-- ✅ Mobile-friendly design
+- ✅ Mobile-friendly responsive design
 - ✅ Works offline
+- ✅ Professional typography and spacing
 
 ### CAPTCHA Analytics
 
