@@ -1899,7 +1899,7 @@ button:active {
       <img class="thumb" data-src="games/Bit Planes/thumbnail.webp" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E" alt="Bit Planes" loading="lazy" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">Bit Planes</div>
-  </div><div class="card ad-tile" data-ad-index="0" style="grid-column: 1 / span 2;">
+  </div><div class="card ad-tile" data-ad-index="0">
     <div class="ad-content">
       <ins class="adsbygoogle"
         style="display:block"
@@ -2101,9 +2101,6 @@ function createAdTile(adIndex) {
   const tile = document.createElement('div');
   tile.className = 'card ad-tile';
   tile.setAttribute('data-ad-index', adIndex);
-  // Alternate ads between left (even indices) and right (odd indices)
-  const gridColumn = adIndex % 2 === 0 ? '1 / span 2' : '5 / span 2';
-  tile.style.gridColumn = gridColumn;
   tile.innerHTML = `<div class="ad-content">
     <ins class="adsbygoogle"
       style="display:block"
