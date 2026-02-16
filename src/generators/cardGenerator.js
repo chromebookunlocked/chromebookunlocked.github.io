@@ -64,9 +64,7 @@ function generateSidebar(categories) {
  * @returns {string} HTML string for ad tile card
  */
 function generateAdTile(adIndex) {
-  // Every odd-indexed ad (1, 3, 5, ...) gets offset 2 tiles to the right
-  const offsetClass = adIndex % 2 === 1 ? ' ad-tile-offset' : '';
-  return `<div class="card ad-tile${offsetClass}" data-ad-index="${adIndex}">
+  return `<div class="card ad-tile" data-ad-index="${adIndex}">
     <div class="ad-content">
       <ins class="adsbygoogle"
         style="display:block"
