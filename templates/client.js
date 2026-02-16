@@ -78,9 +78,6 @@ function createAdTile(adIndex) {
   const tile = document.createElement('div');
   tile.className = 'card ad-tile';
   tile.setAttribute('data-ad-index', adIndex);
-  // Alternate ads between left (even indices) and right (odd indices)
-  const gridColumn = adIndex % 2 === 0 ? '1 / span 2' : '5 / span 2';
-  tile.style.gridColumn = gridColumn;
   tile.innerHTML = `<div class="ad-content">
     <ins class="adsbygoogle"
       style="display:block"
