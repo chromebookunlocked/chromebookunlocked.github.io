@@ -1,22 +1,18 @@
-const { generateGameCard, generateAdTile } = require('./cardGenerator');
+const { generateGameCard, generateHorizontalAd } = require('./cardGenerator');
 
-// Ad tile configuration
-// First ad appears at position 14 (3rd row, 2nd tile at 6 columns)
-// Then every 20 game tiles after that
-const AD_FIRST_POSITION = 13; // 0-indexed (position 14 in 1-indexed)
-const AD_INTERVAL = 20; // Insert ad every 20 game tiles after first
+// Horizontal ad configuration
+// Insert a full-width horizontal ad every 3 rows (every 18 games at 6 columns)
+const COLS_PER_ROW = 6;
+const ROWS_PER_AD = 3;
+const AD_INTERVAL = COLS_PER_ROW * ROWS_PER_AD; // 18
 
 /**
- * Check if an ad should be inserted after a given game index
+ * Check if a horizontal ad should be inserted after a given game index
  * @param {number} gameIndex - The 0-indexed position in the game list
  * @returns {boolean} Whether an ad should be inserted after this game
  */
 function shouldInsertAdAfter(gameIndex) {
-  if (gameIndex < AD_FIRST_POSITION - 1) return false;
-  // First ad after index 12 (13th game, position 14)
-  // Then after index 32, 52, 72, etc.
-  const positionFromFirst = gameIndex - (AD_FIRST_POSITION - 1);
-  return positionFromFirst >= 0 && positionFromFirst % AD_INTERVAL === 0;
+  return (gameIndex + 1) % AD_INTERVAL === 0;
 }
 const { generateIndexMetaTags, generateIndexStructuredData } = require('../utils/seoBuilder');
 const { generateAnalyticsScript } = require('../utils/analyticsEnhanced');
@@ -164,14 +160,14 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     .slice(0, 30)
     .map(g => g.folder);
 
-  // Generate initial game cards HTML with ad tiles
+  // Generate initial game cards HTML with horizontal ads every 3 rows
   let adCount = 0;
   let initialCardsHTML = '';
   initialGames.forEach((game, idx) => {
     initialCardsHTML += generateGameCard(game, idx, gamesDir, true);
-    // Check if we should insert an ad tile after this game
+    // Check if we should insert a horizontal ad after this game
     if (shouldInsertAdAfter(idx)) {
-      initialCardsHTML += generateAdTile(adCount);
+      initialCardsHTML += generateHorizontalAd(adCount);
       adCount++;
     }
   });
@@ -279,13 +275,6 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       </div>
 
       <div class="viewer-wrapper">
-        <!-- Left Banner Ad -->
-        <div class="ad-banner-container ad-banner-left">
-          <div class="ad-banner-placeholder">
-            Advertisement
-          </div>
-        </div>
-
         <!-- Game Viewer -->
         <div class="viewer" id="viewer">
           <div id="startOverlay">
@@ -294,13 +283,6 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
             <button id="startButton" onclick="startGame()">▶ Play</button>
           </div>
           <iframe id="gameFrame" src="" scrolling="no"></iframe>
-        </div>
-
-        <!-- Right Banner Ad -->
-        <div class="ad-banner-container ad-banner-right">
-          <div class="ad-banner-placeholder">
-            Advertisement
-          </div>
         </div>
       </div>
 
@@ -343,8 +325,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     window.__renderedCount = ${initialGameCount};
     window.__rowsPerLoad = ${ROWS_PER_LOAD};
     window.__scrollThreshold = ${SCROLL_THRESHOLD};
-    // Ad tile configuration
-    window.__adFirstPosition = ${AD_FIRST_POSITION};
+    // Horizontal ad configuration (every 3 rows = 18 games at 6 columns)
     window.__adInterval = ${AD_INTERVAL};
     window.__adCount = ${adCount};
     // Newly Added games (folders list)
@@ -354,12 +335,14 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <!-- Initialize AdSense Ads -->
   <script>
     (function() {
-      // Initialize all existing ad tiles
-      var ads = document.querySelectorAll('.ad-tile ins.adsbygoogle');
-      for (var i = 0; i < ads.length; i++) {
-        try {
-          (adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {}
+      if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
+        // Initialize all server-rendered horizontal ad units
+        var ads = document.querySelectorAll('.horizontal-ad-row ins.adsbygoogle');
+        for (var i = 0; i < ads.length; i++) {
+          try {
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          } catch (e) {}
+        }
       }
     })();
   </script>
