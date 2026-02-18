@@ -920,58 +920,24 @@ h1 {
 }
 
 /* ============================================================================
-   AD TILE CARDS
+   HORIZONTAL AD ROW - Full-width ads between game rows
 ============================================================================ */
 
-.card.ad-tile {
-  background: linear-gradient(135deg, rgba(26, 0, 51, 0.9), rgba(45, 0, 82, 0.9));
-  border: 2px solid rgba(255, 102, 255, 0.25);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* Span 2 columns and 2 rows to make it 2x2 */
-  grid-column: span 2;
-  grid-row: span 2;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-  padding: 0;
-  min-height: 0;
-  min-width: 0;
-}
-
-.card.ad-tile:hover {
-  transform: none;
-  border-color: rgba(255, 102, 255, 0.35);
-  box-shadow: 0 4px 20px rgba(255, 102, 255, 0.3);
-}
-
-.card.ad-tile .ad-content {
+.horizontal-ad-row {
+  grid-column: 1 / -1;
   width: 100%;
-  height: 100%;
+  min-height: 90px;
   overflow: hidden;
-  position: relative;
 }
 
-.card.ad-tile .ad-content ins {
+.horizontal-ad-row ins {
   display: block !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
   width: 100% !important;
-  height: 100% !important;
 }
 
-.card.ad-tile .ad-content ins iframe,
-.card.ad-tile .ad-content ins > div {
-  width: 100% !important;
-  height: 100% !important;
-  border: 0 !important;
-}
-
-/* Ensure ad iframes are always visible */
-.card.ad-tile iframe,
-.card.ad-tile .ad-content iframe,
-.card.ad-tile ins iframe {
+/* Ensure horizontal ad iframes are always visible */
+.horizontal-ad-row iframe,
+.horizontal-ad-row ins iframe {
   opacity: 1 !important;
   visibility: visible !important;
   display: block !important;
@@ -1296,67 +1262,10 @@ footer {
   opacity: 0.6;
 }
 
-/* ============================================================================
-   VERTICAL SIDE ADS - Positioned at screen edges, aligned with game window
-============================================================================ */
-
-.vertical-ad-container {
-  display: none;
-  width: 160px;
-  flex-shrink: 0;
-  /* Align to top of game, don't extend below it */
-  align-self: flex-start;
-  /* Match game window height */
-  height: min(85vw * 9 / 16, calc(78vh));
-  max-height: 82vh;
-}
-
-/* Order the elements: left-ad, game, right-ad */
-.vertical-ad-container.left-ad {
-  order: -1;
-}
-
-.vertical-ad-container.right-ad {
-  order: 1;
-}
-
 .game-frame-wrapper {
   order: 0;
   /* Center the game */
   margin: 0 auto;
-}
-
-/* Show vertical ads when there's enough space beside the game */
-@media (min-width: 1200px) {
-  .vertical-ad-container {
-    display: block;
-  }
-}
-
-/* Styling for vertical ad content */
-.vertical-ad-container .ad-content {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-
-.vertical-ad-container .ad-content ins {
-  display: block !important;
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* Ensure vertical ad iframes are always visible */
-.vertical-ad-container iframe,
-.vertical-ad-container .ad-content iframe,
-.vertical-ad-container ins iframe {
-  opacity: 1 !important;
-  visibility: visible !important;
-  position: relative !important;
-  display: block !important;
 }
 
 /* ============================================================================
@@ -1481,32 +1390,6 @@ footer {
           tabindex="0">
         </iframe>
       </div>
-
-      <!-- Vertical Display Ad (Left Side) -->
-      <div class="vertical-ad-container left-ad">
-        <div class="ad-content">
-          <ins class="adsbygoogle"
-            style="display:block"
-            data-ad-client="ca-pub-1033412505744705"
-            data-ad-slot="9122283604"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
-          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        </div>
-      </div>
-
-      <!-- Vertical Display Ad (Right Side) -->
-      <div class="vertical-ad-container right-ad">
-        <div class="ad-content">
-          <ins class="adsbygoogle"
-            style="display:block"
-            data-ad-client="ca-pub-1033412505744705"
-            data-ad-slot="9122283604"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
-          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        </div>
-      </div>
     </div>
   </main>
 
@@ -1587,17 +1470,7 @@ footer {
         <img class="thumb" src="games/Adventure Capitalist/thumbnail.webp" alt="Play Adventure Capitalist Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Adventure Capitalist</div>
-    </a><div class="card ad-tile" data-ad-index="0">
-    <div class="ad-content">
-      <ins class="adsbygoogle"
-        style="display:block;width:100%;height:100%"
-        data-ad-client="ca-pub-1033412505744705"
-        data-ad-slot="1961978889"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </div>
-  </div><a href="/Age Of War.html" class="game-card" title="Play Age Of War Unblocked Free Online" onclick="trackRecentGame('Age Of War')">
+    </a><a href="/Age Of War.html" class="game-card" title="Play Age Of War Unblocked Free Online" onclick="trackRecentGame('Age Of War')">
       <div class="thumb-container" style="--thumb-url: url('games/Age Of War/thumbnail.webp')">
         <img class="thumb" src="games/Age Of War/thumbnail.webp" alt="Play Age Of War Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
@@ -1622,7 +1495,15 @@ footer {
         <img class="thumb" src="games/Bad Time Simulator/thumbnail.webp" alt="Play Bad Time Simulator Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Bad Time Simulator</div>
-    </a><a href="/Basketball FRVR.html" class="game-card" title="Play Basketball FRVR Unblocked Free Online" onclick="trackRecentGame('Basketball FRVR')">
+    </a><div class="horizontal-ad-row" data-ad-index="0">
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="2719401053"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div><a href="/Basketball FRVR.html" class="game-card" title="Play Basketball FRVR Unblocked Free Online" onclick="trackRecentGame('Basketball FRVR')">
       <div class="thumb-container" style="--thumb-url: url('games/Basketball FRVR/thumbnail.webp')">
         <img class="thumb" src="games/Basketball FRVR/thumbnail.webp" alt="Play Basketball FRVR Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
@@ -1697,17 +1578,7 @@ footer {
         <img class="thumb" src="games/BTD5/thumbnail.webp" alt="Play BTD5 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">BTD5</div>
-    </a><div class="card ad-tile" data-ad-index="1">
-    <div class="ad-content">
-      <ins class="adsbygoogle"
-        style="display:block;width:100%;height:100%"
-        data-ad-client="ca-pub-1033412505744705"
-        data-ad-slot="1961978889"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </div>
-  </div><a href="/Bullet Force.html" class="game-card" title="Play Bullet Force Unblocked Free Online" onclick="trackRecentGame('Bullet Force')">
+    </a><a href="/Bullet Force.html" class="game-card" title="Play Bullet Force Unblocked Free Online" onclick="trackRecentGame('Bullet Force')">
       <div class="thumb-container" style="--thumb-url: url('games/Bullet Force/thumbnail.webp')">
         <img class="thumb" src="games/Bullet Force/thumbnail.webp" alt="Play Bullet Force Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
@@ -1722,7 +1593,15 @@ footer {
         <img class="thumb" src="games/Burrito Bison Launcha Libre/thumbnail.webp" alt="Play Burrito Bison Launcha Libre Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Burrito Bison Launcha Libre</div>
-    </a><a href="/Capybara Clicker.html" class="game-card" title="Play Capybara Clicker Unblocked Free Online" onclick="trackRecentGame('Capybara Clicker')">
+    </a><div class="horizontal-ad-row" data-ad-index="1">
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="2719401053"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div><a href="/Capybara Clicker.html" class="game-card" title="Play Capybara Clicker Unblocked Free Online" onclick="trackRecentGame('Capybara Clicker')">
       <div class="thumb-container" style="--thumb-url: url('games/Capybara Clicker/thumbnail.webp')">
         <img class="thumb" src="games/Capybara Clicker/thumbnail.webp" alt="Play Capybara Clicker Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
@@ -1742,6 +1621,16 @@ footer {
         <img class="thumb" src="games/Clear Vision 2/thumbnail.webp" alt="Play Clear Vision 2 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Clear Vision 2</div>
+    </a><a href="/Clear Vision 3.html" class="game-card" title="Play Clear Vision 3 Unblocked Free Online" onclick="trackRecentGame('Clear Vision 3')">
+      <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 3/thumbnail.webp')">
+        <img class="thumb" src="games/Clear Vision 3/thumbnail.webp" alt="Play Clear Vision 3 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+      </div>
+      <div class="card-title">Clear Vision 3</div>
+    </a><a href="/Clear Vision 4.html" class="game-card" title="Play Clear Vision 4 Unblocked Free Online" onclick="trackRecentGame('Clear Vision 4')">
+      <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 4/thumbnail.webp')">
+        <img class="thumb" src="games/Clear Vision 4/thumbnail.webp" alt="Play Clear Vision 4 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+      </div>
+      <div class="card-title">Clear Vision 4</div>
     </a>
     </div>
   </section>
@@ -2262,12 +2151,13 @@ footer {
   <!-- Initialize AdSense Ads -->
   <script>
     (function() {
-      // Initialize all existing ad tiles
-      var ads = document.querySelectorAll('.ad-tile ins.adsbygoogle');
-      for (var i = 0; i < ads.length; i++) {
-        try {
-          (adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {}
+      if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
+        var ads = document.querySelectorAll('.horizontal-ad-row ins.adsbygoogle');
+        for (var i = 0; i < ads.length; i++) {
+          try {
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          } catch (e) {}
+        }
       }
     })();
   </script>
