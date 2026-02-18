@@ -67,7 +67,7 @@ function generateAdTile(adIndex) {
   return `<div class="card ad-tile" data-ad-index="${adIndex}">
     <div class="ad-content">
       <ins class="adsbygoogle"
-        style="display:block"
+        style="display:block;width:100%;height:100%"
         data-ad-client="ca-pub-1033412505744705"
         data-ad-slot="1961978889"
         data-ad-format="auto"
