@@ -59,26 +59,24 @@ function generateSidebar(categories) {
 }
 
 /**
- * Generate HTML for an ad tile card
- * @param {number} adIndex - Unique index for this ad tile
- * @returns {string} HTML string for ad tile card
+ * Generate HTML for a full-width horizontal ad row
+ * @param {number} adIndex - Unique index for this ad
+ * @returns {string} HTML string for horizontal ad row
  */
-function generateAdTile(adIndex) {
-  return `<div class="card ad-tile" data-ad-index="${adIndex}">
-    <div class="ad-content">
-      <ins class="adsbygoogle"
-        style="display:block;width:100%;height:100%"
-        data-ad-client="ca-pub-1033412505744705"
-        data-ad-slot="1961978889"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </div>
+function generateHorizontalAd(adIndex) {
+  return `<div class="horizontal-ad-row" data-ad-index="${adIndex}">
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="2719401053"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>`;
 }
 
 module.exports = {
   generateGameCard,
   generateSidebar,
-  generateAdTile
+  generateHorizontalAd
 };

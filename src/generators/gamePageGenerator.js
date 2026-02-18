@@ -4,63 +4,23 @@ const { generateAnalyticsScript } = require("../utils/analyticsEnhanced");
 const { escapeHtml, escapeHtmlAttr } = require("../utils/htmlEscape");
 const { RECOMMENDED_GAMES_COUNT, MAX_RELATED_GAMES, GAME_DURATION_TRACKING_INTERVAL } = require("../utils/constants");
 
-// Ad tile configuration (same as index page)
-const AD_FIRST_POSITION = 13; // 0-indexed (position 14 in 1-indexed)
-const AD_INTERVAL = 20; // Insert ad every 20 game tiles after first
-const TOTAL_GRID_ITEMS = 42; // 7 rows × 6 columns
+// Horizontal ad configuration: insert every 3 rows (3 × 6 = 18 games)
+const AD_INTERVAL = 18;
 
 /**
- * Check if an ad should be inserted after a given game index
- * @param {number} gameIndex - The 0-indexed position in the game list
- * @returns {boolean} Whether an ad should be inserted after this game
+ * Generate HTML for a full-width horizontal ad row
+ * @param {number} adIndex - Unique index for this ad
+ * @returns {string} HTML string for horizontal ad row
  */
-function shouldInsertAdAfter(gameIndex) {
-  if (gameIndex < AD_FIRST_POSITION - 1) return false;
-  const positionFromFirst = gameIndex - (AD_FIRST_POSITION - 1);
-  return positionFromFirst >= 0 && positionFromFirst % AD_INTERVAL === 0;
-}
-
-/**
- * Calculate how many ads will be inserted for a given number of games
- */
-function calculateAdCount(gameCount) {
-  let adCount = 0;
-  for (let i = 0; i < gameCount; i++) {
-    if (shouldInsertAdAfter(i)) adCount++;
-  }
-  return adCount;
-}
-
-/**
- * Calculate how many games needed to fill grid with ads
- * For 42 total items with ads at positions 14 and 34, we need 40 games
- */
-function getGamesNeededForGrid() {
-  let games = TOTAL_GRID_ITEMS;
-  while (games + calculateAdCount(games) > TOTAL_GRID_ITEMS && games > 0) {
-    games--;
-  }
-  return games;
-}
-
-const GAMES_FOR_RECOMMENDATIONS = getGamesNeededForGrid(); // Should be 40
-
-/**
- * Generate HTML for an ad tile card (for game page recommendations)
- * @param {number} adIndex - Unique index for this ad tile
- * @returns {string} HTML string for ad tile card
- */
-function generateAdTile(adIndex) {
-  return `<div class="card ad-tile" data-ad-index="${adIndex}">
-    <div class="ad-content">
-      <ins class="adsbygoogle"
-        style="display:block;width:100%;height:100%"
-        data-ad-client="ca-pub-1033412505744705"
-        data-ad-slot="1961978889"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </div>
+function generateHorizontalAd(adIndex) {
+  return `<div class="horizontal-ad-row" data-ad-index="${adIndex}">
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="2719401053"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>`;
 }
 
@@ -129,7 +89,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   }
 
   // Build recommendations: first related games, then fill with other games
-  // Use GAMES_FOR_RECOMMENDATIONS to account for ad tiles (40 games + 2 ads = 42 items)
+  // Use RECOMMENDED_GAMES_COUNT (42) — horizontal ads are inserted between rows,
+  // not as grid items, so all 42 slots are game cards.
   const recommendations = [];
 
   // Add related games first (up to MAX_RELATED_GAMES)
@@ -137,17 +98,17 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   recommendations.push(...relatedToAdd);
 
   // Fill remaining slots with other games
-  const remainingSlots = GAMES_FOR_RECOMMENDATIONS - recommendations.length;
+  const remainingSlots = RECOMMENDED_GAMES_COUNT - recommendations.length;
   const othersToAdd = otherGames.slice(0, remainingSlots);
   recommendations.push(...othersToAdd);
 
   // If we still need more games, add more from same category
-  if (recommendations.length < GAMES_FOR_RECOMMENDATIONS && sameCategory.length > MAX_RELATED_GAMES) {
-    const moreRelated = sameCategory.slice(MAX_RELATED_GAMES, MAX_RELATED_GAMES + (GAMES_FOR_RECOMMENDATIONS - recommendations.length));
+  if (recommendations.length < RECOMMENDED_GAMES_COUNT && sameCategory.length > MAX_RELATED_GAMES) {
+    const moreRelated = sameCategory.slice(MAX_RELATED_GAMES, MAX_RELATED_GAMES + (RECOMMENDED_GAMES_COUNT - recommendations.length));
     recommendations.push(...moreRelated);
   }
 
-  // Generate recommended games HTML with ad tiles
+  // Generate recommended games HTML with horizontal ads every 3 rows
   let adCount = 0;
   let recommendedGamesHTML = '';
   recommendations.forEach((g, idx) => {
@@ -166,9 +127,9 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
       <div class="card-title">${escapedNameText}</div>
     </a>`;
 
-    // Check if we should insert an ad tile after this game
-    if (shouldInsertAdAfter(idx)) {
-      recommendedGamesHTML += generateAdTile(adCount);
+    // Insert a full-width horizontal ad every 3 rows (every 18 games)
+    if ((idx + 1) % AD_INTERVAL === 0) {
+      recommendedGamesHTML += generateHorizontalAd(adCount);
       adCount++;
     }
   });
@@ -264,32 +225,6 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
           allowfullscreen
           tabindex="0">
         </iframe>
-      </div>
-
-      <!-- Vertical Display Ad (Left Side) -->
-      <div class="vertical-ad-container left-ad">
-        <div class="ad-content">
-          <ins class="adsbygoogle"
-            style="display:block"
-            data-ad-client="ca-pub-1033412505744705"
-            data-ad-slot="9122283604"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
-          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        </div>
-      </div>
-
-      <!-- Vertical Display Ad (Right Side) -->
-      <div class="vertical-ad-container right-ad">
-        <div class="ad-content">
-          <ins class="adsbygoogle"
-            style="display:block"
-            data-ad-client="ca-pub-1033412505744705"
-            data-ad-slot="9122283604"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
-          <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-        </div>
       </div>
     </div>
   </main>
@@ -724,12 +659,13 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
   <!-- Initialize AdSense Ads -->
   <script>
     (function() {
-      // Initialize all existing ad tiles
-      var ads = document.querySelectorAll('.ad-tile ins.adsbygoogle');
-      for (var i = 0; i < ads.length; i++) {
-        try {
-          (adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {}
+      if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
+        var ads = document.querySelectorAll('.horizontal-ad-row ins.adsbygoogle');
+        for (var i = 0; i < ads.length; i++) {
+          try {
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          } catch (e) {}
+        }
       }
     })();
   </script>

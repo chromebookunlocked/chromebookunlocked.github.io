@@ -1128,50 +1128,7 @@ button:active {
   }
 }
 
-/* Banner Ad Containers */
-.ad-banner-container {
-  display: none;
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 160px;
-  height: 600px;
-  z-index: 50;
-  background: rgba(26, 0, 51, 0.3);
-  border: 1px solid rgba(255, 102, 255, 0.2);
-  border-radius: 10px;
-  backdrop-filter: blur(10px);
-  overflow: hidden;
-}
-
-.ad-banner-left {
-  left: 10px;
-}
-
-.ad-banner-right {
-  right: 10px;
-}
-
-/* Show banners only on large screens and when game is active */
-@media (min-width: 1800px) {
-  #controls.active ~ .viewer-wrapper .ad-banner-container {
-    display: block;
-  }
-}
-
-.ad-banner-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: rgba(255, 255, 255, 0.3);
-  font-family: var(--font-main);
-  font-size: 0.9rem;
-  text-align: center;
-  padding: 1rem;
-}
-
-/* Viewer wrapper for banner positioning */
+/* Viewer wrapper */
 .viewer-wrapper {
   position: relative;
   width: 100%;
@@ -1530,56 +1487,22 @@ button:active {
   letter-spacing: 1px;
 }
 
-/* Ad Tile Cards - 2x2 grid tiles */
-.card.ad-tile {
-  background: linear-gradient(135deg, rgba(26, 0, 51, 0.9), rgba(45, 0, 82, 0.9));
-  border: 2px solid rgba(255, 102, 255, 0.25);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* Span 2 columns and 2 rows to make it 2x2 */
-  grid-column: span 2;
-  grid-row: span 2;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-  padding: 0;
-  min-height: 0;
-  min-width: 0;
-}
-
-.card.ad-tile:hover {
-  transform: none;
-  border-color: rgba(255, 102, 255, 0.35);
-  box-shadow: 0 4px 20px rgba(255, 102, 255, 0.3);
-}
-
-.card.ad-tile .ad-content {
+/* Horizontal Ad Row - Full-width ad between game rows */
+.horizontal-ad-row {
+  grid-column: 1 / -1;
   width: 100%;
-  height: 100%;
+  min-height: 90px;
   overflow: hidden;
-  position: relative;
 }
 
-.card.ad-tile .ad-content ins {
+.horizontal-ad-row ins {
   display: block !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
   width: 100% !important;
-  height: 100% !important;
 }
 
-.card.ad-tile .ad-content ins iframe,
-.card.ad-tile .ad-content ins > div {
-  width: 100% !important;
-  height: 100% !important;
-  border: 0 !important;
-}
-
-/* Ensure ad iframes are always visible */
-.card.ad-tile iframe,
-.card.ad-tile .ad-content iframe,
-.card.ad-tile ins iframe {
+/* Ensure horizontal ad iframes are always visible */
+.horizontal-ad-row iframe,
+.horizontal-ad-row ins iframe {
   opacity: 1 !important;
   visibility: visible !important;
   display: block !important;
@@ -1801,13 +1724,6 @@ button:active {
       </div>
 
       <div class="viewer-wrapper">
-        <!-- Left Banner Ad -->
-        <div class="ad-banner-container ad-banner-left">
-          <div class="ad-banner-placeholder">
-            Advertisement
-          </div>
-        </div>
-
         <!-- Game Viewer -->
         <div class="viewer" id="viewer">
           <div id="startOverlay">
@@ -1816,13 +1732,6 @@ button:active {
             <button id="startButton" onclick="startGame()">▶ Play</button>
           </div>
           <iframe id="gameFrame" src="" scrolling="no"></iframe>
-        </div>
-
-        <!-- Right Banner Ad -->
-        <div class="ad-banner-container ad-banner-right">
-          <div class="ad-banner-placeholder">
-            Advertisement
-          </div>
         </div>
       </div>
 
@@ -1895,16 +1804,6 @@ button:active {
       <img class="thumb" data-src="games/Bit Planes/thumbnail.webp" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E" alt="Bit Planes" loading="lazy" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">Bit Planes</div>
-  </div><div class="card ad-tile" data-ad-index="0">
-    <div class="ad-content">
-      <ins class="adsbygoogle"
-        style="display:block;width:100%;height:100%"
-        data-ad-client="ca-pub-1033412505744705"
-        data-ad-slot="1961978889"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </div>
   </div><div class="card game-card" data-index="13" data-folder="Bouncemasters" data-name="bouncemasters" onclick="window.location.href='/Bouncemasters.html'">
     <div class="thumb-container" style="--thumb-url: url('games/Bouncemasters/thumbnail.webp')">
       <img class="thumb" data-src="games/Bouncemasters/thumbnail.webp" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E" alt="Bouncemasters" loading="lazy" decoding="async" width="300" height="300">
@@ -1930,6 +1829,14 @@ button:active {
       <img class="thumb" data-src="games/Basketball Super Stars/thumbnail.webp" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E" alt="Basketball Super Stars" loading="lazy" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">Basketball Super Stars</div>
+  </div><div class="horizontal-ad-row" data-ad-index="0">
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="2719401053"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div><div class="card game-card" data-index="18" data-folder="Basketball Legends" data-name="basketball legends" onclick="window.location.href='/Basketball Legends.html'">
     <div class="thumb-container" style="--thumb-url: url('games/Basketball Legends/thumbnail.webp')">
       <img class="thumb" data-src="games/Basketball Legends/thumbnail.webp" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E" alt="Basketball Legends" loading="lazy" decoding="async" width="300" height="300">
@@ -1995,9 +1902,8 @@ button:active {
     window.__renderedCount = 24;
     window.__rowsPerLoad = 3;
     window.__scrollThreshold = 300;
-    // Ad tile configuration
-    window.__adFirstPosition = 13;
-    window.__adInterval = 20;
+    // Horizontal ad configuration (every 3 rows = 18 games at 6 columns)
+    window.__adInterval = 18;
     window.__adCount = 1;
     // Newly Added games (folders list)
     window.__newlyAddedFolders = ["Sausage Flip","Skinwalker","Red Ball","Rooftop Run","Obby Cart","Five Nights at Epstein Island","Cars Arena","Tiny Fishing","Plants vs Zombies Modded","Minecraft Tower Defence","Drive in Russia","Meme Soundboard","Mr Mine","Orange Roulette","Exit Path","Bad Ice Cream 2","Obby Bike","Papas Burgeria","Basketball Super Stars","Tower Wizzard","Ninja Obby Parkour","Cave Crawler","Buster Jam","Airline Tycoon Idle","10 Minutes Till Dawn","1on1 Soccer","1on1 Tennis","1v1.lol","2048","234 Player Games"];
@@ -2006,12 +1912,14 @@ button:active {
   <!-- Initialize AdSense Ads -->
   <script>
     (function() {
-      // Initialize all existing ad tiles
-      var ads = document.querySelectorAll('.ad-tile ins.adsbygoogle');
-      for (var i = 0; i < ads.length; i++) {
-        try {
-          (adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {}
+      if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
+        // Initialize all server-rendered horizontal ad units
+        var ads = document.querySelectorAll('.horizontal-ad-row ins.adsbygoogle');
+        for (var i = 0; i < ads.length; i++) {
+          try {
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          } catch (e) {}
+        }
       }
     })();
   </script>
@@ -2078,47 +1986,42 @@ function updateRecentlyPlayedNav() {
   }
 }
 
-// Ad tile configuration
-const AD_FIRST_POSITION = window.__adFirstPosition || 13;
-const AD_INTERVAL = window.__adInterval || 20;
+// Horizontal ad configuration: every 3 rows (18 games at 6 columns)
+const AD_INTERVAL = window.__adInterval || 18;
 let adCount = window.__adCount || 0;
 
 /**
- * Check if an ad should be inserted after a given game index
+ * Check if a horizontal ad should be inserted after a given game index
  * @param {number} gameIndex - The 0-indexed position in the game list
  * @returns {boolean} Whether an ad should be inserted after this game
  */
 function shouldInsertAdAfter(gameIndex) {
-  if (gameIndex < AD_FIRST_POSITION - 1) return false;
-  const positionFromFirst = gameIndex - (AD_FIRST_POSITION - 1);
-  return positionFromFirst >= 0 && positionFromFirst % AD_INTERVAL === 0;
+  return (gameIndex + 1) % AD_INTERVAL === 0;
 }
 
 /**
- * Create an ad tile element
- * @param {number} adIndex - Unique index for this ad tile
- * @returns {HTMLElement} Ad tile element
+ * Create a full-width horizontal ad element
+ * @param {number} adIndex - Unique index for this ad
+ * @returns {HTMLElement} Horizontal ad element
  */
-function createAdTile(adIndex) {
-  const tile = document.createElement('div');
-  tile.className = 'card ad-tile';
-  tile.setAttribute('data-ad-index', adIndex);
-  tile.innerHTML = `<div class="ad-content">
-    <ins class="adsbygoogle"
-      style="display:block;width:100%;height:100%"
-      data-ad-client="ca-pub-1033412505744705"
-      data-ad-slot="1961978889"
-      data-ad-format="auto"
-      data-full-width-responsive="true"></ins>
-  </div>`;
-  return tile;
+function createHorizontalAd(adIndex) {
+  const div = document.createElement('div');
+  div.className = 'horizontal-ad-row';
+  div.setAttribute('data-ad-index', adIndex);
+  div.innerHTML = `<ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-1033412505744705"
+    data-ad-slot="2719401053"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>`;
+  return div;
 }
 
 /**
- * Initialize an ad tile
- * @param {HTMLElement} tile - The ad tile element
+ * Initialize a horizontal ad unit
+ * @param {HTMLElement} adEl - The horizontal ad element
  */
-function initializeAdTile(tile) {
+function initializeHorizontalAd(adEl) {
   // Don't initialize ads if bot is detected
   if (window.botDetector && window.botDetector.shouldBlockAds()) {
     return;
@@ -2296,11 +2199,11 @@ function loadMoreGames(count) {
         imageObserver.observe(img);
       }
 
-      // Check if we should insert an ad tile after this game
+      // Insert a horizontal ad every 3 rows (every 18 games)
       if (shouldInsertAdAfter(i)) {
-        const adTile = createAdTile(adCount);
-        fragment.appendChild(adTile);
-        newAdTiles.push(adTile);
+        const adEl = createHorizontalAd(adCount);
+        fragment.appendChild(adEl);
+        newAdTiles.push(adEl);
         adCount++;
       }
     }
@@ -2308,8 +2211,8 @@ function loadMoreGames(count) {
     gamesGrid.appendChild(fragment);
     renderedCount = endIndex;
 
-    // Initialize new ad tiles after they're in the DOM
-    newAdTiles.forEach(initializeAdTile);
+    // Initialize new horizontal ad units after they're in the DOM
+    newAdTiles.forEach(initializeHorizontalAd);
 
     if (renderedCount >= totalGames) {
       allGamesLoaded = true;

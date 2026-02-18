@@ -59,47 +59,42 @@ function updateRecentlyPlayedNav() {
   }
 }
 
-// Ad tile configuration
-const AD_FIRST_POSITION = window.__adFirstPosition || 13;
-const AD_INTERVAL = window.__adInterval || 20;
+// Horizontal ad configuration: every 3 rows (18 games at 6 columns)
+const AD_INTERVAL = window.__adInterval || 18;
 let adCount = window.__adCount || 0;
 
 /**
- * Check if an ad should be inserted after a given game index
+ * Check if a horizontal ad should be inserted after a given game index
  * @param {number} gameIndex - The 0-indexed position in the game list
  * @returns {boolean} Whether an ad should be inserted after this game
  */
 function shouldInsertAdAfter(gameIndex) {
-  if (gameIndex < AD_FIRST_POSITION - 1) return false;
-  const positionFromFirst = gameIndex - (AD_FIRST_POSITION - 1);
-  return positionFromFirst >= 0 && positionFromFirst % AD_INTERVAL === 0;
+  return (gameIndex + 1) % AD_INTERVAL === 0;
 }
 
 /**
- * Create an ad tile element
- * @param {number} adIndex - Unique index for this ad tile
- * @returns {HTMLElement} Ad tile element
+ * Create a full-width horizontal ad element
+ * @param {number} adIndex - Unique index for this ad
+ * @returns {HTMLElement} Horizontal ad element
  */
-function createAdTile(adIndex) {
-  const tile = document.createElement('div');
-  tile.className = 'card ad-tile';
-  tile.setAttribute('data-ad-index', adIndex);
-  tile.innerHTML = `<div class="ad-content">
-    <ins class="adsbygoogle"
-      style="display:block;width:100%;height:100%"
-      data-ad-client="ca-pub-1033412505744705"
-      data-ad-slot="1961978889"
-      data-ad-format="auto"
-      data-full-width-responsive="true"></ins>
-  </div>`;
-  return tile;
+function createHorizontalAd(adIndex) {
+  const div = document.createElement('div');
+  div.className = 'horizontal-ad-row';
+  div.setAttribute('data-ad-index', adIndex);
+  div.innerHTML = `<ins class="adsbygoogle"
+    style="display:block"
+    data-ad-client="ca-pub-1033412505744705"
+    data-ad-slot="2719401053"
+    data-ad-format="auto"
+    data-full-width-responsive="true"></ins>`;
+  return div;
 }
 
 /**
- * Initialize an ad tile
- * @param {HTMLElement} tile - The ad tile element
+ * Initialize a horizontal ad unit
+ * @param {HTMLElement} adEl - The horizontal ad element
  */
-function initializeAdTile(tile) {
+function initializeHorizontalAd(adEl) {
   // Don't initialize ads if bot is detected
   if (window.botDetector && window.botDetector.shouldBlockAds()) {
     return;
@@ -277,11 +272,11 @@ function loadMoreGames(count) {
         imageObserver.observe(img);
       }
 
-      // Check if we should insert an ad tile after this game
+      // Insert a horizontal ad every 3 rows (every 18 games)
       if (shouldInsertAdAfter(i)) {
-        const adTile = createAdTile(adCount);
-        fragment.appendChild(adTile);
-        newAdTiles.push(adTile);
+        const adEl = createHorizontalAd(adCount);
+        fragment.appendChild(adEl);
+        newAdTiles.push(adEl);
         adCount++;
       }
     }
@@ -289,8 +284,8 @@ function loadMoreGames(count) {
     gamesGrid.appendChild(fragment);
     renderedCount = endIndex;
 
-    // Initialize new ad tiles after they're in the DOM
-    newAdTiles.forEach(initializeAdTile);
+    // Initialize new horizontal ad units after they're in the DOM
+    newAdTiles.forEach(initializeHorizontalAd);
 
     if (renderedCount >= totalGames) {
       allGamesLoaded = true;
