@@ -10,9 +10,11 @@ const AD_INTERVAL = 18;
 /**
  * Generate HTML for a full-width horizontal ad row
  * @param {number} adIndex - Unique index for this ad
- * @returns {string} HTML string for horizontal ad row
+ * @param {boolean} adsEnabled - Whether ads are enabled
+ * @returns {string} HTML string for horizontal ad row (empty string if ads disabled)
  */
-function generateHorizontalAd(adIndex) {
+function generateHorizontalAd(adIndex, adsEnabled = true) {
+  if (!adsEnabled) return '';
   return `<div class="horizontal-ad-row" data-ad-index="${adIndex}">
     <ins class="adsbygoogle"
       style="display:block"
@@ -46,7 +48,7 @@ function escapeJs(str) {
  * @param {string} gamesDir - Path to games directory
  * @returns {string} Complete HTML document for game page
  */
-function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) {
+function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, adsEnabled = true) {
   const thumbInfo = getThumbPath(game, gamesDir);
   const thumbPath = thumbInfo.path;
   const gameUrl = `games/${game.folder}/index.html`;
@@ -129,7 +131,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
     // Insert a full-width horizontal ad every 3 rows (every 18 games)
     if ((idx + 1) % AD_INTERVAL === 0) {
-      recommendedGamesHTML += generateHorizontalAd(adCount);
+      recommendedGamesHTML += generateHorizontalAd(adCount, adsEnabled);
       adCount++;
     }
   });
@@ -146,8 +148,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 <html lang="en">
 <head>
   <!-- Resource Hints for Performance -->
-  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
-  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+  ${adsEnabled ? `<link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>` : ''}
 
   <!-- Bot Detection (must load before ads) -->
   <script src="../assets/bot-detector.js"></script>
@@ -162,7 +164,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
     gtag('config', 'G-4QZLTDX504');
   </script>
 
-  <!-- Google AdSense (conditionally loaded based on bot detection) -->
+  ${adsEnabled ? `<!-- Google AdSense (conditionally loaded based on bot detection) -->
   <script>
     // Only load AdSense if not a bot
     if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
@@ -172,7 +174,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
       adsScript.crossOrigin = 'anonymous';
       document.head.appendChild(adsScript);
     }
-  </script>
+  </script>` : ''}
 
   ${generateAnalyticsScript()}
 
@@ -656,7 +658,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
 
   </script>
 
-  <!-- Initialize AdSense Ads -->
+  ${adsEnabled ? `<!-- Initialize AdSense Ads -->
   <script>
     (function() {
       if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
@@ -668,7 +670,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir) 
         }
       }
     })();
-  </script>
+  </script>` : ''}
 
   <!-- Cookie Consent Banner -->
   <link rel="stylesheet" href="assets/cookie-consent.css">

@@ -61,7 +61,8 @@ jobs:
           # Copy static files
           cp index.html dist/index.html
           cp *.html dist/
-          cp ads.txt dist/ads.txt
+          # Only copy ads.txt if it exists (may be absent when ads are disabled)
+          if [ -f ads.txt ]; then cp ads.txt dist/ads.txt; fi
           cp sitemap.xml dist/sitemap.xml
           cp robots.txt dist/robots.txt
           cp google0d95473435a7c986.html dist/google0d95473435a7c986.html

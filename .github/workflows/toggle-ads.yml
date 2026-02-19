@@ -1,0 +1,152 @@
+name: Toggle Ads
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Enable or disable all ads on the site'
+        required: true
+        type: choice
+        options:
+          - 'Enable Ads'
+          - 'Disable Ads'
+
+jobs:
+  toggle-ads:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Update ads configuration
+        run: |
+          if [ "${{ inputs.action }}" = "Enable Ads" ]; then
+            node -e "
+              const fs = require('fs');
+              const config = JSON.parse(fs.readFileSync('ads-config.json', 'utf8'));
+              config.adsEnabled = true;
+              fs.writeFileSync('ads-config.json', JSON.stringify(config, null, 2) + '\n');
+              console.log('Ads configuration set to ENABLED');
+            "
+          else
+            node -e "
+              const fs = require('fs');
+              const config = JSON.parse(fs.readFileSync('ads-config.json', 'utf8'));
+              config.adsEnabled = false;
+              fs.writeFileSync('ads-config.json', JSON.stringify(config, null, 2) + '\n');
+              console.log('Ads configuration set to DISABLED');
+            "
+          fi
+
+      - name: Rebuild site with updated ad settings
+        run: npm run build
+
+      - name: Copy files to dist
+        run: |
+          mkdir -p dist
+          cp -r games dist/games
+          cp -r assets dist/assets
+          cp -r important-pages dist/important-pages
+
+          rsync -av --delete data/ dist/data/
+
+          cp index.html dist/index.html
+          cp *.html dist/
+
+          # Only copy ads.txt if it exists (removed when ads are disabled)
+          if [ -f ads.txt ]; then
+            cp ads.txt dist/ads.txt
+          else
+            # Remove ads.txt from dist if it exists there
+            rm -f dist/ads.txt
+            echo "ads.txt removed (ads disabled)"
+          fi
+
+          cp sitemap.xml dist/sitemap.xml
+          cp robots.txt dist/robots.txt
+          cp google0d95473435a7c986.html dist/google0d95473435a7c986.html
+          cp .nojekyll dist/.nojekyll
+
+      - name: Commit configuration and rebuilt pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [ "${{ inputs.action }}" = "Enable Ads" ]; then
+            COMMIT_MSG="Enable ads: restore ads.txt and ad code in all pages"
+          else
+            COMMIT_MSG="Disable ads: remove ads.txt and ad code from all pages"
+          fi
+
+          # Stage all changed files (HTML pages, ads-config.json, ads.txt add/remove)
+          git add -A ads-config.json
+          git add -A "*.html" 2>/dev/null || true
+          git add -A index.html 2>/dev/null || true
+          # Handle ads.txt: stage it if present, or stage its removal
+          if [ -f ads.txt ]; then
+            git add ads.txt
+          else
+            git rm --cached ads.txt 2>/dev/null || true
+          fi
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "$COMMIT_MSG" --author="github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+
+            MAX_RETRIES=4
+            RETRY_COUNT=0
+            DELAY=2
+
+            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+              echo "Attempting to push (attempt $((RETRY_COUNT + 1))/$MAX_RETRIES)..."
+              if git push origin main; then
+                echo "Successfully pushed changes"
+                break
+              else
+                RETRY_COUNT=$((RETRY_COUNT + 1))
+                if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                  echo "Push failed, waiting ${DELAY}s before retry..."
+                  sleep $DELAY
+                  DELAY=$((DELAY * 2))
+                  git pull --rebase origin main || true
+                fi
+              fi
+            done
+
+            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+              echo "Failed to push after $MAX_RETRIES attempts"
+              exit 1
+            fi
+          fi
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          clean: false
+
+      - name: Summary
+        run: |
+          if [ "${{ inputs.action }}" = "Enable Ads" ]; then
+            echo "✅ Ads ENABLED successfully!"
+            echo "   - ads.txt restored"
+            echo "   - Ad code added to all pages"
+          else
+            echo "✅ Ads DISABLED successfully!"
+            echo "   - ads.txt removed"
+            echo "   - Ad code stripped from all pages"
+          fi
+          echo "   - Site rebuilt and deployed to GitHub Pages"

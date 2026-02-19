@@ -765,11 +765,15 @@ h1 {
   width: 100%;
   min-height: 90px;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .horizontal-ad-row ins {
   display: block !important;
   width: 100% !important;
+  margin: 0 auto;
 }
 
 /* Ensure horizontal ad iframes are always visible */
