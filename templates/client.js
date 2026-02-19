@@ -69,6 +69,7 @@ let adCount = window.__adCount || 0;
  * @returns {boolean} Whether an ad should be inserted after this game
  */
 function shouldInsertAdAfter(gameIndex) {
+  if (window.__adsEnabled === false) return false;
   return (gameIndex + 1) % AD_INTERVAL === 0;
 }
 
@@ -95,7 +96,8 @@ function createHorizontalAd(adIndex) {
  * @param {HTMLElement} adEl - The horizontal ad element
  */
 function initializeHorizontalAd(adEl) {
-  // Don't initialize ads if bot is detected
+  // Don't initialize ads if disabled or bot is detected
+  if (window.__adsEnabled === false) return;
   if (window.botDetector && window.botDetector.shouldBlockAds()) {
     return;
   }

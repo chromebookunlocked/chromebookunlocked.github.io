@@ -61,9 +61,11 @@ function generateSidebar(categories) {
 /**
  * Generate HTML for a full-width horizontal ad row
  * @param {number} adIndex - Unique index for this ad
- * @returns {string} HTML string for horizontal ad row
+ * @param {boolean} adsEnabled - Whether ads are enabled
+ * @returns {string} HTML string for horizontal ad row (empty string if ads disabled)
  */
-function generateHorizontalAd(adIndex) {
+function generateHorizontalAd(adIndex, adsEnabled = true) {
+  if (!adsEnabled) return '';
   return `<div class="horizontal-ad-row" data-ad-index="${adIndex}">
     <ins class="adsbygoogle"
       style="display:block"

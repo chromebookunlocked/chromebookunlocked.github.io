@@ -27,7 +27,21 @@ const gamesDir = path.join(__dirname, "games");
 const outputDir = __dirname; // Output directly to root directory
 const templatesDir = path.join(__dirname, "templates");
 
+// Load ads configuration
+const adsConfigPath = path.join(__dirname, "ads-config.json");
+const adsConfig = JSON.parse(fs.readFileSync(adsConfigPath, "utf8"));
+const adsEnabled = adsConfig.adsEnabled !== false;
+
+// Manage ads.txt based on configuration
+const adsTxtPath = path.join(__dirname, "ads.txt");
+if (adsEnabled) {
+  fs.writeFileSync(adsTxtPath, adsConfig.adsTxtContent + "\n", "utf8");
+} else if (fs.existsSync(adsTxtPath)) {
+  fs.unlinkSync(adsTxtPath);
+}
+
 console.log("🚀 Starting build process...\n");
+console.log(`📢 Ads: ${adsEnabled ? "ENABLED" : "DISABLED"}\n`);
 
 // Step 1: Load game data
 console.log("📦 Loading game data...");
@@ -48,7 +62,7 @@ console.log("✅ Templates loaded\n");
 
 // Step 4: Generate main index page
 console.log("🏠 Generating main index page...");
-const indexHTML = generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir);
+const indexHTML = generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir, adsEnabled);
 const indexPath = path.join(outputDir, "index.html");
 fs.writeFileSync(indexPath, indexHTML);
 console.log(`✅ Created ${indexPath}\n`);
@@ -58,7 +72,7 @@ console.log("🎮 Generating game pages...");
 let generatedCount = 0;
 
 games.forEach(game => {
-  const gameHTML = generateGamePage(game, games, categories, gamePageStyles, gamesDir);
+  const gameHTML = generateGamePage(game, games, categories, gamePageStyles, gamesDir, adsEnabled);
   const gamePagePath = path.join(outputDir, `${game.folder}.html`);
   fs.writeFileSync(gamePagePath, gameHTML);
   generatedCount++;
@@ -82,4 +96,5 @@ console.log(`   - Games: ${games.length}`);
 console.log(`   - Categories: ${Object.keys(categories).length}`);
 console.log(`   - Total pages: ${games.length + 1} (index + games)`);
 console.log(`   - SEO files: sitemap.xml, robots.txt`);
+console.log(`   - Ads: ${adsEnabled ? "enabled (ads.txt present)" : "disabled (ads.txt removed)"}`);
 console.log(`   - Output directory: ${outputDir}\n`);

@@ -99,7 +99,7 @@ function shuffleArray(array, seed) {
  * @param {string} gamesDir - Optional path to games directory (for asset resolution)
  * @returns {string} Complete HTML document
  */
-function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.') {
+function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.', adsEnabled = true) {
   // Generate sidebar categories - sorted by game count (largest first)
   // Filter out categories with less than 2 games, and exclude special categories
   const sidebarCategories = Object.keys(categories)
@@ -167,7 +167,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     initialCardsHTML += generateGameCard(game, idx, gamesDir, true);
     // Check if we should insert a horizontal ad after this game
     if (shouldInsertAdAfter(idx)) {
-      initialCardsHTML += generateHorizontalAd(adCount);
+      initialCardsHTML += generateHorizontalAd(adCount, adsEnabled);
       adCount++;
     }
   });
@@ -183,8 +183,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <!-- Resource Hints for Performance -->
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
-  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
-  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+  ${adsEnabled ? `<link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>` : ''}
 
   <!-- Optimize Google Fonts loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -216,7 +216,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     gtag('config', 'G-4QZLTDX504');
   </script>
 
-  <!-- Google AdSense (conditionally loaded based on bot detection) -->
+  ${adsEnabled ? `<!-- Google AdSense (conditionally loaded based on bot detection) -->
   <script>
     // Only load AdSense if not a bot
     if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
@@ -226,7 +226,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       adsScript.crossOrigin = 'anonymous';
       document.head.appendChild(adsScript);
     }
-  </script>
+  </script>` : ''}
 
   ${generateAnalyticsScript()}
 
@@ -330,9 +330,11 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     window.__adCount = ${adCount};
     // Newly Added games (folders list)
     window.__newlyAddedFolders = ${JSON.stringify(newlyAddedFolders)};
+    // Ads toggle flag
+    window.__adsEnabled = ${adsEnabled};
   </script>
 
-  <!-- Initialize AdSense Ads -->
+  ${adsEnabled ? `<!-- Initialize AdSense Ads -->
   <script>
     (function() {
       if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
@@ -345,7 +347,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         }
       }
     })();
-  </script>
+  </script>` : ''}
 
   <script>
     ${clientJS}
