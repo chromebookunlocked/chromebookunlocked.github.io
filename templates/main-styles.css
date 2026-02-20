@@ -310,6 +310,46 @@ html,body {
   white-space: nowrap;
 }
 
+/* Header navigation tabs */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0 0.75rem;
+  flex-shrink: 0;
+}
+
+.header-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-family: var(--font-main);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  border: 1px solid rgba(255, 102, 255, 0.2);
+  background: rgba(255, 102, 255, 0.06);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.header-nav-link:hover {
+  color: #fff;
+  border-color: rgba(255, 102, 255, 0.6);
+  background: rgba(255, 102, 255, 0.15);
+  box-shadow: 0 0 12px rgba(255, 102, 255, 0.2);
+}
+
+.header-nav-link.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(255, 102, 255, 0.12);
+}
+
 @media (max-width: 768px) {
   #topHeader {
     height: var(--header-height-mobile);
@@ -351,6 +391,10 @@ html,body {
   #searchContainer {
     height: 40px;
     min-height: 40px;
+  }
+  /* Hide nav tabs on mobile - space-constrained */
+  .header-nav {
+    display: none;
   }
 }
 

@@ -260,6 +260,9 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         <img src="assets/logo.webp" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='/'" width="48" height="48" fetchpriority="high">
         <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
       </div>
+      <nav class="header-nav" aria-label="Site navigation">
+        <a href="/news" class="header-nav-link">📰 News</a>
+      </nav>
       <div id="searchContainer" role="search">
         <span id="searchIcon" aria-hidden="true">🔍</span>
         <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)" aria-label="Search for games" autocomplete="off">
