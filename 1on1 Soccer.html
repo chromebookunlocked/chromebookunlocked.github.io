@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <!-- Resource Hints for Performance -->
-  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
-  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+  
 
   <!-- Bot Detection (must load before ads) -->
   <script src="../assets/bot-detector.js"></script>
@@ -18,17 +17,7 @@
     gtag('config', 'G-4QZLTDX504');
   </script>
 
-  <!-- Google AdSense (conditionally loaded based on bot detection) -->
-  <script>
-    // Only load AdSense if not a bot
-    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
-      var adsScript = document.createElement('script');
-      adsScript.async = true;
-      adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705';
-      adsScript.crossOrigin = 'anonymous';
-      document.head.appendChild(adsScript);
-    }
-  </script>
+  
 
   
 <script>
@@ -928,11 +917,15 @@ h1 {
   width: 100%;
   min-height: 90px;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .horizontal-ad-row ins {
   display: block !important;
   width: 100% !important;
+  margin: 0 auto;
 }
 
 /* Ensure horizontal ad iframes are always visible */
@@ -1495,15 +1488,7 @@ footer {
         <img class="thumb" src="games/Bad Piggies/thumbnail.webp" alt="Play Bad Piggies Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Bad Piggies</div>
-    </a><div class="horizontal-ad-row" data-ad-index="0">
-    <ins class="adsbygoogle"
-      style="display:block"
-      data-ad-client="ca-pub-1033412505744705"
-      data-ad-slot="2719401053"
-      data-ad-format="auto"
-      data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  </div><a href="/Bad Time Simulator.html" class="game-card" title="Play Bad Time Simulator Unblocked Free Online" onclick="trackRecentGame('Bad Time Simulator')">
+    </a><a href="/Bad Time Simulator.html" class="game-card" title="Play Bad Time Simulator Unblocked Free Online" onclick="trackRecentGame('Bad Time Simulator')">
       <div class="thumb-container" style="--thumb-url: url('games/Bad Time Simulator/thumbnail.webp')">
         <img class="thumb" src="games/Bad Time Simulator/thumbnail.webp" alt="Play Bad Time Simulator Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
@@ -1593,15 +1578,7 @@ footer {
         <img class="thumb" src="games/BTD5/thumbnail.webp" alt="Play BTD5 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">BTD5</div>
-    </a><div class="horizontal-ad-row" data-ad-index="1">
-    <ins class="adsbygoogle"
-      style="display:block"
-      data-ad-client="ca-pub-1033412505744705"
-      data-ad-slot="2719401053"
-      data-ad-format="auto"
-      data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  </div><a href="/Bullet Force.html" class="game-card" title="Play Bullet Force Unblocked Free Online" onclick="trackRecentGame('Bullet Force')">
+    </a><a href="/Bullet Force.html" class="game-card" title="Play Bullet Force Unblocked Free Online" onclick="trackRecentGame('Bullet Force')">
       <div class="thumb-container" style="--thumb-url: url('games/Bullet Force/thumbnail.webp')">
         <img class="thumb" src="games/Bullet Force/thumbnail.webp" alt="Play Bullet Force Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
@@ -2147,19 +2124,7 @@ footer {
 
   </script>
 
-  <!-- Initialize AdSense Ads -->
-  <script>
-    (function() {
-      if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
-        var ads = document.querySelectorAll('.horizontal-ad-row ins.adsbygoogle');
-        for (var i = 0; i < ads.length; i++) {
-          try {
-            (adsbygoogle = window.adsbygoogle || []).push({});
-          } catch (e) {}
-        }
-      }
-    })();
-  </script>
+  
 
   <!-- Cookie Consent Banner -->
   <link rel="stylesheet" href="assets/cookie-consent.css">
