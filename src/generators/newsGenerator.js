@@ -111,6 +111,7 @@ function sharedHead(title, description, canonicalPath, extraMeta = "") {
     }
     :root {
       --accent: #ff66ff;
+      --accent-light: #ff99ff;
       --accent-dark: #cc33ff;
       --bg: #0d001a;
       --bg2: #1c0033;
@@ -120,7 +121,9 @@ function sharedHead(title, description, canonicalPath, extraMeta = "") {
       --text: #eee;
       --text-muted: #aaa;
       --font: 'Orbitron', 'Orbitron Fallback', 'Arial Black', sans-serif;
+      --font-main: 'Orbitron', 'Orbitron Fallback', 'Arial Black', sans-serif;
       --radius: 10px;
+      --header-height: 56px;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
@@ -131,35 +134,89 @@ function sharedHead(title, description, canonicalPath, extraMeta = "") {
       min-height: 100vh;
       font-size: clamp(13px, 1vw, 16px);
     }
+    body { padding-top: var(--header-height); }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    /* Header */
-    .site-header {
-      background: rgba(0,0,0,0.5);
-      border-bottom: 1px solid rgba(255,102,255,0.25);
-      padding: 0.75rem 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      position: sticky;
+    /* Header — matches main site #topHeader */
+    #topHeader {
+      position: fixed;
       top: 0;
-      z-index: 100;
+      left: 0;
+      right: 0;
+      z-index: 1001;
+      height: var(--header-height);
+      min-height: var(--header-height);
+      background: rgba(13, 0, 26, 0.97);
       backdrop-filter: blur(8px);
-    }
-    .site-header .logo {
+      -webkit-backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      color: var(--accent);
-      font-size: 1.1em;
-      font-weight: 700;
+      justify-content: space-between;
+      padding-right: 1.5rem;
+    }
+    .header-left {
+      height: 100%;
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      gap: clamp(8px, 1.5vw, 16px);
+      cursor: pointer;
+      transition: 0.3s ease;
       text-decoration: none;
     }
-    .site-header .logo img { width: 36px; height: 36px; border-radius: 6px; }
-    .site-header nav { margin-left: auto; display: flex; gap: 1.5rem; font-size: 0.85em; }
-    .site-header nav a { color: var(--text-muted); }
-    .site-header nav a:hover { color: var(--accent); text-decoration: none; }
+    .header-left:hover { opacity: 0.9; }
+    .header-logo {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      min-height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      padding: 2px;
+      box-shadow: 0 2px 10px rgba(255, 102, 255, 0.2);
+      object-fit: contain;
+    }
+    #topHeader h1 {
+      margin: 0;
+      font-size: clamp(0.85rem, 2vw, 1.3rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light), #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.3px;
+    }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-right: auto;
+      padding-left: 0.5rem;
+    }
+    .header-nav-link {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+      font-weight: 600;
+      padding: 0.3em 0.75em;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 102, 255, 0.2);
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+    .header-nav-link:hover {
+      color: var(--accent);
+      border-color: rgba(255, 102, 255, 0.6);
+      background: rgba(255, 102, 255, 0.08);
+      text-decoration: none;
+    }
+    @media (max-width: 480px) {
+      .header-nav-link { font-size: 0.7rem; padding: 0.25em 0.55em; }
+      #topHeader h1 { display: none; }
+    }
 
     /* Page wrapper */
     .page { max-width: 900px; margin: 2.5rem auto; padding: 0 1.25rem 4rem; }
@@ -282,50 +339,153 @@ function sharedHead(title, description, canonicalPath, extraMeta = "") {
     .related-section { margin-top: 3rem; }
     .related-section h2 { font-size: 1em; color: var(--accent); margin-bottom: 1rem; }
 
-    /* Footer */
-    .site-footer {
+    /* Footer — matches main site #siteFooter */
+    #siteFooter {
+      background: linear-gradient(180deg, rgba(13, 0, 26, 0.98) 0%, rgba(8, 0, 18, 0.99) 100%);
+      border-top: 2px solid rgba(255, 102, 255, 0.3);
       margin-top: 4rem;
-      border-top: 1px solid rgba(255,102,255,0.15);
-      padding-top: 1.5rem;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+      padding: 2.5rem 1.5rem;
       text-align: center;
-      font-size: 0.78em;
-      color: var(--text-muted);
+    }
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+    }
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      text-align: center;
+    }
+    .footer-brand h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff66ff, #ff99ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+    }
+    .footer-url {
+      font-family: 'Courier New', monospace;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.85rem;
+      padding: 0.4rem 0.8rem;
+      background: rgba(255, 102, 255, 0.08);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 102, 255, 0.15);
+    }
+    .footer-links {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
       justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      width: 100%;
     }
-    .site-footer a { color: var(--text-muted); }
-    .site-footer a:hover { color: var(--accent); }
+    .footer-links a {
+      color: rgba(255, 255, 255, 0.65);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      position: relative;
+      font-family: var(--font-main);
+      font-weight: 500;
+      padding: 0.5rem 0;
+      display: inline-block;
+      text-align: center;
+    }
+    .footer-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #ff66ff, transparent);
+      transition: width 0.3s ease;
+    }
+    .footer-links a:hover {
+      color: #ff66ff;
+      text-decoration: none;
+      transform: translateY(-2px);
+    }
+    .footer-links a:hover::after { width: 100%; }
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: center;
+    }
+    .footer-bottom p {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.75rem;
+      margin: 0;
+      opacity: 0.8;
+      font-family: var(--font-main);
+      font-weight: 300;
+      letter-spacing: 0.5px;
+    }
+    @media (max-width: 768px) {
+      #siteFooter { padding: 2rem 1rem; }
+      .footer-content { gap: 1.5rem; }
+      .footer-links { gap: 1.5rem; }
+      .footer-links a { font-size: 0.85rem; }
+      .footer-bottom { padding-top: 1.5rem; }
+    }
+    @media (max-width: 480px) {
+      .footer-links { gap: 1.2rem; }
+      .footer-links a { font-size: 0.8rem; }
+    }
 
     @media (max-width: 640px) {
       .news-card.featured { flex-direction: column; }
-      .site-header .logo span { display: none; }
     }
   </style>
 </head>`;
 }
 
 function siteHeader() {
-  return `<header class="site-header">
-  <a class="logo" href="/">
-    <img src="/assets/logo.webp" alt="Logo" width="36" height="36">
-    <span>Chromebook Unlocked</span>
+  return `<header id="topHeader">
+  <a class="header-left" href="/" aria-label="Go to home page">
+    <img src="/assets/logo.webp" alt="Chromebook Unlocked Games Logo" class="header-logo" width="36" height="36">
+    <h1>Chromebook Unlocked Games</h1>
   </a>
-  <nav>
-    <a href="/">Games</a>
-    <a href="/news.html">News</a>
+  <nav class="header-nav" aria-label="Site navigation">
+    <a href="/" class="header-nav-link">Games</a>
+    <a href="/news.html" class="header-nav-link">News</a>
   </nav>
 </header>`;
 }
 
 function siteFooter() {
-  return `<footer class="site-footer">
-  <a href="/">Home</a>
-  <a href="/news.html">News</a>
-  <a href="/important-pages/privacy-policy.html">Privacy Policy</a>
-  <a href="/important-pages/terms-of-service.html">Terms of Service</a>
-  <a href="/important-pages/contact.html">Contact</a>
+  const year = new Date().getFullYear();
+  return `<footer id="siteFooter">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <h3>Chromebook Unlocked Games</h3>
+      <span class="footer-url">chromebookunlocked.github.io</span>
+    </div>
+    <div class="footer-links">
+      <a href="/important-pages/privacy-policy.html">Privacy Policy</a>
+      <a href="/important-pages/cookie-policy.html">Cookie Policy</a>
+      <a href="/important-pages/terms-of-service.html">Terms of Service</a>
+      <a href="/important-pages/contact.html">Contact</a>
+      <a href="/important-pages/dmca.html">DMCA</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; ${year} Chromebook Unlocked Games. All rights reserved.</p>
+  </div>
 </footer>`;
 }
 
