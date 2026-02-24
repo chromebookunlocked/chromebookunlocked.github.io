@@ -11,14 +11,11 @@
   <meta property="og:url" content="https://chromebookunlocked.github.io/news.html">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary">
-
-  <link rel="icon" type="image/png" href="assets/logo.png">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap"></noscript>
-
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
   <script>
@@ -27,7 +24,6 @@
     gtag('js', new Date());
     gtag('config', 'G-4QZLTDX504');
   </script>
-
   <style>
     @font-face {
       font-family: 'Orbitron Fallback';
@@ -37,21 +33,21 @@
     :root {
       --accent: #ff66ff;
       --accent-dark: #cc33ff;
-      --accent-light: #ff99ff;
       --bg: #0d001a;
+      --bg2: #1c0033;
       --card-bg: #2d0052;
       --card-border: #4d0066;
       --card-hover: #3d006a;
       --text: #eee;
-      --text-muted: rgba(255,255,255,0.65);
-      --font-main: 'Orbitron', 'Orbitron Fallback', 'Arial Black', sans-serif;
-      --header-height: 56px;
+      --text-muted: #aaa;
+      --font: 'Orbitron', 'Orbitron Fallback', 'Arial Black', sans-serif;
+      --radius: 10px;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
       background: linear-gradient(135deg, #0d001a 0%, #1c0033 50%, #2d0052 100%);
       background-attachment: fixed;
-      font-family: var(--font-main);
+      font-family: var(--font);
       color: var(--text);
       min-height: 100vh;
       font-size: clamp(13px, 1vw, 16px);
@@ -59,317 +55,237 @@
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    /* ── Header (matches index.html #topHeader) ── */
-    #topHeader {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 1001;
-      height: var(--header-height);
-      min-height: var(--header-height);
-      background: rgba(13, 0, 26, 0.97);
+    /* Header */
+    .site-header {
+      background: rgba(0,0,0,0.5);
+      border-bottom: 1px solid rgba(255,102,255,0.25);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
       backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      box-shadow: 0 2px 15px rgba(0,0,0,0.3);
+    }
+    .site-header .logo {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding-right: 1.5rem;
-    }
-    .header-left {
-      height: 100%;
-      padding: 0 2rem;
-      display: flex;
-      align-items: center;
-      gap: clamp(8px, 1.5vw, 16px);
-      cursor: pointer;
-      transition: opacity 0.3s ease;
-      text-decoration: none;
-    }
-    .header-left:hover { opacity: 0.9; text-decoration: none; }
-    .header-logo {
-      width: 36px; height: 36px;
-      min-width: 36px; min-height: 36px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      padding: 2px;
-      box-shadow: 0 2px 10px rgba(255,102,255,0.2);
-      object-fit: contain;
-    }
-    .header-title {
-      margin: 0;
-      font-size: clamp(0.85rem, 2vw, 1.3rem);
+      gap: 0.75rem;
+      color: var(--accent);
+      font-size: 1.1em;
       font-weight: 700;
-      background: linear-gradient(135deg, var(--accent), var(--accent-light), #6366f1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -0.3px;
-      white-space: nowrap;
-    }
-    .header-nav {
-      display: flex;
-      align-items: center;
-      margin-right: auto;
-    }
-    .header-nav-link {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: clamp(0.7rem, 1.2vw, 0.85rem);
-      font-weight: 600;
-      padding: 0.3em 0.85em;
-      border-left: 2px solid rgba(255,102,255,0.35);
-      border-right: 2px solid rgba(255,102,255,0.35);
-      transition: color 0.15s, border-color 0.15s;
-      white-space: nowrap;
-    }
-    .header-nav-link:hover {
-      color: var(--accent);
-      border-color: rgba(255,102,255,0.7);
       text-decoration: none;
     }
-    .header-nav-link.active {
-      color: var(--accent);
-      border-color: rgba(255,102,255,0.5);
-    }
+    .site-header .logo img { width: 36px; height: 36px; border-radius: 6px; }
+    .site-header nav { margin-left: auto; display: flex; gap: 1.5rem; font-size: 0.85em; }
+    .site-header nav a { color: var(--text-muted); }
+    .site-header nav a:hover { color: var(--accent); text-decoration: none; }
 
-    @media (max-width: 768px) {
-      #topHeader { height: auto; min-height: var(--header-height); flex-wrap: wrap; padding: 0.5rem 1rem; gap: 0.5rem; }
-      .header-left { padding: 0; }
-      .header-title { font-size: 0.9rem; }
-    }
-    @media (max-width: 480px) {
-      .header-nav-link { font-size: 0.7rem; padding: 0.25em 0.6em; }
-    }
+    /* Page wrapper */
+    .page { max-width: 900px; margin: 2.5rem auto; padding: 0 1.25rem 4rem; }
 
-    /* ── Page layout ── */
-    .page {
-      max-width: 860px;
-      margin: 0 auto;
-      padding: calc(var(--header-height) + 2.5rem) 1.25rem 4rem;
-    }
+    /* Page title */
     .page-title {
-      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
       font-weight: 900;
       color: var(--accent);
-      margin-bottom: 2rem;
-      text-shadow: 0 0 20px rgba(255,102,255,0.35);
+      margin-bottom: 0.4rem;
+      text-shadow: 0 0 20px rgba(255,102,255,0.4);
+    }
+    .page-subtitle { color: var(--text-muted); font-size: 0.9em; margin-bottom: 2rem; }
+
+    /* Category badge */
+    .badge {
+      display: inline-block;
+      padding: 0.2em 0.65em;
+      border-radius: 4px;
+      font-size: 0.72em;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #0d001a;
     }
 
-    /* ── News cards ── */
-    .news-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+    /* News card grid */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
     }
     .news-card {
-      display: block;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 1.3rem 1.5rem;
-      text-decoration: none;
-      color: var(--text);
-      transition: border-color 0.18s, background 0.18s, transform 0.15s;
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
     }
     .news-card:hover {
       background: var(--card-hover);
       border-color: var(--accent-dark);
       transform: translateY(-2px);
-      text-decoration: none;
     }
-    .news-card-title {
-      font-size: clamp(0.95rem, 2vw, 1.15rem);
+    .news-card.featured {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 1.5rem;
+      border-color: var(--accent-dark);
+      background: rgba(204,51,255,0.12);
+    }
+    .news-card.featured .card-body { flex: 1; }
+    .featured-label {
+      font-size: 0.7em;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+    .news-card h2 {
+      font-size: 1em;
       font-weight: 700;
       color: var(--text);
-      margin-bottom: 0.45rem;
-      line-height: 1.3;
+      line-height: 1.35;
     }
-    .news-card-summary {
-      font-size: 0.85em;
-      color: #ccc;
-      line-height: 1.55;
-      margin-bottom: 0.6rem;
+    .news-card.featured h2 { font-size: 1.2em; }
+    .news-card .meta { font-size: 0.75em; color: var(--text-muted); }
+    .news-card p { font-size: 0.85em; color: #ccc; line-height: 1.55; flex: 1; }
+    .news-card .read-more {
+      font-size: 0.82em;
+      color: var(--accent);
+      font-weight: 700;
+      align-self: flex-start;
     }
-    .news-card-meta {
-      font-size: 0.75em;
-      color: rgba(255,255,255,0.45);
-    }
+    .news-card .read-more:hover { text-decoration: underline; }
     .empty-state {
       text-align: center;
       padding: 3rem 1rem;
-      color: rgba(255,255,255,0.45);
+      color: var(--text-muted);
       font-size: 0.9em;
     }
 
-    /* ── Footer (matches index.html #siteFooter) ── */
-    #siteFooter {
-      background: rgba(0,0,0,0.4);
-      border-top: 1px solid rgba(255,102,255,0.12);
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-      padding: 2.5rem 1.5rem;
+    /* Article page */
+    .article-header { margin-bottom: 1.75rem; }
+    .article-header h1 {
+      font-size: clamp(1.3rem, 2.5vw, 2rem);
+      font-weight: 900;
+      line-height: 1.25;
+      color: var(--text);
+      margin: 0.5rem 0 0.75rem;
+    }
+    .article-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; font-size: 0.82em; color: var(--text-muted); }
+    .article-body {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1.75rem 2rem;
+      line-height: 1.75;
+      font-size: 0.95em;
+    }
+    .article-body p { margin-bottom: 1.1em; }
+    .article-body p:last-child { margin-bottom: 0; }
+
+    /* Back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85em;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    .back-link:hover { color: var(--accent); text-decoration: none; }
+
+    /* Related articles */
+    .related-section { margin-top: 3rem; }
+    .related-section h2 { font-size: 1em; color: var(--accent); margin-bottom: 1rem; }
+
+    /* Footer */
+    .site-footer {
+      margin-top: 4rem;
+      border-top: 1px solid rgba(255,102,255,0.15);
+      padding-top: 1.5rem;
       text-align: center;
-    }
-    .footer-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 2rem;
-    }
-    .footer-brand {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.75rem;
-    }
-    .footer-brand h3 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #ff66ff, #ff99ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin: 0;
-    }
-    .footer-url {
-      font-family: 'Courier New', monospace;
-      color: rgba(255,255,255,0.6);
-      font-size: 0.85rem;
-      padding: 0.4rem 0.8rem;
-      background: rgba(255,102,255,0.08);
-      border-radius: 6px;
-      border: 1px solid rgba(255,102,255,0.15);
-    }
-    .footer-links {
+      font-size: 0.78em;
+      color: var(--text-muted);
       display: flex;
       flex-wrap: wrap;
+      gap: 0.75rem;
       justify-content: center;
-      align-items: center;
-      gap: 2rem;
-      width: 100%;
     }
-    .footer-links a {
-      color: rgba(255,255,255,0.65);
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: all 0.3s ease;
-      position: relative;
-      font-family: var(--font-main);
-      font-weight: 500;
-      padding: 0.5rem 0;
-      display: inline-block;
-    }
-    .footer-links a::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 50%;
-      transform: translateX(-50%);
-      width: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, #ff66ff, transparent);
-      transition: width 0.3s ease;
-    }
-    .footer-links a:hover { color: #ff66ff; text-decoration: none; transform: translateY(-2px); }
-    .footer-links a:hover::after { width: 100%; }
-    .footer-bottom {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding-top: 2rem;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      text-align: center;
-    }
-    .footer-bottom p {
-      color: rgba(255,255,255,0.5);
-      font-size: 0.75rem;
-      margin: 0;
-      font-family: var(--font-main);
-      font-weight: 300;
-      letter-spacing: 0.5px;
-    }
-    @media (max-width: 768px) {
-      #siteFooter { padding: 2rem 1rem; }
-      .footer-content { gap: 1.5rem; }
-      .footer-links { gap: 1.5rem; }
-      .footer-links a { font-size: 0.85rem; }
-      .footer-bottom { padding-top: 1.5rem; }
-    }
-    @media (max-width: 480px) {
-      .footer-links { gap: 1.2rem; }
-      .footer-links a { font-size: 0.8rem; }
+    .site-footer a { color: var(--text-muted); }
+    .site-footer a:hover { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .news-card.featured { flex-direction: column; }
+      .site-header .logo span { display: none; }
     }
   </style>
 </head>
 <body>
-
-<header id="topHeader">
-  <a class="header-left" href="/">
-    <img src="/assets/logo.webp" alt="Chromebook Unlocked Games Logo" class="header-logo" width="36" height="36">
-    <h1 class="header-title">Chromebook Unlocked Games</h1>
+<header class="site-header">
+  <a class="logo" href="/">
+    <img src="/assets/logo.webp" alt="Logo" width="36" height="36">
+    <span>Chromebook Unlocked</span>
   </a>
-  <nav class="header-nav" aria-label="Site navigation">
-    <a href="/" class="header-nav-link">Games</a>
+  <nav>
+    <a href="/">Games</a>
+    <a href="/news.html">News</a>
   </nav>
 </header>
-
 <main class="page">
   <h1 class="page-title">News &amp; Updates</h1>
+  <p class="page-subtitle">Announcements, new games, and site updates.</p>
 
-  <div class="news-list" id="newsList">
+  <div class="filter-bar" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem;">
+    <button class="filter-btn active" data-cat="">All</button><button class="filter-btn" data-cat="announcement">Announcements</button><button class="filter-btn" data-cat="update">Updates</button><button class="filter-btn" data-cat="new-games">New Games</button><button class="filter-btn" data-cat="maintenance">Maintenance</button><button class="filter-btn" data-cat="community">Community</button>
+  </div>
+
+  <div class="news-grid" id="newsGrid">
     <div class="empty-state"><p>No news articles yet. Check back soon!</p></div>
   </div>
 </main>
-
-<footer id="siteFooter">
-  <div class="footer-content">
-    <div class="footer-brand">
-      <h3>Chromebook Unlocked Games</h3>
-      <span class="footer-url">chromebookunlocked.github.io</span>
-    </div>
-    <div class="footer-links">
-      <a href="/important-pages/privacy-policy.html">Privacy Policy</a>
-      <a href="/important-pages/cookie-policy.html">Cookie Policy</a>
-      <a href="/important-pages/terms-of-service.html">Terms of Service</a>
-      <a href="/important-pages/contact.html">Contact</a>
-      <a href="/important-pages/dmca.html">DMCA</a>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>&copy; 2026 Chromebook Unlocked Games. All rights reserved.</p>
-  </div>
+<footer class="site-footer">
+  <a href="/">Home</a>
+  <a href="/news.html">News</a>
+  <a href="/important-pages/privacy-policy.html">Privacy Policy</a>
+  <a href="/important-pages/terms-of-service.html">Terms of Service</a>
+  <a href="/important-pages/contact.html">Contact</a>
 </footer>
 
-<script>
-  // Load news articles from /news/*.json, newest first
-  (async () => {
-    try {
-      const res = await fetch('/news/index.json');
-      if (!res.ok) return;
-      const articles = await res.json();
-      if (!articles || !articles.length) return;
-
-      // Sort newest first
-      articles.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-      const list = document.getElementById('newsList');
-      list.innerHTML = articles.map(a => {
-        const date = new Date(a.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        const slug = a.slug || a.id;
-        return `<a class="news-card" href="/news-${slug}.html">
-          <div class="news-card-title">${escHtml(a.title)}</div>
-          ${a.summary ? `<div class="news-card-summary">${escHtml(a.summary)}</div>` : ''}
-          <div class="news-card-meta">${date}${a.author ? ' · ' + escHtml(a.author) : ''}</div>
-        </a>`;
-      }).join('');
-    } catch (e) {
-      // No articles or no index — empty state stays
-    }
-  })();
-
-  function escHtml(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+<style>
+  .filter-bar .filter-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    color: var(--text-muted);
+    padding: 0.3em 0.9em;
+    font-family: var(--font);
+    font-size: 0.78em;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
   }
+  .filter-bar .filter-btn:hover,
+  .filter-bar .filter-btn.active {
+    background: var(--accent-dark);
+    border-color: var(--accent);
+    color: #fff;
+  }
+</style>
+<script>
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.cat;
+      document.querySelectorAll('#newsGrid .news-card').forEach(card => {
+        card.style.display = (!cat || card.dataset.cat === cat) ? '' : 'none';
+      });
+    });
+  });
 </script>
 </body>
 </html>

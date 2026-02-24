@@ -879,16 +879,17 @@ html,body {
   text-decoration: none;
   font-size: clamp(0.7rem, 1.2vw, 0.85rem);
   font-weight: 600;
-  padding: 0.3em 0.85em;
-  border-left: 2px solid rgba(255, 102, 255, 0.35);
-  border-right: 2px solid rgba(255, 102, 255, 0.35);
-  transition: color 0.15s, border-color 0.15s;
+  padding: 0.3em 0.75em;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 102, 255, 0.2);
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
   white-space: nowrap;
 }
 
 .header-nav-link:hover {
   color: var(--accent);
-  border-color: rgba(255, 102, 255, 0.7);
+  border-color: rgba(255, 102, 255, 0.6);
+  background: rgba(255, 102, 255, 0.08);
   text-decoration: none;
 }
 
@@ -1796,7 +1797,7 @@ button:active {
         <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
       </div>
       <nav class="header-nav" aria-label="Site navigation">
-        <a href="news.html" class="header-nav-link">News</a>
+        <a href="news.html" class="header-nav-link">📰 News</a>
       </nav>
       <div id="searchContainer" role="search">
         <span id="searchIcon" aria-hidden="true">🔍</span>
