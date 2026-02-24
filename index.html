@@ -866,6 +866,37 @@ html,body {
 
 /* Logo hover animation removed for performance */
 
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: auto;
+  padding-left: 0.5rem;
+}
+
+.header-nav-link {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: clamp(0.7rem, 1.2vw, 0.85rem);
+  font-weight: 600;
+  padding: 0.3em 0.75em;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 102, 255, 0.2);
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+
+.header-nav-link:hover {
+  color: var(--accent);
+  border-color: rgba(255, 102, 255, 0.6);
+  background: rgba(255, 102, 255, 0.08);
+  text-decoration: none;
+}
+
+@media (max-width: 480px) {
+  .header-nav-link { font-size: 0.7rem; padding: 0.25em 0.55em; }
+}
+
 #topHeader h1 {
   margin: 0;
   font-size: clamp(0.85rem, 2vw, 1.3rem);
@@ -1765,6 +1796,9 @@ button:active {
         <img src="assets/logo.webp" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='/'" width="48" height="48" fetchpriority="high">
         <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
       </div>
+      <nav class="header-nav" aria-label="Site navigation">
+        <a href="news.html" class="header-nav-link">📰 News</a>
+      </nav>
       <div id="searchContainer" role="search">
         <span id="searchIcon" aria-hidden="true">🔍</span>
         <input type="text" id="searchBar" placeholder="Search games..." oninput="searchGames(this.value)" aria-label="Search for games" autocomplete="off">
