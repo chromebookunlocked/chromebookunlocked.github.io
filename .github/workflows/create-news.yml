@@ -1,0 +1,166 @@
+name: Create News Article
+
+# How to use:
+#   Go to Actions → "Create News Article" → "Run workflow"
+#   Fill in the form fields and click "Run workflow".
+#   The workflow will create the article, rebuild the site, and deploy it.
+#
+# Content tips:
+#   - Use a blank line (leave an empty line) between paragraphs in the content field.
+#     GitHub's textarea converts real newlines, so you can press Enter freely.
+#   - If you need a line break within a paragraph, write \n in the content.
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'Article title'
+        required: true
+        type: string
+
+      summary:
+        description: 'Short summary shown on the news listing page (1-2 sentences)'
+        required: true
+        type: string
+
+      content:
+        description: 'Full article body. Press Enter for new paragraphs.'
+        required: true
+        type: string
+
+      category:
+        description: 'Article category'
+        required: true
+        type: choice
+        default: 'announcement'
+        options:
+          - announcement
+          - update
+          - new-games
+          - maintenance
+          - community
+
+      author:
+        description: 'Author name (leave blank to use "Team")'
+        required: false
+        default: 'Team'
+        type: string
+
+      featured:
+        description: 'Feature this article prominently at the top of the news page'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  create-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create news article JSON
+        env:
+          NEWS_TITLE: ${{ inputs.title }}
+          NEWS_SUMMARY: ${{ inputs.summary }}
+          NEWS_CONTENT: ${{ inputs.content }}
+          NEWS_CATEGORY: ${{ inputs.category }}
+          NEWS_AUTHOR: ${{ inputs.author || 'Team' }}
+          NEWS_FEATURED: ${{ inputs.featured }}
+        run: node scripts/create-news-article.js
+
+      - name: Build site
+        run: npm run build
+
+      - name: Copy files to dist
+        run: |
+          mkdir -p dist
+          cp -r games dist/games
+          cp -r assets dist/assets
+          cp -r important-pages dist/important-pages
+
+          # Sync data directory
+          rsync -av --delete data/ dist/data/
+
+          # Copy all root HTML (includes news.html + news-*.html)
+          cp index.html dist/index.html
+          cp *.html dist/
+
+          # Copy news JSON source files so they're tracked
+          cp -r news dist/news 2>/dev/null || true
+
+          # Optional files
+          if [ -f ads.txt ]; then cp ads.txt dist/ads.txt; fi
+          cp sitemap.xml dist/sitemap.xml
+          cp robots.txt dist/robots.txt
+          cp google0d95473435a7c986.html dist/google0d95473435a7c986.html
+          cp .nojekyll dist/.nojekyll
+
+      - name: Commit new article and built files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A news/
+          git add news.html 2>/dev/null || true
+          git add news-*.html 2>/dev/null || true
+          git add sitemap.xml robots.txt 2>/dev/null || true
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add news article: ${{ inputs.title }}" \
+              --author="github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+
+            MAX_RETRIES=5
+            RETRY_COUNT=0
+            DELAY=2
+            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+              echo "Attempting push (attempt $((RETRY_COUNT + 1))/$MAX_RETRIES)..."
+              if git push origin main; then
+                echo "Push successful"
+                break
+              else
+                echo "Push failed, pulling with rebase..."
+                if git pull --rebase origin main; then
+                  RETRY_COUNT=$((RETRY_COUNT + 1))
+                  sleep $DELAY
+                  DELAY=$((DELAY * 2))
+                else
+                  git rebase --abort
+                  exit 1
+                fi
+              fi
+            done
+
+            if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+              echo "Failed to push after $MAX_RETRIES attempts"
+              exit 1
+            fi
+          fi
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          clean: false
+
+      - name: Summary
+        run: |
+          echo "✅ News article published!"
+          echo "   Title:    ${{ inputs.title }}"
+          echo "   Category: ${{ inputs.category }}"
+          echo "   Featured: ${{ inputs.featured }}"
+          echo "   The site has been rebuilt and deployed to GitHub Pages."

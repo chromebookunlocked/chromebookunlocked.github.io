@@ -97,9 +97,11 @@ function shuffleArray(array, seed) {
  * @param {string} mainStyles - CSS content string to embed in <style> tag
  * @param {string} clientJS - JavaScript content string to embed in <script> tag
  * @param {string} gamesDir - Optional path to games directory (for asset resolution)
+ * @param {boolean} adsEnabled - Whether ads are enabled
+ * @param {Array} newsArticles - Latest news articles to show in the banner (newest first)
  * @returns {string} Complete HTML document
  */
-function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.', adsEnabled = true) {
+function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.', adsEnabled = true, newsArticles = []) {
   // Generate sidebar categories - sorted by game count (largest first)
   // Filter out categories with less than 2 games, and exclude special categories
   const sidebarCategories = Object.keys(categories)
@@ -172,6 +174,45 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     }
   });
 
+  // Build news banner HTML (latest 3 articles)
+  const latestNews = newsArticles.slice(0, 3);
+  const newsBannerHtml = latestNews.length > 0 ? (() => {
+    const CATEGORY_COLORS = {
+      announcement: '#ff66ff',
+      update: '#66ccff',
+      'new-games': '#66ff99',
+      maintenance: '#ffcc66',
+      community: '#ff9966',
+    };
+    const CATEGORY_LABELS = {
+      announcement: 'Announcement',
+      update: 'Update',
+      'new-games': 'New Games',
+      maintenance: 'Maintenance',
+      community: 'Community',
+    };
+    const newsItems = latestNews.map(a => {
+      const color = CATEGORY_COLORS[a.category] || '#ff66ff';
+      const label = CATEGORY_LABELS[a.category] || a.category;
+      const date = new Date(a.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      return `<a class="news-item" href="news-${escapeHtmlAttr(a.slug)}.html">
+          <span class="news-badge" style="background:${color}">${escapeHtml(label)}</span>
+          <span class="news-title">${escapeHtml(a.title)}</span>
+          <span class="news-date">${date}</span>
+        </a>`;
+    }).join('');
+    return `<section class="news-banner" aria-label="Latest news">
+      <div class="news-banner-header">
+        <span class="news-banner-icon">📰</span>
+        <span>Latest News</span>
+        <a class="news-see-all" href="news.html">See all &rarr;</a>
+      </div>
+      <div class="news-items">
+        ${newsItems}
+      </div>
+    </section>`;
+  })() : '';
+
   // Get SEO meta tags and structured data
   const metaTags = generateIndexMetaTags();
   const structuredData = generateIndexStructuredData(games);
@@ -237,6 +278,69 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
 
   <style>
     ${mainStyles}
+
+    /* News banner */
+    .news-banner {
+      background: rgba(45, 0, 82, 0.7);
+      border: 1px solid rgba(204, 51, 255, 0.3);
+      border-radius: 10px;
+      padding: 0.85rem 1.1rem;
+      margin-bottom: 1rem;
+    }
+    .news-banner-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78em;
+      font-weight: 700;
+      color: #cc33ff;
+      margin-bottom: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .news-banner-icon { font-style: normal; }
+    .news-see-all {
+      margin-left: auto;
+      color: #ff66ff;
+      font-size: 0.9em;
+      text-decoration: none;
+      opacity: 0.85;
+    }
+    .news-see-all:hover { opacity: 1; text-decoration: underline; }
+    .news-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+    .news-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.3rem 0.5rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: background 0.15s;
+      color: #ddd;
+      font-size: 0.82em;
+    }
+    .news-item:hover {
+      background: rgba(255,102,255,0.1);
+      color: #fff;
+    }
+    .news-badge {
+      font-size: 0.7em;
+      font-weight: 700;
+      padding: 0.15em 0.55em;
+      border-radius: 4px;
+      color: #0d001a;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .news-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .news-date { color: #888; font-size: 0.9em; white-space: nowrap; flex-shrink: 0; }
+    @media (max-width: 500px) {
+      .news-date { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -285,6 +389,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
           <iframe id="gameFrame" src="" scrolling="no"></iframe>
         </div>
       </div>
+
+      ${newsBannerHtml}
 
       <!-- All Games Grid -->
       <div class="category" data-category="All Games" id="allGamesSection">

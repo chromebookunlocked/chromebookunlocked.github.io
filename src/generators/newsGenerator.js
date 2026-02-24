@@ -1,0 +1,554 @@
+const fs = require("fs");
+const path = require("path");
+
+const BASE_URL = "https://chromebookunlocked.github.io";
+
+const CATEGORY_LABELS = {
+  announcement: "Announcement",
+  update: "Update",
+  "new-games": "New Games",
+  maintenance: "Maintenance",
+  community: "Community",
+};
+
+const CATEGORY_COLORS = {
+  announcement: "#ff66ff",
+  update: "#66ccff",
+  "new-games": "#66ff99",
+  maintenance: "#ffcc66",
+  community: "#ff9966",
+};
+
+/**
+ * Load all news articles from the /news/ directory, sorted newest first.
+ * @param {string} newsDir - Path to the /news/ directory
+ * @returns {Array} Sorted array of article objects
+ */
+function loadNews(newsDir) {
+  if (!fs.existsSync(newsDir)) return [];
+
+  const files = fs.readdirSync(newsDir).filter(f => f.endsWith(".json") && f !== ".gitkeep");
+
+  const articles = files.map(file => {
+    try {
+      const raw = fs.readFileSync(path.join(newsDir, file), "utf8");
+      return JSON.parse(raw);
+    } catch (e) {
+      console.warn(`Warning: Could not parse news file ${file}: ${e.message}`);
+      return null;
+    }
+  }).filter(Boolean);
+
+  // Sort newest first
+  articles.sort((a, b) => new Date(b.date) - new Date(a.date));
+  return articles;
+}
+
+/**
+ * Format a date for display, e.g. "January 15, 2024"
+ */
+function formatDate(isoString) {
+  const d = new Date(isoString);
+  return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+}
+
+/**
+ * Convert plain-text content (with \n\n for paragraphs) to safe HTML paragraphs.
+ */
+function contentToHtml(text) {
+  const paragraphs = text.split(/\n\n+/).map(p => p.trim()).filter(Boolean);
+  return paragraphs
+    .map(p => {
+      // Replace single newlines with <br> within a paragraph
+      const withBreaks = p.replace(/\n/g, "<br>");
+      return `<p>${withBreaks}</p>`;
+    })
+    .join("\n");
+}
+
+/**
+ * Escape HTML special chars
+ */
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+/** Shared <head> section for news pages */
+function sharedHead(title, description, canonicalPath, extraMeta = "") {
+  return `<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escHtml(title)}</title>
+  <meta name="description" content="${escHtml(description)}">
+  <link rel="canonical" href="${BASE_URL}${canonicalPath}">
+  <meta property="og:title" content="${escHtml(title)}">
+  <meta property="og:description" content="${escHtml(description)}">
+  <meta property="og:url" content="${BASE_URL}${canonicalPath}">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  ${extraMeta}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap"></noscript>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-4QZLTDX504');
+  </script>
+  <style>
+    @font-face {
+      font-family: 'Orbitron Fallback';
+      src: local('Arial Black'), local('Arial Bold');
+      size-adjust: 95%;
+    }
+    :root {
+      --accent: #ff66ff;
+      --accent-dark: #cc33ff;
+      --bg: #0d001a;
+      --bg2: #1c0033;
+      --card-bg: #2d0052;
+      --card-border: #4d0066;
+      --card-hover: #3d006a;
+      --text: #eee;
+      --text-muted: #aaa;
+      --font: 'Orbitron', 'Orbitron Fallback', 'Arial Black', sans-serif;
+      --radius: 10px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: linear-gradient(135deg, #0d001a 0%, #1c0033 50%, #2d0052 100%);
+      background-attachment: fixed;
+      font-family: var(--font);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: clamp(13px, 1vw, 16px);
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Header */
+    .site-header {
+      background: rgba(0,0,0,0.5);
+      border-bottom: 1px solid rgba(255,102,255,0.25);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+    .site-header .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--accent);
+      font-size: 1.1em;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .site-header .logo img { width: 36px; height: 36px; border-radius: 6px; }
+    .site-header nav { margin-left: auto; display: flex; gap: 1.5rem; font-size: 0.85em; }
+    .site-header nav a { color: var(--text-muted); }
+    .site-header nav a:hover { color: var(--accent); text-decoration: none; }
+
+    /* Page wrapper */
+    .page { max-width: 900px; margin: 2.5rem auto; padding: 0 1.25rem 4rem; }
+
+    /* Page title */
+    .page-title {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 900;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+      text-shadow: 0 0 20px rgba(255,102,255,0.4);
+    }
+    .page-subtitle { color: var(--text-muted); font-size: 0.9em; margin-bottom: 2rem; }
+
+    /* Category badge */
+    .badge {
+      display: inline-block;
+      padding: 0.2em 0.65em;
+      border-radius: 4px;
+      font-size: 0.72em;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #0d001a;
+    }
+
+    /* News card grid */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .news-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    }
+    .news-card:hover {
+      background: var(--card-hover);
+      border-color: var(--accent-dark);
+      transform: translateY(-2px);
+    }
+    .news-card.featured {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 1.5rem;
+      border-color: var(--accent-dark);
+      background: rgba(204,51,255,0.12);
+    }
+    .news-card.featured .card-body { flex: 1; }
+    .featured-label {
+      font-size: 0.7em;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+    .news-card h2 {
+      font-size: 1em;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.35;
+    }
+    .news-card.featured h2 { font-size: 1.2em; }
+    .news-card .meta { font-size: 0.75em; color: var(--text-muted); }
+    .news-card p { font-size: 0.85em; color: #ccc; line-height: 1.55; flex: 1; }
+    .news-card .read-more {
+      font-size: 0.82em;
+      color: var(--accent);
+      font-weight: 700;
+      align-self: flex-start;
+    }
+    .news-card .read-more:hover { text-decoration: underline; }
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+      font-size: 0.9em;
+    }
+
+    /* Article page */
+    .article-header { margin-bottom: 1.75rem; }
+    .article-header h1 {
+      font-size: clamp(1.3rem, 2.5vw, 2rem);
+      font-weight: 900;
+      line-height: 1.25;
+      color: var(--text);
+      margin: 0.5rem 0 0.75rem;
+    }
+    .article-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; font-size: 0.82em; color: var(--text-muted); }
+    .article-body {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 1.75rem 2rem;
+      line-height: 1.75;
+      font-size: 0.95em;
+    }
+    .article-body p { margin-bottom: 1.1em; }
+    .article-body p:last-child { margin-bottom: 0; }
+
+    /* Back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85em;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    .back-link:hover { color: var(--accent); text-decoration: none; }
+
+    /* Related articles */
+    .related-section { margin-top: 3rem; }
+    .related-section h2 { font-size: 1em; color: var(--accent); margin-bottom: 1rem; }
+
+    /* Footer */
+    .site-footer {
+      margin-top: 4rem;
+      border-top: 1px solid rgba(255,102,255,0.15);
+      padding-top: 1.5rem;
+      text-align: center;
+      font-size: 0.78em;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+    .site-footer a { color: var(--text-muted); }
+    .site-footer a:hover { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .news-card.featured { flex-direction: column; }
+      .site-header .logo span { display: none; }
+    }
+  </style>
+</head>`;
+}
+
+function siteHeader() {
+  return `<header class="site-header">
+  <a class="logo" href="/">
+    <img src="/assets/logo.webp" alt="Logo" width="36" height="36">
+    <span>Chromebook Unlocked</span>
+  </a>
+  <nav>
+    <a href="/">Games</a>
+    <a href="/news.html">News</a>
+  </nav>
+</header>`;
+}
+
+function siteFooter() {
+  return `<footer class="site-footer">
+  <a href="/">Home</a>
+  <a href="/news.html">News</a>
+  <a href="/important-pages/privacy-policy.html">Privacy Policy</a>
+  <a href="/important-pages/terms-of-service.html">Terms of Service</a>
+  <a href="/important-pages/contact.html">Contact</a>
+</footer>`;
+}
+
+/**
+ * Generate the news listing page (news.html)
+ */
+function generateNewsListing(articles, outputDir) {
+  const categoryFilter = [
+    { value: "", label: "All" },
+    { value: "announcement", label: "Announcements" },
+    { value: "update", label: "Updates" },
+    { value: "new-games", label: "New Games" },
+    { value: "maintenance", label: "Maintenance" },
+    { value: "community", label: "Community" },
+  ];
+
+  const filterButtons = categoryFilter
+    .map(f => `<button class="filter-btn${f.value === "" ? " active" : ""}" data-cat="${escHtml(f.value)}">${escHtml(f.label)}</button>`)
+    .join("");
+
+  let cardsHtml = "";
+  if (articles.length === 0) {
+    cardsHtml = `<div class="empty-state"><p>No news articles yet. Check back soon!</p></div>`;
+  } else {
+    articles.forEach(article => {
+      const color = CATEGORY_COLORS[article.category] || "#ff66ff";
+      const label = CATEGORY_LABELS[article.category] || article.category;
+      const badge = `<span class="badge" style="background:${color}">${escHtml(label)}</span>`;
+      const featured = article.featured ? " featured" : "";
+      const featuredLabel = article.featured ? `<div class="featured-label">★ Featured</div>` : "";
+      const articleUrl = `/news-${escHtml(article.slug)}.html`;
+
+      cardsHtml += `
+  <article class="news-card${featured}" data-cat="${escHtml(article.category)}">
+    <div class="card-body">
+      ${featuredLabel}
+      <div>${badge}</div>
+      <h2><a href="${articleUrl}">${escHtml(article.title)}</a></h2>
+      <div class="meta">${formatDate(article.date)} &middot; By ${escHtml(article.author)}</div>
+      <p>${escHtml(article.summary)}</p>
+      <a class="read-more" href="${articleUrl}">Read more &rarr;</a>
+    </div>
+  </article>`;
+    });
+  }
+
+  const head = sharedHead(
+    "News & Updates — Chromebook Unlocked Games",
+    "Stay up to date with the latest announcements, new games, and updates from Chromebook Unlocked.",
+    "/news.html"
+  );
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+${head}
+<body>
+${siteHeader()}
+<main class="page">
+  <h1 class="page-title">News &amp; Updates</h1>
+  <p class="page-subtitle">Announcements, new games, and site updates.</p>
+
+  <div class="filter-bar" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem;">
+    ${filterButtons}
+  </div>
+
+  <div class="news-grid" id="newsGrid">
+    ${cardsHtml}
+  </div>
+</main>
+${siteFooter()}
+
+<style>
+  .filter-bar .filter-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    color: var(--text-muted);
+    padding: 0.3em 0.9em;
+    font-family: var(--font);
+    font-size: 0.78em;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .filter-bar .filter-btn:hover,
+  .filter-bar .filter-btn.active {
+    background: var(--accent-dark);
+    border-color: var(--accent);
+    color: #fff;
+  }
+</style>
+<script>
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.cat;
+      document.querySelectorAll('#newsGrid .news-card').forEach(card => {
+        card.style.display = (!cat || card.dataset.cat === cat) ? '' : 'none';
+      });
+    });
+  });
+</script>
+</body>
+</html>`;
+
+  const outPath = path.join(outputDir, "news.html");
+  fs.writeFileSync(outPath, html);
+  return outPath;
+}
+
+/**
+ * Generate an individual news article page (news-{slug}.html)
+ */
+function generateArticlePage(article, allArticles, outputDir) {
+  const color = CATEGORY_COLORS[article.category] || "#ff66ff";
+  const label = CATEGORY_LABELS[article.category] || article.category;
+  const badge = `<span class="badge" style="background:${color}">${escHtml(label)}</span>`;
+
+  const bodyHtml = contentToHtml(article.content);
+
+  // Related articles: up to 3 other articles (same category first, then recent)
+  const sameCat = allArticles.filter(a => a.slug !== article.slug && a.category === article.category).slice(0, 3);
+  const others = allArticles.filter(a => a.slug !== article.slug && a.category !== article.category).slice(0, 3 - sameCat.length);
+  const related = [...sameCat, ...others];
+
+  let relatedHtml = "";
+  if (related.length > 0) {
+    const relatedCards = related.map(a => {
+      const aColor = CATEGORY_COLORS[a.category] || "#ff66ff";
+      const aLabel = CATEGORY_LABELS[a.category] || a.category;
+      return `<article class="news-card">
+      <div class="card-body">
+        <div><span class="badge" style="background:${aColor}">${escHtml(aLabel)}</span></div>
+        <h2><a href="/news-${escHtml(a.slug)}.html">${escHtml(a.title)}</a></h2>
+        <div class="meta">${formatDate(a.date)}</div>
+        <p>${escHtml(a.summary)}</p>
+        <a class="read-more" href="/news-${escHtml(a.slug)}.html">Read more &rarr;</a>
+      </div>
+    </article>`;
+    }).join("\n");
+
+    relatedHtml = `<section class="related-section">
+  <h2>More Articles</h2>
+  <div class="news-grid">${relatedCards}</div>
+</section>`;
+  }
+
+  const articleJsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": article.title,
+    "description": article.summary,
+    "datePublished": article.date,
+    "author": { "@type": "Person", "name": article.author },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Chromebook Unlocked Games",
+      "url": BASE_URL,
+    },
+    "url": `${BASE_URL}/news-${article.slug}.html`,
+  });
+
+  const head = sharedHead(
+    `${article.title} — Chromebook Unlocked Games`,
+    article.summary,
+    `/news-${article.slug}.html`,
+    `<script type="application/ld+json">${articleJsonLd}</script>`
+  );
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+${head}
+<body>
+${siteHeader()}
+<main class="page">
+  <a class="back-link" href="/news.html">&larr; Back to News</a>
+
+  <header class="article-header">
+    ${badge}
+    <h1>${escHtml(article.title)}</h1>
+    <div class="article-meta">
+      <time datetime="${escHtml(article.date)}">${formatDate(article.date)}</time>
+      <span>By ${escHtml(article.author)}</span>
+    </div>
+  </header>
+
+  <div class="article-body">
+    ${bodyHtml}
+  </div>
+
+  ${relatedHtml}
+</main>
+${siteFooter()}
+</body>
+</html>`;
+
+  const outPath = path.join(outputDir, `news-${article.slug}.html`);
+  fs.writeFileSync(outPath, html);
+  return outPath;
+}
+
+/**
+ * Main entry point: generate all news pages.
+ * @param {string} newsDir  - Path to /news/ directory containing JSON files
+ * @param {string} outputDir - Output directory (root of the built site)
+ * @returns {Array} Array of loaded article objects
+ */
+function generateNewsPages(newsDir, outputDir) {
+  const articles = loadNews(newsDir);
+
+  if (articles.length === 0) {
+    console.log("ℹ️  No news articles found — generating empty news page.");
+  }
+
+  const listingPath = generateNewsListing(articles, outputDir);
+  console.log(`✅ News listing: ${listingPath}`);
+
+  articles.forEach(article => {
+    const p = generateArticlePage(article, articles, outputDir);
+    console.log(`   ✅ Article: ${p}`);
+  });
+
+  return articles;
+}
+
+module.exports = { generateNewsPages, loadNews };

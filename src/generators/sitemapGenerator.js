@@ -5,10 +5,11 @@ const { getThumbPath } = require("../utils/assetManager");
 /**
  * Generate XML sitemap with image sitemap support for SEO
  * @param {Array} games - Array of game objects
+ * @param {Array} newsArticles - Array of news article objects
  * @param {string} outputDir - Output directory path
  * @param {string} gamesDir - Games directory path for thumbnail resolution
  */
-function generateSitemap(games, outputDir, gamesDir = './games') {
+function generateSitemap(games, newsArticles = [], outputDir, gamesDir = './games') {
   const today = new Date().toISOString().split('T')[0];
   const baseUrl = 'https://chromebookunlocked.github.io';
 
@@ -71,12 +72,37 @@ function generateSitemap(games, outputDir, gamesDir = './games') {
 `;
   });
 
+  // Add news listing page
+  sitemap += `  <!-- News & Updates page -->
+  <url>
+    <loc>${baseUrl}/news.html</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+`;
+
+  // Add individual news article pages
+  newsArticles.forEach(article => {
+    const articleDate = article.date ? article.date.split('T')[0] : today;
+    sitemap += `  <!-- News: ${article.title} -->
+  <url>
+    <loc>${baseUrl}/news-${encodeURIComponent(article.slug)}.html</loc>
+    <lastmod>${articleDate}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+`;
+  });
+
   sitemap += `</urlset>`;
 
   // Write sitemap to dist folder
   const sitemapPath = path.join(outputDir, 'sitemap.xml');
   fs.writeFileSync(sitemapPath, sitemap);
-  console.log(`✅ Sitemap generated with ${games.length + 2} URLs (with image metadata)`);
+  console.log(`✅ Sitemap generated with ${games.length + 2 + newsArticles.length + 1} URLs (with image metadata)`);
 
   // Also generate robots.txt with sitemap reference
   generateRobotsTxt(outputDir, baseUrl);
