@@ -869,9 +869,16 @@ html,body {
 .header-nav {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0;
   margin-right: auto;
-  padding-left: 0.5rem;
+  padding-left: 0.75rem;
+}
+
+.header-nav-sep {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+  padding: 0 0.15rem;
+  user-select: none;
 }
 
 .header-nav-link {
@@ -879,22 +886,18 @@ html,body {
   text-decoration: none;
   font-size: clamp(0.7rem, 1.2vw, 0.85rem);
   font-weight: 600;
-  padding: 0.3em 0.75em;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 102, 255, 0.2);
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  padding: 0.3em 0.5em;
+  transition: color 0.15s;
   white-space: nowrap;
 }
 
 .header-nav-link:hover {
   color: var(--accent);
-  border-color: rgba(255, 102, 255, 0.6);
-  background: rgba(255, 102, 255, 0.08);
   text-decoration: none;
 }
 
 @media (max-width: 480px) {
-  .header-nav-link { font-size: 0.7rem; padding: 0.25em 0.55em; }
+  .header-nav-link { font-size: 0.7rem; padding: 0.25em 0.35em; }
 }
 
 #topHeader h1 {
@@ -1797,7 +1800,11 @@ button:active {
         <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
       </div>
       <nav class="header-nav" aria-label="Site navigation">
+        <span class="header-nav-sep">|</span>
+        <a href="/" class="header-nav-link">Home</a>
+        <span class="header-nav-sep">|</span>
         <a href="news.html" class="header-nav-link">News</a>
+        <span class="header-nav-sep">|</span>
       </nav>
       <div id="searchContainer" role="search">
         <span id="searchIcon" aria-hidden="true">🔍</span>
