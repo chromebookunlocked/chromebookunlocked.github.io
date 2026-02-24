@@ -1714,67 +1714,17 @@ button:active {
 }
 
 
-    /* News banner */
-    .news-banner {
-      background: rgba(45, 0, 82, 0.7);
-      border: 1px solid rgba(204, 51, 255, 0.3);
-      border-radius: 10px;
-      padding: 0.85rem 1.1rem;
-      margin-bottom: 1rem;
-    }
-    .news-banner-header {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.78em;
+    /* News (new) badge in header */
+    .news-new-badge {
+      font-size: 0.72em;
+      color: #ff99ff;
       font-weight: 700;
-      color: #cc33ff;
-      margin-bottom: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      animation: newsPulse 2s ease-in-out infinite;
+      pointer-events: none;
     }
-    .news-banner-icon { font-style: normal; }
-    .news-see-all {
-      margin-left: auto;
-      color: #ff66ff;
-      font-size: 0.9em;
-      text-decoration: none;
-      opacity: 0.85;
-    }
-    .news-see-all:hover { opacity: 1; text-decoration: underline; }
-    .news-items {
-      display: flex;
-      flex-direction: column;
-      gap: 0.45rem;
-    }
-    .news-item {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.3rem 0.5rem;
-      border-radius: 6px;
-      text-decoration: none;
-      transition: background 0.15s;
-      color: #ddd;
-      font-size: 0.82em;
-    }
-    .news-item:hover {
-      background: rgba(255,102,255,0.1);
-      color: #fff;
-    }
-    .news-badge {
-      font-size: 0.7em;
-      font-weight: 700;
-      padding: 0.15em 0.55em;
-      border-radius: 4px;
-      color: #0d001a;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    .news-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .news-date { color: #888; font-size: 0.9em; white-space: nowrap; flex-shrink: 0; }
-    @media (max-width: 500px) {
-      .news-date { display: none; }
+    @keyframes newsPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
     }
   </style>
 </head>
@@ -1803,7 +1753,7 @@ button:active {
         <span class="header-nav-sep">|</span>
         <a href="/" class="header-nav-link">Home</a>
         <span class="header-nav-sep">|</span>
-        <a href="news.html" class="header-nav-link">News</a>
+        <a href="news.html" class="header-nav-link" id="newsNavLink">News</a>
         <span class="header-nav-sep">|</span>
       </nav>
       <div id="searchContainer" role="search">
@@ -1831,8 +1781,6 @@ button:active {
           <iframe id="gameFrame" src="" scrolling="no"></iframe>
         </div>
       </div>
-
-      
 
       <!-- All Games Grid -->
       <div class="category" data-category="All Games" id="allGamesSection">
@@ -2000,6 +1948,26 @@ button:active {
     window.__newlyAddedFolders = ["Sausage Flip","Skinwalker","Red Ball","Rooftop Run","Obby Cart","Five Nights at Epstein Island","Cars Arena","Tiny Fishing","Plants vs Zombies Modded","Minecraft Tower Defence","Drive in Russia","Meme Soundboard","Mr Mine","Orange Roulette","Exit Path","Bad Ice Cream 2","Obby Bike","Papas Burgeria","Basketball Super Stars","Tower Wizzard","Ninja Obby Parkour","Cave Crawler","Buster Jam","Airline Tycoon Idle","10 Minutes Till Dawn","1on1 Soccer","1on1 Tennis","1v1.lol","2048","234 Player Games"];
     // Ads toggle flag
     window.__adsEnabled = false;
+    // Latest news date for (new) badge
+    window.__latestNewsDate = "2026-02-24T16:23:36.340Z";
+  </script>
+  <script>
+    // Show (new) badge on News header link if there are unread news
+    (function() {
+      if (!window.__latestNewsDate) return;
+      try {
+        var lastVisit = localStorage.getItem('lastNewsVisit');
+        if (!lastVisit || new Date(lastVisit) < new Date(window.__latestNewsDate)) {
+          var link = document.getElementById('newsNavLink');
+          if (link) {
+            var badge = document.createElement('span');
+            badge.className = 'news-new-badge';
+            badge.textContent = ' (new)';
+            link.appendChild(badge);
+          }
+        }
+      } catch(e) {}
+    })();
   </script>
 
   

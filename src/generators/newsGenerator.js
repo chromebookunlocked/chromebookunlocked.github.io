@@ -122,6 +122,7 @@ function sharedHead(title, description, canonicalPath, extraMeta = "") {
       --text-muted: #aaa;
       --font: 'Orbitron', 'Orbitron Fallback', 'Arial Black', sans-serif;
       --font-main: 'Orbitron', 'Orbitron Fallback', 'Arial Black', sans-serif;
+      --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
       --radius: 10px;
       --header-height: 56px;
     }
@@ -289,8 +290,8 @@ function sharedHead(title, description, canonicalPath, extraMeta = "") {
       line-height: 1.35;
     }
     .news-card.featured h2 { font-size: 1.2em; }
-    .news-card .meta { font-size: 0.75em; color: var(--text-muted); }
-    .news-card p { font-size: 0.85em; color: #ccc; line-height: 1.55; flex: 1; }
+    .news-card .meta { font-size: 0.75em; color: var(--text-muted); font-family: var(--font-body); }
+    .news-card p { font-size: 0.9em; color: #ccc; line-height: 1.6; flex: 1; font-family: var(--font-body); }
     .news-card .read-more {
       font-size: 0.82em;
       color: var(--accent);
@@ -320,10 +321,12 @@ function sharedHead(title, description, canonicalPath, extraMeta = "") {
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
       padding: 1.75rem 2rem;
-      line-height: 1.75;
-      font-size: 0.95em;
+      line-height: 1.85;
+      font-size: 1rem;
+      font-family: var(--font-body);
+      letter-spacing: 0.01em;
     }
-    .article-body p { margin-bottom: 1.1em; }
+    .article-body p { margin-bottom: 1.25em; color: #ddd; }
     .article-body p:last-child { margin-bottom: 0; }
 
     /* Back link */
@@ -466,7 +469,7 @@ function siteHeader() {
     <span class="header-nav-sep">|</span>
     <a href="/" class="header-nav-link">Home</a>
     <span class="header-nav-sep">|</span>
-    <a href="/news.html" class="header-nav-link">News</a>
+    <a href="/news.html" class="header-nav-link" id="newsNavLink">News</a>
     <span class="header-nav-sep">|</span>
   </nav>
 </header>`;
@@ -537,6 +540,7 @@ ${siteHeader()}
   </div>
 </main>
 ${siteFooter()}
+<script>try { localStorage.setItem('lastNewsVisit', new Date().toISOString()); } catch(e) {}</script>
 </body>
 </html>`;
 
@@ -609,6 +613,7 @@ function generateArticlePage(article, allArticles, outputDir) {
 ${head}
 <body>
 ${siteHeader()}
+<script>try { localStorage.setItem('lastNewsVisit', new Date().toISOString()); } catch(e) {}</script>
 <main class="page">
   <a class="back-link" href="/news.html">&larr; Back to News</a>
 
