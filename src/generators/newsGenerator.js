@@ -192,29 +192,31 @@ function sharedHead(title, description, canonicalPath, extraMeta = "") {
     .header-nav {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0;
       margin-right: auto;
-      padding-left: 0.5rem;
+      padding-left: 0.75rem;
+    }
+    .header-nav-sep {
+      color: rgba(255, 255, 255, 0.3);
+      font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+      padding: 0 0.15rem;
+      user-select: none;
     }
     .header-nav-link {
       color: rgba(255, 255, 255, 0.7);
       text-decoration: none;
       font-size: clamp(0.7rem, 1.2vw, 0.85rem);
       font-weight: 600;
-      padding: 0.3em 0.75em;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 102, 255, 0.2);
-      transition: color 0.15s, border-color 0.15s, background 0.15s;
+      padding: 0.3em 0.5em;
+      transition: color 0.15s;
       white-space: nowrap;
     }
     .header-nav-link:hover {
       color: var(--accent);
-      border-color: rgba(255, 102, 255, 0.6);
-      background: rgba(255, 102, 255, 0.08);
       text-decoration: none;
     }
     @media (max-width: 480px) {
-      .header-nav-link { font-size: 0.7rem; padding: 0.25em 0.55em; }
+      .header-nav-link { font-size: 0.7rem; padding: 0.25em 0.35em; }
       #topHeader h1 { display: none; }
     }
 
@@ -461,8 +463,11 @@ function siteHeader() {
     <h1>Chromebook Unlocked Games</h1>
   </a>
   <nav class="header-nav" aria-label="Site navigation">
-    <a href="/" class="header-nav-link">Games</a>
+    <span class="header-nav-sep">|</span>
+    <a href="/" class="header-nav-link">Home</a>
+    <span class="header-nav-sep">|</span>
     <a href="/news.html" class="header-nav-link">News</a>
+    <span class="header-nav-sep">|</span>
   </nav>
 </header>`;
 }
@@ -493,36 +498,16 @@ function siteFooter() {
  * Generate the news listing page (news.html)
  */
 function generateNewsListing(articles, outputDir) {
-  const categoryFilter = [
-    { value: "", label: "All" },
-    { value: "announcement", label: "Announcements" },
-    { value: "update", label: "Updates" },
-    { value: "new-games", label: "New Games" },
-    { value: "maintenance", label: "Maintenance" },
-    { value: "community", label: "Community" },
-  ];
-
-  const filterButtons = categoryFilter
-    .map(f => `<button class="filter-btn${f.value === "" ? " active" : ""}" data-cat="${escHtml(f.value)}">${escHtml(f.label)}</button>`)
-    .join("");
-
   let cardsHtml = "";
   if (articles.length === 0) {
     cardsHtml = `<div class="empty-state"><p>No news articles yet. Check back soon!</p></div>`;
   } else {
     articles.forEach(article => {
-      const color = CATEGORY_COLORS[article.category] || "#ff66ff";
-      const label = CATEGORY_LABELS[article.category] || article.category;
-      const badge = `<span class="badge" style="background:${color}">${escHtml(label)}</span>`;
-      const featured = article.featured ? " featured" : "";
-      const featuredLabel = article.featured ? `<div class="featured-label">★ Featured</div>` : "";
       const articleUrl = `/news-${escHtml(article.slug)}.html`;
 
       cardsHtml += `
-  <article class="news-card${featured}" data-cat="${escHtml(article.category)}">
+  <article class="news-card">
     <div class="card-body">
-      ${featuredLabel}
-      <div>${badge}</div>
       <h2><a href="${articleUrl}">${escHtml(article.title)}</a></h2>
       <div class="meta">${formatDate(article.date)} &middot; By ${escHtml(article.author)}</div>
       <p>${escHtml(article.summary)}</p>
@@ -547,47 +532,11 @@ ${siteHeader()}
   <h1 class="page-title">News &amp; Updates</h1>
   <p class="page-subtitle">Announcements, new games, and site updates.</p>
 
-  <div class="filter-bar" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem;">
-    ${filterButtons}
-  </div>
-
   <div class="news-grid" id="newsGrid">
     ${cardsHtml}
   </div>
 </main>
 ${siteFooter()}
-
-<style>
-  .filter-bar .filter-btn {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 20px;
-    color: var(--text-muted);
-    padding: 0.3em 0.9em;
-    font-family: var(--font);
-    font-size: 0.78em;
-    cursor: pointer;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
-  }
-  .filter-bar .filter-btn:hover,
-  .filter-bar .filter-btn.active {
-    background: var(--accent-dark);
-    border-color: var(--accent);
-    color: #fff;
-  }
-</style>
-<script>
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const cat = btn.dataset.cat;
-      document.querySelectorAll('#newsGrid .news-card').forEach(card => {
-        card.style.display = (!cat || card.dataset.cat === cat) ? '' : 'none';
-      });
-    });
-  });
-</script>
 </body>
 </html>`;
 

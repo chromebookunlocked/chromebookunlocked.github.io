@@ -365,7 +365,11 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
       </div>
       <nav class="header-nav" aria-label="Site navigation">
+        <span class="header-nav-sep">|</span>
+        <a href="/" class="header-nav-link">Home</a>
+        <span class="header-nav-sep">|</span>
         <a href="news.html" class="header-nav-link">News</a>
+        <span class="header-nav-sep">|</span>
       </nav>
       <div id="searchContainer" role="search">
         <span id="searchIcon" aria-hidden="true">🔍</span>
