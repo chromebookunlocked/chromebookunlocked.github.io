@@ -2285,6 +2285,14 @@
     <priority>0.6</priority>
   </url>
 
+  <!-- News: First News -->
+  <url>
+    <loc>https://chromebookunlocked.github.io/news-2026-02-24-first-news.html</loc>
+    <lastmod>2026-02-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
   <!-- News: Thanks -->
   <url>
     <loc>https://chromebookunlocked.github.io/news-2026-02-24-thanks.html</loc>
