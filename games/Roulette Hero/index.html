@@ -6,8 +6,19 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity Web Player | Roulette Hero</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 100%; height: 100%; overflow: hidden; background: #231f20; }
+      #unity-container { width: 100%; height: 100%; position: relative; }
+      #unity-canvas { width: 100% !important; height: 100% !important; display: block; }
+      #unity-loading-bar { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+      #unity-logo { width: 154px; height: 130px; background: url('https://cdn.jsdelivr.net/gh/shayderrr/portsv2@main/3dasheditor/logo.png') no-repeat center; background-size: contain; margin: 0 auto 10px; }
+      #unity-progress-bar-empty { width: 141px; height: 18px; margin: 0 auto; background: #fff; border-radius: 9px; overflow: hidden; }
+      #unity-progress-bar-full { height: 100%; background: #00b4d8; width: 0; }
+      #unity-footer { position: absolute; bottom: 0; width: 100%; display: flex; align-items: center; justify-content: flex-end; padding: 4px 8px; background: rgba(0,0,0,0.3); }
+      #unity-fullscreen-button { cursor: pointer; width: 38px; height: 38px; background: url('https://cdn.jsdelivr.net/gh/shayderrr/portsv2@main/3dasheditor/fullscreen-button.png') no-repeat center; background-size: contain; }
+      #unity-warning { position: absolute; top: 0; left: 0; right: 0; z-index: 10; }
+    </style>
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
@@ -66,8 +77,8 @@
         document.querySelector("#unity-container").className = "unity-mobile";
         canvas.className = "unity-mobile";
       } else {
-        canvas.style.width = "960px";
-        canvas.style.height = "600px";
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
       }
 
       document.querySelector("#unity-loading-bar").style.display = "block";
