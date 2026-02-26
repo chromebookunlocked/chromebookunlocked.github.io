@@ -4,7 +4,8 @@
   <!-- Resource Hints for Performance -->
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
-  
+  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
 
   <!-- Optimize Google Fonts loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,7 +37,17 @@
     gtag('config', 'G-4QZLTDX504');
   </script>
 
-  
+  <!-- Google AdSense (conditionally loaded based on bot detection) -->
+  <script>
+    // Only load AdSense if not a bot
+    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
+      var adsScript = document.createElement('script');
+      adsScript.async = true;
+      adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705';
+      adsScript.crossOrigin = 'anonymous';
+      document.head.appendChild(adsScript);
+    }
+  </script>
 
   
 <script>
@@ -1876,6 +1887,14 @@ button:active {
       <img class="thumb" data-src="games/Basketball Super Stars/thumbnail.webp" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E" alt="Basketball Super Stars" loading="lazy" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">Basketball Super Stars</div>
+  </div><div class="horizontal-ad-row" data-ad-index="0">
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="2719401053"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div><div class="card game-card" data-index="18" data-folder="Basketball Legends" data-name="basketball legends" onclick="window.location.href='/Basketball Legends.html'">
     <div class="thumb-container" style="--thumb-url: url('games/Basketball Legends/thumbnail.webp')">
       <img class="thumb" data-src="games/Basketball Legends/thumbnail.webp" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E" alt="Basketball Legends" loading="lazy" decoding="async" width="300" height="300">
@@ -1947,7 +1966,7 @@ button:active {
     // Newly Added games (folders list)
     window.__newlyAddedFolders = ["Roulette Hero","School Escape Duel","FNAF 3","Dino Run","Sausage Flip","Skinwalker","Red Ball","Rooftop Run","Obby Cart","Five Nights at Epstein Island","Cars Arena","Tiny Fishing","Plants vs Zombies Modded","Minecraft Tower Defence","Drive in Russia","Meme Soundboard","Mr Mine","Orange Roulette","Exit Path","Bad Ice Cream 2","Obby Bike","Papas Burgeria","Basketball Super Stars","Tower Wizzard","Ninja Obby Parkour","Cave Crawler","Buster Jam","Airline Tycoon Idle","10 Minutes Till Dawn","1on1 Soccer"];
     // Ads toggle flag
-    window.__adsEnabled = false;
+    window.__adsEnabled = true;
     // Latest news date for (new) badge
     window.__latestNewsDate = "2026-02-24T16:23:36.340Z";
   </script>
@@ -1970,7 +1989,20 @@ button:active {
     })();
   </script>
 
-  
+  <!-- Initialize AdSense Ads -->
+  <script>
+    (function() {
+      if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
+        // Initialize all server-rendered horizontal ad units
+        var ads = document.querySelectorAll('.horizontal-ad-row ins.adsbygoogle');
+        for (var i = 0; i < ads.length; i++) {
+          try {
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          } catch (e) {}
+        }
+      }
+    })();
+  </script>
 
   <script>
     // Lazy Loading State
