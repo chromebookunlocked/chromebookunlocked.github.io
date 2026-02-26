@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <!-- Resource Hints for Performance -->
-  
+  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
 
   <!-- Bot Detection (must load before ads) -->
   <script src="../assets/bot-detector.js"></script>
@@ -17,7 +18,17 @@
     gtag('config', 'G-4QZLTDX504');
   </script>
 
-  
+  <!-- Google AdSense (conditionally loaded based on bot detection) -->
+  <script>
+    // Only load AdSense if not a bot
+    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
+      var adsScript = document.createElement('script');
+      adsScript.async = true;
+      adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705';
+      adsScript.crossOrigin = 'anonymous';
+      document.head.appendChild(adsScript);
+    }
+  </script>
 
   
 <script>
@@ -1488,7 +1499,15 @@ footer {
         <img class="thumb" src="games/Age Of War/thumbnail.webp" alt="Play Age Of War Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Age Of War</div>
-    </a><a href="/Ages of Conflict.html" class="game-card" title="Play Ages of Conflict Unblocked Free Online" onclick="trackRecentGame('Ages of Conflict')">
+    </a><div class="horizontal-ad-row" data-ad-index="0">
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="2719401053"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div><a href="/Ages of Conflict.html" class="game-card" title="Play Ages of Conflict Unblocked Free Online" onclick="trackRecentGame('Ages of Conflict')">
       <div class="thumb-container" style="--thumb-url: url('games/Ages of Conflict/thumbnail.webp')">
         <img class="thumb" src="games/Ages of Conflict/thumbnail.webp" alt="Play Ages of Conflict Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
@@ -1578,7 +1597,15 @@ footer {
         <img class="thumb" src="games/Bouncy Basketball/thumbnail.webp" alt="Play Bouncy Basketball Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Bouncy Basketball</div>
-    </a><a href="/Bounty of One.html" class="game-card" title="Play Bounty of One Unblocked Free Online" onclick="trackRecentGame('Bounty of One')">
+    </a><div class="horizontal-ad-row" data-ad-index="1">
+    <ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="2719401053"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div><a href="/Bounty of One.html" class="game-card" title="Play Bounty of One Unblocked Free Online" onclick="trackRecentGame('Bounty of One')">
       <div class="thumb-container" style="--thumb-url: url('games/Bounty of One/thumbnail.webp')">
         <img class="thumb" src="games/Bounty of One/thumbnail.webp" alt="Play Bounty of One Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
@@ -2124,7 +2151,19 @@ footer {
 
   </script>
 
-  
+  <!-- Initialize AdSense Ads -->
+  <script>
+    (function() {
+      if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
+        var ads = document.querySelectorAll('.horizontal-ad-row ins.adsbygoogle');
+        for (var i = 0; i < ads.length; i++) {
+          try {
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          } catch (e) {}
+        }
+      }
+    })();
+  </script>
 
   <!-- Cookie Consent Banner -->
   <link rel="stylesheet" href="assets/cookie-consent.css">
