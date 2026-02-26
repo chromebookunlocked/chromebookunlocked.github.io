@@ -1525,12 +1525,23 @@ button:active {
 .horizontal-ad-row {
   grid-column: 1 / -1;
   width: 100%;
-  min-height: 90px;
-  max-height: 120px;
+  aspect-ratio: 6 / 1;
   overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+@media (min-width: 900px) and (max-width: 1199px) {
+  .horizontal-ad-row { aspect-ratio: 5 / 1; }
+}
+@media (min-width: 600px) and (max-width: 899px) {
+  .horizontal-ad-row { aspect-ratio: 4 / 1; }
+}
+@media (min-width: 400px) and (max-width: 599px) {
+  .horizontal-ad-row { aspect-ratio: 3 / 1; }
+}
+@media (max-width: 399px) {
+  .horizontal-ad-row { aspect-ratio: 2 / 1; }
 }
 
 .horizontal-ad-row ins {
