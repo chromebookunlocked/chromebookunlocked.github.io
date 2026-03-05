@@ -1,0 +1,18 @@
+{
+  "images/sigma.png":                                                                                { "name": "Patrick Bateman",    "rarity": "Legendary", "category": "Sigmas"     },
+  "images/crashout skull.png":                                                                       { "name": "Crashout Skull",     "rarity": "Epic",      "category": "Skulls"     },
+  "images/freaky skull.png":                                                                         { "name": "Freaky Skull",       "rarity": "Rare",      "category": "Skulls"     },
+  "images/gigachad.png":                                                                             { "name": "Gigachad",           "rarity": "Legendary", "category": "Sigmas"     },
+  "images/glitched trollface.png":                                                                   { "name": "Glitched Trollface", "rarity": "Epic",      "category": "Trollfaces" },
+  "images/goofy-skull-skull-goofy-removebg-preview.png":                                            { "name": "Goofy Skull",        "rarity": "Common",    "category": "Skulls"     },
+  "images/jockier.png":                                                                              { "name": "Jockier",            "rarity": "Rare",      "category": "Sigmas"     },
+  "images/sigma emoji 1.png":                                                                        { "name": "Sigma Emoji",        "rarity": "Rare",      "category": "Emojis"     },
+  "images/skull emoji.png":                                                                          { "name": "Skull Emoji",        "rarity": "Common",    "category": "Skulls"     },
+  "images/trolface red eyes.png":                                                                    { "name": "Red Eye Trollface",  "rarity": "Rare",      "category": "Trollfaces" },
+  "images/trollface crashout.webp":                                                                  { "name": "Crashout Trollface", "rarity": "Epic",      "category": "Trollfaces" },
+  "images/trollface god.png":                                                                        { "name": "Trollface God",      "rarity": "Legendary", "category": "Trollfaces" },
+  "images/tuff baby.png":                                                                            { "name": "Tuff Baby",          "rarity": "Epic",      "category": "Babies"     },
+  "images/tuff blue skull.png":                                                                      { "name": "Tuff Blue Skull",    "rarity": "Rare",      "category": "Skulls"     },
+  "images/tuff skull.png":                                                                           { "name": "Tuff Skull",         "rarity": "Rare",      "category": "Skulls"     },
+  "Special/67.gif":                                                                                  { "name": "The 67",             "rarity": "Special",   "category": "Special"    }
+}
