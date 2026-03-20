@@ -26,6 +26,24 @@ function generateHorizontalAd(adIndex, adsEnabled = true) {
   </div>`;
 }
 
+/**
+ * Generate HTML for a vertical ad slot (flanking the game viewer)
+ * @param {boolean} adsEnabled - Whether ads are enabled
+ * @returns {string} HTML string for vertical ad (empty string if ads disabled)
+ */
+function generateVerticalAd(adsEnabled = true) {
+  if (!adsEnabled) return '';
+  return `<div class="vertical-ad">
+      <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-1033412505744705"
+        data-ad-slot="9122283604"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>`;
+}
+
 // Helper to escape JavaScript string for use in HTML script tags
 function escapeJs(str) {
   if (str == null) return '';
@@ -206,6 +224,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
     <!-- Game Viewer -->
     <div class="game-container">
+      ${generateVerticalAd(adsEnabled)}
       <div class="game-frame-wrapper" id="gameWrapper">
         <!-- Controls Bar (sticky to top of game) -->
         <div class="controls">
@@ -228,6 +247,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
           tabindex="0">
         </iframe>
       </div>
+      ${generateVerticalAd(adsEnabled)}
     </div>
   </main>
 

@@ -946,29 +946,17 @@ button:active {
 .horizontal-ad-row {
   grid-column: 1 / -1;
   width: 100%;
-  aspect-ratio: 6 / 1;
-  overflow: hidden;
+  min-height: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-@media (min-width: 900px) and (max-width: 1199px) {
-  .horizontal-ad-row { aspect-ratio: 5 / 1; }
-}
-@media (min-width: 600px) and (max-width: 899px) {
-  .horizontal-ad-row { aspect-ratio: 4 / 1; }
-}
-@media (min-width: 400px) and (max-width: 599px) {
-  .horizontal-ad-row { aspect-ratio: 3 / 1; }
-}
-@media (max-width: 399px) {
-  .horizontal-ad-row { aspect-ratio: 2 / 1; }
 }
 
 .horizontal-ad-row ins {
   display: block !important;
   width: 100% !important;
   margin: 0 auto;
+  text-align: center;
 }
 
 /* Ensure horizontal ad iframes are always visible */
