@@ -20,12 +20,10 @@ const { generateSitemap } = require("./src/generators/sitemapGenerator");
 // Import generators
 const { generateIndexHTML } = require("./src/generators/indexGenerator");
 const { generateGamePage } = require("./src/generators/gamePageGenerator");
-const { generateNewsPages, loadNews } = require("./src/generators/newsGenerator");
 
 // Configuration
 const dataDir = path.join(__dirname, "data");
 const gamesDir = path.join(__dirname, "games");
-const newsDir = path.join(__dirname, "news");
 const outputDir = __dirname; // Output directly to root directory
 const templatesDir = path.join(__dirname, "templates");
 
@@ -62,14 +60,9 @@ const gamePageStyles = fs.readFileSync(path.join(templatesDir, "game-page-styles
 const clientJS = fs.readFileSync(path.join(templatesDir, "client.js"), "utf8");
 console.log("✅ Templates loaded\n");
 
-// Step 4a: Load news articles (used by index page for the news banner)
-console.log("📰 Loading news articles...");
-const newsArticles = loadNews(newsDir);
-console.log(`✅ Loaded ${newsArticles.length} news article(s)\n`);
-
 // Step 4: Generate main index page
 console.log("🏠 Generating main index page...");
-const indexHTML = generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir, adsEnabled, newsArticles);
+const indexHTML = generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir, adsEnabled);
 const indexPath = path.join(outputDir, "index.html");
 fs.writeFileSync(indexPath, indexHTML);
 console.log(`✅ Created ${indexPath}\n`);
@@ -92,22 +85,16 @@ games.forEach(game => {
 
 console.log(`✅ Generated ${generatedCount} game pages\n`);
 
-// Step 6: Generate news pages
-console.log("📰 Generating news pages...");
-generateNewsPages(newsDir, outputDir);
-console.log(`✅ News pages generated\n`);
-
-// Step 7: Generate sitemap and robots.txt
+// Step 6: Generate sitemap and robots.txt
 console.log("🗺️  Generating sitemap and robots.txt...");
-generateSitemap(games, newsArticles, outputDir, gamesDir);
+generateSitemap(games, outputDir, gamesDir);
 
 // Build complete
 console.log("\n✨ Build complete! All files generated successfully.\n");
 console.log("📊 Build summary:");
 console.log(`   - Games: ${games.length}`);
 console.log(`   - Categories: ${Object.keys(categories).length}`);
-console.log(`   - Total pages: ${games.length + 1 + newsArticles.length + 1} (index + games + news)`);
-console.log(`   - News articles: ${newsArticles.length}`);
+console.log(`   - Total pages: ${games.length + 1} (index + games)`);
 console.log(`   - SEO files: sitemap.xml, robots.txt`);
 console.log(`   - Ads: ${adsEnabled ? "enabled (ads.txt present)" : "disabled (ads.txt removed)"}`);
 console.log(`   - Output directory: ${outputDir}\n`);

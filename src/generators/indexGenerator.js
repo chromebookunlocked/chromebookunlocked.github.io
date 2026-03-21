@@ -98,10 +98,9 @@ function shuffleArray(array, seed) {
  * @param {string} clientJS - JavaScript content string to embed in <script> tag
  * @param {string} gamesDir - Optional path to games directory (for asset resolution)
  * @param {boolean} adsEnabled - Whether ads are enabled
- * @param {Array} newsArticles - Latest news articles to show in the banner (newest first)
  * @returns {string} Complete HTML document
  */
-function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.', adsEnabled = true, newsArticles = []) {
+function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.', adsEnabled = true) {
   // Generate sidebar categories - sorted by game count (largest first)
   // Filter out categories with less than 2 games, and exclude special categories
   const sidebarCategories = Object.keys(categories)
@@ -174,9 +173,6 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     }
   });
 
-  // Latest news date for (new) badge detection (client-side)
-  const latestNewsDate = newsArticles.length > 0 ? newsArticles[0].date : null;
-
   // Get SEO meta tags and structured data
   const metaTags = generateIndexMetaTags();
   const structuredData = generateIndexStructuredData(games);
@@ -243,18 +239,6 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <style>
     ${mainStyles}
 
-    /* News (new) badge in header */
-    .news-new-badge {
-      font-size: 0.72em;
-      color: #ff99ff;
-      font-weight: 700;
-      animation: newsPulse 2s ease-in-out infinite;
-      pointer-events: none;
-    }
-    @keyframes newsPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.45; }
-    }
   </style>
 </head>
 <body>
@@ -281,8 +265,6 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       <nav class="header-nav" aria-label="Site navigation">
         <span class="header-nav-sep">|</span>
         <a href="/" class="header-nav-link">Home</a>
-        <span class="header-nav-sep">|</span>
-        <a href="news.html" class="header-nav-link" id="newsNavLink">News</a>
         <span class="header-nav-sep">|</span>
       </nav>
       <div id="searchContainer" role="search">
@@ -357,26 +339,6 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     window.__newlyAddedFolders = ${JSON.stringify(newlyAddedFolders)};
     // Ads toggle flag
     window.__adsEnabled = ${adsEnabled};
-    // Latest news date for (new) badge
-    window.__latestNewsDate = ${latestNewsDate ? JSON.stringify(latestNewsDate) : 'null'};
-  </script>
-  <script>
-    // Show (new) badge on News header link if there are unread news
-    (function() {
-      if (!window.__latestNewsDate) return;
-      try {
-        var lastVisit = localStorage.getItem('lastNewsVisit');
-        if (!lastVisit || new Date(lastVisit) < new Date(window.__latestNewsDate)) {
-          var link = document.getElementById('newsNavLink');
-          if (link) {
-            var badge = document.createElement('span');
-            badge.className = 'news-new-badge';
-            badge.textContent = ' (new)';
-            link.appendChild(badge);
-          }
-        }
-      } catch(e) {}
-    })();
   </script>
 
   ${adsEnabled ? `<!-- Initialize AdSense Ads -->
