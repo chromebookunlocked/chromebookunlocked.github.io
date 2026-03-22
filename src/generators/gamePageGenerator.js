@@ -38,8 +38,7 @@ function generateVerticalAd(adsEnabled = true) {
         style="display:block"
         data-ad-client="ca-pub-1033412505744705"
         data-ad-slot="9122283604"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
+        data-ad-format="auto"></ins>
       <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>`;
 }
