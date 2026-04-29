@@ -1,13 +1,20 @@
 /**
  * Cloudflare Turnstile verification gate for Chromebook Unlocked.
  *
- * Renders a full-screen interstitial on the first page load of a session,
- * shows the official Turnstile widget, and only releases the page (and lets
- * AdSense load) once the user has been verified. Verification is cached in
- * sessionStorage so subsequent navigations within the same tab session pass
- * through without prompting again.
+ * Designed to stay out of the way for legitimate visitors:
+ *   - The page renders normally; nothing is blocked up front.
+ *   - Turnstile mounts in a hidden container with `appearance: interaction-only`,
+ *     so a managed challenge that auto-passes never shows any UI.
+ *   - If the challenge actually requires user interaction, OR if a quick
+ *     pre-flight heuristic flags the visitor as obviously bot-like, a
+ *     full-screen Cloudflare-style interstitial is shown until the widget
+ *     succeeds.
+ *   - AdSense is gated on verification but does not block page rendering.
  *
- * Public API (kept compatible with prior bot-detector.js callers):
+ * Verification is cached in sessionStorage so subsequent navigations within
+ * the same tab session pass through silently.
+ *
+ * Public API (compatible with prior bot-detector.js callers):
  *   window.botDetector.shouldBlockAds()  -> boolean
  *   window.botDetector.isVerified()      -> boolean
  *   window.botDetector.onVerified(cb)    -> register a one-shot callback
@@ -16,11 +23,18 @@
   var SITEKEY = '0x4AAAAAADFYVNcBHQbRjSvj';
   var STORAGE_KEY = 'cf_turnstile_verified';
   var TURNSTILE_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=__onTurnstileLoad';
+  // If the silent challenge hasn't resolved in this many ms, surface the overlay
+  // so the user can interact. Generous because managed challenges can legitimately
+  // take a few seconds on slow networks.
+  var SILENT_TIMEOUT_MS = 12000;
 
   var verified = sessionStorage.getItem(STORAGE_KEY) === '1';
   var widgetId = null;
   var overlayEl = null;
+  var hiddenHostEl = null;
+  var overlayVisible = false;
   var verifiedCallbacks = [];
+  var silentTimeoutHandle = null;
 
   function runVerifiedCallbacks() {
     while (verifiedCallbacks.length) {
@@ -29,6 +43,7 @@
   }
 
   function markVerified() {
+    if (silentTimeoutHandle) { clearTimeout(silentTimeoutHandle); silentTimeoutHandle = null; }
     if (verified) return;
     verified = true;
     try { sessionStorage.setItem(STORAGE_KEY, '1'); } catch (e) {}
@@ -36,17 +51,33 @@
       gtag('event', 'turnstile_verified', { event_category: 'security' });
     }
     runVerifiedCallbacks();
-    dismissOverlay();
+    hideOverlay(true);
   }
 
-  function dismissOverlay() {
-    if (!overlayEl) return;
-    overlayEl.classList.add('cf-fade-out');
-    var el = overlayEl;
-    overlayEl = null;
-    setTimeout(function () { if (el && el.parentNode) el.parentNode.removeChild(el); }, 300);
-    document.documentElement.style.overflow = '';
-    document.body && (document.body.style.overflow = '');
+  /**
+   * Quick client-side smell test. Only flags visitors that are clearly automated
+   * — real users should never trip this. When it returns true we show the
+   * blocking overlay up front; when false we let the page render and run
+   * Turnstile silently.
+   */
+  function looksSuspicious() {
+    try {
+      if (navigator.webdriver === true) return true;
+      var ua = (navigator.userAgent || '').toLowerCase();
+      var botPatterns = [
+        'headlesschrome', 'phantomjs', 'slimerjs', 'selenium', 'puppeteer',
+        'playwright', 'webdriver', 'electron/', 'python-requests', 'curl/',
+        'wget/', 'scrapy', 'go-http-client', 'java/'
+      ];
+      for (var i = 0; i < botPatterns.length; i++) {
+        if (ua.indexOf(botPatterns[i]) !== -1) return true;
+      }
+      // Real browsers expose at least one language preference.
+      if (!navigator.languages || navigator.languages.length === 0) return true;
+      // Zero-dimension screens are a headless tell.
+      if (typeof screen !== 'undefined' && (screen.width === 0 || screen.height === 0)) return true;
+    } catch (e) { /* if anything throws, don't penalise the user */ }
+    return false;
   }
 
   function injectStyles() {
@@ -68,20 +99,21 @@
       '.cf-meta a:hover{text-decoration:underline;}',
       '.cf-ray{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;}',
       '.cf-perf{display:flex;align-items:center;gap:6px;}',
-      '.cf-perf-logo{width:14px;height:14px;display:inline-block;}',
+      '#cf-turnstile-hidden{position:fixed;left:-10000px;top:-10000px;width:1px;height:1px;overflow:hidden;pointer-events:none;opacity:0;}',
       '@media (max-width:520px){.cf-card{padding:32px 24px;}.cf-host{font-size:18px;}}',
       '@media (prefers-color-scheme:dark){#cf-turnstile-overlay{background:#18181b;color:#f4f4f5;}.cf-card{background:#27272a;border-color:#3f3f46;}.cf-host{color:#fafafa;}.cf-sub{color:#a1a1aa;}.cf-divider{border-top-color:#3f3f46;}.cf-meta,.cf-meta a{color:#a1a1aa;}}'
     ].join('');
     document.head.appendChild(style);
   }
 
-  function buildOverlay() {
-    injectStyles();
+  function ensureOverlay() {
+    if (overlayEl) return;
     var host = window.location.hostname || 'this site';
     var ray = (Date.now().toString(16) + Math.random().toString(16).slice(2, 8)).slice(0, 16);
 
     overlayEl = document.createElement('div');
     overlayEl.id = 'cf-turnstile-overlay';
+    overlayEl.style.display = 'none';
     overlayEl.setAttribute('role', 'dialog');
     overlayEl.setAttribute('aria-modal', 'true');
     overlayEl.setAttribute('aria-label', 'Security verification');
@@ -89,7 +121,7 @@
       '<div class="cf-card">' +
         '<h1 class="cf-host">' + host + '</h1>' +
         '<p class="cf-sub">Verify you are human by completing the action below.</p>' +
-        '<div class="cf-widget" id="cf-turnstile-widget"></div>' +
+        '<div class="cf-widget" id="cf-turnstile-mount"></div>' +
         '<hr class="cf-divider">' +
         '<div class="cf-meta">' +
           '<span class="cf-ray">' + ray + '</span>' +
@@ -98,29 +130,114 @@
           '</span>' +
         '</div>' +
       '</div>';
+    document.body.appendChild(overlayEl);
+  }
 
+  function showOverlay() {
+    if (verified || overlayVisible) return;
+    ensureOverlay();
+    overlayEl.style.display = 'flex';
+    overlayVisible = true;
     document.documentElement.style.overflow = 'hidden';
-    if (document.body) {
-      document.body.style.overflow = 'hidden';
-      document.body.appendChild(overlayEl);
+    if (document.body) document.body.style.overflow = 'hidden';
+  }
+
+  function hideOverlay(removeAfter) {
+    if (!overlayEl || !overlayVisible) return;
+    overlayVisible = false;
+    document.documentElement.style.overflow = '';
+    if (document.body) document.body.style.overflow = '';
+    if (removeAfter) {
+      overlayEl.classList.add('cf-fade-out');
+      var el = overlayEl;
+      setTimeout(function () { if (el && el.parentNode) el.parentNode.removeChild(el); }, 300);
+      overlayEl = null;
     } else {
-      document.addEventListener('DOMContentLoaded', function () {
-        document.body.style.overflow = 'hidden';
-        document.body.appendChild(overlayEl);
-      });
+      overlayEl.style.display = 'none';
     }
   }
 
+  /**
+   * Render the widget. The mount point is the overlay's mount node when the
+   * overlay exists (suspicious or escalated case), otherwise a hidden host
+   * pinned off-screen so the widget can run silently without affecting layout.
+   */
   function renderWidget() {
-    if (!overlayEl) return;
-    var mount = document.getElementById('cf-turnstile-widget');
+    if (verified || !window.turnstile) return;
+
+    var mount;
+    if (overlayEl) {
+      mount = overlayEl.querySelector('#cf-turnstile-mount');
+    } else {
+      hiddenHostEl = document.createElement('div');
+      hiddenHostEl.id = 'cf-turnstile-hidden';
+      document.body.appendChild(hiddenHostEl);
+      mount = hiddenHostEl;
+    }
+    if (!mount) return;
+
+    widgetId = window.turnstile.render(mount, {
+      sitekey: SITEKEY,
+      theme: 'auto',
+      appearance: overlayEl ? 'always' : 'interaction-only',
+      callback: function () { markVerified(); },
+      'before-interactive-callback': function () {
+        // Managed challenge needs user interaction. Move the widget into the
+        // overlay so the user can complete it.
+        if (verified) return;
+        promoteToOverlay();
+      },
+      'error-callback': function () {
+        if (!verified) promoteToOverlay();
+      },
+      'expired-callback': function () {
+        if (widgetId !== null && window.turnstile) {
+          try { window.turnstile.reset(widgetId); } catch (e) {}
+        }
+      },
+      'timeout-callback': function () {
+        if (!verified) promoteToOverlay();
+      }
+    });
+
+    // Watchdog: if the silent challenge hasn't finished in time, escalate.
+    if (!overlayEl) {
+      silentTimeoutHandle = setTimeout(function () {
+        if (!verified) promoteToOverlay();
+      }, SILENT_TIMEOUT_MS);
+    }
+  }
+
+  /**
+   * Escalate from silent mode to the blocking overlay. Re-renders the widget
+   * with `appearance: always` inside the overlay so the interaction is visible.
+   */
+  function promoteToOverlay() {
+    if (verified || overlayVisible) return;
+    ensureOverlay();
+    showOverlay();
+
+    // Tear down the hidden silent widget and re-render in the overlay.
+    if (window.turnstile) {
+      if (widgetId !== null) {
+        try { window.turnstile.remove(widgetId); } catch (e) {}
+        widgetId = null;
+      }
+    }
+    if (hiddenHostEl && hiddenHostEl.parentNode) {
+      hiddenHostEl.parentNode.removeChild(hiddenHostEl);
+      hiddenHostEl = null;
+    }
+    if (silentTimeoutHandle) { clearTimeout(silentTimeoutHandle); silentTimeoutHandle = null; }
+
+    var mount = overlayEl.querySelector('#cf-turnstile-mount');
     if (!mount || !window.turnstile) return;
     widgetId = window.turnstile.render(mount, {
       sitekey: SITEKEY,
       theme: 'auto',
       appearance: 'always',
       callback: function () { markVerified(); },
-      'error-callback': function () { /* widget will surface its own error UI */ },
+      'error-callback': function () {},
       'expired-callback': function () {
         if (widgetId !== null && window.turnstile) {
           try { window.turnstile.reset(widgetId); } catch (e) {}
@@ -141,15 +258,20 @@
 
   window.__onTurnstileLoad = function () { renderWidget(); };
 
+  function start() {
+    injectStyles();
+    if (looksSuspicious()) {
+      ensureOverlay();
+      showOverlay();
+    }
+    loadTurnstileScript();
+  }
+
   if (!verified) {
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function () {
-        buildOverlay();
-        loadTurnstileScript();
-      });
+      document.addEventListener('DOMContentLoaded', start);
     } else {
-      buildOverlay();
-      loadTurnstileScript();
+      start();
     }
   }
 

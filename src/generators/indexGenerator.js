@@ -219,13 +219,17 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
 
   ${adsEnabled ? `<!-- Google AdSense (only loaded after Turnstile verification) -->
   <script>
-    // Only load AdSense once the visitor has cleared the Turnstile challenge
-    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
+    function loadAdSense() {
       var adsScript = document.createElement('script');
       adsScript.async = true;
       adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705';
       adsScript.crossOrigin = 'anonymous';
       document.head.appendChild(adsScript);
+    }
+    if (window.botDetector && typeof window.botDetector.onVerified === 'function') {
+      window.botDetector.onVerified(loadAdSense);
+    } else {
+      loadAdSense();
     }
   </script>` : ''}
 
@@ -341,19 +345,21 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     window.__adsEnabled = ${adsEnabled};
   </script>
 
-  ${adsEnabled ? `<!-- Initialize AdSense Ads -->
+  ${adsEnabled ? `<!-- Initialize AdSense Ads (after Turnstile verification) -->
   <script>
-    (function() {
-      if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
-        // Initialize all server-rendered horizontal ad units
-        var ads = document.querySelectorAll('.horizontal-ad-row ins.adsbygoogle');
-        for (var i = 0; i < ads.length; i++) {
-          try {
-            (adsbygoogle = window.adsbygoogle || []).push({});
-          } catch (e) {}
-        }
+    function initAdSenseSlots() {
+      var ads = document.querySelectorAll('.horizontal-ad-row ins.adsbygoogle');
+      for (var i = 0; i < ads.length; i++) {
+        try {
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {}
       }
-    })();
+    }
+    if (window.botDetector && typeof window.botDetector.onVerified === 'function') {
+      window.botDetector.onVerified(initAdSenseSlots);
+    } else {
+      initAdSenseSlots();
+    }
   </script>` : ''}
 
   <script>

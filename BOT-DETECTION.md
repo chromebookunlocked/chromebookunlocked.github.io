@@ -8,16 +8,18 @@ The implementation lives in `assets/bot-detector.js`.
 
 ## How it works
 
-1. On the first page load of a session, `assets/bot-detector.js` shows a full-screen Cloudflare-style interstitial.
-2. The interstitial mounts the official Turnstile widget pointing at sitekey `0x4AAAAAADFYVNcBHQbRjSvj`.
-3. When the widget fires its success callback, the script:
-   - Records `cf_turnstile_verified=1` in `sessionStorage`.
-   - Dismisses the overlay.
-   - Releases any `botDetector.onVerified()` callbacks.
-4. AdSense is only injected once `window.botDetector.shouldBlockAds()` returns `false`. While the visitor is unverified, the AdSense script and `(adsbygoogle = …).push({})` calls are skipped.
-5. Subsequent navigations within the same tab session reuse the cached verification and skip the interstitial.
+The challenge is non-blocking by default — legitimate visitors should never see the interstitial:
 
-There is no client-side fingerprinting, scoring, or math challenge — the entire decision is delegated to Turnstile.
+1. On the first page load of a session, `assets/bot-detector.js` runs a quick smell test (`navigator.webdriver`, obvious headless / scripting UAs, missing `navigator.languages`, zero-dimension screen). If any of those trip, the visitor is treated as suspicious and the full-screen interstitial is shown immediately.
+2. Otherwise, the page renders normally and the Turnstile widget mounts in a hidden, off-screen container with `appearance: 'interaction-only'`. A managed challenge that auto-passes never produces visible UI.
+3. Turnstile callbacks drive the rest of the flow:
+   - `callback` → mark verified, fire any `botDetector.onVerified()` listeners.
+   - `before-interactive-callback` / `error-callback` / `timeout-callback` → escalate to the blocking overlay so the user can complete an interactive challenge.
+   - A 12 s watchdog also escalates if the silent challenge hasn't resolved.
+4. AdSense is loaded **after** verification, via `botDetector.onVerified()`. The page itself is never gated — only ads are deferred until the challenge succeeds.
+5. On success the script writes `cf_turnstile_verified=1` to `sessionStorage`, so subsequent navigations within the same tab session pass through silently and AdSense loads immediately.
+
+There is no scoring or math challenge — the verification decision is fully delegated to Turnstile.
 
 ## Public API
 
