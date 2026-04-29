@@ -5,7 +5,7 @@
   <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
   <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
 
-  <!-- Bot Detection (must load before ads) -->
+  <!-- Cloudflare Turnstile verification gate (must load before ads) -->
   <script src="../assets/bot-detector.js"></script>
 
   <!-- Google tag (gtag.js) -->
@@ -18,9 +18,9 @@
     gtag('config', 'G-4QZLTDX504');
   </script>
 
-  <!-- Google AdSense (conditionally loaded based on bot detection) -->
+  <!-- Google AdSense (only loaded after Turnstile verification) -->
   <script>
-    // Only load AdSense if not a bot
+    // Only load AdSense once the visitor has cleared the Turnstile challenge
     if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
       var adsScript = document.createElement('script');
       adsScript.async = true;
@@ -1476,16 +1476,16 @@ footer {
         <img class="thumb" src="games/Brotato/thumbnail.webp" alt="Play Brotato Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Brotato</div>
+    </a><a href="/Escape Road 3.html" class="game-card" title="Play Escape Road 3 Unblocked Free Online" onclick="trackRecentGame('Escape Road 3')">
+      <div class="thumb-container" style="--thumb-url: url('games/Escape Road 3/thumbnail.webp')">
+        <img class="thumb" src="games/Escape Road 3/thumbnail.webp" alt="Play Escape Road 3 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+      </div>
+      <div class="card-title">Escape Road 3</div>
     </a><a href="/Schoolboy Runaway.html" class="game-card" title="Play Schoolboy Runaway Unblocked Free Online" onclick="trackRecentGame('Schoolboy Runaway')">
       <div class="thumb-container" style="--thumb-url: url('games/Schoolboy Runaway/thumbnail.webp')">
         <img class="thumb" src="games/Schoolboy Runaway/thumbnail.webp" alt="Play Schoolboy Runaway Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Schoolboy Runaway</div>
-    </a><a href="/The Imposible Quiz.html" class="game-card" title="Play The Imposible Quiz Unblocked Free Online" onclick="trackRecentGame('The Imposible Quiz')">
-      <div class="thumb-container" style="--thumb-url: url('games/The Imposible Quiz/thumbnail.webp')">
-        <img class="thumb" src="games/The Imposible Quiz/thumbnail.webp" alt="Play The Imposible Quiz Unblocked - Free Online Game" loading="lazy" width="300" height="300">
-      </div>
-      <div class="card-title">The Imposible Quiz</div>
     </a><a href="/10 Minutes Till Dawn.html" class="game-card" title="Play 10 Minutes Till Dawn Unblocked Free Online" onclick="trackRecentGame('10 Minutes Till Dawn')">
       <div class="thumb-container" style="--thumb-url: url('games/10 Minutes Till Dawn/thumbnail.webp')">
         <img class="thumb" src="games/10 Minutes Till Dawn/thumbnail.webp" alt="Play 10 Minutes Till Dawn Unblocked - Free Online Game" loading="lazy" width="300" height="300">
