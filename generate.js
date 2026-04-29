@@ -32,10 +32,33 @@ const adsConfigPath = path.join(__dirname, "ads-config.json");
 const adsConfig = JSON.parse(fs.readFileSync(adsConfigPath, "utf8"));
 const adsEnabled = adsConfig.adsEnabled !== false;
 
-// Manage ads.txt based on configuration
+// Manage ads.txt based on configuration.
+//
+// ads.txt on disk is treated as authoritative: if a maintainer has hand-edited
+// the file (e.g. to add a new ad network entry) we prefer that content over
+// what's stored in ads-config.json, and we sync the change back into the
+// config so subsequent builds remain consistent.
 const adsTxtPath = path.join(__dirname, "ads.txt");
 if (adsEnabled) {
-  fs.writeFileSync(adsTxtPath, adsConfig.adsTxtContent + "\n", "utf8");
+  const configContent = (adsConfig.adsTxtContent || "").replace(/\s+$/, "");
+  let diskContent = null;
+  if (fs.existsSync(adsTxtPath)) {
+    diskContent = fs.readFileSync(adsTxtPath, "utf8").replace(/\s+$/, "");
+  }
+
+  if (diskContent !== null && diskContent !== configContent) {
+    // ads.txt was edited by hand — keep it and update ads-config.json to match.
+    adsConfig.adsTxtContent = diskContent;
+    fs.writeFileSync(
+      adsConfigPath,
+      JSON.stringify(adsConfig, null, 2) + "\n",
+      "utf8",
+    );
+    console.log("📝 ads.txt was modified — updated ads-config.json to match.");
+  } else {
+    // No manual edits (or file missing) — write from config.
+    fs.writeFileSync(adsTxtPath, configContent + "\n", "utf8");
+  }
 } else if (fs.existsSync(adsTxtPath)) {
   fs.unlinkSync(adsTxtPath);
 }
