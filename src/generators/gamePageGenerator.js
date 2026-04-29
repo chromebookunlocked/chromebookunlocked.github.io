@@ -169,7 +169,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   ${adsEnabled ? `<link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
   <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>` : ''}
 
-  <!-- Bot Detection (must load before ads) -->
+  <!-- Cloudflare Turnstile verification gate (must load before ads) -->
   <script src="../assets/bot-detector.js"></script>
 
   <!-- Google tag (gtag.js) -->
@@ -182,9 +182,9 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
     gtag('config', 'G-4QZLTDX504');
   </script>
 
-  ${adsEnabled ? `<!-- Google AdSense (conditionally loaded based on bot detection) -->
+  ${adsEnabled ? `<!-- Google AdSense (only loaded after Turnstile verification) -->
   <script>
-    // Only load AdSense if not a bot
+    // Only load AdSense once the visitor has cleared the Turnstile challenge
     if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
       var adsScript = document.createElement('script');
       adsScript.async = true;
