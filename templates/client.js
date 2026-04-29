@@ -96,9 +96,13 @@ function createHorizontalAd(adIndex) {
  * @param {HTMLElement} adEl - The horizontal ad element
  */
 function initializeHorizontalAd(adEl) {
-  // Don't initialize ads if disabled or visitor hasn't passed Turnstile yet
+  // Don't initialize ads if disabled
   if (window.__adsEnabled === false) return;
+  // If visitor hasn't passed Turnstile yet, defer until verification completes
   if (window.botDetector && window.botDetector.shouldBlockAds()) {
+    if (typeof window.botDetector.onVerified === 'function') {
+      window.botDetector.onVerified(function () { initializeHorizontalAd(adEl); });
+    }
     return;
   }
 
