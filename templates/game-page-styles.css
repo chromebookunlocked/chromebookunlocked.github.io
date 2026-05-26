@@ -1,3 +1,23 @@
+/* Header banner ad (Monumetric Header In-screen). */
+.header-banner-ad {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90px;
+  padding: 8px 0;
+}
+.header-banner-ad > div {
+  width: 100%;
+  max-width: 970px;
+  margin: 0 auto;
+}
+@media (max-width: 768px) {
+  .header-banner-ad {
+    min-height: 50px;
+  }
+}
+
 /* ============================================================================
    CHROMEBOOK UNLOCKED GAMES - MODERN GAME PAGE STYLES
    Version: 2.1.0

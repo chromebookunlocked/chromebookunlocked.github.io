@@ -3,45 +3,22 @@ const { generateGameMetaTags, generateGameStructuredData, generateGameSEOTitle, 
 const { generateAnalyticsScript } = require("../utils/analyticsEnhanced");
 const { escapeHtml, escapeHtmlAttr } = require("../utils/htmlEscape");
 const { RECOMMENDED_GAMES_COUNT, MAX_RELATED_GAMES, GAME_DURATION_TRACKING_INTERVAL } = require("../utils/constants");
+const {
+  generateAdNetworkHeadScript,
+  generateHorizontalAd: providerHorizontalAd,
+  generateVerticalAd: providerVerticalAd,
+  generateHeaderBannerAd
+} = require("../utils/adProviders");
 
 // Horizontal ad configuration: insert every 3 rows (3 × 6 = 18 games)
 const AD_INTERVAL = 18;
 
-/**
- * Generate HTML for a full-width horizontal ad row
- * @param {number} adIndex - Unique index for this ad
- * @param {boolean} adsEnabled - Whether ads are enabled
- * @returns {string} HTML string for horizontal ad row (empty string if ads disabled)
- */
-function generateHorizontalAd(adIndex, adsEnabled = true) {
-  if (!adsEnabled) return '';
-  return `<div class="horizontal-ad-row" data-ad-index="${adIndex}">
-    <ins class="adsbygoogle"
-      style="display:block"
-      data-ad-client="ca-pub-1033412505744705"
-      data-ad-slot="2719401053"
-      data-ad-format="auto"
-      data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  </div>`;
+function generateHorizontalAd(adIndex, adsEnabled = true, adProvider = 'adsense') {
+  return providerHorizontalAd(adIndex, adsEnabled, adProvider);
 }
 
-/**
- * Generate HTML for a vertical ad slot (flanking the game viewer)
- * @param {boolean} adsEnabled - Whether ads are enabled
- * @returns {string} HTML string for vertical ad (empty string if ads disabled)
- */
-function generateVerticalAd(adsEnabled = true) {
-  if (!adsEnabled) return '';
-  return `<div class="vertical-ad">
-      <ins class="adsbygoogle"
-        style="display:block"
-        data-ad-client="ca-pub-1033412505744705"
-        data-ad-slot="9122283604"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-    </div>`;
+function generateVerticalAd(adsEnabled = true, adProvider = 'adsense', side = 'left') {
+  return providerVerticalAd(adsEnabled, adProvider, side);
 }
 
 // Helper to escape JavaScript string for use in HTML script tags
@@ -66,7 +43,7 @@ function escapeJs(str) {
  * @param {string} gamesDir - Path to games directory
  * @returns {string} Complete HTML document for game page
  */
-function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, adsEnabled = true) {
+function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, adsEnabled = true, adProvider = 'adsense') {
   const thumbInfo = getThumbPath(game, gamesDir);
   const thumbPath = thumbInfo.path;
   const gameUrl = `games/${game.folder}/index.html`;
@@ -149,7 +126,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
     // Insert a full-width horizontal ad every 3 rows (every 18 games)
     if ((idx + 1) % AD_INTERVAL === 0) {
-      recommendedGamesHTML += generateHorizontalAd(adCount, adsEnabled);
+      recommendedGamesHTML += generateHorizontalAd(adCount, adsEnabled, adProvider);
       adCount++;
     }
   });
@@ -166,8 +143,10 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 <html lang="en">
 <head>
   <!-- Resource Hints for Performance -->
-  ${adsEnabled ? `<link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  ${adsEnabled && adProvider === 'adsense' ? `<link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
   <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>` : ''}
+  ${adsEnabled && adProvider === 'monumetric' ? `<link rel="dns-prefetch" href="https://monu.delivery">
+  <link rel="preconnect" href="https://monu.delivery" crossorigin>` : ''}
 
   <!-- Cloudflare Turnstile verification gate (must load before ads) -->
   <script src="../assets/bot-detector.js"></script>
@@ -182,28 +161,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
     gtag('config', 'G-4QZLTDX504');
   </script>
 
-  ${adsEnabled ? `<!-- Google AdSense (only loaded after Turnstile verification) -->
-  <script>
-    // Only load AdSense once the visitor has cleared the Turnstile challenge
-    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
-      var adsScript = document.createElement('script');
-      adsScript.async = true;
-      adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705';
-      adsScript.crossOrigin = 'anonymous';
-      document.head.appendChild(adsScript);
-    }
-  </script>
-
-  <!-- Monumetric ads (only loaded after Turnstile verification) -->
-  <script>
-    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
-      var monuScript = document.createElement('script');
-      monuScript.type = 'text/javascript';
-      monuScript.src = '//monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js';
-      monuScript.setAttribute('data-cfasync', 'false');
-      document.head.appendChild(monuScript);
-    }
-  </script>` : ''}
+  ${generateAdNetworkHeadScript(adsEnabled, adProvider)}
 
   ${generateAnalyticsScript()}
 
@@ -227,6 +185,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
     </div>
   </header>
 
+  ${generateHeaderBannerAd(adsEnabled, adProvider)}
+
   <!-- Main Game Content -->
   <main itemscope itemtype="https://schema.org/VideoGame">
     <meta itemprop="name" content="${escapedGameNameAttr}">
@@ -235,7 +195,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
     <!-- Game Viewer -->
     <div class="game-container">
-      ${generateVerticalAd(adsEnabled)}
+      ${generateVerticalAd(adsEnabled, adProvider, 'left')}
       <div class="game-frame-wrapper" id="gameWrapper">
         <!-- Controls Bar (sticky to top of game) -->
         <div class="controls">
@@ -258,7 +218,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
           tabindex="0">
         </iframe>
       </div>
-      ${generateVerticalAd(adsEnabled)}
+      ${generateVerticalAd(adsEnabled, adProvider, 'right')}
     </div>
   </main>
 
@@ -689,7 +649,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
   </script>
 
-  ${adsEnabled ? `<!-- Initialize AdSense Ads -->
+  ${adsEnabled && adProvider === 'adsense' ? `<!-- Initialize AdSense Ads -->
   <script>
     (function() {
       if (!window.botDetector || !window.botDetector.shouldBlockAds()) {

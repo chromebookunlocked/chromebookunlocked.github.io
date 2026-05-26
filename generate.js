@@ -31,6 +31,7 @@ const templatesDir = path.join(__dirname, "templates");
 const adsConfigPath = path.join(__dirname, "ads-config.json");
 const adsConfig = JSON.parse(fs.readFileSync(adsConfigPath, "utf8"));
 const adsEnabled = adsConfig.adsEnabled !== false;
+const adProvider = adsConfig.adProvider === 'monumetric' ? 'monumetric' : 'adsense';
 
 // Manage ads.txt based on configuration.
 //
@@ -64,7 +65,8 @@ if (adsEnabled) {
 }
 
 console.log("🚀 Starting build process...\n");
-console.log(`📢 Ads: ${adsEnabled ? "ENABLED" : "DISABLED"}\n`);
+console.log(`📢 Ads: ${adsEnabled ? "ENABLED" : "DISABLED"}`);
+console.log(`📊 Provider: ${adsEnabled ? adProvider.toUpperCase() : "n/a"}\n`);
 
 // Step 1: Load game data
 console.log("📦 Loading game data...");
@@ -85,7 +87,7 @@ console.log("✅ Templates loaded\n");
 
 // Step 4: Generate main index page
 console.log("🏠 Generating main index page...");
-const indexHTML = generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir, adsEnabled);
+const indexHTML = generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir, adsEnabled, adProvider);
 const indexPath = path.join(outputDir, "index.html");
 fs.writeFileSync(indexPath, indexHTML);
 console.log(`✅ Created ${indexPath}\n`);
@@ -95,7 +97,7 @@ console.log("🎮 Generating game pages...");
 let generatedCount = 0;
 
 games.forEach(game => {
-  const gameHTML = generateGamePage(game, games, categories, gamePageStyles, gamesDir, adsEnabled);
+  const gameHTML = generateGamePage(game, games, categories, gamePageStyles, gamesDir, adsEnabled, adProvider);
   const gamePagePath = path.join(outputDir, `${game.folder}.html`);
   fs.writeFileSync(gamePagePath, gameHTML);
   generatedCount++;

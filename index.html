@@ -6,6 +6,7 @@
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
   <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
   <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+  
 
   <!-- Optimize Google Fonts loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -39,24 +40,12 @@
 
   <!-- Google AdSense (only loaded after Turnstile verification) -->
   <script>
-    // Only load AdSense once the visitor has cleared the Turnstile challenge
     if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
       var adsScript = document.createElement('script');
       adsScript.async = true;
       adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705';
       adsScript.crossOrigin = 'anonymous';
       document.head.appendChild(adsScript);
-    }
-  </script>
-
-  <!-- Monumetric ads (only loaded after Turnstile verification) -->
-  <script>
-    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
-      var monuScript = document.createElement('script');
-      monuScript.type = 'text/javascript';
-      monuScript.src = '//monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js';
-      monuScript.setAttribute('data-cfasync', 'false');
-      document.head.appendChild(monuScript);
     }
   </script>
 
@@ -588,7 +577,29 @@
   </script>
 
   <style>
-    /* Fallback font with size-adjust to minimize CLS when Orbitron loads */
+    /* Header banner ad (Monumetric Header In-screen). Sits between site header
+   and main content. Reserves a fixed-ish min-height so layout doesn't jump
+   when the ad loads. */
+.header-banner-ad {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90px;
+  padding: 8px 0;
+}
+.header-banner-ad > div {
+  width: 100%;
+  max-width: 970px;
+  margin: 0 auto;
+}
+@media (max-width: 768px) {
+  .header-banner-ad {
+    min-height: 50px;
+  }
+}
+
+/* Fallback font with size-adjust to minimize CLS when Orbitron loads */
 @font-face {
   font-family: 'Orbitron Fallback';
   src: local('Arial Black'), local('Arial Bold'), local('Helvetica Bold');
@@ -1771,6 +1782,8 @@ button:active {
       </div>
     </header>
 
+    
+
     <div class="content-wrapper" id="main-content">
       <div id="controls">
         <button id="backBtn" onclick="closeGame()" aria-label="Go back to game list">← Back</button>
@@ -1964,6 +1977,7 @@ button:active {
     window.__newlyAddedFolders = ["Tung Tung Horror","Escape Road 3","The Imposible Quiz","The Impossible Quiz 2","Schoolboy Runaway","Punch the Trump","Brawl Simulator 3D","Brotato","Ambulance Rush","Roulette Hero","School Escape Duel","FNAF 3","Dino Run","Sausage Flip","Skinwalker","Red Ball","Rooftop Run","Obby Cart","Five Nights at Epstein Island","Cars Arena","Tiny Fishing","Plants vs Zombies Modded","Minecraft Tower Defence","Drive in Russia","Meme Soundboard","Mr Mine","Orange Roulette","Exit Path","Bad Ice Cream 2","Obby Bike"];
     // Ads toggle flag
     window.__adsEnabled = true;
+    window.__adProvider = "adsense";
   </script>
 
   <!-- Initialize AdSense Ads -->
@@ -2066,17 +2080,32 @@ function createHorizontalAd(adIndex) {
   const div = document.createElement('div');
   div.className = 'horizontal-ad-row';
   div.setAttribute('data-ad-index', adIndex);
-  div.innerHTML = `<ins class="adsbygoogle"
-    style="display:block"
-    data-ad-client="ca-pub-1033412505744705"
-    data-ad-slot="2719401053"
-    data-ad-format="auto"
-    data-full-width-responsive="true"></ins>`;
+
+  if (window.__adProvider === 'monumetric') {
+    // In-Content Repeatable unit. Container id is suffixed with adIndex so
+    // multiple instances on the same page don't collide on duplicate ids.
+    const slotId = '152f0341-dbcb-4430-ab30-d9860e3bccfa';
+    div.innerHTML = `<div id="mmt-${slotId}-${adIndex}"></div>`;
+    // Inline script tags created via innerHTML do not execute, so push to
+    // Monumetric's command queue directly.
+    try {
+      window.$MMT = window.$MMT || {};
+      window.$MMT.cmd = window.$MMT.cmd || [];
+      window.$MMT.cmd.push(function() { window.$MMT.display.slots.push([slotId]); });
+    } catch (e) {}
+  } else {
+    div.innerHTML = `<ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="2719401053"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>`;
+  }
   return div;
 }
 
 /**
- * Initialize a horizontal ad unit
+ * Initialize a horizontal ad unit (AdSense only — Monumetric queues itself).
  * @param {HTMLElement} adEl - The horizontal ad element
  */
 function initializeHorizontalAd(adEl) {
@@ -2085,6 +2114,8 @@ function initializeHorizontalAd(adEl) {
   if (window.botDetector && window.botDetector.shouldBlockAds()) {
     return;
   }
+
+  if (window.__adProvider === 'monumetric') return;
 
   try {
     (adsbygoogle = window.adsbygoogle || []).push({});
