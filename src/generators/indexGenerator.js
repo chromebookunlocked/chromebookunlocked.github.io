@@ -19,7 +19,7 @@ const { generateAnalyticsScript } = require('../utils/analyticsEnhanced');
 const { escapeHtml, escapeHtmlAttr } = require('../utils/htmlEscape');
 const { getThumbPath } = require('../utils/assetManager');
 const { INITIAL_ROWS, ROWS_PER_LOAD, SCROLL_THRESHOLD, EAGER_LOAD_CARDS } = require('../utils/constants');
-const { generateAdNetworkHeadScript, generateAdNetworkInitScript, generateHeaderBannerAd } = require('../utils/adProviders');
+const { generateAdNetworkHeadScript, generateAdNetworkInitScript, generateHeaderBannerAd, generateBottomLeaderboardAd, generateFooterInScreenAd } = require('../utils/adProviders');
 
 // Category to icon mapping (kept for sidebar)
 const categoryIcons = {
@@ -301,6 +301,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         <div id="scrollSentinel" style="height:1px;"></div>
       </div>
 
+      ${generateBottomLeaderboardAd(adsEnabled, adProvider)}
+
       <footer id="siteFooter">
         <div class="footer-content">
           <div class="footer-brand">
@@ -373,6 +375,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <link rel="preload" as="style" href="assets/cookie-consent.css" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="assets/cookie-consent.css"></noscript>
   <script src="assets/cookie-consent.js" defer></script>
+
+  ${generateFooterInScreenAd(adsEnabled, adProvider)}
 </body>
 </html>`;
 

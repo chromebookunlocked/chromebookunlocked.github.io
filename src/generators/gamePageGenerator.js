@@ -7,7 +7,9 @@ const {
   generateAdNetworkHeadScript,
   generateHorizontalAd: providerHorizontalAd,
   generateVerticalAd: providerVerticalAd,
-  generateHeaderBannerAd
+  generateHeaderBannerAd,
+  generateBottomLeaderboardAd,
+  generateFooterInScreenAd
 } = require("../utils/adProviders");
 
 // Horizontal ad configuration: insert every 3 rows (3 × 6 = 18 games)
@@ -308,6 +310,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
       </div>
     </div>
   </section>
+
+  ${generateBottomLeaderboardAd(adsEnabled, adProvider)}
 
   <footer>
     <div class="footer-content">
@@ -666,6 +670,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   <!-- Cookie Consent Banner -->
   <link rel="stylesheet" href="assets/cookie-consent.css">
   <script src="assets/cookie-consent.js"></script>
+
+  ${generateFooterInScreenAd(adsEnabled, adProvider)}
 </body>
 </html>`;
 }
