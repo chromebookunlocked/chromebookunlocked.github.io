@@ -92,10 +92,13 @@ function generateHorizontalAd(adIndex, adsEnabled, adProvider) {
   const provider = normalizeProvider(adProvider);
 
   if (provider === 'monumetric') {
-    // Suffix the container id with adIndex so repeated in-content units don't
-    // collide on duplicate HTML ids. The slot id passed to $MMT stays constant.
+    // The "Repeatable" unit is meant to have the snippet pasted verbatim
+    // multiple times, including the exact container id "mmt-{slot}". Adding
+    // a suffix prevented Monumetric's renderer from finding the containers.
+    // Browsers tolerate the duplicate ids; data-ad-index keeps each row
+    // identifiable for our own code.
     return `<div class="horizontal-ad-row" data-ad-index="${adIndex}">
-    <div id="mmt-${MONU_SLOTS.inContentRepeatable}-${adIndex}"></div>
+    <div id="mmt-${MONU_SLOTS.inContentRepeatable}"></div>
     <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["${MONU_SLOTS.inContentRepeatable}"]); })</script>
   </div>`;
   }
@@ -121,12 +124,13 @@ function generateVerticalAd(adsEnabled, adProvider, side = 'left') {
 
   if (provider === 'monumetric') {
     // Left uses the dedicated Pillar-Left unit; right reuses the repeatable
-    // in-content unit (it's explicitly safe to reuse on the same page).
+    // in-content unit. Container id matches the slot id verbatim — that's
+    // the pattern Monumetric's renderer looks for.
     const slotId = side === 'right'
       ? MONU_SLOTS.inContentRepeatable
       : MONU_SLOTS.pillarLeft;
     return `<div class="vertical-ad vertical-ad-${side}">
-      <div id="mmt-${slotId}${side === 'right' ? '-right' : ''}"></div>
+      <div id="mmt-${slotId}"></div>
       <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["${slotId}"]); })</script>
     </div>`;
   }
