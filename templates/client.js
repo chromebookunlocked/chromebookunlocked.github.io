@@ -84,10 +84,11 @@ function createHorizontalAd(adIndex) {
   div.setAttribute('data-ad-index', adIndex);
 
   if (window.__adProvider === 'monumetric') {
-    // In-Content Repeatable unit. Container id is suffixed with adIndex so
-    // multiple instances on the same page don't collide on duplicate ids.
+    // In-Content Repeatable unit. Container id matches the slot id exactly
+    // (the verbatim Monumetric pattern); duplicate ids across multiple
+    // instances are intentional and handled by Monumetric's renderer.
     const slotId = '152f0341-dbcb-4430-ab30-d9860e3bccfa';
-    div.innerHTML = `<div id="mmt-${slotId}-${adIndex}"></div>`;
+    div.innerHTML = `<div id="mmt-${slotId}"></div>`;
     // Inline script tags created via innerHTML do not execute, so push to
     // Monumetric's command queue directly.
     try {

@@ -1979,7 +1979,7 @@ button:active {
     </div>
     <div class="card-title">Airline Tycoon Idle</div>
   </div><div class="horizontal-ad-row" data-ad-index="0">
-    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa-0"></div>
+    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
     <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["152f0341-dbcb-4430-ab30-d9860e3bccfa"]); })</script>
   </div><div class="card game-card" data-index="18" data-folder="Basketball Super Stars" data-name="basketball super stars" onclick="window.location.href='/Basketball Super Stars.html'">
     <div class="thumb-container" style="--thumb-url: url('games/Basketball Super Stars/thumbnail.webp')">
@@ -2150,10 +2150,11 @@ function createHorizontalAd(adIndex) {
   div.setAttribute('data-ad-index', adIndex);
 
   if (window.__adProvider === 'monumetric') {
-    // In-Content Repeatable unit. Container id is suffixed with adIndex so
-    // multiple instances on the same page don't collide on duplicate ids.
+    // In-Content Repeatable unit. Container id matches the slot id exactly
+    // (the verbatim Monumetric pattern); duplicate ids across multiple
+    // instances are intentional and handled by Monumetric's renderer.
     const slotId = '152f0341-dbcb-4430-ab30-d9860e3bccfa';
-    div.innerHTML = `<div id="mmt-${slotId}-${adIndex}"></div>`;
+    div.innerHTML = `<div id="mmt-${slotId}"></div>`;
     // Inline script tags created via innerHTML do not execute, so push to
     // Monumetric's command queue directly.
     try {
