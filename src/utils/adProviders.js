@@ -158,11 +158,44 @@ function generateHeaderBannerAd(adsEnabled, adProvider) {
   </div>`;
 }
 
+/**
+ * Bottom leaderboard placed inline directly above the site footer.
+ * Monumetric-only; AdSense doesn't have an equivalent slot configured.
+ */
+function generateBottomLeaderboardAd(adsEnabled, adProvider) {
+  if (!adsEnabled) return '';
+  const provider = normalizeProvider(adProvider);
+  if (provider !== 'monumetric') return '';
+
+  return `<div class="bottom-leaderboard-ad">
+    <div id="mmt-${MONU_SLOTS.bottomLeaderboard}"></div>
+    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["${MONU_SLOTS.bottomLeaderboard}"]); })</script>
+  </div>`;
+}
+
+/**
+ * Footer In-screen banner that sticks to the bottom of the viewport.
+ * Includes a small close button so visitors can dismiss it. Monumetric-only.
+ */
+function generateFooterInScreenAd(adsEnabled, adProvider) {
+  if (!adsEnabled) return '';
+  const provider = normalizeProvider(adProvider);
+  if (provider !== 'monumetric') return '';
+
+  return `<div class="footer-inscreen-ad" id="footerInScreenAd">
+    <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="document.getElementById('footerInScreenAd').style.display='none'">×</button>
+    <div id="mmt-${MONU_SLOTS.footerInScreen}"></div>
+    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["${MONU_SLOTS.footerInScreen}"]); })</script>
+  </div>`;
+}
+
 module.exports = {
   generateAdNetworkHeadScript,
   generateAdNetworkInitScript,
   generateHorizontalAd,
   generateVerticalAd,
   generateHeaderBannerAd,
+  generateBottomLeaderboardAd,
+  generateFooterInScreenAd,
   normalizeProvider
 };
