@@ -192,6 +192,17 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
       adsScript.crossOrigin = 'anonymous';
       document.head.appendChild(adsScript);
     }
+  </script>
+
+  <!-- Monumetric ads (only loaded after Turnstile verification) -->
+  <script>
+    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
+      var monuScript = document.createElement('script');
+      monuScript.type = 'text/javascript';
+      monuScript.src = '//monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js';
+      monuScript.setAttribute('data-cfasync', 'false');
+      document.head.appendChild(monuScript);
+    }
   </script>` : ''}
 
   ${generateAnalyticsScript()}
