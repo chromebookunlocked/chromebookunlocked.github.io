@@ -192,7 +192,10 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
       adsScript.crossOrigin = 'anonymous';
       document.head.appendChild(adsScript);
     }
-  </script>` : ''}
+  </script>
+
+  <!-- Monumetric ads -->
+  <script type="text/javascript" src="//monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js" data-cfasync="false"></script>` : ''}
 
   ${generateAnalyticsScript()}
 
