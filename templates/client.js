@@ -82,17 +82,32 @@ function createHorizontalAd(adIndex) {
   const div = document.createElement('div');
   div.className = 'horizontal-ad-row';
   div.setAttribute('data-ad-index', adIndex);
-  div.innerHTML = `<ins class="adsbygoogle"
-    style="display:block"
-    data-ad-client="ca-pub-1033412505744705"
-    data-ad-slot="2719401053"
-    data-ad-format="auto"
-    data-full-width-responsive="true"></ins>`;
+
+  if (window.__adProvider === 'monumetric') {
+    // In-Content Repeatable unit. Container id is suffixed with adIndex so
+    // multiple instances on the same page don't collide on duplicate ids.
+    const slotId = '152f0341-dbcb-4430-ab30-d9860e3bccfa';
+    div.innerHTML = `<div id="mmt-${slotId}-${adIndex}"></div>`;
+    // Inline script tags created via innerHTML do not execute, so push to
+    // Monumetric's command queue directly.
+    try {
+      window.$MMT = window.$MMT || {};
+      window.$MMT.cmd = window.$MMT.cmd || [];
+      window.$MMT.cmd.push(function() { window.$MMT.display.slots.push([slotId]); });
+    } catch (e) {}
+  } else {
+    div.innerHTML = `<ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="2719401053"
+      data-ad-format="auto"
+      data-full-width-responsive="true"></ins>`;
+  }
   return div;
 }
 
 /**
- * Initialize a horizontal ad unit
+ * Initialize a horizontal ad unit (AdSense only — Monumetric queues itself).
  * @param {HTMLElement} adEl - The horizontal ad element
  */
 function initializeHorizontalAd(adEl) {
@@ -101,6 +116,8 @@ function initializeHorizontalAd(adEl) {
   if (window.botDetector && window.botDetector.shouldBlockAds()) {
     return;
   }
+
+  if (window.__adProvider === 'monumetric') return;
 
   try {
     (adsbygoogle = window.adsbygoogle || []).push({});

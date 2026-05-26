@@ -19,6 +19,7 @@ const { generateAnalyticsScript } = require('../utils/analyticsEnhanced');
 const { escapeHtml, escapeHtmlAttr } = require('../utils/htmlEscape');
 const { getThumbPath } = require('../utils/assetManager');
 const { INITIAL_ROWS, ROWS_PER_LOAD, SCROLL_THRESHOLD, EAGER_LOAD_CARDS } = require('../utils/constants');
+const { generateAdNetworkHeadScript, generateAdNetworkInitScript, generateHeaderBannerAd } = require('../utils/adProviders');
 
 // Category to icon mapping (kept for sidebar)
 const categoryIcons = {
@@ -98,9 +99,10 @@ function shuffleArray(array, seed) {
  * @param {string} clientJS - JavaScript content string to embed in <script> tag
  * @param {string} gamesDir - Optional path to games directory (for asset resolution)
  * @param {boolean} adsEnabled - Whether ads are enabled
+ * @param {string} adProvider - "adsense" | "monumetric"
  * @returns {string} Complete HTML document
  */
-function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.', adsEnabled = true) {
+function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.', adsEnabled = true, adProvider = 'adsense') {
   // Generate sidebar categories - sorted by game count (largest first)
   // Filter out categories with less than 2 games, and exclude special categories
   const sidebarCategories = Object.keys(categories)
@@ -168,7 +170,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     initialCardsHTML += generateGameCard(game, idx, gamesDir, true);
     // Check if we should insert a horizontal ad after this game
     if (shouldInsertAdAfter(idx)) {
-      initialCardsHTML += generateHorizontalAd(adCount, adsEnabled);
+      initialCardsHTML += generateHorizontalAd(adCount, adsEnabled, adProvider);
       adCount++;
     }
   });
@@ -184,8 +186,10 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <!-- Resource Hints for Performance -->
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
-  ${adsEnabled ? `<link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  ${adsEnabled && adProvider === 'adsense' ? `<link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
   <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>` : ''}
+  ${adsEnabled && adProvider === 'monumetric' ? `<link rel="dns-prefetch" href="https://monu.delivery">
+  <link rel="preconnect" href="https://monu.delivery" crossorigin>` : ''}
 
   <!-- Optimize Google Fonts loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -217,28 +221,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     gtag('config', 'G-4QZLTDX504');
   </script>
 
-  ${adsEnabled ? `<!-- Google AdSense (only loaded after Turnstile verification) -->
-  <script>
-    // Only load AdSense once the visitor has cleared the Turnstile challenge
-    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
-      var adsScript = document.createElement('script');
-      adsScript.async = true;
-      adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705';
-      adsScript.crossOrigin = 'anonymous';
-      document.head.appendChild(adsScript);
-    }
-  </script>
-
-  <!-- Monumetric ads (only loaded after Turnstile verification) -->
-  <script>
-    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
-      var monuScript = document.createElement('script');
-      monuScript.type = 'text/javascript';
-      monuScript.src = '//monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js';
-      monuScript.setAttribute('data-cfasync', 'false');
-      document.head.appendChild(monuScript);
-    }
-  </script>` : ''}
+  ${generateAdNetworkHeadScript(adsEnabled, adProvider)}
 
   ${generateAnalyticsScript()}
 
@@ -284,6 +267,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         <div id="searchDropdown" role="listbox" aria-label="Search results"></div>
       </div>
     </header>
+
+    ${generateHeaderBannerAd(adsEnabled, adProvider)}
 
     <div class="content-wrapper" id="main-content">
       <div id="controls">
@@ -350,9 +335,10 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     window.__newlyAddedFolders = ${JSON.stringify(newlyAddedFolders)};
     // Ads toggle flag
     window.__adsEnabled = ${adsEnabled};
+    window.__adProvider = ${JSON.stringify(adProvider)};
   </script>
 
-  ${adsEnabled ? `<!-- Initialize AdSense Ads -->
+  ${adsEnabled && adProvider === 'adsense' ? `<!-- Initialize AdSense Ads -->
   <script>
     (function() {
       if (!window.botDetector || !window.botDetector.shouldBlockAds()) {

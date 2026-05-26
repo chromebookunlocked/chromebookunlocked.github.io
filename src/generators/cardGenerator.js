@@ -1,6 +1,7 @@
 const { getThumbPath } = require("../utils/assetManager");
 const { escapeHtml, escapeHtmlAttr } = require("../utils/htmlEscape");
 const { EAGER_LOAD_CARDS } = require("../utils/constants");
+const { generateHorizontalAd: providerHorizontalAd } = require("../utils/adProviders");
 
 /**
  * Generate HTML for a single game card
@@ -59,22 +60,11 @@ function generateSidebar(categories) {
 }
 
 /**
- * Generate HTML for a full-width horizontal ad row
- * @param {number} adIndex - Unique index for this ad
- * @param {boolean} adsEnabled - Whether ads are enabled
- * @returns {string} HTML string for horizontal ad row (empty string if ads disabled)
+ * Generate HTML for a full-width horizontal ad row, delegating to the
+ * configured ad provider (AdSense or Monumetric).
  */
-function generateHorizontalAd(adIndex, adsEnabled = true) {
-  if (!adsEnabled) return '';
-  return `<div class="horizontal-ad-row" data-ad-index="${adIndex}">
-    <ins class="adsbygoogle"
-      style="display:block"
-      data-ad-client="ca-pub-1033412505744705"
-      data-ad-slot="2719401053"
-      data-ad-format="auto"
-      data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  </div>`;
+function generateHorizontalAd(adIndex, adsEnabled = true, adProvider = 'adsense') {
+  return providerHorizontalAd(adIndex, adsEnabled, adProvider);
 }
 
 module.exports = {
