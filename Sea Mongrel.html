@@ -181,6 +181,80 @@
   }
 }
 
+/* Bottom leaderboard ad sits inline above the footer. */
+.bottom-leaderboard-ad {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90px;
+  padding: 16px 0;
+}
+.bottom-leaderboard-ad > div {
+  width: 100%;
+  max-width: 970px;
+  margin: 0 auto;
+}
+@media (max-width: 768px) {
+  .bottom-leaderboard-ad {
+    min-height: 50px;
+  }
+}
+
+/* Footer In-screen ad — sticks to the bottom of the viewport. */
+.footer-inscreen-ad {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90px;
+  padding: 4px 0;
+  background: rgba(20, 14, 38, 0.92);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.35);
+}
+.footer-inscreen-ad > div:not(.footer-inscreen-ad__close) {
+  width: 100%;
+  max-width: 728px;
+  margin: 0 auto;
+}
+.footer-inscreen-ad__close {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+.footer-inscreen-ad__close:hover {
+  background: rgba(0, 0, 0, 0.85);
+}
+@media (max-width: 768px) {
+  .footer-inscreen-ad {
+    min-height: 60px;
+  }
+}
+body:has(.footer-inscreen-ad) {
+  padding-bottom: 100px;
+}
+body:has(.footer-inscreen-ad) .cookie-consent-banner {
+  bottom: 120px !important;
+}
+
 /* ============================================================================
    CHROMEBOOK UNLOCKED GAMES - MODERN GAME PAGE STYLES
    Version: 2.1.0
@@ -1458,7 +1532,7 @@ footer {
         </iframe>
       </div>
       <div class="vertical-ad vertical-ad-right">
-      <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa-right"></div>
+      <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
       <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["152f0341-dbcb-4430-ab30-d9860e3bccfa"]); })</script>
     </div>
     </div>
@@ -1567,7 +1641,7 @@ footer {
       </div>
       <div class="card-title">Airline Tycoon Idle</div>
     </a><div class="horizontal-ad-row" data-ad-index="0">
-    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa-0"></div>
+    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
     <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["152f0341-dbcb-4430-ab30-d9860e3bccfa"]); })</script>
   </div><a href="/Ambulance Rush.html" class="game-card" title="Play Ambulance Rush Unblocked Free Online" onclick="trackRecentGame('Ambulance Rush')">
       <div class="thumb-container" style="--thumb-url: url('games/Ambulance Rush/thumbnail.webp')">
@@ -1660,7 +1734,7 @@ footer {
       </div>
       <div class="card-title">Bouncy Basketball</div>
     </a><div class="horizontal-ad-row" data-ad-index="1">
-    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa-1"></div>
+    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
     <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["152f0341-dbcb-4430-ab30-d9860e3bccfa"]); })</script>
   </div><a href="/Bouncy Motors.html" class="game-card" title="Play Bouncy Motors Unblocked Free Online" onclick="trackRecentGame('Bouncy Motors')">
       <div class="thumb-container" style="--thumb-url: url('games/Bouncy Motors/thumbnail.webp')">
@@ -1758,6 +1832,11 @@ footer {
       </div>
     </div>
   </section>
+
+  <div class="bottom-leaderboard-ad">
+    <div id="mmt-74d3975a-b756-41a9-94fe-689c862500d6"></div>
+    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["74d3975a-b756-41a9-94fe-689c862500d6"]); })</script>
+  </div>
 
   <footer>
     <div class="footer-content">
@@ -2213,5 +2292,11 @@ footer {
   <!-- Cookie Consent Banner -->
   <link rel="stylesheet" href="assets/cookie-consent.css">
   <script src="assets/cookie-consent.js"></script>
+
+  <div class="footer-inscreen-ad" id="footerInScreenAd">
+    <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="document.getElementById('footerInScreenAd').style.display='none'">×</button>
+    <div id="mmt-bd025b48-54d2-4cff-88c7-33f195987398"></div>
+    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["bd025b48-54d2-4cff-88c7-33f195987398"]); })</script>
+  </div>
 </body>
 </html>
