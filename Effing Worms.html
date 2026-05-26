@@ -4,6 +4,7 @@
   <!-- Resource Hints for Performance -->
   <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
   <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+  
 
   <!-- Cloudflare Turnstile verification gate (must load before ads) -->
   <script src="../assets/bot-detector.js"></script>
@@ -20,24 +21,12 @@
 
   <!-- Google AdSense (only loaded after Turnstile verification) -->
   <script>
-    // Only load AdSense once the visitor has cleared the Turnstile challenge
     if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
       var adsScript = document.createElement('script');
       adsScript.async = true;
       adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705';
       adsScript.crossOrigin = 'anonymous';
       document.head.appendChild(adsScript);
-    }
-  </script>
-
-  <!-- Monumetric ads (only loaded after Turnstile verification) -->
-  <script>
-    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
-      var monuScript = document.createElement('script');
-      monuScript.type = 'text/javascript';
-      monuScript.src = '//monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js';
-      monuScript.setAttribute('data-cfasync', 'false');
-      document.head.appendChild(monuScript);
     }
   </script>
 
@@ -172,7 +161,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
 
   <style>
-    /* ============================================================================
+    /* Header banner ad (Monumetric Header In-screen). */
+.header-banner-ad {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 90px;
+  padding: 8px 0;
+}
+.header-banner-ad > div {
+  width: 100%;
+  max-width: 970px;
+  margin: 0 auto;
+}
+@media (max-width: 768px) {
+  .header-banner-ad {
+    min-height: 50px;
+  }
+}
+
+/* ============================================================================
    CHROMEBOOK UNLOCKED GAMES - MODERN GAME PAGE STYLES
    Version: 2.1.0
    Description: Modern, user-friendly design for game pages
@@ -1409,6 +1418,8 @@ footer {
     </div>
   </header>
 
+  
+
   <!-- Main Game Content -->
   <main itemscope itemtype="https://schema.org/VideoGame">
     <meta itemprop="name" content="Effing Worms">
@@ -1417,7 +1428,7 @@ footer {
 
     <!-- Game Viewer -->
     <div class="game-container">
-      <div class="vertical-ad">
+      <div class="vertical-ad vertical-ad-left">
       <ins class="adsbygoogle"
         style="display:block"
         data-ad-client="ca-pub-1033412505744705"
@@ -1448,7 +1459,7 @@ footer {
           tabindex="0">
         </iframe>
       </div>
-      <div class="vertical-ad">
+      <div class="vertical-ad vertical-ad-right">
       <ins class="adsbygoogle"
         style="display:block"
         data-ad-client="ca-pub-1033412505744705"
