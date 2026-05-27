@@ -12,9 +12,10 @@
 const ADSENSE_CLIENT = 'ca-pub-1033412505744705';
 const ADSENSE_HORIZONTAL_SLOT = '2719401053';
 const ADSENSE_VERTICAL_SLOT = '9122283604';
+const ADSENSE_SCRIPT_SRC = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
 
 // Monumetric site script + slot IDs
-const MONU_SCRIPT_SRC = '//monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js';
+const MONU_SCRIPT_SRC = 'https://monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js';
 const MONU_SLOTS = {
   headerInScreen: 'd56921e6-6064-44b4-85de-214e86cc24f8',
   pillarLeft: '0f94f1df-dac8-4d55-b24e-3051d266c344',
@@ -28,35 +29,63 @@ function normalizeProvider(adProvider) {
 }
 
 /**
- * <head> script that loads the active ad network's main library after the
- * Turnstile bot challenge passes.
+ * Resource hints for the active ad network: dns-prefetch + preconnect for
+ * the provider's origin, preload for the main script, and preconnect for
+ * the most common ad-exchange endpoints. Saves ~200-500ms on first ad fill.
  */
-function generateAdNetworkHeadScript(adsEnabled, adProvider) {
+function generateAdNetworkHeadHints(adsEnabled, adProvider) {
   if (!adsEnabled) return '';
   const provider = normalizeProvider(adProvider);
 
   if (provider === 'monumetric') {
-    return `<!-- Monumetric main script (only loaded after Turnstile verification) -->
-  <script>
-    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
-      var monuScript = document.createElement('script');
-      monuScript.type = 'text/javascript';
-      monuScript.src = '${MONU_SCRIPT_SRC}';
-      monuScript.setAttribute('data-cfasync', 'false');
-      document.head.appendChild(monuScript);
-    }
-  </script>`;
+    // Monumetric's own snippet loads the script without crossorigin, so the
+    // preload must match (no crossorigin) for the browser to reuse it instead
+    // of double-fetching.
+    return `<link rel="dns-prefetch" href="https://monu.delivery">
+  <link rel="preconnect" href="https://monu.delivery">
+  <link rel="preload" as="script" href="${MONU_SCRIPT_SRC}">
+  <link rel="preconnect" href="https://securepubads.g.doubleclick.net" crossorigin>
+  <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossorigin>
+  <link rel="preconnect" href="https://tpc.googlesyndication.com" crossorigin>`;
   }
 
-  return `<!-- Google AdSense (only loaded after Turnstile verification) -->
+  return `<link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
+  <link rel="preload" as="script" href="${ADSENSE_SCRIPT_SRC}" crossorigin>`;
+}
+
+/**
+ * <head> script that loads the active ad network's main library. Loads
+ * immediately if the visitor is already Turnstile-verified (cached in
+ * sessionStorage), otherwise registers an onVerified callback so the
+ * script kicks in the moment Turnstile clears — no page reload needed.
+ * Combined with the preload hint above, the script is in HTTP cache by
+ * the time we execute it, so loading is effectively instant.
+ */
+function generateAdNetworkHeadScript(adsEnabled, adProvider) {
+  if (!adsEnabled) return '';
+  const provider = normalizeProvider(adProvider);
+  const src = provider === 'monumetric' ? MONU_SCRIPT_SRC : ADSENSE_SCRIPT_SRC;
+  const extra = provider === 'monumetric'
+    ? `s.setAttribute('data-cfasync','false');`
+    : `s.async=true;s.crossOrigin='anonymous';`;
+
+  return `<!-- Ad network main script (loads after Turnstile verification) -->
   <script>
-    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
-      var adsScript = document.createElement('script');
-      adsScript.async = true;
-      adsScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}';
-      adsScript.crossOrigin = 'anonymous';
-      document.head.appendChild(adsScript);
-    }
+    (function(){
+      function load(){
+        if (window.__adNetworkLoaded) return;
+        window.__adNetworkLoaded = true;
+        var s = document.createElement('script');
+        s.src = ${JSON.stringify(src)};
+        ${extra}
+        document.head.appendChild(s);
+      }
+      var bd = window.botDetector;
+      if (!bd) { load(); return; }
+      if (bd.isVerified && bd.isVerified()) { load(); return; }
+      if (typeof bd.onVerified === 'function') bd.onVerified(load);
+    })();
   </script>`;
 }
 
@@ -72,34 +101,52 @@ function generateAdNetworkInitScript(adsEnabled, adProvider) {
   return `<!-- Initialize AdSense Ads -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Initialize all server-rendered horizontal ad units
       var ads = document.querySelectorAll('.horizontal-ad-row ins.adsbygoogle');
       ads.forEach(function(ad) {
-        try {
-          (adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {}
+        try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
       });
     });
   </script>`;
 }
 
 /**
- * Horizontal ad row that sits between rows of game cards.
- * Renders an empty container when ads are disabled.
+ * Inline Monumetric slot markup. When `lazy:true`, the slot push is deferred
+ * via IntersectionObserver until the wrapping element is within 600px of the
+ * viewport — so off-screen ads don't trigger an auction until they're about
+ * to be seen.
+ */
+function monumetricSlot(slotId, opts) {
+  const lazy = opts && opts.lazy === true;
+  if (!lazy) {
+    return `<div id="mmt-${slotId}"></div>
+    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["${slotId}"]); })</script>`;
+  }
+  return `<div id="mmt-${slotId}"></div>
+    <script type="text/javascript" data-cfasync="false">
+    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+    (function(){
+      var slot=${JSON.stringify(slotId)};
+      var row=document.currentScript&&document.currentScript.parentElement;
+      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      if (!row || !('IntersectionObserver' in window)) { push(); return; }
+      new IntersectionObserver(function(entries, obs){
+        if (entries[0].isIntersecting) { push(); obs.disconnect(); }
+      }, { rootMargin: '600px 0px' }).observe(row);
+    })();
+    </script>`;
+}
+
+/**
+ * Horizontal ad row that sits between rows of game cards. Lazy-loaded on
+ * Monumetric since these are below the fold on initial paint.
  */
 function generateHorizontalAd(adIndex, adsEnabled, adProvider) {
   if (!adsEnabled) return '';
   const provider = normalizeProvider(adProvider);
 
   if (provider === 'monumetric') {
-    // The "Repeatable" unit is meant to have the snippet pasted verbatim
-    // multiple times, including the exact container id "mmt-{slot}". Adding
-    // a suffix prevented Monumetric's renderer from finding the containers.
-    // Browsers tolerate the duplicate ids; data-ad-index keeps each row
-    // identifiable for our own code.
     return `<div class="horizontal-ad-row" data-ad-index="${adIndex}">
-    <div id="mmt-${MONU_SLOTS.inContentRepeatable}"></div>
-    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["${MONU_SLOTS.inContentRepeatable}"]); })</script>
+    ${monumetricSlot(MONU_SLOTS.inContentRepeatable, { lazy: true })}
   </div>`;
   }
 
@@ -116,22 +163,17 @@ function generateHorizontalAd(adIndex, adsEnabled, adProvider) {
 
 /**
  * Vertical ad slot flanking the game viewer.
- * @param {'left'|'right'} side - which side; affects Monumetric slot choice.
+ * For Monumetric, only the LEFT side renders (Pillar-Left); the right side
+ * has no dedicated unit so we leave it empty. AdSense uses both.
  */
 function generateVerticalAd(adsEnabled, adProvider, side = 'left') {
   if (!adsEnabled) return '';
   const provider = normalizeProvider(adProvider);
 
   if (provider === 'monumetric') {
-    // Left uses the dedicated Pillar-Left unit; right reuses the repeatable
-    // in-content unit. Container id matches the slot id verbatim — that's
-    // the pattern Monumetric's renderer looks for.
-    const slotId = side === 'right'
-      ? MONU_SLOTS.inContentRepeatable
-      : MONU_SLOTS.pillarLeft;
+    if (side !== 'left') return '';
     return `<div class="vertical-ad vertical-ad-${side}">
-      <div id="mmt-${slotId}"></div>
-      <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["${slotId}"]); })</script>
+      ${monumetricSlot(MONU_SLOTS.pillarLeft)}
     </div>`;
   }
 
@@ -147,53 +189,44 @@ function generateVerticalAd(adsEnabled, adProvider, side = 'left') {
 }
 
 /**
- * Header banner that sits at the very top of <body>, under the site header.
- * Only Monumetric uses this slot today; AdSense returns empty so the
- * placement stays Monumetric-only (extra placement requested by the owner).
+ * Header banner under the site header. Above the fold — loaded immediately.
+ * Monumetric-only.
  */
 function generateHeaderBannerAd(adsEnabled, adProvider) {
   if (!adsEnabled) return '';
-  const provider = normalizeProvider(adProvider);
-  if (provider !== 'monumetric') return '';
-
+  if (normalizeProvider(adProvider) !== 'monumetric') return '';
   return `<div class="header-banner-ad">
-    <div id="mmt-${MONU_SLOTS.headerInScreen}"></div>
-    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["${MONU_SLOTS.headerInScreen}"]); })</script>
+    ${monumetricSlot(MONU_SLOTS.headerInScreen)}
   </div>`;
 }
 
 /**
- * Bottom leaderboard placed inline directly above the site footer.
- * Monumetric-only; AdSense doesn't have an equivalent slot configured.
+ * Bottom leaderboard inline above the footer. Lazy-loaded since it's deep
+ * below the fold. Monumetric-only.
  */
 function generateBottomLeaderboardAd(adsEnabled, adProvider) {
   if (!adsEnabled) return '';
-  const provider = normalizeProvider(adProvider);
-  if (provider !== 'monumetric') return '';
-
+  if (normalizeProvider(adProvider) !== 'monumetric') return '';
   return `<div class="bottom-leaderboard-ad">
-    <div id="mmt-${MONU_SLOTS.bottomLeaderboard}"></div>
-    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["${MONU_SLOTS.bottomLeaderboard}"]); })</script>
+    ${monumetricSlot(MONU_SLOTS.bottomLeaderboard, { lazy: true })}
   </div>`;
 }
 
 /**
- * Footer In-screen banner that sticks to the bottom of the viewport.
- * Includes a small close button so visitors can dismiss it. Monumetric-only.
+ * Footer In-screen sticky banner. Always in the viewport — loaded immediately.
+ * Monumetric-only.
  */
 function generateFooterInScreenAd(adsEnabled, adProvider) {
   if (!adsEnabled) return '';
-  const provider = normalizeProvider(adProvider);
-  if (provider !== 'monumetric') return '';
-
+  if (normalizeProvider(adProvider) !== 'monumetric') return '';
   return `<div class="footer-inscreen-ad" id="footerInScreenAd">
     <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="document.getElementById('footerInScreenAd').style.display='none'">×</button>
-    <div id="mmt-${MONU_SLOTS.footerInScreen}"></div>
-    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["${MONU_SLOTS.footerInScreen}"]); })</script>
+    ${monumetricSlot(MONU_SLOTS.footerInScreen)}
   </div>`;
 }
 
 module.exports = {
+  generateAdNetworkHeadHints,
   generateAdNetworkHeadScript,
   generateAdNetworkInitScript,
   generateHorizontalAd,

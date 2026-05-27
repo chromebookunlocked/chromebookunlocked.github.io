@@ -19,7 +19,7 @@ const { generateAnalyticsScript } = require('../utils/analyticsEnhanced');
 const { escapeHtml, escapeHtmlAttr } = require('../utils/htmlEscape');
 const { getThumbPath } = require('../utils/assetManager');
 const { INITIAL_ROWS, ROWS_PER_LOAD, SCROLL_THRESHOLD, EAGER_LOAD_CARDS } = require('../utils/constants');
-const { generateAdNetworkHeadScript, generateAdNetworkInitScript, generateHeaderBannerAd, generateBottomLeaderboardAd, generateFooterInScreenAd } = require('../utils/adProviders');
+const { generateAdNetworkHeadHints, generateAdNetworkHeadScript, generateAdNetworkInitScript, generateHeaderBannerAd, generateBottomLeaderboardAd, generateFooterInScreenAd } = require('../utils/adProviders');
 
 // Category to icon mapping (kept for sidebar)
 const categoryIcons = {
@@ -186,10 +186,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <!-- Resource Hints for Performance -->
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
-  ${adsEnabled && adProvider === 'adsense' ? `<link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
-  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>` : ''}
-  ${adsEnabled && adProvider === 'monumetric' ? `<link rel="dns-prefetch" href="https://monu.delivery">
-  <link rel="preconnect" href="https://monu.delivery" crossorigin>` : ''}
+  ${generateAdNetworkHeadHints(adsEnabled, adProvider)}
 
   <!-- Optimize Google Fonts loading -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
