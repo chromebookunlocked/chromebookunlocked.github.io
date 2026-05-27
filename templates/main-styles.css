@@ -1042,14 +1042,23 @@ button:active {
   letter-spacing: 1px;
 }
 
-/* Horizontal Ad Row - Full-width ad between game rows */
+/* Horizontal Ad Row - Full-width ad between game rows.
+   min-height matches the typical 300x250 medium rectangle so the row
+   reserves the right amount of space (minimal CLS, minimal whitespace).
+   The row will grow naturally for larger ads (336x280, 728x90 etc.). */
 .horizontal-ad-row {
   grid-column: 1 / -1;
   width: 100%;
-  min-height: 60px;
+  min-height: 250px;
+  padding: 12px 0;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+@media (max-width: 768px) {
+  .horizontal-ad-row {
+    min-height: 100px;
+  }
 }
 
 .horizontal-ad-row ins {

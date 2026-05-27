@@ -892,10 +892,16 @@ h1 {
 .horizontal-ad-row {
   grid-column: 1 / -1;
   width: 100%;
-  min-height: 60px;
+  min-height: 250px;
+  padding: 12px 0;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+@media (max-width: 768px) {
+  .horizontal-ad-row {
+    min-height: 100px;
+  }
 }
 
 .horizontal-ad-row ins {

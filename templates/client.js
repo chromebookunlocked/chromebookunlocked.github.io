@@ -84,18 +84,26 @@ function createHorizontalAd(adIndex) {
   div.setAttribute('data-ad-index', adIndex);
 
   if (window.__adProvider === 'monumetric') {
-    // In-Content Repeatable unit. Container id matches the slot id exactly
-    // (the verbatim Monumetric pattern); duplicate ids across multiple
-    // instances are intentional and handled by Monumetric's renderer.
+    // In-Content Repeatable unit. Same id pattern as server-rendered slots
+    // (duplicate ids are intentional and handled by Monumetric's renderer).
+    // Lazy: defer the slot push via IntersectionObserver so off-screen ads
+    // don't trigger an auction until they're about to scroll into view.
     const slotId = '152f0341-dbcb-4430-ab30-d9860e3bccfa';
     div.innerHTML = `<div id="mmt-${slotId}"></div>`;
-    // Inline script tags created via innerHTML do not execute, so push to
-    // Monumetric's command queue directly.
-    try {
-      window.$MMT = window.$MMT || {};
-      window.$MMT.cmd = window.$MMT.cmd || [];
-      window.$MMT.cmd.push(function() { window.$MMT.display.slots.push([slotId]); });
-    } catch (e) {}
+    const push = function() {
+      try {
+        window.$MMT = window.$MMT || {};
+        window.$MMT.cmd = window.$MMT.cmd || [];
+        window.$MMT.cmd.push(function() { window.$MMT.display.slots.push([slotId]); });
+      } catch (e) {}
+    };
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function(entries, obs) {
+        if (entries[0].isIntersecting) { push(); obs.disconnect(); }
+      }, { rootMargin: '600px 0px' }).observe(div);
+    } else {
+      push();
+    }
   } else {
     div.innerHTML = `<ins class="adsbygoogle"
       style="display:block"

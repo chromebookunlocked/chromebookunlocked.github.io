@@ -2,9 +2,12 @@
 <html lang="en">
 <head>
   <!-- Resource Hints for Performance -->
-  
   <link rel="dns-prefetch" href="https://monu.delivery">
-  <link rel="preconnect" href="https://monu.delivery" crossorigin>
+  <link rel="preconnect" href="https://monu.delivery">
+  <link rel="preload" as="script" href="https://monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js">
+  <link rel="preconnect" href="https://securepubads.g.doubleclick.net" crossorigin>
+  <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossorigin>
+  <link rel="preconnect" href="https://tpc.googlesyndication.com" crossorigin>
 
   <!-- Cloudflare Turnstile verification gate (must load before ads) -->
   <script src="../assets/bot-detector.js"></script>
@@ -19,15 +22,22 @@
     gtag('config', 'G-4QZLTDX504');
   </script>
 
-  <!-- Monumetric main script (only loaded after Turnstile verification) -->
+  <!-- Ad network main script (loads after Turnstile verification) -->
   <script>
-    if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
-      var monuScript = document.createElement('script');
-      monuScript.type = 'text/javascript';
-      monuScript.src = '//monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js';
-      monuScript.setAttribute('data-cfasync', 'false');
-      document.head.appendChild(monuScript);
-    }
+    (function(){
+      function load(){
+        if (window.__adNetworkLoaded) return;
+        window.__adNetworkLoaded = true;
+        var s = document.createElement('script');
+        s.src = "https://monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js";
+        s.setAttribute('data-cfasync','false');
+        document.head.appendChild(s);
+      }
+      var bd = window.botDetector;
+      if (!bd) { load(); return; }
+      if (bd.isVerified && bd.isVerified()) { load(); return; }
+      if (typeof bd.onVerified === 'function') bd.onVerified(load);
+    })();
   </script>
 
   
@@ -1055,10 +1065,16 @@ h1 {
 .horizontal-ad-row {
   grid-column: 1 / -1;
   width: 100%;
-  min-height: 60px;
+  min-height: 250px;
+  padding: 12px 0;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+@media (max-width: 768px) {
+  .horizontal-ad-row {
+    min-height: 100px;
+  }
 }
 
 .horizontal-ad-row ins {
@@ -1507,7 +1523,7 @@ footer {
     <div class="game-container">
       <div class="vertical-ad vertical-ad-left">
       <div id="mmt-0f94f1df-dac8-4d55-b24e-3051d266c344"></div>
-      <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["0f94f1df-dac8-4d55-b24e-3051d266c344"]); })</script>
+    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["0f94f1df-dac8-4d55-b24e-3051d266c344"]); })</script>
     </div>
       <div class="game-frame-wrapper" id="gameWrapper">
         <!-- Controls Bar (sticky to top of game) -->
@@ -1531,10 +1547,7 @@ footer {
           tabindex="0">
         </iframe>
       </div>
-      <div class="vertical-ad vertical-ad-right">
-      <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
-      <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["152f0341-dbcb-4430-ab30-d9860e3bccfa"]); })</script>
-    </div>
+      
     </div>
   </main>
 
@@ -1642,7 +1655,18 @@ footer {
       <div class="card-title">Bad Ice Cream 2</div>
     </a><div class="horizontal-ad-row" data-ad-index="0">
     <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
-    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["152f0341-dbcb-4430-ab30-d9860e3bccfa"]); })</script>
+    <script type="text/javascript" data-cfasync="false">
+    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+    (function(){
+      var slot="152f0341-dbcb-4430-ab30-d9860e3bccfa";
+      var row=document.currentScript&&document.currentScript.parentElement;
+      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      if (!row || !('IntersectionObserver' in window)) { push(); return; }
+      new IntersectionObserver(function(entries, obs){
+        if (entries[0].isIntersecting) { push(); obs.disconnect(); }
+      }, { rootMargin: '600px 0px' }).observe(row);
+    })();
+    </script>
   </div><a href="/Bad Parenting.html" class="game-card" title="Play Bad Parenting Unblocked Free Online" onclick="trackRecentGame('Bad Parenting')">
       <div class="thumb-container" style="--thumb-url: url('games/Bad Parenting/thumbnail.webp')">
         <img class="thumb" src="games/Bad Parenting/thumbnail.webp" alt="Play Bad Parenting Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -1735,7 +1759,18 @@ footer {
       <div class="card-title">Bouncemasters</div>
     </a><div class="horizontal-ad-row" data-ad-index="1">
     <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
-    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["152f0341-dbcb-4430-ab30-d9860e3bccfa"]); })</script>
+    <script type="text/javascript" data-cfasync="false">
+    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+    (function(){
+      var slot="152f0341-dbcb-4430-ab30-d9860e3bccfa";
+      var row=document.currentScript&&document.currentScript.parentElement;
+      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      if (!row || !('IntersectionObserver' in window)) { push(); return; }
+      new IntersectionObserver(function(entries, obs){
+        if (entries[0].isIntersecting) { push(); obs.disconnect(); }
+      }, { rootMargin: '600px 0px' }).observe(row);
+    })();
+    </script>
   </div><a href="/Bouncy Basketball.html" class="game-card" title="Play Bouncy Basketball Unblocked Free Online" onclick="trackRecentGame('Bouncy Basketball')">
       <div class="thumb-container" style="--thumb-url: url('games/Bouncy Basketball/thumbnail.webp')">
         <img class="thumb" src="games/Bouncy Basketball/thumbnail.webp" alt="Play Bouncy Basketball Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -1835,7 +1870,18 @@ footer {
 
   <div class="bottom-leaderboard-ad">
     <div id="mmt-74d3975a-b756-41a9-94fe-689c862500d6"></div>
-    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["74d3975a-b756-41a9-94fe-689c862500d6"]); })</script>
+    <script type="text/javascript" data-cfasync="false">
+    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+    (function(){
+      var slot="74d3975a-b756-41a9-94fe-689c862500d6";
+      var row=document.currentScript&&document.currentScript.parentElement;
+      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      if (!row || !('IntersectionObserver' in window)) { push(); return; }
+      new IntersectionObserver(function(entries, obs){
+        if (entries[0].isIntersecting) { push(); obs.disconnect(); }
+      }, { rootMargin: '600px 0px' }).observe(row);
+    })();
+    </script>
   </div>
 
   <footer>

@@ -4,6 +4,7 @@ const { generateAnalyticsScript } = require("../utils/analyticsEnhanced");
 const { escapeHtml, escapeHtmlAttr } = require("../utils/htmlEscape");
 const { RECOMMENDED_GAMES_COUNT, MAX_RELATED_GAMES, GAME_DURATION_TRACKING_INTERVAL } = require("../utils/constants");
 const {
+  generateAdNetworkHeadHints,
   generateAdNetworkHeadScript,
   generateHorizontalAd: providerHorizontalAd,
   generateVerticalAd: providerVerticalAd,
@@ -145,10 +146,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 <html lang="en">
 <head>
   <!-- Resource Hints for Performance -->
-  ${adsEnabled && adProvider === 'adsense' ? `<link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
-  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>` : ''}
-  ${adsEnabled && adProvider === 'monumetric' ? `<link rel="dns-prefetch" href="https://monu.delivery">
-  <link rel="preconnect" href="https://monu.delivery" crossorigin>` : ''}
+  ${generateAdNetworkHeadHints(adsEnabled, adProvider)}
 
   <!-- Cloudflare Turnstile verification gate (must load before ads) -->
   <script src="../assets/bot-detector.js"></script>
