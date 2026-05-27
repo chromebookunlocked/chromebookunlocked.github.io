@@ -1042,14 +1042,23 @@ button:active {
   letter-spacing: 1px;
 }
 
-/* Horizontal Ad Row - Full-width ad between game rows */
+/* Horizontal Ad Row - Full-width ad between game rows.
+   min-height fits the largest typical ad size (300x250 / 336x280) so the
+   row reserves space before the ad loads (CLS), but is dialed back on
+   mobile where smaller banner sizes (320x50, 320x100) are common. */
 .horizontal-ad-row {
   grid-column: 1 / -1;
   width: 100%;
-  min-height: 60px;
+  min-height: 280px;
+  padding: 16px 0;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+@media (max-width: 768px) {
+  .horizontal-ad-row {
+    min-height: 110px;
+  }
 }
 
 .horizontal-ad-row ins {

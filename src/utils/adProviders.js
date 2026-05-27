@@ -123,15 +123,14 @@ function generateVerticalAd(adsEnabled, adProvider, side = 'left') {
   const provider = normalizeProvider(adProvider);
 
   if (provider === 'monumetric') {
-    // Left uses the dedicated Pillar-Left unit; right reuses the repeatable
-    // in-content unit. Container id matches the slot id verbatim — that's
-    // the pattern Monumetric's renderer looks for.
-    const slotId = side === 'right'
-      ? MONU_SLOTS.inContentRepeatable
-      : MONU_SLOTS.pillarLeft;
+    // Only the LEFT side gets a Monumetric unit (Pillar-Left). The right
+    // side has no dedicated unit, so we render nothing there to avoid the
+    // broken/empty container that resulted from reusing the in-content
+    // repeatable slot in a vertical slot.
+    if (side !== 'left') return '';
     return `<div class="vertical-ad vertical-ad-${side}">
-      <div id="mmt-${slotId}"></div>
-      <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["${slotId}"]); })</script>
+      <div id="mmt-${MONU_SLOTS.pillarLeft}"></div>
+      <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["${MONU_SLOTS.pillarLeft}"]); })</script>
     </div>`;
   }
 

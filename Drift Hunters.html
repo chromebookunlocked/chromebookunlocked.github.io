@@ -1055,10 +1055,16 @@ h1 {
 .horizontal-ad-row {
   grid-column: 1 / -1;
   width: 100%;
-  min-height: 60px;
+  min-height: 280px;
+  padding: 16px 0;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+@media (max-width: 768px) {
+  .horizontal-ad-row {
+    min-height: 110px;
+  }
 }
 
 .horizontal-ad-row ins {
@@ -1531,10 +1537,7 @@ footer {
           tabindex="0">
         </iframe>
       </div>
-      <div class="vertical-ad vertical-ad-right">
-      <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
-      <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["152f0341-dbcb-4430-ab30-d9860e3bccfa"]); })</script>
-    </div>
+      
     </div>
   </main>
 
