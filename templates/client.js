@@ -100,7 +100,7 @@ function createHorizontalAd(adIndex) {
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function(entries, obs) {
         if (entries[0].isIntersecting) { push(); obs.disconnect(); }
-      }, { rootMargin: '600px 0px' }).observe(div);
+      }, { rootMargin: '800px 0px' }).observe(div);
     } else {
       push();
     }
