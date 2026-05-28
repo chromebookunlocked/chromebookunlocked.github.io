@@ -55,12 +55,13 @@ function generateAdNetworkHeadHints(adsEnabled, adProvider) {
 }
 
 /**
- * <head> script that loads the active ad network's main library. Loads
- * immediately if the visitor is already Turnstile-verified (cached in
- * sessionStorage), otherwise registers an onVerified callback so the
- * script kicks in the moment Turnstile clears — no page reload needed.
- * Combined with the preload hint above, the script is in HTTP cache by
- * the time we execute it, so loading is effectively instant.
+ * <head> script that (1) starts loading the ad network's main library
+ * immediately — in parallel with the Turnstile challenge — so the framework
+ * is initialized and connected to exchanges by the time verification clears,
+ * and (2) exposes window.__adsReady(cb): a gate that runs cb only once the
+ * visitor is verified (or right away if there's no bot detector). Ad slot
+ * requests go through __adsReady so the library warms up early but no ads are
+ * actually requested for unverified/bot traffic.
  */
 function generateAdNetworkHeadScript(adsEnabled, adProvider) {
   if (!adsEnabled) return '';
@@ -70,21 +71,25 @@ function generateAdNetworkHeadScript(adsEnabled, adProvider) {
     ? `s.async=true;s.setAttribute('data-cfasync','false');`
     : `s.async=true;s.crossOrigin='anonymous';`;
 
-  return `<!-- Ad network main script (loads after Turnstile verification) -->
+  return `<!-- Ad network main script: starts loading early, in parallel with Turnstile -->
   <script>
     (function(){
-      function load(){
-        if (window.__adNetworkLoaded) return;
+      if (!window.__adNetworkLoaded) {
         window.__adNetworkLoaded = true;
         var s = document.createElement('script');
         s.src = ${JSON.stringify(src)};
         ${extra}
         document.head.appendChild(s);
       }
-      var bd = window.botDetector;
-      if (!bd) { load(); return; }
-      if (bd.isVerified && bd.isVerified()) { load(); return; }
-      if (typeof bd.onVerified === 'function') bd.onVerified(load);
+      // Gate actual ad requests on verification so the warmed-up library
+      // doesn't serve ads to unverified/bot traffic.
+      window.__adsReady = function(cb){
+        var bd = window.botDetector;
+        if (!bd) return cb();
+        if (bd.isVerified && bd.isVerified()) return cb();
+        if (typeof bd.onVerified === 'function') return bd.onVerified(cb);
+        cb();
+      };
     })();
   </script>`;
 }
@@ -110,20 +115,16 @@ function generateAdNetworkInitScript(adsEnabled, adProvider) {
 }
 
 /**
- * Inline Monumetric slot markup. When `lazy:true`, the slot push is deferred
- * via IntersectionObserver until the wrapping element is within 600px of the
- * viewport — so off-screen ads don't trigger an auction until they're about
- * to be seen.
- */
-/**
- * Inline Monumetric slot markup with three load strategies:
- *   - default (immediate): push the slot as the HTML parses. Use above the
- *     fold where the ad should appear as soon as the main script runs.
- *   - { lazy: true }: defer the push via IntersectionObserver until the
- *     wrapping element is within 800px of the viewport. Use below the fold.
- *   - { idle: true }: defer the push to requestIdleCallback (fallback
- *     setTimeout) so it doesn't compete with above-the-fold ad calls during
- *     the initial render. Use for persistent-but-non-critical slots.
+ * Inline Monumetric slot markup with three load strategies. In every case the
+ * actual slot request runs through window.__adsReady(), so it only fires once
+ * the visitor is Turnstile-verified (the library itself loads earlier).
+ *   - default (immediate): request the slot as soon as it's verified. Use
+ *     above the fold.
+ *   - { lazy: true }: also wait until the wrapping element is within 800px of
+ *     the viewport (IntersectionObserver). Use below the fold.
+ *   - { idle: true }: also wait for requestIdleCallback (fallback setTimeout)
+ *     so it doesn't compete with above-the-fold ad calls. Use for
+ *     persistent-but-non-critical slots (sticky footer).
  */
 function monumetricSlot(slotId, opts) {
   const lazy = opts && opts.lazy === true;
@@ -132,7 +133,14 @@ function monumetricSlot(slotId, opts) {
 
   if (!lazy && !idle) {
     return `<div id="mmt-${slotId}"></div>
-    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push([${slotJson}]); })</script>`;
+    <script type="text/javascript" data-cfasync="false">
+    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+    (function(){
+      var slot=${slotJson};
+      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      (window.__adsReady||function(c){c();})(push);
+    })();
+    </script>`;
   }
 
   if (idle) {
@@ -142,8 +150,9 @@ function monumetricSlot(slotId, opts) {
     (function(){
       var slot=${slotJson};
       function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
-      if ('requestIdleCallback' in window) { requestIdleCallback(push, { timeout: 3000 }); }
-      else { setTimeout(push, 1200); }
+      function ready(){ (window.__adsReady||function(c){c();})(push); }
+      if ('requestIdleCallback' in window) { requestIdleCallback(ready, { timeout: 3000 }); }
+      else { setTimeout(ready, 1200); }
     })();
     </script>`;
   }
@@ -155,9 +164,10 @@ function monumetricSlot(slotId, opts) {
       var slot=${slotJson};
       var row=document.currentScript&&document.currentScript.parentElement;
       function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
-      if (!row || !('IntersectionObserver' in window)) { push(); return; }
+      function ready(){ (window.__adsReady||function(c){c();})(push); }
+      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
       new IntersectionObserver(function(entries, obs){
-        if (entries[0].isIntersecting) { push(); obs.disconnect(); }
+        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
       }, { rootMargin: '800px 0px' }).observe(row);
     })();
     </script>`;

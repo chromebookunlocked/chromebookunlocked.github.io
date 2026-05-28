@@ -97,12 +97,14 @@ function createHorizontalAd(adIndex) {
         window.$MMT.cmd.push(function() { window.$MMT.display.slots.push([slotId]); });
       } catch (e) {}
     };
+    // Gate the request on verification (library is already warming up).
+    const ready = function() { (window.__adsReady || function(c) { c(); })(push); };
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function(entries, obs) {
-        if (entries[0].isIntersecting) { push(); obs.disconnect(); }
+        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
       }, { rootMargin: '800px 0px' }).observe(div);
     } else {
-      push();
+      ready();
     }
   } else {
     div.innerHTML = `<ins class="adsbygoogle"
