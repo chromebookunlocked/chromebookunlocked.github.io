@@ -30,7 +30,7 @@
         window.__adNetworkLoaded = true;
         var s = document.createElement('script');
         s.src = "https://monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js";
-        s.setAttribute('data-cfasync','false');
+        s.async=true;s.setAttribute('data-cfasync','false');
         document.head.appendChild(s);
       }
       var bd = window.botDetector;
@@ -1547,7 +1547,7 @@ footer {
           tabindex="0">
         </iframe>
       </div>
-      
+      <div class="vertical-ad vertical-ad-spacer" aria-hidden="true"></div>
     </div>
   </main>
 
@@ -1664,7 +1664,7 @@ footer {
       if (!row || !('IntersectionObserver' in window)) { push(); return; }
       new IntersectionObserver(function(entries, obs){
         if (entries[0].isIntersecting) { push(); obs.disconnect(); }
-      }, { rootMargin: '600px 0px' }).observe(row);
+      }, { rootMargin: '800px 0px' }).observe(row);
     })();
     </script>
   </div><a href="/Bad Ice Cream.html" class="game-card" title="Play Bad Ice Cream Unblocked Free Online" onclick="trackRecentGame('Bad Ice Cream')">
@@ -1768,7 +1768,7 @@ footer {
       if (!row || !('IntersectionObserver' in window)) { push(); return; }
       new IntersectionObserver(function(entries, obs){
         if (entries[0].isIntersecting) { push(); obs.disconnect(); }
-      }, { rootMargin: '600px 0px' }).observe(row);
+      }, { rootMargin: '800px 0px' }).observe(row);
     })();
     </script>
   </div><a href="/Bob The Robber 5.html" class="game-card" title="Play Bob The Robber 5 Unblocked Free Online" onclick="trackRecentGame('Bob The Robber 5')">
@@ -1879,7 +1879,7 @@ footer {
       if (!row || !('IntersectionObserver' in window)) { push(); return; }
       new IntersectionObserver(function(entries, obs){
         if (entries[0].isIntersecting) { push(); obs.disconnect(); }
-      }, { rootMargin: '600px 0px' }).observe(row);
+      }, { rootMargin: '800px 0px' }).observe(row);
     })();
     </script>
   </div>
@@ -2342,7 +2342,15 @@ footer {
   <div class="footer-inscreen-ad" id="footerInScreenAd">
     <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="document.getElementById('footerInScreenAd').style.display='none'">×</button>
     <div id="mmt-bd025b48-54d2-4cff-88c7-33f195987398"></div>
-    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["bd025b48-54d2-4cff-88c7-33f195987398"]); })</script>
+    <script type="text/javascript" data-cfasync="false">
+    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+    (function(){
+      var slot="bd025b48-54d2-4cff-88c7-33f195987398";
+      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      if ('requestIdleCallback' in window) { requestIdleCallback(push, { timeout: 3000 }); }
+      else { setTimeout(push, 1200); }
+    })();
+    </script>
   </div>
 </body>
 </html>

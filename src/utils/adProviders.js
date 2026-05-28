@@ -67,7 +67,7 @@ function generateAdNetworkHeadScript(adsEnabled, adProvider) {
   const provider = normalizeProvider(adProvider);
   const src = provider === 'monumetric' ? MONU_SCRIPT_SRC : ADSENSE_SCRIPT_SRC;
   const extra = provider === 'monumetric'
-    ? `s.setAttribute('data-cfasync','false');`
+    ? `s.async=true;s.setAttribute('data-cfasync','false');`
     : `s.async=true;s.crossOrigin='anonymous';`;
 
   return `<!-- Ad network main script (loads after Turnstile verification) -->
@@ -115,23 +115,50 @@ function generateAdNetworkInitScript(adsEnabled, adProvider) {
  * viewport — so off-screen ads don't trigger an auction until they're about
  * to be seen.
  */
+/**
+ * Inline Monumetric slot markup with three load strategies:
+ *   - default (immediate): push the slot as the HTML parses. Use above the
+ *     fold where the ad should appear as soon as the main script runs.
+ *   - { lazy: true }: defer the push via IntersectionObserver until the
+ *     wrapping element is within 800px of the viewport. Use below the fold.
+ *   - { idle: true }: defer the push to requestIdleCallback (fallback
+ *     setTimeout) so it doesn't compete with above-the-fold ad calls during
+ *     the initial render. Use for persistent-but-non-critical slots.
+ */
 function monumetricSlot(slotId, opts) {
   const lazy = opts && opts.lazy === true;
-  if (!lazy) {
+  const idle = opts && opts.idle === true;
+  const slotJson = JSON.stringify(slotId);
+
+  if (!lazy && !idle) {
     return `<div id="mmt-${slotId}"></div>
-    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push(["${slotId}"]); })</script>`;
+    <script type="text/javascript" data-cfasync="false">$MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];$MMT.cmd.push(function(){ $MMT.display.slots.push([${slotJson}]); })</script>`;
   }
+
+  if (idle) {
+    return `<div id="mmt-${slotId}"></div>
+    <script type="text/javascript" data-cfasync="false">
+    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+    (function(){
+      var slot=${slotJson};
+      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      if ('requestIdleCallback' in window) { requestIdleCallback(push, { timeout: 3000 }); }
+      else { setTimeout(push, 1200); }
+    })();
+    </script>`;
+  }
+
   return `<div id="mmt-${slotId}"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
-      var slot=${JSON.stringify(slotId)};
+      var slot=${slotJson};
       var row=document.currentScript&&document.currentScript.parentElement;
       function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
       if (!row || !('IntersectionObserver' in window)) { push(); return; }
       new IntersectionObserver(function(entries, obs){
         if (entries[0].isIntersecting) { push(); obs.disconnect(); }
-      }, { rootMargin: '600px 0px' }).observe(row);
+      }, { rootMargin: '800px 0px' }).observe(row);
     })();
     </script>`;
 }
@@ -163,15 +190,20 @@ function generateHorizontalAd(adIndex, adsEnabled, adProvider) {
 
 /**
  * Vertical ad slot flanking the game viewer.
- * For Monumetric, only the LEFT side renders (Pillar-Left); the right side
- * has no dedicated unit so we leave it empty. AdSense uses both.
+ * For Monumetric, only the LEFT side has a real unit (Pillar-Left). The right
+ * side renders an empty spacer of equal width so the game frame stays centered
+ * (without it, the lone left ad pushes the game off-center to the right).
+ * AdSense uses real ads on both sides.
  */
 function generateVerticalAd(adsEnabled, adProvider, side = 'left') {
   if (!adsEnabled) return '';
   const provider = normalizeProvider(adProvider);
 
   if (provider === 'monumetric') {
-    if (side !== 'left') return '';
+    if (side !== 'left') {
+      // Balancing spacer keeps the game viewer centered.
+      return `<div class="vertical-ad vertical-ad-spacer" aria-hidden="true"></div>`;
+    }
     return `<div class="vertical-ad vertical-ad-${side}">
       ${monumetricSlot(MONU_SLOTS.pillarLeft)}
     </div>`;
@@ -221,7 +253,7 @@ function generateFooterInScreenAd(adsEnabled, adProvider) {
   if (normalizeProvider(adProvider) !== 'monumetric') return '';
   return `<div class="footer-inscreen-ad" id="footerInScreenAd">
     <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="document.getElementById('footerInScreenAd').style.display='none'">×</button>
-    ${monumetricSlot(MONU_SLOTS.footerInScreen)}
+    ${monumetricSlot(MONU_SLOTS.footerInScreen, { idle: true })}
   </div>`;
 }
 
