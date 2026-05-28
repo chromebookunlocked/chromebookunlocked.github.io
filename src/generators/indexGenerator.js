@@ -102,7 +102,7 @@ function shuffleArray(array, seed) {
  * @param {string} adProvider - "adsense" | "monumetric"
  * @returns {string} Complete HTML document
  */
-function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.', adsEnabled = true, adProvider = 'adsense') {
+function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.', adsEnabled = true, adProvider = 'adsense', botVerificationEnabled = true) {
   // Generate sidebar categories - sorted by game count (largest first)
   // Filter out categories with less than 2 games, and exclude special categories
   const sidebarCategories = Object.keys(categories)
@@ -205,8 +205,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     }
   </script>
 
-  <!-- Cloudflare Turnstile verification gate (must load before ads) -->
-  <script src="assets/bot-detector.js"></script>
+  ${botVerificationEnabled ? `<!-- Cloudflare Turnstile verification gate (must load before ads) -->
+  <script src="assets/bot-detector.js"></script>` : ''}
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>

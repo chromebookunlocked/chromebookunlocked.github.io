@@ -46,7 +46,7 @@ function escapeJs(str) {
  * @param {string} gamesDir - Path to games directory
  * @returns {string} Complete HTML document for game page
  */
-function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, adsEnabled = true, adProvider = 'adsense') {
+function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, adsEnabled = true, adProvider = 'adsense', botVerificationEnabled = true) {
   const thumbInfo = getThumbPath(game, gamesDir);
   const thumbPath = thumbInfo.path;
   const gameUrl = `games/${game.folder}/index.html`;
@@ -148,8 +148,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   <!-- Resource Hints for Performance -->
   ${generateAdNetworkHeadHints(adsEnabled, adProvider)}
 
-  <!-- Cloudflare Turnstile verification gate (must load before ads) -->
-  <script src="../assets/bot-detector.js"></script>
+  ${botVerificationEnabled ? `<!-- Cloudflare Turnstile verification gate (must load before ads) -->
+  <script src="../assets/bot-detector.js"></script>` : ''}
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
