@@ -1,4 +1,8 @@
-/* Header banner ad (Monumetric Header In-screen). */
+/* Header banner ad (Monumetric Header In-screen).
+   The site <header> is position:fixed, so this banner (the first in-flow
+   element) must be pushed down by the header's height or it renders behind
+   it. The game-container normally reserves that space via top padding, so
+   when the banner is present we hand that job to the banner instead. */
 .header-banner-ad {
   width: 100%;
   display: flex;
@@ -6,6 +10,10 @@
   align-items: center;
   min-height: 90px;
   padding: 8px 0;
+  margin-top: clamp(48px, 6vw, 64px);
+}
+body:has(.header-banner-ad) .game-container {
+  padding-top: var(--spacing-xs);
 }
 .header-banner-ad > div {
   width: 100%;
