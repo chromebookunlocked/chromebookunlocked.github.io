@@ -1,11 +1,13 @@
 /**
  * Cloudflare Turnstile verification gate for Chromebook Unlocked.
  *
- * Renders a full-screen interstitial on the first page load of a session,
- * shows the official Turnstile widget, and only releases the page (and lets
- * AdSense load) once the user has been verified. Verification is cached in
- * sessionStorage so subsequent navigations within the same tab session pass
- * through without prompting again.
+ * Runs Turnstile INVISIBLY on first page load of a session. Most human
+ * visitors are cleared by the non-interactive challenge and never see
+ * anything — ads simply load a moment later once the success callback fires.
+ * The full-screen interstitial is only revealed if Turnstile decides the
+ * visitor needs to interact (i.e. the traffic looks risky/bot-like).
+ * Verification is cached in sessionStorage so subsequent navigations within
+ * the same tab session pass through instantly.
  *
  * Public API (kept compatible with prior bot-detector.js callers):
  *   window.botDetector.shouldBlockAds()  -> boolean
@@ -19,7 +21,9 @@
 
   var verified = sessionStorage.getItem(STORAGE_KEY) === '1';
   var widgetId = null;
-  var overlayEl = null;
+  var overlayEl = null;       // the (hidden-by-default) interstitial
+  var hostEl = null;          // wrapper that holds the widget mount
+  var interactive = false;    // has the challenge escalated to a visible prompt?
   var verifiedCallbacks = [];
 
   function runVerifiedCallbacks() {
@@ -39,12 +43,29 @@
     dismissOverlay();
   }
 
+  // Reveal the interstitial only when the challenge actually needs interaction.
+  function showInteractive() {
+    if (interactive || verified || !overlayEl) return;
+    interactive = true;
+    overlayEl.classList.remove('cf-invisible');
+    document.documentElement.style.overflow = 'hidden';
+    if (document.body) document.body.style.overflow = 'hidden';
+    if (typeof gtag === 'function') {
+      gtag('event', 'turnstile_interactive', { event_category: 'security' });
+    }
+  }
+
   function dismissOverlay() {
     if (!overlayEl) return;
-    overlayEl.classList.add('cf-fade-out');
     var el = overlayEl;
     overlayEl = null;
-    setTimeout(function () { if (el && el.parentNode) el.parentNode.removeChild(el); }, 300);
+    if (interactive) {
+      el.classList.add('cf-fade-out');
+      setTimeout(function () { if (el && el.parentNode) el.parentNode.removeChild(el); }, 300);
+    } else if (el.parentNode) {
+      // Never shown — remove immediately, no animation.
+      el.parentNode.removeChild(el);
+    }
     document.documentElement.style.overflow = '';
     document.body && (document.body.style.overflow = '');
   }
@@ -54,7 +75,12 @@
     var style = document.createElement('style');
     style.id = 'cf-turnstile-styles';
     style.textContent = [
+      // The overlay starts invisible: it occupies no visual space and ignores
+      // pointer events, but stays in the DOM so Turnstile can run its
+      // non-interactive challenge inside it.
       '#cf-turnstile-overlay{position:fixed;inset:0;width:100%;height:100%;background:#f4f4f5;display:flex;align-items:center;justify-content:center;z-index:2147483647;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#1f1f1f;animation:cfFadeIn .15s ease;}',
+      '#cf-turnstile-overlay.cf-invisible{opacity:0;pointer-events:none;background:transparent;}',
+      '#cf-turnstile-overlay.cf-invisible .cf-card{opacity:0;pointer-events:none;}',
       '#cf-turnstile-overlay.cf-fade-out{animation:cfFadeOut .3s ease forwards;}',
       '@keyframes cfFadeIn{from{opacity:0}to{opacity:1}}',
       '@keyframes cfFadeOut{from{opacity:1}to{opacity:0}}',
@@ -82,6 +108,8 @@
 
     overlayEl = document.createElement('div');
     overlayEl.id = 'cf-turnstile-overlay';
+    // Start hidden — only revealed if the challenge needs interaction.
+    overlayEl.className = 'cf-invisible';
     overlayEl.setAttribute('role', 'dialog');
     overlayEl.setAttribute('aria-modal', 'true');
     overlayEl.setAttribute('aria-label', 'Security verification');
@@ -99,13 +127,11 @@
         '</div>' +
       '</div>';
 
-    document.documentElement.style.overflow = 'hidden';
+    hostEl = overlayEl;
     if (document.body) {
-      document.body.style.overflow = 'hidden';
       document.body.appendChild(overlayEl);
     } else {
       document.addEventListener('DOMContentLoaded', function () {
-        document.body.style.overflow = 'hidden';
         document.body.appendChild(overlayEl);
       });
     }
@@ -118,9 +144,20 @@
     widgetId = window.turnstile.render(mount, {
       sitekey: SITEKEY,
       theme: 'auto',
-      appearance: 'always',
+      // 'interaction-only' keeps the widget invisible while the
+      // non-interactive challenge runs; it only renders a prompt if the
+      // visitor must interact. Pair with a "Managed" widget in the
+      // Cloudflare dashboard for the silent-for-humans behaviour.
+      appearance: 'interaction-only',
       callback: function () { markVerified(); },
-      'error-callback': function () { /* widget will surface its own error UI */ },
+      // Fired right before Turnstile shows an interactive challenge — this is
+      // our cue to reveal the interstitial so the user can complete it.
+      'before-interactive-callback': function () { showInteractive(); },
+      'error-callback': function () {
+        // If the challenge errors out, surface the UI so the user can retry
+        // rather than leaving them silently blocked from ads.
+        showInteractive();
+      },
       'expired-callback': function () {
         if (widgetId !== null && window.turnstile) {
           try { window.turnstile.reset(widgetId); } catch (e) {}
