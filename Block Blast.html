@@ -223,63 +223,102 @@ body:has(.header-banner-ad) .game-container {
   }
 }
 
-/* Footer In-screen ad — sticks to the bottom of the viewport. */
+/* Footer In-screen ad — a polished floating card that slides up from the bottom. */
 .footer-inscreen-ad {
   position: fixed;
-  left: 0;
-  right: 0;
+  left: 50%;
   bottom: 0;
+  transform: translateX(-50%);
   z-index: 9998;
+  width: calc(100% - 24px);
+  max-width: 820px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  min-height: 90px;
-  padding: 4px 0;
-  background: rgba(20, 14, 38, 0.92);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.35);
+  padding: 12px 18px 14px;
+  background: linear-gradient(180deg, rgba(36, 24, 64, 0.96), rgba(17, 11, 33, 0.97));
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgba(168, 132, 255, 0.22);
+  border-bottom: none;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -10px 36px rgba(0, 0, 0, 0.5);
+  animation: footerAdSlideUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.footer-inscreen-ad > div:not(.footer-inscreen-ad__close) {
+/* gradient accent line along the top edge */
+.footer-inscreen-ad::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 22px;
+  right: 22px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, rgba(124, 77, 255, 0.9), rgba(0, 229, 255, 0.7), transparent);
+}
+@keyframes footerAdSlideUp {
+  from { transform: translate(-50%, 110%); opacity: 0; }
+  to   { transform: translate(-50%, 0);    opacity: 1; }
+}
+.footer-inscreen-ad__label {
+  margin-bottom: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(190, 170, 235, 0.65);
+}
+.footer-inscreen-ad > div {
   width: 100%;
   max-width: 728px;
   margin: 0 auto;
+  display: flex;
+  justify-content: center;
 }
 .footer-inscreen-ad__close {
   position: absolute;
-  top: 50%;
-  right: 8px;
-  transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
+  top: -15px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
   padding: 0;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.65);
-  font-size: 24px;
+  border: 1px solid rgba(168, 132, 255, 0.3);
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(48, 32, 84, 0.98), rgba(28, 18, 50, 0.98));
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 20px;
   font-weight: 300;
   line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.15s ease, background 0.15s ease;
-  z-index: 1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s ease, color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  z-index: 2;
 }
 .footer-inscreen-ad__close:hover {
   color: #fff;
-  background: rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(124, 77, 255, 0.98), rgba(94, 53, 200, 0.98));
+  border-color: rgba(168, 132, 255, 0.6);
+  transform: scale(1.08) rotate(90deg);
 }
 @media (max-width: 768px) {
   .footer-inscreen-ad {
-    min-height: 60px;
+    width: 100%;
+    border-radius: 14px 14px 0 0;
+    padding: 10px 14px 12px;
   }
 }
+@media (prefers-reduced-motion: reduce) {
+  .footer-inscreen-ad { animation: none; }
+  .footer-inscreen-ad__close { transition: none; }
+}
 body:has(.footer-inscreen-ad) {
-  padding-bottom: 100px;
+  padding-bottom: 112px;
 }
 body:has(.footer-inscreen-ad) .cookie-consent-banner {
-  bottom: 120px !important;
+  bottom: 132px !important;
 }
 
 /* ============================================================================
@@ -2378,6 +2417,7 @@ footer {
 
   <div class="footer-inscreen-ad" id="footerInScreenAd">
     <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="document.getElementById('footerInScreenAd').style.display='none'">×</button>
+    <span class="footer-inscreen-ad__label">Advertisement</span>
     <div id="mmt-bd025b48-54d2-4cff-88c7-33f195987398"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
