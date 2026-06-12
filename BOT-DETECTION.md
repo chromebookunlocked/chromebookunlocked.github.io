@@ -19,6 +19,10 @@ The implementation lives in `assets/bot-detector.js`.
 
 There is no client-side fingerprinting, scoring, or math challenge — the entire decision is delegated to Turnstile.
 
+## Ad-ops bypass
+
+Visits that carry Monumetric's placement-helper parameter (`?mmt-ph=...`) skip the Turnstile challenge entirely: the script marks the session verified immediately so the Monumetric team can review ad placements without being challenged (their VPN/tooling traffic tends to trigger the interactive challenge). The verified flag is stored in `sessionStorage`, so subsequent navigation in the same tab also passes through. Note this is a deliberate trust decision — anyone who appends the parameter gets the same bypass, which is acceptable because the gate is client-side and advisory anyway (see "Server-side verification" below).
+
 ## Public API
 
 `assets/bot-detector.js` exposes `window.botDetector` with three methods, kept compatible with the previous module:

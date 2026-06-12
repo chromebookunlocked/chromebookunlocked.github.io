@@ -19,7 +19,15 @@
   var STORAGE_KEY = 'cf_turnstile_verified';
   var TURNSTILE_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=__onTurnstileLoad';
 
-  var verified = sessionStorage.getItem(STORAGE_KEY) === '1';
+  // Monumetric's ad-ops team reviews placements with their placement helper
+  // (?mmt-ph=...). Let that traffic skip the challenge so they can always see
+  // the ad slots; the session is marked verified so navigation stays open.
+  var isAdOpsReview = /[?&]mmt-ph=/.test(window.location.search);
+
+  var verified = isAdOpsReview || sessionStorage.getItem(STORAGE_KEY) === '1';
+  if (isAdOpsReview) {
+    try { sessionStorage.setItem(STORAGE_KEY, '1'); } catch (e) {}
+  }
   var widgetId = null;
   var overlayEl = null;       // the (hidden-by-default) interstitial
   var hostEl = null;          // wrapper that holds the widget mount
