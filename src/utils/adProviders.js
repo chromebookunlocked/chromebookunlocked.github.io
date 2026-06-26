@@ -44,9 +44,8 @@ function generateAdNetworkHeadHints(adsEnabled, adProvider) {
     return `<link rel="dns-prefetch" href="https://monu.delivery">
   <link rel="preconnect" href="https://monu.delivery">
   <link rel="preload" as="script" href="${MONU_SCRIPT_SRC}">
-  <link rel="preconnect" href="https://securepubads.g.doubleclick.net" crossorigin>
-  <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossorigin>
-  <link rel="preconnect" href="https://tpc.googlesyndication.com" crossorigin>`;
+  <link rel="dns-prefetch" href="https://securepubads.g.doubleclick.net">
+  <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net">`;
   }
 
   return `<link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
