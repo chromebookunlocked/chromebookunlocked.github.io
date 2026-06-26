@@ -1,0 +1,32 @@
+name: Sync Monumetric ads.txt
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # daily at 6am UTC
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch ads.txt from Monumetric
+        run: |
+          curl -fsSL "https://monu.delivery/adstxt/0/c/07d613-c796-4eac-978c-7029566ea884.txt" -o ads.txt.new
+
+      - name: Update if changed
+        run: |
+          if ! diff -q ads.txt ads.txt.new > /dev/null 2>&1; then
+            mv ads.txt.new ads.txt
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add ads.txt
+            git commit -m "chore: sync Monumetric ads.txt"
+            git push
+          else
+            echo "ads.txt is already up to date"
+            rm ads.txt.new
+          fi
