@@ -574,7 +574,10 @@ function handleRouting() {
     const category = decodeURIComponent(hash.replace('#/category/', ''));
     filterCategory(category, false);
   } else {
-    // Home - show all games
+    // Strip any stray hash fragment (e.g. /#, #top) so the URL stays clean
+    if (hash) {
+      window.history.replaceState(null, '', '/');
+    }
     filterCategory('Home', false);
   }
 }
@@ -610,7 +613,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   });
 
-  // Handle routing
+  // Handle routing on load, hash changes, and pushState back/forward
   handleRouting();
   window.addEventListener('hashchange', handleRouting);
+  window.addEventListener('popstate', handleRouting);
 });
