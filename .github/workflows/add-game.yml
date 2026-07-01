@@ -1,0 +1,87 @@
+name: Add Game
+
+# Add a game without touching a local checkout (works from a phone):
+# Actions → "Add Game" → Run workflow → fill in the name and the game
+# HTML URL. The workflow creates the game folder, screenshots a
+# thumbnail, suggests tags, commits to main, and rebuilds the site.
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Game name (becomes the folder and page name)'
+        required: true
+        type: string
+      html_url:
+        description: 'URL of the game HTML file (raw HTML, e.g. a raw.githubusercontent.com link)'
+        required: true
+        type: string
+      tags:
+        description: 'Tags, comma-separated (leave empty to auto-suggest)'
+        required: false
+        type: string
+      thumbnail_url:
+        description: 'Thumbnail image URL (leave empty to auto-screenshot the game)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  add-game:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Playwright (for thumbnail screenshot)
+        if: inputs.thumbnail_url == ''
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Add game
+        env:
+          GAME_NAME: ${{ inputs.name }}
+          HTML_URL: ${{ inputs.html_url }}
+          TAGS: ${{ inputs.tags }}
+          THUMBNAIL_URL: ${{ inputs.thumbnail_url }}
+        run: |
+          ARGS=(--name "$GAME_NAME" --url "$HTML_URL")
+          if [ -n "$TAGS" ]; then
+            ARGS+=(--tags "$TAGS")
+          fi
+          if [ -n "$THUMBNAIL_URL" ]; then
+            ARGS+=(--thumbnail "$THUMBNAIL_URL")
+          fi
+          node scripts/add-game.js "${ARGS[@]}"
+
+      - name: Commit and push
+        env:
+          GAME_NAME: ${{ inputs.name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "games/$GAME_NAME" "data/$GAME_NAME.json"
+          git commit -m "Add new game: $GAME_NAME"
+          git push origin main
+
+  # Rebuild and deploy the site with the new game
+  build:
+    needs: add-game
+    uses: ./.github/workflows/manual-update.yml
+    permissions:
+      contents: write
+    secrets: inherit

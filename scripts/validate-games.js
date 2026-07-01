@@ -6,13 +6,13 @@ const gamesDir = path.join(__dirname, "..", "games");
 
 // ANSI color codes for better output
 const colors = {
-  reset: '\x1b[0m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  magenta: '\x1b[35m',
-  cyan: '\x1b[36m'
+  reset: "\x1b[0m",
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  blue: "\x1b[34m",
+  magenta: "\x1b[35m",
+  cyan: "\x1b[36m"
 };
 
 let errors = 0;
@@ -45,18 +45,17 @@ console.log(`${colors.magenta}
 ${colors.reset}`);
 
 // Get all JSON files
-const jsonFiles = fs.readdirSync(dataDir).filter(f => f.endsWith('.json'));
+const jsonFiles = fs.readdirSync(dataDir).filter(f => f.endsWith(".json"));
 console.log(`\n${colors.blue}Found ${jsonFiles.length} game metadata files${colors.reset}\n`);
 
-// Valid categories
-const validCategories = [
-  "Action", "Puzzle", "Shooter", "Clickers", "Horror", "Racing",
-  "Adventure", "Sports", "Strategy", "Platformer", "RPG",
-  "Simulation", "Uncategorized"
-];
+// Valid categories come from the canonical vocabulary in tags.json
+const { loadTagsConfig } = require("./lib/tag-utils");
+const tagsConfig = loadTagsConfig();
+const validCategories = tagsConfig.tags;
+const categoryAliases = Object.keys(tagsConfig.aliases || {});
 
 jsonFiles.forEach((file, index) => {
-  const gameName = path.basename(file, '.json');
+  const gameName = path.basename(file, ".json");
   console.log(`${colors.cyan}[${index + 1}/${jsonFiles.length}] Validating: ${gameName}${colors.reset}`);
 
   const jsonPath = path.join(dataDir, file);
@@ -64,7 +63,7 @@ jsonFiles.forEach((file, index) => {
   // 1. Check if JSON is valid
   let gameData;
   try {
-    const content = fs.readFileSync(jsonPath, 'utf8');
+    const content = fs.readFileSync(jsonPath, "utf8");
     gameData = JSON.parse(content);
   } catch (e) {
     error(`${file} - Invalid JSON: ${e.message}`);
@@ -74,7 +73,7 @@ jsonFiles.forEach((file, index) => {
   // 2. Check required fields
   if (!gameData.name) {
     error(`${file} - Missing required field: "name"`);
-  } else if (gameData.name.trim() === '') {
+  } else if (gameData.name.trim() === "") {
     error(`${file} - Field "name" is empty`);
   }
 
@@ -85,8 +84,8 @@ jsonFiles.forEach((file, index) => {
   // 3. Validate category values
   let categories = [];
   if (gameData.category) {
-    if (typeof gameData.category === 'string') {
-      categories = gameData.category.split(',').map(c => c.trim());
+    if (typeof gameData.category === "string") {
+      categories = gameData.category.split(",").map(c => c.trim());
     } else {
       error(`${file} - Field "category" must be a string`);
     }
@@ -100,8 +99,10 @@ jsonFiles.forEach((file, index) => {
   }
 
   categories.forEach(cat => {
-    if (!validCategories.includes(cat)) {
-      warn(`${file} - Unknown category: "${cat}". Valid: ${validCategories.join(', ')}`);
+    if (categoryAliases.includes(cat)) {
+      warn(`${file} - Category "${cat}" is a known typo/alias. Run "npm run normalize-tags" to fix it.`);
+    } else if (!validCategories.includes(cat)) {
+      warn(`${file} - Unknown category: "${cat}". Add it to tags.json or run "npm run normalize-tags".`);
     }
   });
 
@@ -123,7 +124,7 @@ jsonFiles.forEach((file, index) => {
   }
 
   // 6. Check index.html exists
-  const indexPath = path.join(gamePath, 'index.html');
+  const indexPath = path.join(gamePath, "index.html");
   if (!fs.existsSync(indexPath)) {
     error(`${file} - Missing index.html in ${folderName}/`);
   } else {
@@ -137,7 +138,7 @@ jsonFiles.forEach((file, index) => {
   }
 
   // 7. Check thumbnail exists
-  const thumbnails = gameData.thumbs || ['thumbnail.webp', 'thumbnail.png', 'thumbnail.jpg'];
+  const thumbnails = gameData.thumbs || ["thumbnail.webp", "thumbnail.png", "thumbnail.jpg"];
   let foundThumbnail = false;
 
   thumbnails.forEach(thumb => {
@@ -155,7 +156,7 @@ jsonFiles.forEach((file, index) => {
   });
 
   if (!foundThumbnail) {
-    warn(`${file} - No thumbnail found (will use fallback). Looking for: ${thumbnails.join(', ')}`);
+    warn(`${file} - No thumbnail found (will use fallback). Looking for: ${thumbnails.join(", ")}`);
   }
 
   // 8. Check for common issues
@@ -169,7 +170,7 @@ jsonFiles.forEach((file, index) => {
     success(`${gameName} - All checks passed`);
   }
 
-  console.log(''); // Empty line between games
+  console.log(""); // Empty line between games
 });
 
 // Check for orphaned game folders (folders without JSON)

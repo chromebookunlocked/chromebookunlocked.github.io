@@ -1,6 +1,24 @@
-name: Manual Update & Build
+name: Update & Build
 
 on:
+  # Automatic: any push to main that touches games or site source rebuilds
+  # and redeploys — no manual workflow trigger needed anymore.
+  # (Commits made by this workflow itself use GITHUB_TOKEN and therefore
+  # do not re-trigger it, so there is no build loop.)
+  push:
+    branches: [main]
+    paths:
+      - 'games/**'
+      - 'data/**'
+      - 'templates/**'
+      - 'src/**'
+      - 'assets/**'
+      - 'generate.js'
+      - 'ads-config.json'
+      - 'tags.json'
+  # Reusable: called by the add-game workflow after it commits a new game
+  workflow_call:
+  # Manual: still available as a fallback
   workflow_dispatch:
     inputs:
       skip_validation:
@@ -12,6 +30,11 @@ on:
           - 'false'
           - 'true'
 
+# Never run two builds/deploys at the same time
+concurrency:
+  group: update-and-build
+  cancel-in-progress: false
+
 jobs:
   update-and-build:
     runs-on: ubuntu-latest
@@ -20,6 +43,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
+          # Always build the latest main (matters when called from the
+          # add-game workflow, which pushes a commit right before this runs)
+          ref: main
           fetch-depth: 0
 
       - name: Setup Node.js

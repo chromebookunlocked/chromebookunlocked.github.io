@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { suggestTags } = require("./lib/tag-utils");
 
 const gamesDir = path.join(__dirname, "..", "games");
 const dataDir = path.join(__dirname, "..", "data");
@@ -9,13 +10,13 @@ if (!fs.existsSync(dataDir)) {
 }
 
 // Valid thumbnail extensions
-const validThumbnailExts = ['.webp', '.png', '.jpg', '.jpeg', '.gif'];
+const validThumbnailExts = [".webp", ".png", ".jpg", ".jpeg", ".gif"];
 
 /**
  * Check if a game folder has a valid index.html file
  */
 function hasValidIndexHTML(gamePath) {
-  const indexPath = path.join(gamePath, 'index.html');
+  const indexPath = path.join(gamePath, "index.html");
   if (!fs.existsSync(indexPath)) {
     return false;
   }
@@ -37,7 +38,7 @@ function hasValidThumbnail(gamePath) {
     const basename = path.basename(file, ext).toLowerCase();
 
     // Look for files named "thumbnail" with valid extensions
-    if (basename === 'thumbnail' && validThumbnailExts.includes(ext)) {
+    if (basename === "thumbnail" && validThumbnailExts.includes(ext)) {
       const filePath = path.join(gamePath, file);
       const stats = fs.statSync(filePath);
       return stats.size > 0; // Must not be empty
@@ -57,11 +58,11 @@ function validateGameFolder(gamePath, folderName) {
   const warnings = []; // Non-critical - game can still be added
 
   if (!hasValidIndexHTML(gamePath)) {
-    errors.push('missing or empty index.html');
+    errors.push("missing or empty index.html");
   }
 
   if (!hasValidThumbnail(gamePath)) {
-    warnings.push(`missing thumbnail (will use fallback)`);
+    warnings.push("missing thumbnail (will use fallback)");
   }
 
   return {
@@ -86,9 +87,13 @@ function validateGameFolder(gamePath, folderName) {
  * }
  */
 function generateGameData(folderName) {
+  const suggested = suggestTags(folderName);
   return {
     name: folderName,
-    category: "Uncategorized"
+    displayName: folderName,
+    category: suggested.length > 0 ? suggested.join(", ") : "Uncategorized",
+    createdAt: new Date().toISOString(),
+    description: ""
   };
 }
 
@@ -141,7 +146,7 @@ function syncGames() {
   });
 
   // 2. Delete JSON files for removed games
-  const jsonFiles = fs.readdirSync(dataDir).filter(f => f.endsWith('.json'));
+  const jsonFiles = fs.readdirSync(dataDir).filter(f => f.endsWith(".json"));
   jsonFiles.forEach(file => {
     const gameName = path.basename(file, ".json");
     if (!gameFolders.includes(gameName)) {
@@ -152,7 +157,7 @@ function syncGames() {
   });
 
   // Summary
-  console.log(`\n📊 Summary:`);
+  console.log("\n📊 Summary:");
   console.log(`   ✅ Created: ${created}`);
   console.log(`   ⚠️  Skipped (invalid): ${skipped}`);
   console.log(`   🗑️  Deleted: ${deleted}`);
@@ -160,7 +165,7 @@ function syncGames() {
 
   if (skipped > 0) {
     console.log(`⚠️  Warning: ${skipped} game(s) were skipped due to validation issues.`);
-    console.log(`   Fix the issues above and run this script again.\n`);
+    console.log("   Fix the issues above and run this script again.\n");
   }
 }
 

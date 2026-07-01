@@ -1,0 +1,87 @@
+name: Game Health Check
+
+# Weekly link-rot check: verifies the external CDN asset URLs every game
+# depends on are still alive, and maintains a single "Game health report"
+# issue with the results. No action needed when everything is healthy.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Every Monday 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run health check
+        id: check
+        run: |
+          node scripts/health-check.js --no-fail --report health-report.md
+          BROKEN=$(grep -oP '❌ Broken: \*\*\K[0-9]+' health-report.md || echo 0)
+          echo "broken=$BROKEN" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update health report issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('health-report.md', 'utf8');
+            const broken = parseInt('${{ steps.check.outputs.broken }}', 10) || 0;
+            const title = '🩺 Game health report';
+
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              creator: 'github-actions[bot]'
+            });
+            const existing = issues.find(i => i.title === title);
+
+            if (broken > 0) {
+              if (existing) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: existing.number,
+                  body
+                });
+                core.info(`Updated issue #${existing.number} (${broken} broken game(s))`);
+              } else {
+                const { data: issue } = await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title,
+                  body
+                });
+                core.info(`Created issue #${issue.number} (${broken} broken game(s))`);
+              }
+            } else if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body: '✅ All games are healthy again — closing.'
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                state: 'closed'
+              });
+              core.info(`Closed issue #${existing.number} — all healthy`);
+            } else {
+              core.info('All games healthy, nothing to report.');
+            }

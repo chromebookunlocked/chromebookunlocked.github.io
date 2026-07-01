@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+const fs = require("fs");
+const path = require("path");
+const { execSync } = require("child_process");
 
 /**
  * Convert all game thumbnails to WebP format with optimized resolution
@@ -8,17 +8,17 @@ const { execSync } = require('child_process');
  * Quality: 80 (good balance between size and quality)
  */
 
-const GAMES_DIR = path.join(__dirname, '..', 'games');
+const GAMES_DIR = path.join(__dirname, "..", "games");
 const TARGET_SIZE = 300; // Max width/height for thumbnails
 const WEBP_QUALITY = 80;
 const MIN_VALID_SIZE = 100; // Minimum size in bytes for a valid WebP file
 
 // Image extensions to convert (in priority order for source images)
-const IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.gif', '.webp', '.avif', '.bmp', '.tiff'];
+const IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".avif", ".bmp", ".tiff"];
 
 function checkSharpAvailable() {
   try {
-    require.resolve('sharp');
+    require.resolve("sharp");
     return true;
   } catch (e) {
     return false;
@@ -27,7 +27,7 @@ function checkSharpAvailable() {
 
 function checkImageMagickAvailable() {
   try {
-    execSync('which convert', { stdio: 'ignore' });
+    execSync("which convert", { stdio: "ignore" });
     return true;
   } catch (e) {
     return false;
@@ -36,14 +36,14 @@ function checkImageMagickAvailable() {
 
 function detectRealFormat(filePath) {
   try {
-    const output = execSync(`file "${filePath}"`, { encoding: 'utf-8' });
-    if (output.includes('AVIF')) return 'avif';
-    if (output.includes('PNG')) return 'png';
-    if (output.includes('JPEG') || output.includes('JFIF')) return 'jpeg';
-    if (output.includes('GIF')) return 'gif';
-    if (output.includes('WebP')) return 'webp';
-    if (output.includes('BMP')) return 'bmp';
-    if (output.includes('TIFF')) return 'tiff';
+    const output = execSync(`file "${filePath}"`, { encoding: "utf-8" });
+    if (output.includes("AVIF")) return "avif";
+    if (output.includes("PNG")) return "png";
+    if (output.includes("JPEG") || output.includes("JFIF")) return "jpeg";
+    if (output.includes("GIF")) return "gif";
+    if (output.includes("WebP")) return "webp";
+    if (output.includes("BMP")) return "bmp";
+    if (output.includes("TIFF")) return "tiff";
     return null;
   } catch (e) {
     return null;
@@ -53,7 +53,7 @@ function detectRealFormat(filePath) {
 function convertWithImageMagick(inputPath, outputPath) {
   try {
     execSync(`convert "${inputPath}" -resize ${TARGET_SIZE}x${TARGET_SIZE}\\> -quality ${WEBP_QUALITY} "${outputPath}"`, {
-      stdio: 'pipe'
+      stdio: "pipe"
     });
     return true;
   } catch (e) {
@@ -73,7 +73,7 @@ async function isValidWebP(filePath, sharp) {
     const metadata = await sharp(filePath).metadata();
 
     // Verify it's actually a WebP and has valid dimensions
-    if (metadata.format !== 'webp' || !metadata.width || !metadata.height) {
+    if (metadata.format !== "webp" || !metadata.width || !metadata.height) {
       return false;
     }
 
@@ -84,9 +84,9 @@ async function isValidWebP(filePath, sharp) {
 }
 
 async function convertWithSharp() {
-  const sharp = require('sharp');
+  const sharp = require("sharp");
 
-  console.log('🔍 Scanning games directory for thumbnails...\n');
+  console.log("🔍 Scanning games directory for thumbnails...\n");
 
   const gameFolders = fs.readdirSync(GAMES_DIR)
     .filter(f => fs.statSync(path.join(GAMES_DIR, f)).isDirectory());
@@ -100,14 +100,14 @@ async function convertWithSharp() {
 
   for (const folder of gameFolders) {
     const gamePath = path.join(GAMES_DIR, folder);
-    const outputPath = path.join(gamePath, 'thumbnail.webp');
+    const outputPath = path.join(gamePath, "thumbnail.webp");
 
     // Find all thumbnail files (including existing WebP and source formats)
     const files = fs.readdirSync(gamePath);
     const allThumbnails = files.filter(f => {
       const basename = path.parse(f).name.toLowerCase();
       const ext = path.extname(f).toLowerCase();
-      return basename === 'thumbnail' && IMAGE_EXTENSIONS.includes(ext);
+      return basename === "thumbnail" && IMAGE_EXTENSIONS.includes(ext);
     });
 
     if (allThumbnails.length === 0) {
@@ -117,7 +117,7 @@ async function convertWithSharp() {
     }
 
     // Check if WebP exists and is valid
-    const existingWebP = allThumbnails.find(f => f.toLowerCase() === 'thumbnail.webp');
+    const existingWebP = allThumbnails.find(f => f.toLowerCase() === "thumbnail.webp");
     let needsConversion = false;
     let isReconvert = false;
 
@@ -133,7 +133,7 @@ async function convertWithSharp() {
         isReconvert = true;
       } else {
         // Valid WebP exists, check if there are source files to clean up
-        const sourceFiles = allThumbnails.filter(f => f.toLowerCase() !== 'thumbnail.webp');
+        const sourceFiles = allThumbnails.filter(f => f.toLowerCase() !== "thumbnail.webp");
         if (sourceFiles.length > 0) {
           // Delete old source files
           sourceFiles.forEach(f => {
@@ -156,7 +156,7 @@ async function convertWithSharp() {
     // Find source thumbnail (prefer non-WebP formats)
     const sourceFile = allThumbnails.find(f => {
       const ext = path.extname(f).toLowerCase();
-      return ext !== '.webp';
+      return ext !== ".webp";
     }) || allThumbnails[0];
 
     if (!sourceFile) {
@@ -177,7 +177,7 @@ async function convertWithSharp() {
       // Detect if file format mismatches extension (e.g., AVIF with .png extension)
       const realFormat = detectRealFormat(inputPath);
       const fileExt = path.extname(inputPath).toLowerCase().slice(1);
-      const formatMismatch = realFormat && realFormat !== fileExt && !(realFormat === 'jpeg' && fileExt === 'jpg');
+      const formatMismatch = realFormat && realFormat !== fileExt && !(realFormat === "jpeg" && fileExt === "jpg");
 
       if (formatMismatch) {
         console.log(`⚠️  ${folder}: File is actually ${realFormat.toUpperCase()}, not ${fileExt.toUpperCase()}`);
@@ -193,7 +193,7 @@ async function convertWithSharp() {
         // Resize if image is larger than target size
         if (metadata.width > TARGET_SIZE || metadata.height > TARGET_SIZE) {
           pipeline = pipeline.resize(TARGET_SIZE, TARGET_SIZE, {
-            fit: 'inside', // Maintain aspect ratio
+            fit: "inside", // Maintain aspect ratio
             withoutEnlargement: true
           });
         }
@@ -212,7 +212,7 @@ async function convertWithSharp() {
         const sizeAfter = (newStats.size / 1024).toFixed(1);
         const savings = (((stats.size - newStats.size) / stats.size) * 100).toFixed(1);
 
-        const prefix = isReconvert ? '🔄' : '✓';
+        const prefix = isReconvert ? "🔄" : "✓";
         console.log(`${prefix}  ${folder}: ${sizeBefore}KB → ${sizeAfter}KB (${savings}% smaller)`);
       } catch (sharpError) {
         // Sharp failed, try ImageMagick as fallback
@@ -239,7 +239,7 @@ async function convertWithSharp() {
 
       if (conversionSuccess) {
         // Delete old source thumbnail if conversion was successful
-        if (sourceFile !== 'thumbnail.webp') {
+        if (sourceFile !== "thumbnail.webp") {
           fs.unlinkSync(inputPath);
         }
 
@@ -255,8 +255,8 @@ async function convertWithSharp() {
     }
   }
 
-  console.log('\n' + '='.repeat(60));
-  console.log(`📊 Conversion Summary:`);
+  console.log("\n" + "=".repeat(60));
+  console.log("📊 Conversion Summary:");
   console.log(`   Converted: ${converted}`);
   console.log(`   Reconverted (from corrupted): ${reconverted}`);
   console.log(`   Skipped (already valid): ${skipped}`);
@@ -267,7 +267,7 @@ async function convertWithSharp() {
     const totalSavings = (((totalSizeBefore - totalSizeAfter) / totalSizeBefore) * 100).toFixed(1);
     console.log(`   Total savings: ${totalSavings}%`);
   }
-  console.log('='.repeat(60));
+  console.log("=".repeat(60));
 }
 
 function isValidWebPBasic(filePath) {
@@ -280,19 +280,19 @@ function isValidWebPBasic(filePath) {
 }
 
 function convertWithCwebp() {
-  console.log('📦 Using cwebp for conversion (sharp not available)...\n');
+  console.log("📦 Using cwebp for conversion (sharp not available)...\n");
 
   // Check if cwebp is available
   try {
-    execSync('which cwebp', { stdio: 'ignore' });
+    execSync("which cwebp", { stdio: "ignore" });
   } catch (e) {
-    console.error('❌ Error: Neither sharp nor cwebp is available.');
-    console.error('   Please install sharp: npm install sharp');
-    console.error('   Or install cwebp: apt-get install webp (Linux) / brew install webp (Mac)');
+    console.error("❌ Error: Neither sharp nor cwebp is available.");
+    console.error("   Please install sharp: npm install sharp");
+    console.error("   Or install cwebp: apt-get install webp (Linux) / brew install webp (Mac)");
     process.exit(1);
   }
 
-  console.log('🔍 Scanning games directory for thumbnails...\n');
+  console.log("🔍 Scanning games directory for thumbnails...\n");
 
   const gameFolders = fs.readdirSync(GAMES_DIR)
     .filter(f => fs.statSync(path.join(GAMES_DIR, f)).isDirectory());
@@ -304,14 +304,14 @@ function convertWithCwebp() {
 
   for (const folder of gameFolders) {
     const gamePath = path.join(GAMES_DIR, folder);
-    const outputPath = path.join(gamePath, 'thumbnail.webp');
+    const outputPath = path.join(gamePath, "thumbnail.webp");
 
     // Find all thumbnail files
     const files = fs.readdirSync(gamePath);
     const allThumbnails = files.filter(f => {
       const basename = path.parse(f).name.toLowerCase();
       const ext = path.extname(f).toLowerCase();
-      return basename === 'thumbnail' && IMAGE_EXTENSIONS.includes(ext);
+      return basename === "thumbnail" && IMAGE_EXTENSIONS.includes(ext);
     });
 
     if (allThumbnails.length === 0) {
@@ -321,7 +321,7 @@ function convertWithCwebp() {
     }
 
     // Check if WebP exists and is valid
-    const existingWebP = allThumbnails.find(f => f.toLowerCase() === 'thumbnail.webp');
+    const existingWebP = allThumbnails.find(f => f.toLowerCase() === "thumbnail.webp");
     let needsConversion = false;
     let isReconvert = false;
 
@@ -334,7 +334,7 @@ function convertWithCwebp() {
         isReconvert = true;
       } else {
         // Valid WebP exists, clean up source files
-        const sourceFiles = allThumbnails.filter(f => f.toLowerCase() !== 'thumbnail.webp');
+        const sourceFiles = allThumbnails.filter(f => f.toLowerCase() !== "thumbnail.webp");
         if (sourceFiles.length > 0) {
           sourceFiles.forEach(f => {
             fs.unlinkSync(path.join(gamePath, f));
@@ -356,7 +356,7 @@ function convertWithCwebp() {
     // Find source thumbnail
     const sourceFile = allThumbnails.find(f => {
       const ext = path.extname(f).toLowerCase();
-      return ext !== '.webp';
+      return ext !== ".webp";
     }) || allThumbnails[0];
 
     if (!sourceFile) {
@@ -373,7 +373,7 @@ function convertWithCwebp() {
       // Detect if file format mismatches extension
       const realFormat = detectRealFormat(inputPath);
       const fileExt = path.extname(inputPath).toLowerCase().slice(1);
-      const formatMismatch = realFormat && realFormat !== fileExt && !(realFormat === 'jpeg' && fileExt === 'jpg');
+      const formatMismatch = realFormat && realFormat !== fileExt && !(realFormat === "jpeg" && fileExt === "jpg");
 
       if (formatMismatch) {
         console.log(`⚠️  ${folder}: File is actually ${realFormat.toUpperCase()}, not ${fileExt.toUpperCase()}`);
@@ -382,11 +382,11 @@ function convertWithCwebp() {
       try {
         // Use cwebp to convert
         execSync(`cwebp -q ${WEBP_QUALITY} -resize ${TARGET_SIZE} ${TARGET_SIZE} "${inputPath}" -o "${outputPath}"`, {
-          stdio: 'pipe'
+          stdio: "pipe"
         });
         conversionSuccess = true;
 
-        const prefix = isReconvert ? '🔄' : '✓';
+        const prefix = isReconvert ? "🔄" : "✓";
         console.log(`${prefix}  ${folder}: Converted to WebP`);
       } catch (cwebpError) {
         // cwebp failed, try ImageMagick as fallback
@@ -396,7 +396,7 @@ function convertWithCwebp() {
             conversionSuccess = true;
             console.log(`✓  ${folder}: Converted via ImageMagick`);
           } else {
-            throw new Error(`Both cwebp and ImageMagick failed`);
+            throw new Error("Both cwebp and ImageMagick failed");
           }
         } else {
           throw cwebpError;
@@ -405,7 +405,7 @@ function convertWithCwebp() {
 
       if (conversionSuccess) {
         // Delete old source thumbnail
-        if (sourceFile !== 'thumbnail.webp') {
+        if (sourceFile !== "thumbnail.webp") {
           fs.unlinkSync(inputPath);
         }
 
@@ -421,18 +421,18 @@ function convertWithCwebp() {
     }
   }
 
-  console.log('\n' + '='.repeat(60));
-  console.log(`📊 Conversion Summary:`);
+  console.log("\n" + "=".repeat(60));
+  console.log("📊 Conversion Summary:");
   console.log(`   Converted: ${converted}`);
   console.log(`   Reconverted (from corrupted): ${reconverted}`);
   console.log(`   Skipped (already valid): ${skipped}`);
   console.log(`   Errors: ${errors}`);
-  console.log('='.repeat(60));
+  console.log("=".repeat(60));
 }
 
 // Main execution
 (async () => {
-  console.log('🎮 Starting thumbnail conversion to WebP format\n');
+  console.log("🎮 Starting thumbnail conversion to WebP format\n");
   console.log(`Target size: ${TARGET_SIZE}×${TARGET_SIZE} pixels`);
   console.log(`WebP quality: ${WEBP_QUALITY}\n`);
 
@@ -442,6 +442,6 @@ function convertWithCwebp() {
     convertWithCwebp();
   }
 
-  console.log('\n✅ Conversion complete!');
-  console.log('💡 Don\'t forget to update game JSON files if they reference old thumbnail names.');
+  console.log("\n✅ Conversion complete!");
+  console.log("💡 Don't forget to update game JSON files if they reference old thumbnail names.");
 })();

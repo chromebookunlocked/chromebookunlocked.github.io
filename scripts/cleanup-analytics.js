@@ -4,16 +4,16 @@ const path = require("path");
 const dataDir = path.join(__dirname, "..", "data");
 
 function cleanupAnalyticsFields() {
-  const jsonFiles = fs.readdirSync(dataDir).filter(f => f.endsWith('.json'));
+  const jsonFiles = fs.readdirSync(dataDir).filter(f => f.endsWith(".json"));
 
   let cleaned = 0;
 
   jsonFiles.forEach(file => {
     const filePath = path.join(dataDir, file);
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
 
     // Check if analytics fields exist
-    if (data.hasOwnProperty('impressions') || data.hasOwnProperty('opens')) {
+    if (Object.prototype.hasOwnProperty.call(data, "impressions") || Object.prototype.hasOwnProperty.call(data, "opens")) {
       // Remove analytics fields
       delete data.impressions;
       delete data.opens;

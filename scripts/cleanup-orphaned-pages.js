@@ -8,8 +8,8 @@ const dataDir = path.join(rootDir, "data");
  * Get all valid game names from data/*.json files
  */
 function getValidGameNames() {
-  const jsonFiles = fs.readdirSync(dataDir).filter(f => f.endsWith('.json'));
-  return jsonFiles.map(f => path.basename(f, '.json'));
+  const jsonFiles = fs.readdirSync(dataDir).filter(f => f.endsWith(".json"));
+  return jsonFiles.map(f => path.basename(f, ".json"));
 }
 
 /**
@@ -20,14 +20,14 @@ function getGameHTMLFiles() {
 
   // Filter for .html files, excluding special files
   const specialFiles = [
-    'index.html',
-    'index.template.html',
-    'dmca.html',
-    'google0d95473435a7c986.html'
+    "index.html",
+    "index.template.html",
+    "dmca.html",
+    "google0d95473435a7c986.html"
   ];
 
   return files.filter(f => {
-    return f.endsWith('.html') && !specialFiles.includes(f);
+    return f.endsWith(".html") && !specialFiles.includes(f);
   });
 }
 
@@ -35,7 +35,7 @@ function getGameHTMLFiles() {
  * Clean up orphaned game HTML pages
  */
 function cleanupOrphanedPages() {
-  console.log('\n🧹 Cleaning up orphaned game HTML pages...\n');
+  console.log("\n🧹 Cleaning up orphaned game HTML pages...\n");
 
   const validGameNames = getValidGameNames();
   const gameHTMLFiles = getGameHTMLFiles();
@@ -44,7 +44,7 @@ function cleanupOrphanedPages() {
   let kept = 0;
 
   gameHTMLFiles.forEach(htmlFile => {
-    const gameName = path.basename(htmlFile, '.html');
+    const gameName = path.basename(htmlFile, ".html");
 
     // Check if this game has a corresponding JSON file
     if (!validGameNames.includes(gameName)) {
@@ -58,7 +58,7 @@ function cleanupOrphanedPages() {
   });
 
   // Summary
-  console.log(`\n📊 Cleanup Summary:`);
+  console.log("\n📊 Cleanup Summary:");
   console.log(`   🗑️  Deleted: ${deleted} orphaned HTML pages`);
   console.log(`   ✓ Kept: ${kept} valid game pages`);
   console.log(`   📝 Total JSON files: ${validGameNames.length}\n`);
@@ -66,7 +66,7 @@ function cleanupOrphanedPages() {
   if (deleted > 0) {
     console.log(`✨ Removed ${deleted} orphaned game page(s)\n`);
   } else {
-    console.log(`✓ No orphaned pages found\n`);
+    console.log("✓ No orphaned pages found\n");
   }
 }
 

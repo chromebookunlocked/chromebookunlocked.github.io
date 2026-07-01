@@ -2,37 +2,45 @@
 
 ## 🎮 How to Add/Update/Delete Games
 
-### **Method 1: Manual Workflow (Recommended)**
+### **Method 1: One-command add (Recommended)**
 
-This is the easiest way - just click one button to trigger the entire update and build process.
+The `add-game` script does everything at once: creates the game folder,
+downloads/copies the HTML, screenshots a thumbnail, suggests tags, and
+writes the metadata JSON.
 
-#### Steps:
-1. **Add/update/delete games** in the `games/` folder
-   - Each game must be in its own folder (e.g., `games/GameName/`)
-   - Each folder must contain:
-     - `index.html` - The game file
-     - `thumbnail.png` (or `.jpg`, `.jpeg`, `.gif`) - The thumbnail image
+```bash
+# From a URL (e.g. a raw.githubusercontent.com link)
+npm run add-game -- --name "Cool Game" --url "https://example.com/game.html"
 
-2. **Commit and push** your changes to the `main` branch:
-   ```bash
-   git add games/
-   git commit -m "Add new game: GameName"
-   git push origin main
-   ```
+# From a local HTML file
+npm run add-game -- --name "Cool Game" --file ./cool-game.html
 
-3. **Trigger the workflow**:
-   - Go to [GitHub Actions](../../actions)
-   - Click on "Manual Update & Build" workflow
-   - Click "Run workflow" button
-   - Click the green "Run workflow" button to confirm
+# Override the auto-suggested tags / thumbnail if you want
+npm run add-game -- --name "Cool Game" --file game.html \
+  --tags "Action, Racing" --thumbnail ./cover.png
+```
 
-4. **Wait for completion** (~2-3 minutes)
-   - The workflow will:
-     - ✅ Validate all game folders
-     - ✅ Create/update JSON files in `data/`
-     - ✅ Clean up orphaned game HTML pages
-     - ✅ Build the site
-     - ✅ Deploy to GitHub Pages
+Then just commit and push — **the site rebuilds automatically on every
+push to `main`** that touches `games/` or `data/` (no manual workflow
+trigger needed anymore):
+
+```bash
+git add games/ data/
+git commit -m "Add new game: Cool Game"
+git push origin main
+```
+
+> One-time setup for the screenshot thumbnails:
+> `npm install --no-save playwright && npx playwright install chromium`
+
+### **Method 1b: Add a game from your phone (GitHub Action)**
+
+No local checkout needed:
+
+1. Go to [GitHub Actions](../../actions) → **Add Game** → "Run workflow"
+2. Fill in the game name and the URL of the game HTML file
+   (tags and thumbnail are optional — they're auto-generated)
+3. The workflow commits the game to `main` and rebuilds the site
 
 ### **Method 2: Local Development**
 
@@ -109,9 +117,7 @@ To delete a game:
    git push origin main
    ```
 
-3. **Run the Manual Update workflow** (see Method 1 above)
-
-The workflow will automatically:
+The build workflow runs automatically on push and will:
 - Delete the JSON file from `data/GameName.json`
 - Delete the HTML page `GameName.html` from the root
 - Rebuild the site without the game
@@ -120,22 +126,65 @@ The workflow will automatically:
 
 | Command | Description |
 |---------|-------------|
+| `npm run add-game` | **Add a game in one command** (folder + HTML + thumbnail + tags + JSON) |
+| `npm run screenshot` | Generate thumbnails by screenshotting games (`--missing`, `--force`, `--click`) |
+| `npm run health-check` | Check that the external CDN assets games depend on are still alive |
+| `npm run normalize-tags` | Fix tag typos/duplicates against the `tags.json` vocabulary |
 | `npm run sync-data` | Create/update/delete JSON files in `data/` based on `games/` folders |
 | `npm run cleanup` | Remove orphaned game HTML pages from root directory |
-| `npm run validate` | Validate all games (checks for index.html and thumbnails) |
+| `npm run validate` | Validate all games (checks for index.html, thumbnails, tags) |
 | `npm run build` | Build the static site to `dist/` |
 | `npm run update-all` | **Run all steps above in sequence** |
 | `npm run dev` | Build and serve locally at http://localhost:3000 |
+
+## 🏷️ Tags
+
+The canonical tag vocabulary lives in **`tags.json`** at the repo root:
+
+- `tags` — the allowed category list (validation warns on anything else)
+- `aliases` — maps typos/variants to canonical tags (e.g. `Rougelike` → `Roguelike`)
+- `keywords` — name keywords used to auto-suggest tags for new games
+
+To add a brand-new category, add it to `tags` first. If validation warns
+about a typo, run `npm run normalize-tags` to fix all data files at once.
+
+## 🩺 Game Health (automatic)
+
+Games are thin HTML wrappers around CDN-hosted assets, so they break when
+the source CDN/repo disappears. The **Game Health Check** workflow runs
+every Monday, verifies every game's external asset URLs, and keeps a
+single "🩺 Game health report" issue up to date:
+
+- Broken games → the issue lists them with the dead URLs
+- Everything healthy → the issue is closed automatically
+
+You can also run it anytime: `npm run health-check` (or trigger the
+workflow manually in the Actions tab).
+
+## 📸 Thumbnails (automatic)
+
+No more hunting for images online — thumbnails are generated by loading
+the game in a headless browser and screenshotting it:
+
+```bash
+npm run screenshot -- --missing        # all games without a thumbnail
+npm run screenshot -- --force "Slope"  # regenerate one game
+npm run screenshot -- --click "OvO"    # click to start the game first
+```
+
+Output is a 300×300 `thumbnail.webp` in the game folder. Blank frames
+(game didn't render) are rejected automatically, and the site falls back
+to the default thumbnail until you retry.
 
 ## 🚨 Troubleshooting
 
 ### "Game not showing on site"
 - ✅ Check game folder has `index.html` and `thumbnail.*`
 - ✅ Run `npm run validate` to see what's missing
-- ✅ Make sure you ran the Manual Update workflow
+- ✅ Check the "Update & Build" workflow ran for your push in the Actions tab
 
 ### "Orphaned game page still exists"
-- ✅ Run the Manual Update workflow again
+- ✅ Trigger the "Update & Build" workflow manually in the Actions tab
 - ✅ Or run locally: `npm run cleanup`
 
 ### "Workflow failed"
@@ -193,8 +242,13 @@ The workflow will automatically:
 
 ## 🔄 Workflow Files
 
-- **`.github/workflows/manual-update.yml`** - Main workflow (use this!)
+- **`.github/workflows/manual-update.yml`** - Main build & deploy. Runs
+  **automatically on every push to `main`** that touches `games/`, `data/`,
+  `templates/`, `src/`, `assets/`, `generate.js`, `ads-config.json` or
+  `tags.json`. Can still be triggered manually as a fallback.
+- **`.github/workflows/add-game.yml`** - Add a game from the Actions tab
+  (works from a phone), then rebuilds the site.
+- **`.github/workflows/health-check.yml`** - Weekly link-rot check that
+  maintains the "🩺 Game health report" issue.
 - **`.github/workflows/update-data.yml`** - Legacy (disabled)
 - **`.github/workflows/build.yml`** - Legacy (disabled)
-
-The old workflows are disabled by default. Only use the **Manual Update** workflow.
