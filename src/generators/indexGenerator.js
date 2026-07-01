@@ -1,4 +1,4 @@
-const { generateGameCard, generateHorizontalAd } = require('./cardGenerator');
+const { generateGameCard, generateHorizontalAd } = require("./cardGenerator");
 
 // Horizontal ad configuration
 // Insert a full-width horizontal ad every 3 rows (every 18 games at 6 columns)
@@ -14,51 +14,51 @@ const AD_INTERVAL = COLS_PER_ROW * ROWS_PER_AD; // 18
 function shouldInsertAdAfter(gameIndex) {
   return (gameIndex + 1) % AD_INTERVAL === 0;
 }
-const { generateIndexMetaTags, generateIndexStructuredData } = require('../utils/seoBuilder');
-const { generateAnalyticsScript } = require('../utils/analyticsEnhanced');
-const { escapeHtml, escapeHtmlAttr } = require('../utils/htmlEscape');
-const { getThumbPath } = require('../utils/assetManager');
-const { INITIAL_ROWS, ROWS_PER_LOAD, SCROLL_THRESHOLD, EAGER_LOAD_CARDS } = require('../utils/constants');
-const { generateAdNetworkHeadHints, generateAdNetworkHeadScript, generateAdNetworkInitScript, generateHeaderBannerAd, generateBottomLeaderboardAd, generateFooterInScreenAd } = require('../utils/adProviders');
+const { generateIndexMetaTags, generateIndexStructuredData } = require("../utils/seoBuilder");
+const { generateAnalyticsScript } = require("../utils/analyticsEnhanced");
+const { escapeHtml, escapeHtmlAttr } = require("../utils/htmlEscape");
+const { getThumbPath } = require("../utils/assetManager");
+const { INITIAL_ROWS, ROWS_PER_LOAD, SCROLL_THRESHOLD, EAGER_LOAD_CARDS } = require("../utils/constants");
+const { generateAdNetworkHeadHints, generateAdNetworkHeadScript, generateAdNetworkInitScript, generateHeaderBannerAd, generateBottomLeaderboardAd, generateFooterInScreenAd } = require("../utils/adProviders");
 
 // Category to icon mapping (kept for sidebar)
 const categoryIcons = {
-  'Home': '🏠',
-  'All Games': '🎮',
-  'Trending Games': '🔥',
-  'Newly Added': '✨',
-  'Action': '⚔️',
-  'Puzzle': '🧩',
-  'Shooter': '🔫',
-  'Clickers': '👆',
-  'Horror': '👻',
-  'Racing': '🏎️',
-  'Adventure': '🗺️',
-  'Sports': '⚽',
-  'Strategy': '♟️',
-  'Platformer': '🏃',
-  'RPG': '🎭',
-  'Simulation': '🎯',
-  'Multiplayer': '👥',
-  'Arcade': '🕹️',
-  'Fighting': '🥊',
-  'Rhythm': '🎵',
-  'Music': '🎶',
-  'Building': '🏗️',
-  'Survival': '🏕️',
-  'Roguelike': '💀',
-  'Retro': '👾',
-  '2 Player': '👫',
-  'Football': '🏈',
-  'Basketball': '🏀',
-  'Card': '🃏',
-  'IO': '🌐',
-  'Uncategorized': '📁'
+  "Home": "🏠",
+  "All Games": "🎮",
+  "Trending Games": "🔥",
+  "Newly Added": "✨",
+  "Action": "⚔️",
+  "Puzzle": "🧩",
+  "Shooter": "🔫",
+  "Clickers": "👆",
+  "Horror": "👻",
+  "Racing": "🏎️",
+  "Adventure": "🗺️",
+  "Sports": "⚽",
+  "Strategy": "♟️",
+  "Platformer": "🏃",
+  "RPG": "🎭",
+  "Simulation": "🎯",
+  "Multiplayer": "👥",
+  "Arcade": "🕹️",
+  "Fighting": "🥊",
+  "Rhythm": "🎵",
+  "Music": "🎶",
+  "Building": "🏗️",
+  "Survival": "🏕️",
+  "Roguelike": "💀",
+  "Retro": "👾",
+  "2 Player": "👫",
+  "Football": "🏈",
+  "Basketball": "🏀",
+  "Card": "🃏",
+  "IO": "🌐",
+  "Uncategorized": "📁"
 };
 
 // Get icon for a category, with fallback
 function getCategoryIcon(category) {
-  return categoryIcons[category] || '🎯';
+  return categoryIcons[category] || "🎯";
 }
 
 /**
@@ -102,7 +102,7 @@ function shuffleArray(array, seed) {
  * @param {string} adProvider - "adsense" | "monumetric"
  * @returns {string} Complete HTML document
  */
-function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.', adsEnabled = true, adProvider = 'adsense', botVerificationEnabled = true) {
+function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = ".", adsEnabled = true, adProvider = "adsense", botVerificationEnabled = true) {
   // Generate sidebar categories - sorted by game count (largest first)
   // Filter out categories with less than 2 games, and exclude special categories
   const sidebarCategories = Object.keys(categories)
@@ -117,25 +117,41 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     .join("");
 
   // Fixed sidebar items for Recently Played and Newly Added
-  const recentlyPlayedItem = `<li role="menuitem" tabindex="0" id="recentlyPlayedNav" onclick="filterCategory('Recently Played')" onkeypress="if(event.key==='Enter')filterCategory('Recently Played')" style="display:none"><span class="icon">🕐</span><span class="text">Recently Played</span></li>`;
-  const newlyAddedItem = `<li role="menuitem" tabindex="0" onclick="filterCategory('Newly Added')" onkeypress="if(event.key==='Enter')filterCategory('Newly Added')"><span class="icon">✨</span><span class="text">Newly Added</span></li>`;
+  const recentlyPlayedItem = "<li role=\"menuitem\" tabindex=\"0\" id=\"recentlyPlayedNav\" onclick=\"filterCategory('Recently Played')\" onkeypress=\"if(event.key==='Enter')filterCategory('Recently Played')\" style=\"display:none\"><span class=\"icon\">🕐</span><span class=\"text\">Recently Played</span></li>";
+  const newlyAddedItem = "<li role=\"menuitem\" tabindex=\"0\" onclick=\"filterCategory('Newly Added')\" onkeypress=\"if(event.key==='Enter')filterCategory('Newly Added')\"><span class=\"icon\">✨</span><span class=\"text\">Newly Added</span></li>";
+
+  // Trending Games (auto-populated from analytics data) — only shown when
+  // some games actually carry the tag
+  const trendingItem = (categories["Trending Games"] || []).length > 0
+    ? "<li role=\"menuitem\" tabindex=\"0\" onclick=\"filterCategory('Trending Games')\" onkeypress=\"if(event.key==='Enter')filterCategory('Trending Games')\"><span class=\"icon\">🔥</span><span class=\"text\">Trending Games</span></li>"
+    : "";
 
   // Use current date as seed for daily randomization
   const today = new Date();
   const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
 
-  // Separate priority games from non-priority games
+  // Home grid order: manual priority games first, then games sorted by
+  // play count from analytics (popularity.json), then a daily-seeded
+  // shuffle of anything without play data.
   const priorityGames = games.filter(game => game.priority > 0);
-  const nonPriorityGames = games.filter(game => !game.priority || game.priority === 0);
+  const popularGames = games.filter(
+    game => (!game.priority || game.priority === 0) && game.plays > 0
+  );
+  const remainingGames = games.filter(
+    game => (!game.priority || game.priority === 0) && !(game.plays > 0)
+  );
 
   // Sort priority games by priority value (highest first)
   const sortedPriorityGames = priorityGames.sort((a, b) => b.priority - a.priority);
 
-  // Shuffle non-priority games with seeded random for consistent daily order
-  const shuffledNonPriorityGames = shuffleArray(nonPriorityGames, seed);
+  // Sort popular games by play count (highest first)
+  const sortedPopularGames = popularGames.sort((a, b) => b.plays - a.plays);
 
-  // Combine: priority games first, then shuffled non-priority games
-  const shuffledGames = [...sortedPriorityGames, ...shuffledNonPriorityGames];
+  // Shuffle games without play data with seeded random for consistent daily order
+  const shuffledRemainingGames = shuffleArray(remainingGames, seed);
+
+  // Combine: priority first, then most-played, then shuffled rest
+  const shuffledGames = [...sortedPriorityGames, ...sortedPopularGames, ...shuffledRemainingGames];
 
   // Calculate how many games to render initially (INITIAL_ROWS * 6 columns)
   const columnsPerRow = 6;
@@ -165,7 +181,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
 
   // Generate initial game cards HTML with horizontal ads every 3 rows
   let adCount = 0;
-  let initialCardsHTML = '';
+  let initialCardsHTML = "";
   initialGames.forEach((game, idx) => {
     initialCardsHTML += generateGameCard(game, idx, gamesDir, true);
     // Check if we should insert a horizontal ad after this game
@@ -206,7 +222,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   </script>
 
   ${botVerificationEnabled ? `<!-- Cloudflare Turnstile verification gate (must load before ads) -->
-  <script src="assets/bot-detector.js"></script>` : ''}
+  <script src="assets/bot-detector.js"></script>` : ""}
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
@@ -239,6 +255,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     <ul id="categoryList" role="menu">
       <li role="menuitem" tabindex="0" onclick="window.location.href='/'" onkeypress="if(event.key==='Enter')window.location.href='/'"><span class="icon">🏠</span><span class="text">Home</span></li>
       ${recentlyPlayedItem}
+      ${trendingItem}
       ${newlyAddedItem}
       ${sidebarCategories}
     </ul>
@@ -332,7 +349,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     window.__adProvider = ${JSON.stringify(adProvider)};
   </script>
 
-  ${adsEnabled && adProvider === 'adsense' ? `<!-- Initialize AdSense Ads -->
+  ${adsEnabled && adProvider === "adsense" ? `<!-- Initialize AdSense Ads -->
   <script>
     (function() {
       if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
@@ -345,7 +362,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         }
       }
     })();
-  </script>` : ''}
+  </script>` : ""}
 
   <script>
     ${clientJS}

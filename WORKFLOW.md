@@ -130,6 +130,8 @@ The build workflow runs automatically on push and will:
 | `npm run screenshot` | Generate thumbnails by screenshotting games (`--missing`, `--force`, `--click`) |
 | `npm run health-check` | Check that the external CDN assets games depend on are still alive |
 | `npm run normalize-tags` | Fix tag typos/duplicates against the `tags.json` vocabulary |
+| `npm run import-analytics` | Turn a Google Analytics CSV export into `popularity.json` (drives site order) |
+| `npm run drive-diff` | List the Google Drive folder and show which games are new vs. on-site/rejected |
 | `npm run sync-data` | Create/update/delete JSON files in `data/` based on `games/` folders |
 | `npm run cleanup` | Remove orphaned game HTML pages from root directory |
 | `npm run validate` | Validate all games (checks for index.html, thumbnails, tags) |
@@ -147,6 +149,50 @@ The canonical tag vocabulary lives in **`tags.json`** at the repo root:
 
 To add a brand-new category, add it to `tags` first. If validation warns
 about a typo, run `npm run normalize-tags` to fix all data files at once.
+
+## 🔥 Popularity ordering (from Google Analytics)
+
+The home grid order and the "Trending Games" tag are driven by real view
+counts instead of manual edits:
+
+1. In GA4: **Reports → Engagement → Pages and screens → Export → CSV**
+2. Run: `npm run import-analytics -- path/to/export.csv`
+   (writes `popularity.json` — game pages are matched by their
+   `/GameName.html` paths, other pages are ignored)
+3. Commit and push `popularity.json` — the site rebuilds automatically
+
+What the build does with it:
+
+- **Home grid**: manually pinned games (`priority` in the data JSON)
+  first, then all games **sorted by views**, then a daily shuffle of
+  games without view data
+- **Trending Games**: the top 15 most-viewed games get the tag
+  automatically, and a 🔥 "Trending Games" entry appears in the sidebar
+
+Repeat whenever you want to refresh the order (monthly is plenty). Games
+with a manual `priority` always stay on top — remove the `priority` field
+from a game's JSON if you'd rather let analytics decide.
+
+## 📂 Google Drive intake
+
+Compare the shared Drive folder of candidate games against the site:
+
+```bash
+# First run: pass the folder link (it's remembered afterwards)
+npm run drive-diff -- "https://drive.google.com/drive/folders/<FOLDER_ID>"
+
+# Later runs
+npm run drive-diff
+
+# Mark bad/old games so they're never suggested again
+npm run drive-diff -- --reject "Some Old Game" "Broken Game"
+```
+
+The script lists what's in Drive and splits it into: already on site,
+rejected earlier, and **new candidates to review**. Add the good ones with
+`npm run add-game`; reject the rest once and they stay hidden forever.
+The folder must be shared as "anyone with the link". State lives in
+`drive-ignore.json` (commit it so rejections stick).
 
 ## 🩺 Game Health (automatic)
 

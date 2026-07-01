@@ -16,6 +16,7 @@ on:
       - 'generate.js'
       - 'ads-config.json'
       - 'tags.json'
+      - 'popularity.json'
   # Reusable: called by the add-game workflow after it commits a new game
   workflow_call:
   # Manual: still available as a fallback

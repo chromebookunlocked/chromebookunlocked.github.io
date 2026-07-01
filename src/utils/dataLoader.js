@@ -2,6 +2,28 @@ const fs = require("fs");
 const path = require("path");
 const { DEFAULT_THUMBNAILS } = require("./constants");
 
+// Games in the top N by plays are auto-tagged "Trending Games" at build time
+const TRENDING_COUNT = 15;
+
+/**
+ * Load play counts from popularity.json at the repo root (written by
+ * scripts/import-analytics.js). Returns an empty map when the file is
+ * absent, so the build works without analytics data.
+ * @param {string} dataDir - Path to data directory (popularity.json lives next to it)
+ * @returns {Object} Map of game name -> play/view count
+ */
+function loadPopularity(dataDir) {
+  const popularityPath = path.join(dataDir, "..", "popularity.json");
+  if (!fs.existsSync(popularityPath)) return {};
+  try {
+    const json = JSON.parse(fs.readFileSync(popularityPath, "utf8"));
+    return json.plays || {};
+  } catch (error) {
+    console.warn(`⚠️  Could not read popularity.json: ${error.message}`);
+    return {};
+  }
+}
+
 /**
  * Load and validate games from JSON files
  * @param {string} dataDir - Path to data directory
@@ -9,17 +31,18 @@ const { DEFAULT_THUMBNAILS } = require("./constants");
  * @returns {Array} Array of validated game objects
  */
 function loadGames(dataDir, gamesDir) {
+  const popularity = loadPopularity(dataDir);
   const games = fs.readdirSync(dataDir)
     .filter(f => f.endsWith(".json"))
     .map(f => {
       try {
         const filePath = path.join(dataDir, f);
-        const json = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+        const json = JSON.parse(fs.readFileSync(filePath, "utf8"));
 
         // Support multiple categories (comma-separated string or array)
         let gameCategories = json.category || json.categories || "Uncategorized";
-        if (typeof gameCategories === 'string') {
-          gameCategories = gameCategories.split(',').map(c => c.trim());
+        if (typeof gameCategories === "string") {
+          gameCategories = gameCategories.split(",").map(c => c.trim());
         }
         if (!Array.isArray(gameCategories)) {
           gameCategories = [gameCategories];
@@ -43,8 +66,8 @@ function loadGames(dataDir, gamesDir) {
 
         // Support otherNames for search aliases (can be string or array)
         let otherNames = json.otherNames || [];
-        if (typeof otherNames === 'string') {
-          otherNames = otherNames.split(',').map(n => n.trim()).filter(n => n);
+        if (typeof otherNames === "string") {
+          otherNames = otherNames.split(",").map(n => n.trim()).filter(n => n);
         }
         if (!Array.isArray(otherNames)) {
           otherNames = [];
@@ -60,7 +83,7 @@ function loadGames(dataDir, gamesDir) {
 
             // Update the JSON file to include the createdAt date for future builds
             json.createdAt = createdAt;
-            fs.writeFileSync(filePath, JSON.stringify(json, null, 2) + '\n');
+            fs.writeFileSync(filePath, JSON.stringify(json, null, 2) + "\n");
           } catch (statError) {
             // If we can't get file stats, use current time as fallback
             createdAt = new Date().toISOString();
@@ -69,7 +92,7 @@ function loadGames(dataDir, gamesDir) {
         }
 
         // Support priority value (higher priority = shown first in lists)
-        const priority = typeof json.priority === 'number' ? json.priority : 0;
+        const priority = typeof json.priority === "number" ? json.priority : 0;
 
         // Track if JSON needs to be updated
         let jsonNeedsUpdate = false;
@@ -90,7 +113,7 @@ function loadGames(dataDir, gamesDir) {
 
         // Update JSON file if any fields were added
         if (jsonNeedsUpdate) {
-          fs.writeFileSync(filePath, JSON.stringify(json, null, 2) + '\n');
+          fs.writeFileSync(filePath, JSON.stringify(json, null, 2) + "\n");
         }
 
         return {
@@ -101,6 +124,7 @@ function loadGames(dataDir, gamesDir) {
           thumbs: json.thumbs && json.thumbs.length ? json.thumbs : DEFAULT_THUMBNAILS,
           createdAt: createdAt, // ISO date string for when game was added
           priority: priority, // Priority value for sorting (higher = first)
+          plays: popularity[json.name] || popularity[folder] || 0, // View count from analytics
           description: description // Custom game description (empty string = auto-generate)
         };
       } catch (error) {
@@ -113,6 +137,22 @@ function loadGames(dataDir, gamesDir) {
   if (games.length === 0) {
     console.error("❌ No valid games found! Build aborted.");
     process.exit(1);
+  }
+
+  // Auto-tag the most-played games as "Trending Games" so the tag
+  // maintains itself from analytics data instead of manual edits.
+  // Manually tagged games keep the tag either way.
+  const topPlayed = games
+    .filter(g => g.plays > 0)
+    .sort((a, b) => b.plays - a.plays)
+    .slice(0, TRENDING_COUNT);
+  topPlayed.forEach(g => {
+    if (!g.categories.includes("Trending Games")) {
+      g.categories.push("Trending Games");
+    }
+  });
+  if (topPlayed.length > 0) {
+    console.log(`🔥 Auto-tagged top ${topPlayed.length} games as Trending (from popularity.json)`);
   }
 
   return games;
