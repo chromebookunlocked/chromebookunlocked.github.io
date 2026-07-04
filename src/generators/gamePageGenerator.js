@@ -1,6 +1,6 @@
 const { getThumbPath, FALLBACK_THUMBNAIL } = require("../utils/assetManager");
 const { generateGameMetaTags, generateGameStructuredData, generateGameSEOTitle, generateGameSEODescription } = require("../utils/seoBuilder");
-const { generateAnalyticsScript } = require("../utils/analyticsEnhanced");
+const { generateAnalyticsScript, generateConsentModeScript } = require("../utils/analyticsEnhanced");
 const { escapeHtml, escapeHtmlAttr } = require("../utils/htmlEscape");
 const { RECOMMENDED_GAMES_COUNT, MAX_RELATED_GAMES, GAME_DURATION_TRACKING_INTERVAL } = require("../utils/constants");
 const {
@@ -59,34 +59,36 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   const escapedCategoryList = escapeHtml(categoryList);
   const escapedCategoryListJs = escapeJs(categoryList);
 
-  // Get similar games for "You Might Also Like" section (no duplicates)
-  // Shuffle only if SHUFFLE_RECOMMENDATIONS env var is set (for manual builds)
-  const shouldShuffle = process.env.SHUFFLE_RECOMMENDATIONS === 'true';
+  // Get similar games for "You Might Also Like" section (no duplicates).
+  // Order is a deterministic shuffle seeded by this game's folder: stable
+  // across rebuilds (no diff churn) but different on every game page, so the
+  // same handful of alphabetically-first games doesn't lead everywhere.
+  const seed = [...game.folder].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7);
+  const seededSort = (arr) => {
+    let state = seed;
+    const rand = () => {
+      state = (state * 1664525 + 1013904223) % 4294967296;
+      return state / 4294967296;
+    };
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
 
-  const sameCategory = allGames.filter((g) =>
+  const sameCategory = seededSort(allGames.filter((g) =>
     g.folder !== game.folder &&
     g.categories.some((cat) => game.categories.includes(cat))
-  );
-
-  // Sort by name for stable order, or shuffle for manual builds
-  if (shouldShuffle) {
-    sameCategory.sort(() => Math.random() - 0.5);
-  } else {
-    sameCategory.sort((a, b) => a.name.localeCompare(b.name));
-  }
+  ));
 
   // Get other games, excluding same-category games
   const sameCategoryFolders = new Set(sameCategory.map(g => g.folder));
-  const otherGames = allGames.filter((g) =>
+  const otherGames = seededSort(allGames.filter((g) =>
     g.folder !== game.folder &&
     !sameCategoryFolders.has(g.folder)
-  );
-
-  if (shouldShuffle) {
-    otherGames.sort(() => Math.random() - 0.5);
-  } else {
-    otherGames.sort((a, b) => a.name.localeCompare(b.name));
-  }
+  ));
 
   // Build recommendations: first related games, then fill with other games
   // Use RECOMMENDED_GAMES_COUNT (42) — horizontal ads are inserted between rows,
@@ -145,19 +147,20 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
+  ${metaTags}
+
   <!-- Resource Hints for Performance -->
   ${generateAdNetworkHeadHints(adsEnabled, adProvider)}
 
   ${botVerificationEnabled ? `<!-- Cloudflare Turnstile verification gate (must load before ads) -->
   <script src="../assets/bot-detector.js"></script>` : ''}
 
+  ${generateConsentModeScript()}
+
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-4QZLTDX504');
   </script>
 
@@ -165,12 +168,12 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
   ${generateAnalyticsScript()}
 
-  ${metaTags}
-
-  <!-- Google Fonts -->
+  <!-- Google Fonts (async, non-blocking) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap"></noscript>
 
   <style>
     ${gamePageStyles}
@@ -283,18 +286,6 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
               </div>
               <div class="meta-item">
                 <strong>Status:</strong> Unblocked & Free to Play
-              </div>
-            </div>
-            <div class="keywords-section">
-              <strong>Popular Searches:</strong>
-              <div class="keywords-list">
-                <span class="keyword">${escapedGameName} unblocked</span>
-                <span class="keyword">${escapedGameName} online</span>
-                <span class="keyword">play ${escapedGameName}</span>
-                <span class="keyword">${escapedGameName} free</span>
-                <span class="keyword">${escapeHtml(categoryText)} games</span>
-                <span class="keyword">unblocked games</span>
-                <span class="keyword">chromebook games</span>
               </div>
             </div>
           </div>
@@ -492,12 +483,12 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
       if (!gameIsActive) return;
 
       // Block these keys from affecting the page (scrolling, navigation, etc.)
+      // Tab and Escape are intentionally NOT blocked: keyboard users must be
+      // able to leave the game (accessibility) and Escape exits fullscreen.
       const blockedKeys = [
         'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',  // Arrow keys
         ' ', 'Space',  // Spacebar (page scroll)
-        'Tab',  // Tab navigation (keep focus in game)
         'Enter',  // Prevent form submissions
-        'Escape',  // Keep in game (fullscreen exit handled separately)
         'w', 'W', 'a', 'A', 's', 'S', 'd', 'D',  // WASD movement
         'q', 'Q', 'e', 'E', 'r', 'R', 'f', 'F',  // Common game keys
         'Shift', 'Control', 'Alt',  // Modifier keys
@@ -520,7 +511,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
       const blockedKeys = [
         'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
-        ' ', 'Space', 'Tab', 'Enter',
+        ' ', 'Space', 'Enter',
         'w', 'W', 'a', 'A', 's', 'S', 'd', 'D',
         'q', 'Q', 'e', 'E', 'r', 'R', 'f', 'F',
         'Shift', 'Control', 'Alt',
