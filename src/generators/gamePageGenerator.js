@@ -14,7 +14,7 @@ const {
 } = require("../utils/adProviders");
 
 // Horizontal ad configuration: insert every 3 rows (3 × 6 = 18 games)
-const AD_INTERVAL = 18;
+const AD_INTERVAL = 12; // ad every 2 rows of 6
 
 function generateHorizontalAd(adIndex, adsEnabled = true, adProvider = 'adsense') {
   return providerHorizontalAd(adIndex, adsEnabled, adProvider);
