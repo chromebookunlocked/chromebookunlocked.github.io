@@ -73,6 +73,8 @@
       } catch (e) {}
       var analytics = saved ? saved.analytics === true : false;
       var marketing = saved ? saved.marketing === true : false;
+      // Strip identifiers from cookieless pings while ad storage is denied.
+      gtag('set', 'ads_data_redaction', !marketing);
       gtag('consent', 'default', {
         analytics_storage: analytics ? 'granted' : 'denied',
         ad_storage: marketing ? 'granted' : 'denied',
@@ -337,6 +339,10 @@ body.has-footer-ad .cookie-consent-banner {
 }
 
 :root {
+  /* Full viewport height: dvh tracks mobile browser UI bars (iOS Safari)
+     so the game frame fits the visible area. */
+  --vh100: 100vh;
+
   /* Color Palette */
   --primary-color: #ff66ff;
   --primary-dark: #cc00ff;
@@ -382,6 +388,12 @@ body.has-footer-ad .cookie-consent-banner {
   /* Consistent Button Sizing */
   --btn-icon-size: clamp(40px, 4vw, 56px);
   --btn-icon-svg: clamp(18px, 1.8vw, 26px);
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --vh100: 100dvh;
+  }
 }
 
 /* ============================================================================
@@ -550,7 +562,7 @@ h1 {
   aspect-ratio: 16 / 9;
   width: min(85vw, calc(78vh * 16 / 9));
   max-width: 1500px;
-  max-height: 82vh;
+  max-height: calc(var(--vh100) * 0.82);
 }
 /* Leave room for the fixed-width pillars beside the game */
 @media (min-width: 1280px) {
@@ -592,6 +604,30 @@ h1 {
   aspect-ratio: auto;
   border-radius: 0;
   transition: none !important;
+}
+
+/* Pseudo-fullscreen fallback for browsers without element fullscreen
+   (iOS Safari): pin the game frame over the whole visual viewport. */
+.game-frame-wrapper.pseudo-fullscreen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: var(--vh100);
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+  border-radius: 0;
+  z-index: 10000;
+  background: #000;
+  transition: none !important;
+}
+body.pseudo-fullscreen-active {
+  overflow: hidden;
+}
+/* Keep sticky ads and the consent banner out of the fake fullscreen */
+body.pseudo-fullscreen-active .footer-inscreen-ad,
+body.pseudo-fullscreen-active .cookie-consent-banner {
+  display: none !important;
 }
 
 /* ============================================================================
@@ -1138,6 +1174,19 @@ h1 {
   background: rgba(0, 0, 0, 0.75);
 }
 
+/* No hover on touch — keep game names visible so cards aren't anonymous */
+@media (hover: none) and (pointer: coarse) {
+  .game-card .card-title {
+    opacity: 1;
+    transform: translateY(0);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.78) 55%);
+    padding-top: 1.2rem;
+  }
+  .game-card:active {
+    transform: scale(0.98);
+  }
+}
+
 /* ============================================================================
    HORIZONTAL AD ROW - Full-width ads between game rows
 ============================================================================ */
@@ -1375,7 +1424,7 @@ footer {
     /* Maintain 16:9 aspect ratio on tablets with improved sizing */
     width: 92vw;
     max-width: 92vw;
-    max-height: 65vh;
+    max-height: calc(var(--vh100) * 0.65);
     height: auto;
   }
 
@@ -1448,7 +1497,7 @@ footer {
     /* Maintain 16:9 aspect ratio on mobile with better sizing */
     width: 95vw;
     max-width: 95vw;
-    max-height: 60vh;
+    max-height: calc(var(--vh100) * 0.6);
     height: auto;
   }
 
@@ -2200,6 +2249,19 @@ footer {
 
     function toggleFullscreen() {
       const wrapper = document.getElementById('gameWrapper');
+
+      // iOS Safari has no element fullscreen API — fall back to a CSS
+      // "pseudo fullscreen" that pins the frame over the whole viewport.
+      const fsSupported = wrapper.requestFullscreen || wrapper.webkitRequestFullscreen || wrapper.mozRequestFullScreen;
+      if (!fsSupported) {
+        const entering = !wrapper.classList.contains('pseudo-fullscreen');
+        wrapper.classList.toggle('pseudo-fullscreen', entering);
+        document.body.classList.toggle('pseudo-fullscreen-active', entering);
+        updateFullscreenIcon();
+        if (gameIsActive) setTimeout(focusGameFrame, 150);
+        return;
+      }
+
       const isEnteringFullscreen = !document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement;
 
       if (isEnteringFullscreen) {
@@ -2223,11 +2285,16 @@ footer {
       }
     }
 
+    function isPseudoFullscreen() {
+      const wrapper = document.getElementById('gameWrapper');
+      return wrapper && wrapper.classList.contains('pseudo-fullscreen');
+    }
+
     function updateFullscreenIcon() {
       const icon = document.getElementById('fullscreenIcon');
       const btn = document.getElementById('fullscreenBtn');
 
-      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || isPseudoFullscreen()) {
         // In fullscreen - show X icon
         icon.innerHTML = '<path d="M18 6L6 18M6 6l12 12"/>';
         btn.title = 'Exit Fullscreen';

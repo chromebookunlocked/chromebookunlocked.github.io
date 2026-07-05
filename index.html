@@ -92,6 +92,8 @@
       } catch (e) {}
       var analytics = saved ? saved.analytics === true : false;
       var marketing = saved ? saved.marketing === true : false;
+      // Strip identifiers from cookieless pings while ad storage is denied.
+      gtag('set', 'ads_data_redaction', !marketing);
       gtag('consent', 'default', {
         analytics_storage: analytics ? 'granted' : 'denied',
         ad_storage: marketing ? 'granted' : 'denied',
@@ -742,6 +744,9 @@ body.has-footer-ad .cookie-consent-banner {
 }
 
 :root {
+  /* Full viewport height: dvh tracks mobile browser UI bars (iOS Safari)
+     so bottom content isn't hidden behind them. */
+  --vh100: 100vh;
   --base-font: clamp(11px, 1vw, 16px);
   --thumb-height: clamp(100px, 12vw, 200px);
   --sidebar-width: clamp(40px, 4vw, 70px);
@@ -758,6 +763,12 @@ body.has-footer-ad .cookie-consent-banner {
   /* Fixed header height to prevent CLS */
   --header-height: 56px;
   --header-height-mobile: 90px;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --vh100: 100dvh;
+  }
 }
 
 /* basics */
@@ -800,7 +811,7 @@ html,body {
   -webkit-backdrop-filter: blur(8px);
   padding:0;
   padding-top: 0;
-  height: calc(100vh - var(--header-height)); /* Full height minus header */
+  height: calc(var(--vh100) - var(--header-height)); /* Full height minus header */
   overflow-y:auto;
   overflow-x:hidden;
   position:fixed;
@@ -906,7 +917,7 @@ html,body {
   margin-top: var(--header-height); /* Space for fixed header */
   width: calc(100% - var(--sidebar-width));
   /* Removed margin-left transition to prevent CLS */
-  height: calc(100vh - var(--header-height));
+  height: calc(var(--vh100) - var(--header-height));
   -webkit-overflow-scrolling: touch;
 }
 
@@ -929,13 +940,19 @@ html,body {
     transform: translateX(-100%);
     width: 220px;
     top: var(--header-height);
-    height: calc(100vh - var(--header-height));
+    height: calc(var(--vh100) - var(--header-height));
     z-index: 2000;
     transition: transform .25s ease;
   }
-  #sidebar:hover,
+  /* Keyboard access; hover-open only on devices with real hover — touch
+     browsers synthesize :hover on tap, which pinned the drawer open. */
   #sidebar:focus-within {
     transform: translateX(0);
+  }
+  @media (hover: hover) {
+    #sidebar:hover {
+      transform: translateX(0);
+    }
   }
   #sidebar li {
     padding: 0.6rem 0.8rem;
@@ -951,7 +968,7 @@ html,body {
   #sidebar {
     width: 200px;
     top: 85px;
-    height: calc(100vh - 85px);
+    height: calc(var(--vh100) - 85px);
   }
   #sidebar li {
     padding: 0.5rem 0.7rem;
@@ -962,7 +979,7 @@ html,body {
   }
   #content {
     margin-top: 85px;
-    height: calc(100vh - 85px);
+    height: calc(var(--vh100) - 85px);
   }
 }
 
@@ -979,6 +996,66 @@ html,body {
   #sidebar li .icon {
     font-size: 0.95rem;
     min-width: 1.1rem;
+  }
+}
+
+/* Mobile sidebar drawer: hamburger button + backdrop.
+   The sidebar is off-canvas below 1024px and hover can't open it on touch,
+   so the menu button toggles body.sidebar-open instead. */
+#menuToggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  padding: 0;
+  margin-left: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 102, 255, 0.12);
+  border: 1px solid rgba(255, 102, 255, 0.35);
+  border-radius: 10px;
+  color: #fff;
+  box-shadow: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+#menuToggle:hover {
+  transform: none;
+  background: rgba(255, 102, 255, 0.22);
+  box-shadow: none;
+}
+
+#sidebarBackdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1500;
+}
+
+@media (max-width: 1024px) {
+  #menuToggle {
+    display: flex;
+  }
+  body.sidebar-open #sidebar {
+    transform: translateX(0);
+  }
+  body.sidebar-open #sidebarBackdrop {
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Header stacks into two rows on phones — pin the button over row 1 */
+  #menuToggle {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    margin-left: 0;
+    z-index: 2;
   }
 }
 
@@ -1108,11 +1185,11 @@ html,body {
   }
   #sidebar {
     top: var(--header-height-mobile);
-    height: calc(100vh - var(--header-height-mobile));
+    height: calc(var(--vh100) - var(--header-height-mobile));
   }
   #content {
     margin-top: var(--header-height-mobile);
-    height: calc(100vh - var(--header-height-mobile));
+    height: calc(var(--vh100) - var(--header-height-mobile));
   }
   /* Mobile search container fixed height */
   #searchContainer {
@@ -1570,6 +1647,14 @@ button:active {
   .card:active {
     transform:scale(0.98);
   }
+  /* No hover on touch — keep game names visible so cards aren't anonymous.
+     (.card qualifier: must outrank the base .card-title rule further down.) */
+  .card .card-title {
+    opacity: 1;
+    transform: translateY(0);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.78) 55%);
+    padding-top: 1.2rem;
+  }
 }
 
 .thumb-container {
@@ -1904,11 +1989,15 @@ button:active {
     </ul>
   </nav>
   <div id="sidebarIndicator" aria-hidden="true"></div>
+  <div id="sidebarBackdrop" aria-hidden="true" onclick="toggleSidebar(false)"></div>
 
   <!-- Content -->
   <div id="content" role="main">
     <!-- Top Header with Search -->
     <header id="topHeader">
+      <button id="menuToggle" aria-label="Open categories menu" aria-expanded="false" aria-controls="sidebar" onclick="toggleSidebar()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
       <div class="header-left">
         <img src="assets/logo.webp" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='/'" width="48" height="48" fetchpriority="high">
         <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
@@ -2187,6 +2276,31 @@ function isMobileDevice() {
          (window.innerWidth <= 768);
 }
 
+// Mobile sidebar drawer (hamburger). On touch devices the sidebar can't be
+// opened via :hover, so the menu button toggles it as an overlay drawer.
+function toggleSidebar(force) {
+  const open = typeof force === 'boolean'
+    ? force
+    : !document.body.classList.contains('sidebar-open');
+  document.body.classList.toggle('sidebar-open', open);
+  const btn = document.getElementById('menuToggle');
+  if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (!open) {
+    // A focused category item would keep the drawer pinned open via the
+    // sidebar's :focus-within rule — release it.
+    const sidebar = document.getElementById('sidebar');
+    const active = document.activeElement;
+    if (sidebar && active && sidebar.contains(active)) active.blur();
+  }
+}
+
+// Close the drawer with the Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.body.classList.contains('sidebar-open')) {
+    toggleSidebar(false);
+  }
+});
+
 /**
  * Get recently played games from localStorage
  * @returns {Array} Array of folder names
@@ -2236,6 +2350,18 @@ function updateRecentlyPlayedNav() {
 const AD_INTERVAL = window.__adInterval || 12;
 let adCount = window.__adCount || 0;
 
+// Ad rows salvaged from a grid rebuild. Server-rendered Monumetric slots are
+// "armed" (IntersectionObserver + verification gate) before any rebuild runs;
+// destroying them — as happened on every mobile page load when the grid is
+// re-ordered — killed the in-content ads. Un-filled rows are moved into the
+// new grid instead, keeping their observers and pending slot requests alive.
+let reusableAdRows = [];
+
+// Effective ad interval. The server interval (12 = 2 rows of 6 columns)
+// leaves mobile almost ad-free: at 2 columns that's one ad every 6 rows.
+// Grid rebuilds recompute it as ~3 rows of the current column count.
+let currentAdInterval = AD_INTERVAL;
+
 /**
  * Check if a horizontal ad should be inserted after a given game index
  * @param {number} gameIndex - The 0-indexed position in the game list
@@ -2243,7 +2369,7 @@ let adCount = window.__adCount || 0;
  */
 function shouldInsertAdAfter(gameIndex) {
   if (window.__adsEnabled === false) return false;
-  return (gameIndex + 1) % AD_INTERVAL === 0;
+  return (gameIndex + 1) % currentAdInterval === 0;
 }
 
 /**
@@ -2477,11 +2603,14 @@ function loadMoreGames(count) {
         imageObserver.observe(img);
       }
 
-      // Insert a horizontal ad every 3 rows (every 18 games)
+      // Insert a horizontal ad every 3 rows (every 18 games).
+      // Prefer a salvaged (still-armed, un-filled) row from a previous grid
+      // over creating a new slot — see reusableAdRows.
       if (shouldInsertAdAfter(i)) {
-        const adEl = createHorizontalAd(adCount);
+        const reused = reusableAdRows.shift();
+        const adEl = reused || createHorizontalAd(adCount);
         fragment.appendChild(adEl);
-        newAdTiles.push(adEl);
+        if (!reused) newAdTiles.push(adEl);
         adCount++;
       }
     }
@@ -2515,6 +2644,14 @@ function resetAndReloadGrid(category) {
   isLoading = false;
   adCount = 0; // Reset ad count for new grid
 
+  // Salvage ad rows that haven't rendered a creative yet (no iframe inside):
+  // moving them keeps their observers/queued slot requests working. Rows that
+  // already rendered are discarded — re-parenting an ad iframe blanks it, so
+  // a fresh slot (new auction) is created in their place instead.
+  reusableAdRows = Array.from(gamesGrid.querySelectorAll('.horizontal-ad-row'))
+    .filter(row => !row.querySelector('iframe'));
+  reusableAdRows.forEach(row => row.remove());
+
   // Clear existing cards
   gamesGrid.innerHTML = '';
 
@@ -2522,6 +2659,10 @@ function resetAndReloadGrid(category) {
   const columnsPerRow = getColumnCount();
   const rowsToLoad = window.__rowsPerLoad ? window.__rowsPerLoad + 2 : 5;
   const initialCount = columnsPerRow * rowsToLoad;
+
+  // Narrow grids get an ad every ~3 rows instead of the desktop-tuned
+  // every-12-games, otherwise phones see almost no in-content ads.
+  currentAdInterval = columnsPerRow <= 3 ? columnsPerRow * 3 : AD_INTERVAL;
 
   // Load initial games
   loadMoreGames(initialCount);
@@ -2716,6 +2857,9 @@ function filterCategory(cat, updateURL = true) {
   // Clear search
   if (searchBar) searchBar.value = '';
   hideSearchDropdown();
+
+  // Picking a category closes the mobile drawer
+  toggleSidebar(false);
 
   // Update URL if requested
   if (updateURL) {

@@ -413,6 +413,19 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
     function toggleFullscreen() {
       const wrapper = document.getElementById('gameWrapper');
+
+      // iOS Safari has no element fullscreen API — fall back to a CSS
+      // "pseudo fullscreen" that pins the frame over the whole viewport.
+      const fsSupported = wrapper.requestFullscreen || wrapper.webkitRequestFullscreen || wrapper.mozRequestFullScreen;
+      if (!fsSupported) {
+        const entering = !wrapper.classList.contains('pseudo-fullscreen');
+        wrapper.classList.toggle('pseudo-fullscreen', entering);
+        document.body.classList.toggle('pseudo-fullscreen-active', entering);
+        updateFullscreenIcon();
+        if (gameIsActive) setTimeout(focusGameFrame, 150);
+        return;
+      }
+
       const isEnteringFullscreen = !document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement;
 
       if (isEnteringFullscreen) {
@@ -436,11 +449,16 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
       }
     }
 
+    function isPseudoFullscreen() {
+      const wrapper = document.getElementById('gameWrapper');
+      return wrapper && wrapper.classList.contains('pseudo-fullscreen');
+    }
+
     function updateFullscreenIcon() {
       const icon = document.getElementById('fullscreenIcon');
       const btn = document.getElementById('fullscreenBtn');
 
-      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || isPseudoFullscreen()) {
         // In fullscreen - show X icon
         icon.innerHTML = '<path d="M18 6L6 18M6 6l12 12"/>';
         btn.title = 'Exit Fullscreen';

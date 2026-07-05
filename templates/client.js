@@ -14,6 +14,31 @@ function isMobileDevice() {
          (window.innerWidth <= 768);
 }
 
+// Mobile sidebar drawer (hamburger). On touch devices the sidebar can't be
+// opened via :hover, so the menu button toggles it as an overlay drawer.
+function toggleSidebar(force) {
+  const open = typeof force === 'boolean'
+    ? force
+    : !document.body.classList.contains('sidebar-open');
+  document.body.classList.toggle('sidebar-open', open);
+  const btn = document.getElementById('menuToggle');
+  if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (!open) {
+    // A focused category item would keep the drawer pinned open via the
+    // sidebar's :focus-within rule — release it.
+    const sidebar = document.getElementById('sidebar');
+    const active = document.activeElement;
+    if (sidebar && active && sidebar.contains(active)) active.blur();
+  }
+}
+
+// Close the drawer with the Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.body.classList.contains('sidebar-open')) {
+    toggleSidebar(false);
+  }
+});
+
 /**
  * Get recently played games from localStorage
  * @returns {Array} Array of folder names
@@ -63,6 +88,18 @@ function updateRecentlyPlayedNav() {
 const AD_INTERVAL = window.__adInterval || 12;
 let adCount = window.__adCount || 0;
 
+// Ad rows salvaged from a grid rebuild. Server-rendered Monumetric slots are
+// "armed" (IntersectionObserver + verification gate) before any rebuild runs;
+// destroying them — as happened on every mobile page load when the grid is
+// re-ordered — killed the in-content ads. Un-filled rows are moved into the
+// new grid instead, keeping their observers and pending slot requests alive.
+let reusableAdRows = [];
+
+// Effective ad interval. The server interval (12 = 2 rows of 6 columns)
+// leaves mobile almost ad-free: at 2 columns that's one ad every 6 rows.
+// Grid rebuilds recompute it as ~3 rows of the current column count.
+let currentAdInterval = AD_INTERVAL;
+
 /**
  * Check if a horizontal ad should be inserted after a given game index
  * @param {number} gameIndex - The 0-indexed position in the game list
@@ -70,7 +107,7 @@ let adCount = window.__adCount || 0;
  */
 function shouldInsertAdAfter(gameIndex) {
   if (window.__adsEnabled === false) return false;
-  return (gameIndex + 1) % AD_INTERVAL === 0;
+  return (gameIndex + 1) % currentAdInterval === 0;
 }
 
 /**
@@ -304,11 +341,14 @@ function loadMoreGames(count) {
         imageObserver.observe(img);
       }
 
-      // Insert a horizontal ad every 3 rows (every 18 games)
+      // Insert a horizontal ad every 3 rows (every 18 games).
+      // Prefer a salvaged (still-armed, un-filled) row from a previous grid
+      // over creating a new slot — see reusableAdRows.
       if (shouldInsertAdAfter(i)) {
-        const adEl = createHorizontalAd(adCount);
+        const reused = reusableAdRows.shift();
+        const adEl = reused || createHorizontalAd(adCount);
         fragment.appendChild(adEl);
-        newAdTiles.push(adEl);
+        if (!reused) newAdTiles.push(adEl);
         adCount++;
       }
     }
@@ -342,6 +382,14 @@ function resetAndReloadGrid(category) {
   isLoading = false;
   adCount = 0; // Reset ad count for new grid
 
+  // Salvage ad rows that haven't rendered a creative yet (no iframe inside):
+  // moving them keeps their observers/queued slot requests working. Rows that
+  // already rendered are discarded — re-parenting an ad iframe blanks it, so
+  // a fresh slot (new auction) is created in their place instead.
+  reusableAdRows = Array.from(gamesGrid.querySelectorAll('.horizontal-ad-row'))
+    .filter(row => !row.querySelector('iframe'));
+  reusableAdRows.forEach(row => row.remove());
+
   // Clear existing cards
   gamesGrid.innerHTML = '';
 
@@ -349,6 +397,10 @@ function resetAndReloadGrid(category) {
   const columnsPerRow = getColumnCount();
   const rowsToLoad = window.__rowsPerLoad ? window.__rowsPerLoad + 2 : 5;
   const initialCount = columnsPerRow * rowsToLoad;
+
+  // Narrow grids get an ad every ~3 rows instead of the desktop-tuned
+  // every-12-games, otherwise phones see almost no in-content ads.
+  currentAdInterval = columnsPerRow <= 3 ? columnsPerRow * 3 : AD_INTERVAL;
 
   // Load initial games
   loadMoreGames(initialCount);
@@ -543,6 +595,9 @@ function filterCategory(cat, updateURL = true) {
   // Clear search
   if (searchBar) searchBar.value = '';
   hideSearchDropdown();
+
+  // Picking a category closes the mobile drawer
+  toggleSidebar(false);
 
   // Update URL if requested
   if (updateURL) {

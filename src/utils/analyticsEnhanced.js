@@ -23,6 +23,8 @@ function generateConsentModeScript() {
       } catch (e) {}
       var analytics = saved ? saved.analytics === true : false;
       var marketing = saved ? saved.marketing === true : false;
+      // Strip identifiers from cookieless pings while ad storage is denied.
+      gtag('set', 'ads_data_redaction', !marketing);
       gtag('consent', 'default', {
         analytics_storage: analytics ? 'granted' : 'denied',
         ad_storage: marketing ? 'granted' : 'denied',

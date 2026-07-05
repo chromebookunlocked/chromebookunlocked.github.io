@@ -241,11 +241,15 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     </ul>
   </nav>
   <div id="sidebarIndicator" aria-hidden="true"></div>
+  <div id="sidebarBackdrop" aria-hidden="true" onclick="toggleSidebar(false)"></div>
 
   <!-- Content -->
   <div id="content" role="main">
     <!-- Top Header with Search -->
     <header id="topHeader">
+      <button id="menuToggle" aria-label="Open categories menu" aria-expanded="false" aria-controls="sidebar" onclick="toggleSidebar()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
       <div class="header-left">
         <img src="assets/logo.webp" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='/'" width="48" height="48" fetchpriority="high">
         <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>

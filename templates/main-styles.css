@@ -135,6 +135,9 @@ body.has-footer-ad .cookie-consent-banner {
 }
 
 :root {
+  /* Full viewport height: dvh tracks mobile browser UI bars (iOS Safari)
+     so bottom content isn't hidden behind them. */
+  --vh100: 100vh;
   --base-font: clamp(11px, 1vw, 16px);
   --thumb-height: clamp(100px, 12vw, 200px);
   --sidebar-width: clamp(40px, 4vw, 70px);
@@ -151,6 +154,12 @@ body.has-footer-ad .cookie-consent-banner {
   /* Fixed header height to prevent CLS */
   --header-height: 56px;
   --header-height-mobile: 90px;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --vh100: 100dvh;
+  }
 }
 
 /* basics */
@@ -193,7 +202,7 @@ html,body {
   -webkit-backdrop-filter: blur(8px);
   padding:0;
   padding-top: 0;
-  height: calc(100vh - var(--header-height)); /* Full height minus header */
+  height: calc(var(--vh100) - var(--header-height)); /* Full height minus header */
   overflow-y:auto;
   overflow-x:hidden;
   position:fixed;
@@ -299,7 +308,7 @@ html,body {
   margin-top: var(--header-height); /* Space for fixed header */
   width: calc(100% - var(--sidebar-width));
   /* Removed margin-left transition to prevent CLS */
-  height: calc(100vh - var(--header-height));
+  height: calc(var(--vh100) - var(--header-height));
   -webkit-overflow-scrolling: touch;
 }
 
@@ -322,13 +331,19 @@ html,body {
     transform: translateX(-100%);
     width: 220px;
     top: var(--header-height);
-    height: calc(100vh - var(--header-height));
+    height: calc(var(--vh100) - var(--header-height));
     z-index: 2000;
     transition: transform .25s ease;
   }
-  #sidebar:hover,
+  /* Keyboard access; hover-open only on devices with real hover — touch
+     browsers synthesize :hover on tap, which pinned the drawer open. */
   #sidebar:focus-within {
     transform: translateX(0);
+  }
+  @media (hover: hover) {
+    #sidebar:hover {
+      transform: translateX(0);
+    }
   }
   #sidebar li {
     padding: 0.6rem 0.8rem;
@@ -344,7 +359,7 @@ html,body {
   #sidebar {
     width: 200px;
     top: 85px;
-    height: calc(100vh - 85px);
+    height: calc(var(--vh100) - 85px);
   }
   #sidebar li {
     padding: 0.5rem 0.7rem;
@@ -355,7 +370,7 @@ html,body {
   }
   #content {
     margin-top: 85px;
-    height: calc(100vh - 85px);
+    height: calc(var(--vh100) - 85px);
   }
 }
 
@@ -372,6 +387,66 @@ html,body {
   #sidebar li .icon {
     font-size: 0.95rem;
     min-width: 1.1rem;
+  }
+}
+
+/* Mobile sidebar drawer: hamburger button + backdrop.
+   The sidebar is off-canvas below 1024px and hover can't open it on touch,
+   so the menu button toggles body.sidebar-open instead. */
+#menuToggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  padding: 0;
+  margin-left: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 102, 255, 0.12);
+  border: 1px solid rgba(255, 102, 255, 0.35);
+  border-radius: 10px;
+  color: #fff;
+  box-shadow: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+#menuToggle:hover {
+  transform: none;
+  background: rgba(255, 102, 255, 0.22);
+  box-shadow: none;
+}
+
+#sidebarBackdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1500;
+}
+
+@media (max-width: 1024px) {
+  #menuToggle {
+    display: flex;
+  }
+  body.sidebar-open #sidebar {
+    transform: translateX(0);
+  }
+  body.sidebar-open #sidebarBackdrop {
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Header stacks into two rows on phones — pin the button over row 1 */
+  #menuToggle {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    margin-left: 0;
+    z-index: 2;
   }
 }
 
@@ -501,11 +576,11 @@ html,body {
   }
   #sidebar {
     top: var(--header-height-mobile);
-    height: calc(100vh - var(--header-height-mobile));
+    height: calc(var(--vh100) - var(--header-height-mobile));
   }
   #content {
     margin-top: var(--header-height-mobile);
-    height: calc(100vh - var(--header-height-mobile));
+    height: calc(var(--vh100) - var(--header-height-mobile));
   }
   /* Mobile search container fixed height */
   #searchContainer {
@@ -962,6 +1037,14 @@ button:active {
 @media (hover: none) and (pointer: coarse) {
   .card:active {
     transform:scale(0.98);
+  }
+  /* No hover on touch — keep game names visible so cards aren't anonymous.
+     (.card qualifier: must outrank the base .card-title rule further down.) */
+  .card .card-title {
+    opacity: 1;
+    transform: translateY(0);
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.78) 55%);
+    padding-top: 1.2rem;
   }
 }
 
