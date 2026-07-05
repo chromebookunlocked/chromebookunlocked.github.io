@@ -261,11 +261,43 @@ function generateBottomLeaderboardAd(adsEnabled, adProvider) {
 function generateFooterInScreenAd(adsEnabled, adProvider) {
   if (!adsEnabled) return '';
   if (normalizeProvider(adProvider) !== 'monumetric') return '';
-  return `<div class="footer-inscreen-ad" id="footerInScreenAd">
-    <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="document.getElementById('footerInScreenAd').style.display='none';document.body.classList.remove('has-footer-ad')">×</button>
-    ${monumetricSlot(MONU_SLOTS.footerInScreen, { idle: true })}
+  const slotId = MONU_SLOTS.footerInScreen;
+  return `<div class="footer-inscreen-ad" id="footerInScreenAd" hidden>
+    <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="window.__closeFooterAd()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="footer-inscreen-ad__slot"><div id="mmt-${slotId}"></div></div>
   </div>
-  <script>document.body.classList.add('has-footer-ad');</script>`;
+  <script type="text/javascript" data-cfasync="false">
+  (function(){
+    var el = document.getElementById('footerInScreenAd');
+    var DISMISS_KEY = 'footerAdClosed';
+
+    window.__closeFooterAd = function(){
+      el.classList.remove('footer-inscreen-ad--visible');
+      document.body.classList.remove('has-footer-ad');
+      try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch (e) {}
+      setTimeout(function(){ el.hidden = true; }, 250);
+    };
+
+    // Respect an earlier dismissal for the whole tab session — and skip the
+    // auction entirely so we don't burn an impression nobody sees.
+    var dismissed = false;
+    try { dismissed = sessionStorage.getItem(DISMISS_KEY) === '1'; } catch (e) {}
+    if (dismissed) { el.remove(); return; }
+
+    function push(){
+      $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+      $MMT.cmd.push(function(){ $MMT.display.slots.push([${JSON.stringify(slotId)}]); });
+      el.hidden = false;
+      document.body.classList.add('has-footer-ad');
+      requestAnimationFrame(function(){ el.classList.add('footer-inscreen-ad--visible'); });
+    }
+    function ready(){ (window.__adsReady||function(c){c();})(push); }
+    if ('requestIdleCallback' in window) { requestIdleCallback(ready, { timeout: 3000 }); }
+    else { setTimeout(ready, 1200); }
+  })();
+  </script>`;
 }
 
 module.exports = {

@@ -60,7 +60,7 @@ function updateRecentlyPlayedNav() {
 }
 
 // Horizontal ad configuration: every 3 rows (18 games at 6 columns)
-const AD_INTERVAL = window.__adInterval || 18;
+const AD_INTERVAL = window.__adInterval || 12;
 let adCount = window.__adCount || 0;
 
 /**
@@ -224,11 +224,13 @@ function createGameCard(game, idx, eagerLoad = false) {
 function getFilteredGames() {
   let allGames = window.__gameData || [];
 
-  // Filter by Mobile category if on mobile device
+  // On mobile, show touch-friendly (Mobile-tagged) games first but keep the
+  // full catalog — hiding 80% of games also removed nearly all in-content
+  // ad rows on mobile.
   if (isMobileDevice()) {
-    allGames = allGames.filter(game => {
-      return game.c && game.c.includes('Mobile');
-    });
+    const mobileGames = allGames.filter(g => g.c && g.c.includes('Mobile'));
+    const otherGames = allGames.filter(g => !(g.c && g.c.includes('Mobile')));
+    allGames = [...mobileGames, ...otherGames];
   }
 
   if (!currentCategory) {
@@ -567,7 +569,12 @@ function goToHome() {
 }
 
 // Routing & deep links
-function handleRouting() {
+// initialLoad: on first load the server-rendered grid already shows the home
+// view in the same order as __gameData, so wiping and re-rendering it would
+// only cause a visible flash, image refetches, and destroy the in-content ad
+// slot mid-auction. Only rebuild when the view actually differs (category
+// deep-link, or mobile where the order changes).
+function handleRouting(initialLoad = false) {
   const hash = window.location.hash;
 
   if (hash.startsWith('#/category/')) {
@@ -577,6 +584,10 @@ function handleRouting() {
     // Strip any stray hash fragment (e.g. /#, #top) so the URL stays clean
     if (hash) {
       window.history.replaceState(null, '', '/');
+    }
+    if (initialLoad && !isMobileDevice()) {
+      // Keep the server-rendered grid untouched.
+      return;
     }
     filterCategory('Home', false);
   }
@@ -614,7 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Handle routing on load, hash changes, and pushState back/forward
-  handleRouting();
-  window.addEventListener('hashchange', handleRouting);
-  window.addEventListener('popstate', handleRouting);
+  handleRouting(true);
+  window.addEventListener('hashchange', () => handleRouting());
+  window.addEventListener('popstate', () => handleRouting());
 });

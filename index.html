@@ -648,70 +648,83 @@
 }
 
 /* Footer In-screen ad — sticks to the bottom of the viewport. */
+/* Floating bottom ad card: sized to its content (not a full-width bar),
+   close button anchored OUTSIDE the ad surface so it can't be mis-clicked
+   or covered by the creative, fixed slot height so the card never resizes
+   after fill. Slides up once the slot is requested. */
 .footer-inscreen-ad {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%) translateY(calc(100% + 16px));
   z-index: 9998;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 90px;
-  padding: 4px 0;
-  background: rgba(20, 14, 38, 0.92);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.35);
+  max-width: calc(100vw - 16px);
+  padding: 4px;
+  background: rgba(20, 14, 38, 0.95);
+  border: 1px solid rgba(255, 102, 255, 0.25);
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: transform 0.25s ease, opacity 0.25s ease;
 }
-.footer-inscreen-ad > div:not(.footer-inscreen-ad__close) {
-  width: 100%;
-  max-width: 728px;
-  margin: 0 auto;
+.footer-inscreen-ad--visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+.footer-inscreen-ad__slot {
+  width: 728px;
+  max-width: calc(100vw - 24px);
+  height: 90px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
 }
 .footer-inscreen-ad__close {
   position: absolute;
-  top: 50%;
-  right: 8px;
-  transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
+  top: -14px;
+  right: -6px;
+  width: 28px;
+  height: 28px;
   padding: 0;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.65);
-  font-size: 24px;
-  font-weight: 300;
-  line-height: 1;
+  border: 1px solid rgba(255, 102, 255, 0.4);
+  border-radius: 50%;
+  background: #1c0033;
+  color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.15s ease, background 0.15s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
   z-index: 1;
 }
 .footer-inscreen-ad__close:hover {
   color: #fff;
-  background: rgba(255, 255, 255, 0.12);
+  background: #2d0052;
+  transform: scale(1.1);
 }
 @media (max-width: 768px) {
-  .footer-inscreen-ad {
-    min-height: 60px;
+  .footer-inscreen-ad__slot {
+    width: 320px;
+    height: 50px;
+  }
+  .footer-inscreen-ad__close {
+    top: -16px;
+    right: 0;
   }
 }
 
 /* When the sticky footer ad is present, lift the cookie banner above it
    and pad the page bottom so content isn't hidden under the ad. */
-body:has(.footer-inscreen-ad) {
-  padding-bottom: 100px;
-}
-/* Separate rule: browsers without :has() drop any list containing it */
+/* Managed by the footer-ad script: class is added only when the ad card
+   actually appears and removed when it's closed. */
 body.has-footer-ad {
   padding-bottom: 100px;
-}
-body:has(.footer-inscreen-ad) #cookieConsentBanner,
-body:has(.footer-inscreen-ad) .cookie-consent-banner {
-  bottom: 120px !important;
 }
 body.has-footer-ad #cookieConsentBanner,
 body.has-footer-ad .cookie-consent-banner {
@@ -1677,7 +1690,9 @@ button:active {
 }
 @media (max-width: 768px) {
   .horizontal-ad-row {
-    min-height: 100px;
+    /* Mobile in-content fill is typically 300x250 — reserving less caused
+       a 150px+ layout jump under the user's thumb when the ad rendered. */
+    min-height: 250px;
   }
 }
 
@@ -2001,6 +2016,21 @@ button:active {
       <img class="thumb" data-src="games/Five Nights at Epstein Island/thumbnail.webp" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E" alt="Five Nights at Epstein Island" loading="lazy" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">Five Nights at Epstein Island</div>
+  </div><div class="horizontal-ad-row" data-ad-index="0">
+    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
+    <script type="text/javascript" data-cfasync="false">
+    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+    (function(){
+      var slot="152f0341-dbcb-4430-ab30-d9860e3bccfa";
+      var row=document.currentScript&&document.currentScript.parentElement;
+      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      function ready(){ (window.__adsReady||function(c){c();})(push); }
+      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
+      new IntersectionObserver(function(entries, obs){
+        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
+      }, { rootMargin: '800px 0px' }).observe(row);
+    })();
+    </script>
   </div><div class="card game-card" data-index="12" data-folder="FNAF 2" data-name="fnaf 2" onclick="window.location.href='/FNAF 2.html'">
     <div class="thumb-container" style="--thumb-url: url('games/FNAF 2/thumbnail.webp')">
       <img class="thumb" data-src="games/FNAF 2/thumbnail.webp" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E" alt="FNAF 2" loading="lazy" decoding="async" width="300" height="300">
@@ -2031,21 +2061,6 @@ button:active {
       <img class="thumb" data-src="games/Airline Tycoon Idle/thumbnail.webp" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E" alt="Airline Tycoon Idle" loading="lazy" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">Airline Tycoon Idle</div>
-  </div><div class="horizontal-ad-row" data-ad-index="0">
-    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
-    <script type="text/javascript" data-cfasync="false">
-    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
-    (function(){
-      var slot="152f0341-dbcb-4430-ab30-d9860e3bccfa";
-      var row=document.currentScript&&document.currentScript.parentElement;
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
-      function ready(){ (window.__adsReady||function(c){c();})(push); }
-      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
-      new IntersectionObserver(function(entries, obs){
-        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
-      }, { rootMargin: '800px 0px' }).observe(row);
-    })();
-    </script>
   </div><div class="card game-card" data-index="18" data-folder="Basketball Super Stars" data-name="basketball super stars" onclick="window.location.href='/Basketball Super Stars.html'">
     <div class="thumb-container" style="--thumb-url: url('games/Basketball Super Stars/thumbnail.webp')">
       <img class="thumb" data-src="games/Basketball Super Stars/thumbnail.webp" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E" alt="Basketball Super Stars" loading="lazy" decoding="async" width="300" height="300">
@@ -2076,6 +2091,21 @@ button:active {
       <img class="thumb" data-src="games/Fireboy and Watergirl 1/thumbnail.webp" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3C/svg%3E" alt="Fireboy and Watergirl 1" loading="lazy" decoding="async" width="300" height="300">
     </div>
     <div class="card-title">Fireboy and Watergirl 1</div>
+  </div><div class="horizontal-ad-row" data-ad-index="1">
+    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
+    <script type="text/javascript" data-cfasync="false">
+    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+    (function(){
+      var slot="152f0341-dbcb-4430-ab30-d9860e3bccfa";
+      var row=document.currentScript&&document.currentScript.parentElement;
+      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      function ready(){ (window.__adsReady||function(c){c();})(push); }
+      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
+      new IntersectionObserver(function(entries, obs){
+        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
+      }, { rootMargin: '800px 0px' }).observe(row);
+    })();
+    </script>
   </div>
         </div>
         <div id="loadingIndicator" style="display:none;text-align:center;padding:2rem;">
@@ -2129,8 +2159,8 @@ button:active {
     window.__rowsPerLoad = 3;
     window.__scrollThreshold = 300;
     // Horizontal ad configuration (every 3 rows = 18 games at 6 columns)
-    window.__adInterval = 18;
-    window.__adCount = 1;
+    window.__adInterval = 12;
+    window.__adCount = 2;
     // Newly Added games (folders list)
     window.__newlyAddedFolders = ["Tung Tung Horror","Escape Road 3","The Imposible Quiz","The Impossible Quiz 2","Schoolboy Runaway","Punch the Trump","Brawl Simulator 3D","Brotato","Ambulance Rush","Roulette Hero","School Escape Duel","FNAF 3","Dino Run","Sausage Flip","Skinwalker","Red Ball","Rooftop Run","Obby Cart","Five Nights at Epstein Island","Cars Arena","Tiny Fishing","Plants vs Zombies Modded","Minecraft Tower Defence","Drive in Russia","Meme Soundboard","Mr Mine","Orange Roulette","Exit Path","Bad Ice Cream 2","Obby Bike"];
     // Ads toggle flag
@@ -2203,7 +2233,7 @@ function updateRecentlyPlayedNav() {
 }
 
 // Horizontal ad configuration: every 3 rows (18 games at 6 columns)
-const AD_INTERVAL = window.__adInterval || 18;
+const AD_INTERVAL = window.__adInterval || 12;
 let adCount = window.__adCount || 0;
 
 /**
@@ -2367,11 +2397,13 @@ function createGameCard(game, idx, eagerLoad = false) {
 function getFilteredGames() {
   let allGames = window.__gameData || [];
 
-  // Filter by Mobile category if on mobile device
+  // On mobile, show touch-friendly (Mobile-tagged) games first but keep the
+  // full catalog — hiding 80% of games also removed nearly all in-content
+  // ad rows on mobile.
   if (isMobileDevice()) {
-    allGames = allGames.filter(game => {
-      return game.c && game.c.includes('Mobile');
-    });
+    const mobileGames = allGames.filter(g => g.c && g.c.includes('Mobile'));
+    const otherGames = allGames.filter(g => !(g.c && g.c.includes('Mobile')));
+    allGames = [...mobileGames, ...otherGames];
   }
 
   if (!currentCategory) {
@@ -2710,7 +2742,12 @@ function goToHome() {
 }
 
 // Routing & deep links
-function handleRouting() {
+// initialLoad: on first load the server-rendered grid already shows the home
+// view in the same order as __gameData, so wiping and re-rendering it would
+// only cause a visible flash, image refetches, and destroy the in-content ad
+// slot mid-auction. Only rebuild when the view actually differs (category
+// deep-link, or mobile where the order changes).
+function handleRouting(initialLoad = false) {
   const hash = window.location.hash;
 
   if (hash.startsWith('#/category/')) {
@@ -2720,6 +2757,10 @@ function handleRouting() {
     // Strip any stray hash fragment (e.g. /#, #top) so the URL stays clean
     if (hash) {
       window.history.replaceState(null, '', '/');
+    }
+    if (initialLoad && !isMobileDevice()) {
+      // Keep the server-rendered grid untouched.
+      return;
     }
     filterCategory('Home', false);
   }
@@ -2757,9 +2798,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Handle routing on load, hash changes, and pushState back/forward
-  handleRouting();
-  window.addEventListener('hashchange', handleRouting);
-  window.addEventListener('popstate', handleRouting);
+  handleRouting(true);
+  window.addEventListener('hashchange', () => handleRouting());
+  window.addEventListener('popstate', () => handleRouting());
 });
 
   </script>
@@ -2781,20 +2822,41 @@ document.addEventListener('DOMContentLoaded', () => {
   <noscript><link rel="stylesheet" href="assets/cookie-consent.css"></noscript>
   <script src="assets/cookie-consent.js" defer></script>
 
-  <div class="footer-inscreen-ad" id="footerInScreenAd">
-    <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="document.getElementById('footerInScreenAd').style.display='none';document.body.classList.remove('has-footer-ad')">×</button>
-    <div id="mmt-bd025b48-54d2-4cff-88c7-33f195987398"></div>
-    <script type="text/javascript" data-cfasync="false">
-    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
-    (function(){
-      var slot="bd025b48-54d2-4cff-88c7-33f195987398";
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
-      function ready(){ (window.__adsReady||function(c){c();})(push); }
-      if ('requestIdleCallback' in window) { requestIdleCallback(ready, { timeout: 3000 }); }
-      else { setTimeout(ready, 1200); }
-    })();
-    </script>
+  <div class="footer-inscreen-ad" id="footerInScreenAd" hidden>
+    <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="window.__closeFooterAd()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="footer-inscreen-ad__slot"><div id="mmt-bd025b48-54d2-4cff-88c7-33f195987398"></div></div>
   </div>
-  <script>document.body.classList.add('has-footer-ad');</script>
+  <script type="text/javascript" data-cfasync="false">
+  (function(){
+    var el = document.getElementById('footerInScreenAd');
+    var DISMISS_KEY = 'footerAdClosed';
+
+    window.__closeFooterAd = function(){
+      el.classList.remove('footer-inscreen-ad--visible');
+      document.body.classList.remove('has-footer-ad');
+      try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch (e) {}
+      setTimeout(function(){ el.hidden = true; }, 250);
+    };
+
+    // Respect an earlier dismissal for the whole tab session — and skip the
+    // auction entirely so we don't burn an impression nobody sees.
+    var dismissed = false;
+    try { dismissed = sessionStorage.getItem(DISMISS_KEY) === '1'; } catch (e) {}
+    if (dismissed) { el.remove(); return; }
+
+    function push(){
+      $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+      $MMT.cmd.push(function(){ $MMT.display.slots.push(["bd025b48-54d2-4cff-88c7-33f195987398"]); });
+      el.hidden = false;
+      document.body.classList.add('has-footer-ad');
+      requestAnimationFrame(function(){ el.classList.add('footer-inscreen-ad--visible'); });
+    }
+    function ready(){ (window.__adsReady||function(c){c();})(push); }
+    if ('requestIdleCallback' in window) { requestIdleCallback(ready, { timeout: 3000 }); }
+    else { setTimeout(ready, 1200); }
+  })();
+  </script>
 </body>
 </html>
