@@ -15,6 +15,9 @@
 body:has(.header-banner-ad) .game-container {
   padding-top: var(--spacing-xs);
 }
+body.has-header-ad .game-container {
+  padding-top: var(--spacing-xs);
+}
 .header-banner-ad > div {
   width: 100%;
   max-width: 970px;
@@ -101,7 +104,14 @@ body:has(.header-banner-ad) .game-container {
 body:has(.footer-inscreen-ad) {
   padding-bottom: 100px;
 }
+/* Separate rule: browsers without :has() drop any list containing it */
+body.has-footer-ad {
+  padding-bottom: 100px;
+}
 body:has(.footer-inscreen-ad) .cookie-consent-banner {
+  bottom: 120px !important;
+}
+body.has-footer-ad .cookie-consent-banner {
   bottom: 120px !important;
 }
 

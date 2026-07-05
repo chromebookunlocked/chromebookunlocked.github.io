@@ -7,37 +7,23 @@
 const BASE_URL = 'https://chromebookunlocked.github.io';
 const SITE_NAME = 'Chromebook Unlocked Games';
 const LOGO_URL = `${BASE_URL}/assets/logo.webp`;
+const OG_IMAGE_URL = `${BASE_URL}/assets/og-image.png`;
 
-// Primary SEO keywords to include across pages
+// Favicon links shared by all pages (absolute paths so they work at any depth)
+const FAVICON_LINKS = `<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">`;
+
+// Primary SEO keywords (kept short — search engines ignore long keyword
+// lists and excessive repetition reads as stuffing)
 const PRIMARY_KEYWORDS = [
   'unblocked games',
   'free online games',
-  'school games',
   'chromebook games',
-  'unblocked games at school',
-  'free games online',
-  'play games at school',
-  'no download games',
-  'browser games',
   'unblocked games for school',
-  'free unblocked games',
-  'online games unblocked',
-  'school computer games',
-  'games for chromebook',
-  'unblocked school games',
-  'play free games online',
-  'games that work at school',
-  'undetected games',
-  'games not blocked at school',
-  'unrestricted games',
-  'unrestricted games at school',
-  'chromebook unlocked games',
-  'chromebook unlocked',
-  'play online free',
-  'games online free',
-  'unrestricted school games',
-  'unblocked chromebook games',
-  'free unrestricted games'
+  'browser games',
+  'no download games',
+  'chromebook unlocked games'
 ];
 
 /**
@@ -47,27 +33,7 @@ const PRIMARY_KEYWORDS = [
 function generateIndexMetaTags() {
   const title = 'Chromebook Unlocked Games - Play Unblocked Games Online Free at School';
   const description = 'Chromebook Unlocked Games - Play 100+ free unblocked games online at school! Access unrestricted games for Chromebook and school computers. No downloads, no blocks - play online free instantly. Popular unblocked games like Slope, Happy Wheels, FNAF and more!';
-  const keywords = [
-    ...PRIMARY_KEYWORDS,
-    'play unblocked games',
-    'best unblocked games',
-    'fun games for school',
-    'games to play at school',
-    'free browser games',
-    'online games for kids',
-    'classroom games',
-    'games for students',
-    'unblocked gaming site',
-    'free school games',
-    'chromebook unlocked',
-    'games unblocked at school',
-    'play games free online',
-    'unrestricted online games',
-    'play online free games',
-    'chromebook unlocked games site',
-    'unblocked games chromebook',
-    'school unblocked games online'
-  ].join(', ');
+  const keywords = PRIMARY_KEYWORDS.join(', ');
 
   return `<meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -89,7 +55,7 @@ function generateIndexMetaTags() {
   <meta property="og:url" content="${BASE_URL}/">
   <meta property="og:title" content="${title}">
   <meta property="og:description" content="${description}">
-  <meta property="og:image" content="${LOGO_URL}">
+  <meta property="og:image" content="${OG_IMAGE_URL}">
   <meta property="og:image:alt" content="Chromebook Unlocked Games - Play Unblocked Games Online Free at School">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -101,17 +67,11 @@ function generateIndexMetaTags() {
   <meta name="twitter:url" content="${BASE_URL}/">
   <meta name="twitter:title" content="${title}">
   <meta name="twitter:description" content="${description}">
-  <meta name="twitter:image" content="${LOGO_URL}">
+  <meta name="twitter:image" content="${OG_IMAGE_URL}">
   <meta name="twitter:image:alt" content="Chromebook Unlocked Games - Play Unblocked Games Online Free at School">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/logo.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/logo.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/logo.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="assets/logo.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/logo.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/logo.png">
-  <link rel="shortcut icon" type="image/png" href="assets/logo.png">
+  ${FAVICON_LINKS}
 
   <!-- Additional SEO -->
   <meta name="theme-color" content="#ff66ff">
@@ -219,52 +179,14 @@ function generateGameKeywords(game) {
   const categories = game.categories || [];
 
   const gameSpecificKeywords = [
-    // Game name variations with SEO terms - (game name) unblocked play online free
     `${gameName}`,
     `${gameName} unblocked`,
-    `${gameName} online`,
-    `${gameName} free`,
-    `${gameName} unblocked play online free`,
-    `play ${gameName} online free`,
-    `${gameName} play online free`,
-    `play ${gameName}`,
     `play ${gameName} online`,
-    `play ${gameName} free`,
-    `${gameName} game`,
-    `${gameName} game online`,
-    `${gameName} game unblocked`,
-    `${gameName} unblocked games`,
-    `${gameName} free online`,
-    `${gameName} play free`,
-    `${gameName} at school`,
-    `${gameName} school unblocked`,
-    `${gameName} chromebook`,
-    `${gameName} browser game`,
-    `${gameName} no download`,
-    `free ${gameName} game`,
-    `unblocked ${gameName}`,
-    `${gameName} unrestricted`,
-    `${gameName} unrestricted game`,
-    `play ${gameName} unrestricted`,
-    // Category-based keywords
-    ...categories.map(cat => `${cat.toLowerCase()} games unblocked`),
-    ...categories.map(cat => `free ${cat.toLowerCase()} games`),
-    ...categories.map(cat => `${cat.toLowerCase()} games online`),
-    ...categories.map(cat => `${cat.toLowerCase()} games unrestricted`),
-    // Generic SEO terms with new keywords
+    `${gameName} free`,
+    ...categories.slice(0, 3).map(cat => `${cat.toLowerCase()} games unblocked`),
     'unblocked games',
     'free online games',
-    'school games',
-    'chromebook games',
-    'unblocked games at school',
-    'play games at school',
-    'browser games free',
-    'games not blocked',
-    'unrestricted games',
-    'chromebook unlocked games',
-    'play online free',
-    'games online free',
-    'unrestricted school games'
+    'chromebook games'
   ];
 
   return gameSpecificKeywords.join(', ');
@@ -310,19 +232,19 @@ function generateGameMetaTags(game, thumbPath) {
   <meta property="og:url" content="${gameUrl}">
   <meta property="og:title" content="${gameTitle}">
   <meta property="og:description" content="${gameDescription}">
-  <meta property="og:image" content="${LOGO_URL}">
+  <meta property="og:image" content="${imageUrl}">
   <meta property="og:image:alt" content="${gameName} Unblocked - Play Online Free">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
+  <meta property="og:image:width" content="300">
+  <meta property="og:image:height" content="300">
   <meta property="og:site_name" content="${SITE_NAME}">
   <meta property="og:locale" content="en_US">
 
   <!-- Twitter -->
-  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:card" content="summary">
   <meta name="twitter:url" content="${gameUrl}">
   <meta name="twitter:title" content="${gameTitle}">
   <meta name="twitter:description" content="${gameDescription}">
-  <meta name="twitter:image" content="${LOGO_URL}">
+  <meta name="twitter:image" content="${imageUrl}">
   <meta name="twitter:image:alt" content="${gameName} Unblocked - Play Online Free">
 
   <!-- Game-specific meta -->
@@ -331,13 +253,7 @@ function generateGameMetaTags(game, thumbPath) {
   <meta property="game:platform" content="Web Browser">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/logo.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/logo.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/logo.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="assets/logo.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="assets/logo.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/logo.png">
-  <link rel="shortcut icon" type="image/png" href="assets/logo.png">
+  ${FAVICON_LINKS}
 
   <!-- Additional SEO -->
   <meta name="theme-color" content="#ff66ff">
@@ -366,7 +282,7 @@ function generateGameStructuredData(game, thumbPath) {
     "alternateName": [`${gameName} Unblocked`, `${gameName} Online`, `${gameName} Free`, `${gameName} Unrestricted`, `Play ${gameName} Online Free`],
     "url": gameUrl,
     "description": `Play ${gameName} unblocked online free! Enjoy this popular ${categories.join(', ').toLowerCase() || 'action'} game unrestricted on your Chromebook or school computer. No downloads required - play online free instantly!`,
-    "image": LOGO_URL,
+    "image": imageUrl,
     "thumbnailUrl": imageUrl,
     "genre": categories,
     "gamePlatform": ["Web Browser", "Chromebook", "PC", "Mac"],
@@ -393,13 +309,6 @@ function generateGameStructuredData(game, thumbPath) {
         "@type": "ImageObject",
         "url": LOGO_URL
       }
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.5",
-      "ratingCount": "100",
-      "bestRating": "5",
-      "worstRating": "1"
     }
   };
 
@@ -436,7 +345,7 @@ function generateGameStructuredData(game, thumbPath) {
     "name": `${gameName} Unblocked - Play Online Free`,
     "description": `Play ${gameName} unblocked online free at school on your Chromebook - unrestricted games`,
     "url": gameUrl,
-    "image": LOGO_URL,
+    "image": imageUrl,
     "inLanguage": "en-US",
     "isPartOf": {
       "@type": "WebSite",

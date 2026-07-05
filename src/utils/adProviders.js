@@ -238,7 +238,8 @@ function generateHeaderBannerAd(adsEnabled, adProvider) {
   if (normalizeProvider(adProvider) !== 'monumetric') return '';
   return `<div class="header-banner-ad">
     ${monumetricSlot(MONU_SLOTS.headerInScreen)}
-  </div>`;
+  </div>
+  <script>document.body.classList.add('has-header-ad');</script>`;
 }
 
 /**
@@ -261,9 +262,10 @@ function generateFooterInScreenAd(adsEnabled, adProvider) {
   if (!adsEnabled) return '';
   if (normalizeProvider(adProvider) !== 'monumetric') return '';
   return `<div class="footer-inscreen-ad" id="footerInScreenAd">
-    <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="document.getElementById('footerInScreenAd').style.display='none'">×</button>
+    <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="document.getElementById('footerInScreenAd').style.display='none';document.body.classList.remove('has-footer-ad')">×</button>
     ${monumetricSlot(MONU_SLOTS.footerInScreen, { idle: true })}
-  </div>`;
+  </div>
+  <script>document.body.classList.add('has-footer-ad');</script>`;
 }
 
 module.exports = {

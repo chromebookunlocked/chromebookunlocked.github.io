@@ -15,7 +15,7 @@ function shouldInsertAdAfter(gameIndex) {
   return (gameIndex + 1) % AD_INTERVAL === 0;
 }
 const { generateIndexMetaTags, generateIndexStructuredData } = require('../utils/seoBuilder');
-const { generateAnalyticsScript } = require('../utils/analyticsEnhanced');
+const { generateAnalyticsScript, generateConsentModeScript } = require('../utils/analyticsEnhanced');
 const { escapeHtml, escapeHtmlAttr } = require('../utils/htmlEscape');
 const { getThumbPath } = require('../utils/assetManager');
 const { INITIAL_ROWS, ROWS_PER_LOAD, SCROLL_THRESHOLD, EAGER_LOAD_CARDS } = require('../utils/constants');
@@ -183,14 +183,14 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
+  ${metaTags}
+
   <!-- Resource Hints for Performance -->
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
   ${generateAdNetworkHeadHints(adsEnabled, adProvider)}
 
   <!-- Optimize Google Fonts loading -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap"></noscript>
@@ -208,21 +208,18 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   ${botVerificationEnabled ? `<!-- Cloudflare Turnstile verification gate (must load before ads) -->
   <script src="assets/bot-detector.js"></script>` : ''}
 
+  ${generateConsentModeScript()}
+
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
   <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-4QZLTDX504');
   </script>
 
   ${generateAdNetworkHeadScript(adsEnabled, adProvider)}
 
   ${generateAnalyticsScript()}
-
-  ${metaTags}
 
   <!-- Structured Data for Search Engines -->
   ${structuredData}
