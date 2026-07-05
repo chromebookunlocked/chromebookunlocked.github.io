@@ -3,7 +3,7 @@ const { generateGameCard, generateHorizontalAd } = require('./cardGenerator');
 // Horizontal ad configuration
 // Insert a full-width horizontal ad every 3 rows (every 18 games at 6 columns)
 const COLS_PER_ROW = 6;
-const ROWS_PER_AD = 3;
+const ROWS_PER_AD = 2;
 const AD_INTERVAL = COLS_PER_ROW * ROWS_PER_AD; // 18
 
 /**

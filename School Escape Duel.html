@@ -245,66 +245,80 @@ body.has-header-ad .game-container {
 }
 
 /* Footer In-screen ad — sticks to the bottom of the viewport. */
+/* Floating bottom ad card: sized to its content (not a full-width bar),
+   close button anchored OUTSIDE the ad surface so it can't be mis-clicked
+   or covered by the creative, fixed slot height so the card never resizes
+   after fill. Slides up once the slot is requested. */
 .footer-inscreen-ad {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%) translateY(calc(100% + 16px));
   z-index: 9998;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 90px;
-  padding: 4px 0;
-  background: rgba(20, 14, 38, 0.92);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.35);
+  max-width: calc(100vw - 16px);
+  padding: 4px;
+  background: rgba(20, 14, 38, 0.95);
+  border: 1px solid rgba(255, 102, 255, 0.25);
+  border-radius: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: transform 0.25s ease, opacity 0.25s ease;
 }
-.footer-inscreen-ad > div:not(.footer-inscreen-ad__close) {
-  width: 100%;
-  max-width: 728px;
-  margin: 0 auto;
+.footer-inscreen-ad--visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+.footer-inscreen-ad__slot {
+  width: 728px;
+  max-width: calc(100vw - 24px);
+  height: 90px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
 }
 .footer-inscreen-ad__close {
   position: absolute;
-  top: 50%;
-  right: 8px;
-  transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
+  top: -14px;
+  right: -6px;
+  width: 28px;
+  height: 28px;
   padding: 0;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.65);
-  font-size: 24px;
-  font-weight: 300;
-  line-height: 1;
+  border: 1px solid rgba(255, 102, 255, 0.4);
+  border-radius: 50%;
+  background: #1c0033;
+  color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.15s ease, background 0.15s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
   z-index: 1;
 }
 .footer-inscreen-ad__close:hover {
   color: #fff;
-  background: rgba(255, 255, 255, 0.12);
+  background: #2d0052;
+  transform: scale(1.1);
 }
 @media (max-width: 768px) {
-  .footer-inscreen-ad {
-    min-height: 60px;
+  .footer-inscreen-ad__slot {
+    width: 320px;
+    height: 50px;
+  }
+  .footer-inscreen-ad__close {
+    top: -16px;
+    right: 0;
   }
 }
-body:has(.footer-inscreen-ad) {
-  padding-bottom: 100px;
-}
-/* Separate rule: browsers without :has() drop any list containing it */
+/* Managed by the footer-ad script: class is added only when the ad card
+   actually appears and removed when it's closed. */
 body.has-footer-ad {
   padding-bottom: 100px;
-}
-body:has(.footer-inscreen-ad) .cookie-consent-banner {
-  bottom: 120px !important;
 }
 body.has-footer-ad .cookie-consent-banner {
   bottom: 120px !important;
@@ -492,13 +506,21 @@ h1 {
    VERTICAL AD SLOTS - Flanking the game viewer
 ============================================================================ */
 
+/* Pillar must fit a standard unit: 160x600 by default, 300x600 on wide
+   screens. Fixed flex-basis (not flex:1) — a squished pillar can't render
+   any standard IAB size, which meant empty slots or overflowing iframes. */
 .vertical-ad {
-  flex: 1;
-  min-width: 0;
-  max-width: 260px;
+  flex: 0 0 160px;
+  width: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+@media (min-width: 1600px) {
+  .vertical-ad {
+    flex-basis: 300px;
+    width: 300px;
+  }
 }
 
 .vertical-ad ins {
@@ -515,8 +537,8 @@ h1 {
   display: block !important;
 }
 
-/* Hide vertical ads when there's no room beside the game */
-@media (max-width: 1100px) {
+/* Hide vertical ads when a 160px pillar + game frame can't both fit */
+@media (max-width: 1279px) {
   .vertical-ad {
     display: none;
   }
@@ -529,6 +551,19 @@ h1 {
   width: min(85vw, calc(78vh * 16 / 9));
   max-width: 1500px;
   max-height: 82vh;
+}
+/* Leave room for the fixed-width pillars beside the game */
+@media (min-width: 1280px) {
+  .game-frame-wrapper {
+    width: min(calc(100vw - 400px), calc(78vh * 16 / 9));
+  }
+}
+@media (min-width: 1600px) {
+  .game-frame-wrapper {
+    width: min(calc(100vw - 680px), calc(78vh * 16 / 9));
+  }
+}
+.game-frame-wrapper {
   position: relative;
   border-radius: var(--radius-xl);
   overflow: hidden;
@@ -1118,7 +1153,9 @@ h1 {
 }
 @media (max-width: 768px) {
   .horizontal-ad-row {
-    min-height: 100px;
+    /* Mobile in-content fill is typically 300x250 — reserving less caused
+       a 150px+ layout jump under the user's thumb when the ad rendered. */
+    min-height: 250px;
   }
 }
 
@@ -1683,7 +1720,22 @@ footer {
         <img class="thumb" src="games/1v1.lol/thumbnail.webp" alt="Play 1v1.lol Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">1v1.lol</div>
-    </a><a href="/Tung Tung Horror.html" class="game-card" title="Play Tung Tung Horror Unblocked Free Online" onclick="trackRecentGame('Tung Tung Horror')">
+    </a><div class="horizontal-ad-row" data-ad-index="0">
+    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
+    <script type="text/javascript" data-cfasync="false">
+    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+    (function(){
+      var slot="152f0341-dbcb-4430-ab30-d9860e3bccfa";
+      var row=document.currentScript&&document.currentScript.parentElement;
+      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      function ready(){ (window.__adsReady||function(c){c();})(push); }
+      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
+      new IntersectionObserver(function(entries, obs){
+        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
+      }, { rootMargin: '800px 0px' }).observe(row);
+    })();
+    </script>
+  </div><a href="/Tung Tung Horror.html" class="game-card" title="Play Tung Tung Horror Unblocked Free Online" onclick="trackRecentGame('Tung Tung Horror')">
       <div class="thumb-container" style="--thumb-url: url('games/Tung Tung Horror/thumbnail.webp')">
         <img class="thumb" src="games/Tung Tung Horror/thumbnail.webp" alt="Play Tung Tung Horror Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
@@ -1713,22 +1765,7 @@ footer {
         <img class="thumb" src="games/Dino Run/thumbnail.webp" alt="Play Dino Run Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Dino Run</div>
-    </a><div class="horizontal-ad-row" data-ad-index="0">
-    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
-    <script type="text/javascript" data-cfasync="false">
-    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
-    (function(){
-      var slot="152f0341-dbcb-4430-ab30-d9860e3bccfa";
-      var row=document.currentScript&&document.currentScript.parentElement;
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
-      function ready(){ (window.__adsReady||function(c){c();})(push); }
-      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
-      new IntersectionObserver(function(entries, obs){
-        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
-      }, { rootMargin: '800px 0px' }).observe(row);
-    })();
-    </script>
-  </div><a href="/Block the Pig.html" class="game-card" title="Play Block the Pig Unblocked Free Online" onclick="trackRecentGame('Block the Pig')">
+    </a><a href="/Block the Pig.html" class="game-card" title="Play Block the Pig Unblocked Free Online" onclick="trackRecentGame('Block the Pig')">
       <div class="thumb-container" style="--thumb-url: url('games/Block the Pig/thumbnail.webp')">
         <img class="thumb" src="games/Block the Pig/thumbnail.webp" alt="Play Block the Pig Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
@@ -1758,7 +1795,22 @@ footer {
         <img class="thumb" src="games/Retro Bowl/thumbnail.webp" alt="Play Retro Bowl Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Retro Bowl</div>
-    </a><a href="/Exo Observation.html" class="game-card" title="Play Exo Observation Unblocked Free Online" onclick="trackRecentGame('Exo Observation')">
+    </a><div class="horizontal-ad-row" data-ad-index="1">
+    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
+    <script type="text/javascript" data-cfasync="false">
+    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+    (function(){
+      var slot="152f0341-dbcb-4430-ab30-d9860e3bccfa";
+      var row=document.currentScript&&document.currentScript.parentElement;
+      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      function ready(){ (window.__adsReady||function(c){c();})(push); }
+      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
+      new IntersectionObserver(function(entries, obs){
+        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
+      }, { rootMargin: '800px 0px' }).observe(row);
+    })();
+    </script>
+  </div><a href="/Exo Observation.html" class="game-card" title="Play Exo Observation Unblocked Free Online" onclick="trackRecentGame('Exo Observation')">
       <div class="thumb-container" style="--thumb-url: url('games/Exo Observation/thumbnail.webp')">
         <img class="thumb" src="games/Exo Observation/thumbnail.webp" alt="Play Exo Observation Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
@@ -1818,7 +1870,7 @@ footer {
         <img class="thumb" src="games/Blaze Drifter/thumbnail.webp" alt="Play Blaze Drifter Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Blaze Drifter</div>
-    </a><div class="horizontal-ad-row" data-ad-index="1">
+    </a><div class="horizontal-ad-row" data-ad-index="2">
     <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
@@ -2384,20 +2436,41 @@ footer {
   <link rel="stylesheet" href="assets/cookie-consent.css">
   <script src="assets/cookie-consent.js"></script>
 
-  <div class="footer-inscreen-ad" id="footerInScreenAd">
-    <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="document.getElementById('footerInScreenAd').style.display='none';document.body.classList.remove('has-footer-ad')">×</button>
-    <div id="mmt-bd025b48-54d2-4cff-88c7-33f195987398"></div>
-    <script type="text/javascript" data-cfasync="false">
-    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
-    (function(){
-      var slot="bd025b48-54d2-4cff-88c7-33f195987398";
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
-      function ready(){ (window.__adsReady||function(c){c();})(push); }
-      if ('requestIdleCallback' in window) { requestIdleCallback(ready, { timeout: 3000 }); }
-      else { setTimeout(ready, 1200); }
-    })();
-    </script>
+  <div class="footer-inscreen-ad" id="footerInScreenAd" hidden>
+    <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="window.__closeFooterAd()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="footer-inscreen-ad__slot"><div id="mmt-bd025b48-54d2-4cff-88c7-33f195987398"></div></div>
   </div>
-  <script>document.body.classList.add('has-footer-ad');</script>
+  <script type="text/javascript" data-cfasync="false">
+  (function(){
+    var el = document.getElementById('footerInScreenAd');
+    var DISMISS_KEY = 'footerAdClosed';
+
+    window.__closeFooterAd = function(){
+      el.classList.remove('footer-inscreen-ad--visible');
+      document.body.classList.remove('has-footer-ad');
+      try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch (e) {}
+      setTimeout(function(){ el.hidden = true; }, 250);
+    };
+
+    // Respect an earlier dismissal for the whole tab session — and skip the
+    // auction entirely so we don't burn an impression nobody sees.
+    var dismissed = false;
+    try { dismissed = sessionStorage.getItem(DISMISS_KEY) === '1'; } catch (e) {}
+    if (dismissed) { el.remove(); return; }
+
+    function push(){
+      $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+      $MMT.cmd.push(function(){ $MMT.display.slots.push(["bd025b48-54d2-4cff-88c7-33f195987398"]); });
+      el.hidden = false;
+      document.body.classList.add('has-footer-ad');
+      requestAnimationFrame(function(){ el.classList.add('footer-inscreen-ad--visible'); });
+    }
+    function ready(){ (window.__adsReady||function(c){c();})(push); }
+    if ('requestIdleCallback' in window) { requestIdleCallback(ready, { timeout: 3000 }); }
+    else { setTimeout(ready, 1200); }
+  })();
+  </script>
 </body>
 </html>
