@@ -1,4 +1,4 @@
-# Ads.txt last updated on: 2026/07/05 07:35:37.929709 by MONUMETRIC
+# Ads.txt last updated on: 2026/07/06 02:18:01.484692 by MONUMETRIC
 OWNERDOMAIN=chromebookunlocked.github.io
 MANAGERDOMAIN=monumetric.com
 CONTACT=support@monumetric.com
@@ -671,3 +671,4 @@ loopme.com, 11479, RESELLER, 6c8d5f95897a5a3b
 # ALL CUSTOM RECORDS MUST BE BELOW THIS LINE
 
 INVENTORYPARTNERDOMAIN=monumetric.com
+
