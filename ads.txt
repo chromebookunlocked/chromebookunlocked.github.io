@@ -1,4 +1,4 @@
-# Ads.txt last updated on: 2026/08/13 00:02:33.119118 by MONUMETRIC
+# Ads.txt last updated on: 2026/08/14 00:02:38.555725 by MONUMETRIC
 OWNERDOMAIN=chromebookunlocked.github.io
 MANAGERDOMAIN=monumetric.com
 CONTACT=support@monumetric.com
