@@ -182,11 +182,12 @@
 /* Buttons */
 .cookie-consent-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
 .cookie-btn {
-  flex: 1;
+  flex: 1 1 110px;
   padding: 12px 16px;
   border-radius: 8px;
   border: none;

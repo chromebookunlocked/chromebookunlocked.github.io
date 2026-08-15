@@ -50,9 +50,16 @@ console.log(`\n${colors.blue}Found ${jsonFiles.length} game metadata files${colo
 
 // Valid categories
 const validCategories = [
-  "Action", "Puzzle", "Shooter", "Clickers", "Horror", "Racing",
-  "Adventure", "Sports", "Strategy", "Platformer", "RPG",
-  "Simulation", "Uncategorized"
+  "2 Player", "3D", "Action", "Adventure", "Arcade", "Basketball",
+  "Boss Fight", "Building", "Card", "Casino", "Casual", "Clicker",
+  "Crafting", "Defense", "Driving", "Endless", "Fighting", "Flight",
+  "Football", "Funny", "Horror", "Idle", "Logic", "Management",
+  "Mining", "Mobile", "Multiplayer", "Music", "Parkour", "Physics",
+  "Platformer", "Point and Click", "Psychological", "Puzzle", "Racing",
+  "Ragdoll", "Retro", "Rhythm", "Roguelike", "RPG", "Running",
+  "Sandbox", "Shooter", "Simulation", "Skill", "Sniper", "Soccer",
+  "Sports", "Stealth", "Strategy", "Survival", "Tower Defence",
+  "Trending Games", "Uncategorized", "Visual Novel", "Zombie"
 ];
 
 jsonFiles.forEach((file, index) => {

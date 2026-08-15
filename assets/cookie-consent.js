@@ -10,22 +10,40 @@
   const COOKIE_EXPIRY_DAYS = 365;
 
   function hasConsent() {
-    return getCookie(COOKIE_NAME) !== null;
+    return getSavedPreferences() !== null;
   }
 
   function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
-      return parts.pop().split(';').shift();
+      const raw = parts.pop().split(';').shift();
+      try { return decodeURIComponent(raw); } catch (e) { return raw; }
     }
     return null;
+  }
+
+  function getSavedPreferences() {
+    const consent = getCookie(COOKIE_NAME);
+    if (!consent) return null;
+    try {
+      const parsed = JSON.parse(consent);
+      if (!parsed || typeof parsed !== 'object') return null;
+      return {
+        essential: true,
+        analytics: parsed.analytics === true,
+        marketing: parsed.marketing === true
+      };
+    } catch (e) {
+      return null;
+    }
   }
 
   function setCookie(name, value, days) {
     const date = new Date();
     date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    document.cookie = `${name}=${value};expires=${date.toUTCString()};path=/;SameSite=Lax`;
+    const secure = window.location.protocol === 'https:' ? ';Secure' : '';
+    document.cookie = `${name}=${encodeURIComponent(value)};expires=${date.toUTCString()};path=/;SameSite=Lax${secure}`;
   }
 
   function createBanner() {
@@ -36,22 +54,23 @@
     banner.className = 'cookie-consent-banner';
 
     banner.innerHTML = `
-      <div class="cookie-close-btn" id="cookieClose" role="button" aria-label="Accept and close" tabindex="0">
+      <button type="button" class="cookie-close-btn" id="cookieClose" aria-label="Close and use essential cookies only">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
-      </div>
+      </button>
       <div class="cookie-consent-content">
         <h3 class="cookie-consent-title">Cookie Settings</h3>
         <p class="cookie-consent-text">
-          We use cookies to enhance your experience. By clicking "Accept" or closing this window, you agree to our use of cookies.
+          Choose whether we may use analytics and advertising cookies. Closing this window keeps only essential storage enabled.
           <a href="/important-pages/cookie-policy.html">Learn more</a>
         </p>
         <div id="cookieMainView">
           <div class="cookie-consent-buttons">
             <button id="cookieOptions" class="cookie-btn cookie-btn-options">More options</button>
-            <button id="cookieAccept" class="cookie-btn cookie-btn-accept">Accept</button>
+            <button id="cookieDeclineMain" class="cookie-btn cookie-btn-decline">Reject all</button>
+            <button id="cookieAccept" class="cookie-btn cookie-btn-accept">Accept all</button>
           </div>
         </div>
         <div id="cookieOptionsView" style="display: none;">
@@ -72,7 +91,7 @@
                 <p class="cookie-category-desc">Help us improve our site</p>
               </div>
               <label class="cookie-toggle">
-                <input type="checkbox" id="cookieAnalytics" checked>
+                <input type="checkbox" id="cookieAnalytics">
                 <span class="cookie-toggle-slider"></span>
               </label>
             </div>
@@ -82,7 +101,7 @@
                 <p class="cookie-category-desc">Personalized ads and content</p>
               </div>
               <label class="cookie-toggle">
-                <input type="checkbox" id="cookieMarketing" checked>
+                <input type="checkbox" id="cookieMarketing">
                 <span class="cookie-toggle-slider"></span>
               </label>
             </div>
@@ -97,14 +116,18 @@
 
     document.body.appendChild(banner);
 
-    // Close button accepts all
+    // Dismissing a consent prompt is not affirmative consent.
     document.getElementById('cookieClose').addEventListener('click', function () {
-      saveConsent({ essential: true, analytics: true, marketing: true });
+      saveConsent({ essential: true, analytics: false, marketing: false });
     });
 
     // Accept button accepts all
     document.getElementById('cookieAccept').addEventListener('click', function () {
       saveConsent({ essential: true, analytics: true, marketing: true });
+    });
+
+    document.getElementById('cookieDeclineMain').addEventListener('click', function () {
+      saveConsent({ essential: true, analytics: false, marketing: false });
     });
 
     // More options shows categories
@@ -133,6 +156,9 @@
   function saveConsent(preferences) {
     setCookie(COOKIE_NAME, JSON.stringify(preferences), COOKIE_EXPIRY_DAYS);
     updateConsentMode(preferences);
+    try {
+      window.dispatchEvent(new CustomEvent('cookieconsentchange', { detail: preferences }));
+    } catch (e) {}
     hideBanner();
   }
 
@@ -186,15 +212,7 @@
     },
     hasConsent: hasConsent,
     getConsent: function () {
-      const consent = getCookie(COOKIE_NAME);
-      if (consent) {
-        try {
-          return JSON.parse(consent);
-        } catch (e) {
-          return consent;
-        }
-      }
-      return null;
+      return getSavedPreferences();
     }
   };
 })();

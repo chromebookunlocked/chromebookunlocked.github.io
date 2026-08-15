@@ -19,7 +19,8 @@
   var STORAGE_KEY = 'cf_turnstile_verified';
   var TURNSTILE_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=__onTurnstileLoad';
 
-  var verified = sessionStorage.getItem(STORAGE_KEY) === '1';
+  var verified = false;
+  try { verified = sessionStorage.getItem(STORAGE_KEY) === '1'; } catch (e) {}
   var widgetId = null;
   var overlayEl = null;       // the (hidden-by-default) interstitial
   var hostEl = null;          // wrapper that holds the widget mount

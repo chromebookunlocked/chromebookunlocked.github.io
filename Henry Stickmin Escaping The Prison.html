@@ -59,7 +59,7 @@
   <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net">
 
   <!-- Cloudflare Turnstile verification gate (must load before ads) -->
-  <script src="../assets/bot-detector.js"></script>
+  <script src="assets/bot-detector.js"></script>
 
   <!-- Google Consent Mode v2: default denied, restore saved choice -->
   <script>
@@ -89,21 +89,12 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
   <script>
     gtag('js', new Date());
-    gtag('config', 'G-4QZLTDX504');
+    gtag('config', 'G-4QZLTDX504', { send_page_view: false });
   </script>
 
-  <!-- Ad network main script: starts loading early, in parallel with Turnstile -->
+  <!-- Ad network runtime: verified library load + deduplicated slot requests -->
   <script>
     (function(){
-      if (!window.__adNetworkLoaded) {
-        window.__adNetworkLoaded = true;
-        var s = document.createElement('script');
-        s.src = "https://monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js";
-        s.async=true;s.setAttribute('data-cfasync','false');
-        document.head.appendChild(s);
-      }
-      // Gate actual ad requests on verification so the warmed-up library
-      // doesn't serve ads to unverified/bot traffic.
       window.__adsReady = function(cb){
         var bd = window.botDetector;
         if (!bd) return cb();
@@ -111,79 +102,41 @@
         if (typeof bd.onVerified === 'function') return bd.onVerified(cb);
         cb();
       };
+      function loadAdNetwork(){
+        if (window.__adNetworkLoaded) return;
+        window.__adNetworkLoaded = true;
+        var s = document.createElement('script');
+        s.src = "https://monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js";
+        s.async=true;s.setAttribute('data-cfasync','false');
+        document.head.appendChild(s);
+      }
+      // The preload hint fetches the library early, but execution waits for
+      // verification because some networks discover and request slots as soon
+      // as their main script runs.
+      window.__adsReady(loadAdNetwork);
+
     })();
   </script>
 
-  
+
 <script>
-  // Simple Analytics Tracking - Core Metrics Only
+  // One explicit page_view per generated page. GA owns its own session and
+  // user identifiers, so the site does not create parallel tracking IDs.
   (function() {
-    // Session management (for proper user tracking, but no extra events)
-    function getSessionId() {
-      const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes
-      let sessionData = sessionStorage.getItem('ga_session_data');
-
-      if (sessionData) {
-        try {
-          const data = JSON.parse(sessionData);
-          const now = Date.now();
-
-          // Check if session is still valid
-          if (now - data.lastActivity < SESSION_DURATION) {
-            data.lastActivity = now;
-            sessionStorage.setItem('ga_session_data', JSON.stringify(data));
-            return data.sessionId;
-          }
-        } catch (e) {
-          // Create new session on error
-        }
-      }
-
-      // Create new session
-      const newSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-      const newSessionData = {
-        sessionId: newSessionId,
-        startTime: Date.now(),
-        lastActivity: Date.now()
-      };
-      sessionStorage.setItem('ga_session_data', JSON.stringify(newSessionData));
-
-      return newSessionId;
-    }
-
-    // Get or create user ID for tracking across sessions
-    function getUserId() {
-      let userId = localStorage.getItem('ga_user_id');
-      if (!userId) {
-        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('ga_user_id', userId);
-      }
-      return userId;
-    }
-
-    // Initialize session tracking (lightweight)
-    window.analyticsSession = {
-      sessionId: getSessionId(),
-      userId: getUserId()
-    };
-
-    // Track page view - SINGLE EVENT ONLY (no duplicates)
     function trackEnhancedPageView(pageType, pageName, additionalParams) {
       if (typeof gtag !== 'undefined') {
         gtag('event', 'page_view', {
           page_type: pageType,
           page_name: pageName,
-          session_id: window.analyticsSession.sessionId,
           ...additionalParams
         });
       }
     }
 
-    // Expose tracking function globally
     window.trackEnhancedPageView = trackEnhancedPageView;
   })();
 </script>
-  
+
 
   <!-- Google Fonts (async, non-blocking) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1590,14 +1543,41 @@ footer {
     </div>
   </header>
 
-  <div class="header-banner-ad">
+  <div class="header-banner-ad" role="complementary" aria-label="Advertisement">
     <div id="mmt-d56921e6-6064-44b4-85de-214e86cc24f8"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
       var slot="d56921e6-6064-44b4-85de-214e86cc24f8";
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
-      (window.__adsReady||function(c){c();})(push);
+      var row=document.currentScript&&document.currentScript.parentElement;
+      var requested=false;
+      function push(){
+        if (requested) return;
+        requested=true;
+        $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); });
+      }
+      function ready(){ (window.__adsReady||function(c){c();})(push); }
+      function load(){
+
+
+        ready();
+      }
+      var media="";
+      if (media && window.matchMedia) {
+        var query=window.matchMedia(media);
+        if (!query.matches) {
+          var onChange=function(event){
+            if (!event.matches) return;
+            if (query.removeEventListener) query.removeEventListener('change', onChange);
+            else if (query.removeListener) query.removeListener(onChange);
+            load();
+          };
+          if (query.addEventListener) query.addEventListener('change', onChange);
+          else if (query.addListener) query.addListener(onChange);
+          return;
+        }
+      }
+      load();
     })();
     </script>
   </div>
@@ -1611,14 +1591,41 @@ footer {
 
     <!-- Game Viewer -->
     <div class="game-container">
-      <div class="vertical-ad vertical-ad-left">
+      <div class="vertical-ad vertical-ad-left" role="complementary" aria-label="Advertisement">
       <div id="mmt-0f94f1df-dac8-4d55-b24e-3051d266c344"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
       var slot="0f94f1df-dac8-4d55-b24e-3051d266c344";
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
-      (window.__adsReady||function(c){c();})(push);
+      var row=document.currentScript&&document.currentScript.parentElement;
+      var requested=false;
+      function push(){
+        if (requested) return;
+        requested=true;
+        $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); });
+      }
+      function ready(){ (window.__adsReady||function(c){c();})(push); }
+      function load(){
+
+
+        ready();
+      }
+      var media="(min-width: 1280px)";
+      if (media && window.matchMedia) {
+        var query=window.matchMedia(media);
+        if (!query.matches) {
+          var onChange=function(event){
+            if (!event.matches) return;
+            if (query.removeEventListener) query.removeEventListener('change', onChange);
+            else if (query.removeListener) query.removeListener(onChange);
+            load();
+          };
+          if (query.addEventListener) query.addEventListener('change', onChange);
+          else if (query.addListener) query.addListener(onChange);
+          return;
+        }
+      }
+      load();
     })();
     </script>
     </div>
@@ -1680,11 +1687,11 @@ footer {
         <img class="thumb" src="games/Henry Stickmin Infiltrating The Airship/thumbnail.webp" alt="Play Henry Stickmin Infiltrating The Airship Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Henry Stickmin Infiltrating The Airship</div>
-    </a><a href="/Whack Your Computer.html" class="game-card" title="Play Whack Your Computer Unblocked Free Online" onclick="trackRecentGame('Whack Your Computer')">
-      <div class="thumb-container" style="--thumb-url: url('games/Whack Your Computer/thumbnail.webp')">
-        <img class="thumb" src="games/Whack Your Computer/thumbnail.webp" alt="Play Whack Your Computer Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Whack Your Boss.html" class="game-card" title="Play Whack Your Boss Unblocked Free Online" onclick="trackRecentGame('Whack Your Boss')">
+      <div class="thumb-container" style="--thumb-url: url('games/Whack Your Boss/thumbnail.webp')">
+        <img class="thumb" src="games/Whack Your Boss/thumbnail.webp" alt="Play Whack Your Boss Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Whack Your Computer</div>
+      <div class="card-title">Whack Your Boss</div>
     </a><a href="/Happy Wheels.html" class="game-card" title="Play Happy Wheels Unblocked Free Online" onclick="trackRecentGame('Happy Wheels')">
       <div class="thumb-container" style="--thumb-url: url('games/Happy Wheels/thumbnail.webp')">
         <img class="thumb" src="games/Happy Wheels/thumbnail.webp" alt="Play Happy Wheels Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -1705,11 +1712,11 @@ footer {
         <img class="thumb" src="games/Tung Tung Horror/thumbnail.webp" alt="Play Tung Tung Horror Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Tung Tung Horror</div>
-    </a><a href="/FNAF Pizzeria Simulator.html" class="game-card" title="Play FNAF Pizzeria Simulator Unblocked Free Online" onclick="trackRecentGame('FNAF Pizzeria Simulator')">
-      <div class="thumb-container" style="--thumb-url: url('games/FNAF Pizzeria Simulator/thumbnail.webp')">
-        <img class="thumb" src="games/FNAF Pizzeria Simulator/thumbnail.webp" alt="Play FNAF Pizzeria Simulator Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/FNAF 1.html" class="game-card" title="Play FNAF 1 Unblocked Free Online" onclick="trackRecentGame('FNAF 1')">
+      <div class="thumb-container" style="--thumb-url: url('games/FNAF 1/thumbnail.webp')">
+        <img class="thumb" src="games/FNAF 1/thumbnail.webp" alt="Play FNAF 1 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">FNAF Pizzeria Simulator</div>
+      <div class="card-title">FNAF 1</div>
     </a><a href="/Douchebag Life.html" class="game-card" title="Play Douchebag Life Unblocked Free Online" onclick="trackRecentGame('Douchebag Life')">
       <div class="thumb-container" style="--thumb-url: url('games/Douchebag Life/thumbnail.webp')">
         <img class="thumb" src="games/Douchebag Life/thumbnail.webp" alt="Play Douchebag Life Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -1720,19 +1727,47 @@ footer {
         <img class="thumb" src="games/Obby Bike/thumbnail.webp" alt="Play Obby Bike Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Obby Bike</div>
-    </a><div class="horizontal-ad-row" data-ad-index="0">
+    </a><div class="horizontal-ad-row" data-ad-index="0" role="complementary" aria-label="Advertisement">
     <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
       var slot="152f0341-dbcb-4430-ab30-d9860e3bccfa";
       var row=document.currentScript&&document.currentScript.parentElement;
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      var requested=false;
+      function push(){
+        if (requested) return;
+        requested=true;
+        $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); });
+      }
       function ready(){ (window.__adsReady||function(c){c();})(push); }
-      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
-      new IntersectionObserver(function(entries, obs){
-        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
-      }, { rootMargin: '800px 0px' }).observe(row);
+      function load(){
+        if (row && 'IntersectionObserver' in window) {
+          var observer=new IntersectionObserver(function(entries){
+            if (!entries[0].isIntersecting) return;
+            observer.disconnect(); ready();
+          }, { rootMargin: '600px 0px' });
+          observer.observe(row); return;
+        }
+
+        ready();
+      }
+      var media="";
+      if (media && window.matchMedia) {
+        var query=window.matchMedia(media);
+        if (!query.matches) {
+          var onChange=function(event){
+            if (!event.matches) return;
+            if (query.removeEventListener) query.removeEventListener('change', onChange);
+            else if (query.removeListener) query.removeListener(onChange);
+            load();
+          };
+          if (query.addEventListener) query.addEventListener('change', onChange);
+          else if (query.addListener) query.addListener(onChange);
+          return;
+        }
+      }
+      load();
     })();
     </script>
   </div><a href="/A Dance of Fire and Ice.html" class="game-card" title="Play A Dance of Fire and Ice Unblocked Free Online" onclick="trackRecentGame('A Dance of Fire and Ice')">
@@ -1745,16 +1780,16 @@ footer {
         <img class="thumb" src="games/Elastic Face/thumbnail.webp" alt="Play Elastic Face Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Elastic Face</div>
-    </a><a href="/Capybara Clicker.html" class="game-card" title="Play Capybara Clicker Unblocked Free Online" onclick="trackRecentGame('Capybara Clicker')">
-      <div class="thumb-container" style="--thumb-url: url('games/Capybara Clicker/thumbnail.webp')">
-        <img class="thumb" src="games/Capybara Clicker/thumbnail.webp" alt="Play Capybara Clicker Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Cars Arena.html" class="game-card" title="Play Cars Arena Unblocked Free Online" onclick="trackRecentGame('Cars Arena')">
+      <div class="thumb-container" style="--thumb-url: url('games/Cars Arena/thumbnail.webp')">
+        <img class="thumb" src="games/Cars Arena/thumbnail.webp" alt="Play Cars Arena Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Capybara Clicker</div>
-    </a><a href="/Clear Vision 2.html" class="game-card" title="Play Clear Vision 2 Unblocked Free Online" onclick="trackRecentGame('Clear Vision 2')">
-      <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 2/thumbnail.webp')">
-        <img class="thumb" src="games/Clear Vision 2/thumbnail.webp" alt="Play Clear Vision 2 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+      <div class="card-title">Cars Arena</div>
+    </a><a href="/Clear Vision 3.html" class="game-card" title="Play Clear Vision 3 Unblocked Free Online" onclick="trackRecentGame('Clear Vision 3')">
+      <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 3/thumbnail.webp')">
+        <img class="thumb" src="games/Clear Vision 3/thumbnail.webp" alt="Play Clear Vision 3 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Clear Vision 2</div>
+      <div class="card-title">Clear Vision 3</div>
     </a><a href="/Minecraft Tower Defence.html" class="game-card" title="Play Minecraft Tower Defence Unblocked Free Online" onclick="trackRecentGame('Minecraft Tower Defence')">
       <div class="thumb-container" style="--thumb-url: url('games/Minecraft Tower Defence/thumbnail.webp')">
         <img class="thumb" src="games/Minecraft Tower Defence/thumbnail.webp" alt="Play Minecraft Tower Defence Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -1770,16 +1805,16 @@ footer {
         <img class="thumb" src="games/Slope/thumbnail.webp" alt="Play Slope Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Slope</div>
-    </a><a href="/Clear Vision 3.html" class="game-card" title="Play Clear Vision 3 Unblocked Free Online" onclick="trackRecentGame('Clear Vision 3')">
-      <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 3/thumbnail.webp')">
-        <img class="thumb" src="games/Clear Vision 3/thumbnail.webp" alt="Play Clear Vision 3 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Clear Vision 4.html" class="game-card" title="Play Clear Vision 4 Unblocked Free Online" onclick="trackRecentGame('Clear Vision 4')">
+      <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 4/thumbnail.webp')">
+        <img class="thumb" src="games/Clear Vision 4/thumbnail.webp" alt="Play Clear Vision 4 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Clear Vision 3</div>
-    </a><a href="/Bouncy Motors.html" class="game-card" title="Play Bouncy Motors Unblocked Free Online" onclick="trackRecentGame('Bouncy Motors')">
-      <div class="thumb-container" style="--thumb-url: url('games/Bouncy Motors/thumbnail.webp')">
-        <img class="thumb" src="games/Bouncy Motors/thumbnail.webp" alt="Play Bouncy Motors Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+      <div class="card-title">Clear Vision 4</div>
+    </a><a href="/Bounty of One.html" class="game-card" title="Play Bounty of One Unblocked Free Online" onclick="trackRecentGame('Bounty of One')">
+      <div class="thumb-container" style="--thumb-url: url('games/Bounty of One/thumbnail.webp')">
+        <img class="thumb" src="games/Bounty of One/thumbnail.webp" alt="Play Bounty of One Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Bouncy Motors</div>
+      <div class="card-title">Bounty of One</div>
     </a><a href="/2048.html" class="game-card" title="Play 2048 Unblocked Free Online" onclick="trackRecentGame('2048')">
       <div class="thumb-container" style="--thumb-url: url('games/2048/thumbnail.webp')">
         <img class="thumb" src="games/2048/thumbnail.webp" alt="Play 2048 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -1795,19 +1830,47 @@ footer {
         <img class="thumb" src="games/Roulette Hero/thumbnail.webp" alt="Play Roulette Hero Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Roulette Hero</div>
-    </a><div class="horizontal-ad-row" data-ad-index="1">
+    </a><div class="horizontal-ad-row" data-ad-index="1" role="complementary" aria-label="Advertisement">
     <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
       var slot="152f0341-dbcb-4430-ab30-d9860e3bccfa";
       var row=document.currentScript&&document.currentScript.parentElement;
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      var requested=false;
+      function push(){
+        if (requested) return;
+        requested=true;
+        $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); });
+      }
       function ready(){ (window.__adsReady||function(c){c();})(push); }
-      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
-      new IntersectionObserver(function(entries, obs){
-        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
-      }, { rootMargin: '800px 0px' }).observe(row);
+      function load(){
+        if (row && 'IntersectionObserver' in window) {
+          var observer=new IntersectionObserver(function(entries){
+            if (!entries[0].isIntersecting) return;
+            observer.disconnect(); ready();
+          }, { rootMargin: '600px 0px' });
+          observer.observe(row); return;
+        }
+
+        ready();
+      }
+      var media="";
+      if (media && window.matchMedia) {
+        var query=window.matchMedia(media);
+        if (!query.matches) {
+          var onChange=function(event){
+            if (!event.matches) return;
+            if (query.removeEventListener) query.removeEventListener('change', onChange);
+            else if (query.removeListener) query.removeListener(onChange);
+            load();
+          };
+          if (query.addEventListener) query.addEventListener('change', onChange);
+          else if (query.addListener) query.addListener(onChange);
+          return;
+        }
+      }
+      load();
     })();
     </script>
   </div><a href="/4th and Goal.html" class="game-card" title="Play 4th and Goal Unblocked Free Online" onclick="trackRecentGame('4th and Goal')">
@@ -1825,11 +1888,11 @@ footer {
         <img class="thumb" src="games/Granny/thumbnail.webp" alt="Play Granny Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Granny</div>
-    </a><a href="/Bowmasters.html" class="game-card" title="Play Bowmasters Unblocked Free Online" onclick="trackRecentGame('Bowmasters')">
-      <div class="thumb-container" style="--thumb-url: url('games/Bowmasters/thumbnail.webp')">
-        <img class="thumb" src="games/Bowmasters/thumbnail.webp" alt="Play Bowmasters Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Brawl Simulator 3D.html" class="game-card" title="Play Brawl Simulator 3D Unblocked Free Online" onclick="trackRecentGame('Brawl Simulator 3D')">
+      <div class="thumb-container" style="--thumb-url: url('games/Brawl Simulator 3D/thumbnail.webp')">
+        <img class="thumb" src="games/Brawl Simulator 3D/thumbnail.webp" alt="Play Brawl Simulator 3D Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Bowmasters</div>
+      <div class="card-title">Brawl Simulator 3D</div>
     </a><a href="/Gun Spin.html" class="game-card" title="Play Gun Spin Unblocked Free Online" onclick="trackRecentGame('Gun Spin')">
       <div class="thumb-container" style="--thumb-url: url('games/Gun Spin/thumbnail.webp')">
         <img class="thumb" src="games/Gun Spin/thumbnail.webp" alt="Play Gun Spin Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -1870,19 +1933,47 @@ footer {
         <img class="thumb" src="games/10 Minutes Till Dawn/thumbnail.webp" alt="Play 10 Minutes Till Dawn Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">10 Minutes Till Dawn</div>
-    </a><div class="horizontal-ad-row" data-ad-index="2">
+    </a><div class="horizontal-ad-row" data-ad-index="2" role="complementary" aria-label="Advertisement">
     <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
       var slot="152f0341-dbcb-4430-ab30-d9860e3bccfa";
       var row=document.currentScript&&document.currentScript.parentElement;
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      var requested=false;
+      function push(){
+        if (requested) return;
+        requested=true;
+        $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); });
+      }
       function ready(){ (window.__adsReady||function(c){c();})(push); }
-      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
-      new IntersectionObserver(function(entries, obs){
-        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
-      }, { rootMargin: '800px 0px' }).observe(row);
+      function load(){
+        if (row && 'IntersectionObserver' in window) {
+          var observer=new IntersectionObserver(function(entries){
+            if (!entries[0].isIntersecting) return;
+            observer.disconnect(); ready();
+          }, { rootMargin: '600px 0px' });
+          observer.observe(row); return;
+        }
+
+        ready();
+      }
+      var media="";
+      if (media && window.matchMedia) {
+        var query=window.matchMedia(media);
+        if (!query.matches) {
+          var onChange=function(event){
+            if (!event.matches) return;
+            if (query.removeEventListener) query.removeEventListener('change', onChange);
+            else if (query.removeListener) query.removeListener(onChange);
+            load();
+          };
+          if (query.addEventListener) query.addEventListener('change', onChange);
+          else if (query.addListener) query.addListener(onChange);
+          return;
+        }
+      }
+      load();
     })();
     </script>
   </div><a href="/Dunk Shot.html" class="game-card" title="Play Dunk Shot Unblocked Free Online" onclick="trackRecentGame('Dunk Shot')">
@@ -1970,19 +2061,47 @@ footer {
     </div>
   </section>
 
-  <div class="bottom-leaderboard-ad">
+  <div class="bottom-leaderboard-ad" role="complementary" aria-label="Advertisement">
     <div id="mmt-74d3975a-b756-41a9-94fe-689c862500d6"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
       var slot="74d3975a-b756-41a9-94fe-689c862500d6";
       var row=document.currentScript&&document.currentScript.parentElement;
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      var requested=false;
+      function push(){
+        if (requested) return;
+        requested=true;
+        $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); });
+      }
       function ready(){ (window.__adsReady||function(c){c();})(push); }
-      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
-      new IntersectionObserver(function(entries, obs){
-        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
-      }, { rootMargin: '800px 0px' }).observe(row);
+      function load(){
+        if (row && 'IntersectionObserver' in window) {
+          var observer=new IntersectionObserver(function(entries){
+            if (!entries[0].isIntersecting) return;
+            observer.disconnect(); ready();
+          }, { rootMargin: '600px 0px' });
+          observer.observe(row); return;
+        }
+
+        ready();
+      }
+      var media="";
+      if (media && window.matchMedia) {
+        var query=window.matchMedia(media);
+        if (!query.matches) {
+          var onChange=function(event){
+            if (!event.matches) return;
+            if (query.removeEventListener) query.removeEventListener('change', onChange);
+            else if (query.removeListener) query.removeListener(onChange);
+            load();
+          };
+          if (query.addEventListener) query.addEventListener('change', onChange);
+          else if (query.addListener) query.addListener(onChange);
+          return;
+        }
+      }
+      load();
     })();
     </script>
   </div>
@@ -2164,8 +2283,7 @@ footer {
       if (typeof gtag !== 'undefined') {
         gtag('event', 'game_started', {
           game_name: 'Henry Stickmin Escaping The Prison',
-          game_folder: 'Henry Stickmin Escaping The Prison',
-          session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          game_folder: 'Henry Stickmin Escaping The Prison'
         });
       }
 
@@ -2429,13 +2547,13 @@ footer {
 
   </script>
 
-  
+
 
   <!-- Cookie Consent Banner -->
   <link rel="stylesheet" href="assets/cookie-consent.css">
   <script src="assets/cookie-consent.js"></script>
 
-  <div class="footer-inscreen-ad" id="footerInScreenAd" hidden>
+  <div class="footer-inscreen-ad" id="footerInScreenAd" role="complementary" aria-label="Advertisement" hidden>
     <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="window.__closeFooterAd()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
@@ -2459,12 +2577,28 @@ footer {
     try { dismissed = sessionStorage.getItem(DISMISS_KEY) === '1'; } catch (e) {}
     if (dismissed) { el.remove(); return; }
 
-    function push(){
-      $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
-      $MMT.cmd.push(function(){ $MMT.display.slots.push(["bd025b48-54d2-4cff-88c7-33f195987398"]); });
+    function reveal(){
+      if (!el.hidden) return;
       el.hidden = false;
       document.body.classList.add('has-footer-ad');
       requestAnimationFrame(function(){ el.classList.add('footer-inscreen-ad--visible'); });
+    }
+    function watchForFill(){
+      var slot = el.querySelector('.footer-inscreen-ad__slot');
+      function filled(){ return !!slot.querySelector('iframe, img, video, object, embed'); }
+      if (filled()) { reveal(); return; }
+      if (!('MutationObserver' in window)) { reveal(); return; }
+      var observer = new MutationObserver(function(){
+        if (!filled()) return;
+        observer.disconnect(); reveal();
+      });
+      observer.observe(slot, { childList: true, subtree: true });
+      setTimeout(function(){ observer.disconnect(); }, 15000);
+    }
+    function push(){
+      $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+      $MMT.cmd.push(function(){ $MMT.display.slots.push(["bd025b48-54d2-4cff-88c7-33f195987398"]); });
+      watchForFill();
     }
     function ready(){ (window.__adsReady||function(c){c();})(push); }
     if ('requestIdleCallback' in window) { requestIdleCallback(ready, { timeout: 3000 }); }

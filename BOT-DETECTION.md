@@ -8,13 +8,13 @@ The implementation lives in `assets/bot-detector.js`.
 
 ## How it works
 
-1. On the first page load of a session, `assets/bot-detector.js` shows a full-screen Cloudflare-style interstitial.
+1. On the first page load of a session, `assets/bot-detector.js` runs Turnstile invisibly and only reveals the full-screen interstitial if interaction is required.
 2. The interstitial mounts the official Turnstile widget pointing at sitekey `0x4AAAAAADFYVNcBHQbRjSvj`.
 3. When the widget fires its success callback, the script:
    - Records `cf_turnstile_verified=1` in `sessionStorage`.
    - Dismisses the overlay.
    - Releases any `botDetector.onVerified()` callbacks.
-4. AdSense is only injected once `window.botDetector.shouldBlockAds()` returns `false`. While the visitor is unverified, the AdSense script and `(adsbygoogle = …).push({})` calls are skipped.
+4. The active ad-network script and every slot request wait until `window.botDetector.shouldBlockAds()` returns `false`.
 5. Subsequent navigations within the same tab session reuse the cached verification and skip the interstitial.
 
 There is no client-side fingerprinting, scoring, or math challenge — the entire decision is delegated to Turnstile.
@@ -25,16 +25,17 @@ There is no client-side fingerprinting, scoring, or math challenge — the entir
 
 | Method | Returns | Description |
 | --- | --- | --- |
-| `shouldBlockAds()` | `boolean` | `true` until the visitor has cleared Turnstile this session. Used by index/game pages to gate AdSense. |
+| `shouldBlockAds()` | `boolean` | `true` until the visitor has cleared Turnstile this session. Used by index/game pages to gate the active ad network. |
 | `isVerified()` | `boolean` | `true` once Turnstile has succeeded this session. |
 | `onVerified(cb)` | `void` | Registers a callback fired once when verification succeeds (or immediately if already verified). |
 
 ## Files
 
 - `assets/bot-detector.js` — Turnstile loader, interstitial UI, and `window.botDetector` shim.
-- `src/generators/indexGenerator.js` — emits the `<script src="assets/bot-detector.js">` tag and gates the AdSense loader behind `shouldBlockAds()`.
-- `src/generators/gamePageGenerator.js` — same wiring for individual game pages (uses `../assets/bot-detector.js`).
-- `templates/client.js` — runtime ad initialization also checks `shouldBlockAds()` before pushing to `adsbygoogle`.
+- `src/generators/indexGenerator.js` — emits the `<script src="assets/bot-detector.js">` tag.
+- `src/generators/gamePageGenerator.js` — uses the same root-level asset path on individual game pages.
+- `src/utils/adProviders.js` — gates the provider library and slot requests behind `onVerified()`.
+- `templates/client.js` — routes dynamically inserted AdSense slots through the shared request helper.
 
 ## Configuration
 
@@ -48,7 +49,7 @@ To rotate the key, edit that constant. No regeneration of the HTML pages is requ
 
 ## Server-side verification
 
-This site is hosted on GitHub Pages, so there is no server to verify the Turnstile token against `https://challenges.cloudflare.com/turnstile/v0/siteverify`. A determined attacker who instruments the page can therefore mark themselves as verified without solving the challenge. If end-to-end verification is desired later, deploy a small Cloudflare Worker (or any serverless function) that:
+This site is hosted on GitHub Pages, so there is no server to verify the Turnstile token against `https://challenges.cloudflare.com/turnstile/v0/siteverify`. Cloudflare requires server-side validation for a security boundary; the current client-only implementation is therefore a traffic-quality deterrent, not authoritative bot verification. A determined attacker who instruments the page can mark themselves as verified without solving the challenge. For end-to-end verification, deploy a small Cloudflare Worker (or another serverless function) that:
 
 1. Accepts the token from the browser.
 2. POSTs `{ secret, response: token }` to `https://challenges.cloudflare.com/turnstile/v0/siteverify`.
@@ -56,4 +57,4 @@ This site is hosted on GitHub Pages, so there is no server to verify the Turnsti
 
 ## Privacy
 
-Turnstile is privacy-preserving by design — it does not require cookies and does not collect personal data. See Cloudflare's [Turnstile privacy policy](https://www.cloudflare.com/privacypolicy/) for details. The only thing this site stores locally is `sessionStorage["cf_turnstile_verified"] = "1"` so the interstitial does not reappear during the same tab session.
+Turnstile does not require this site to set a long-lived verification cookie. See Cloudflare's [privacy policy](https://www.cloudflare.com/privacypolicy/) for its data practices. This implementation stores `sessionStorage["cf_turnstile_verified"] = "1"` so the check does not reappear during the same tab session.

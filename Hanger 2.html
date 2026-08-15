@@ -59,7 +59,7 @@
   <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net">
 
   <!-- Cloudflare Turnstile verification gate (must load before ads) -->
-  <script src="../assets/bot-detector.js"></script>
+  <script src="assets/bot-detector.js"></script>
 
   <!-- Google Consent Mode v2: default denied, restore saved choice -->
   <script>
@@ -89,21 +89,12 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
   <script>
     gtag('js', new Date());
-    gtag('config', 'G-4QZLTDX504');
+    gtag('config', 'G-4QZLTDX504', { send_page_view: false });
   </script>
 
-  <!-- Ad network main script: starts loading early, in parallel with Turnstile -->
+  <!-- Ad network runtime: verified library load + deduplicated slot requests -->
   <script>
     (function(){
-      if (!window.__adNetworkLoaded) {
-        window.__adNetworkLoaded = true;
-        var s = document.createElement('script');
-        s.src = "https://monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js";
-        s.async=true;s.setAttribute('data-cfasync','false');
-        document.head.appendChild(s);
-      }
-      // Gate actual ad requests on verification so the warmed-up library
-      // doesn't serve ads to unverified/bot traffic.
       window.__adsReady = function(cb){
         var bd = window.botDetector;
         if (!bd) return cb();
@@ -111,79 +102,41 @@
         if (typeof bd.onVerified === 'function') return bd.onVerified(cb);
         cb();
       };
+      function loadAdNetwork(){
+        if (window.__adNetworkLoaded) return;
+        window.__adNetworkLoaded = true;
+        var s = document.createElement('script');
+        s.src = "https://monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js";
+        s.async=true;s.setAttribute('data-cfasync','false');
+        document.head.appendChild(s);
+      }
+      // The preload hint fetches the library early, but execution waits for
+      // verification because some networks discover and request slots as soon
+      // as their main script runs.
+      window.__adsReady(loadAdNetwork);
+
     })();
   </script>
 
-  
+
 <script>
-  // Simple Analytics Tracking - Core Metrics Only
+  // One explicit page_view per generated page. GA owns its own session and
+  // user identifiers, so the site does not create parallel tracking IDs.
   (function() {
-    // Session management (for proper user tracking, but no extra events)
-    function getSessionId() {
-      const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes
-      let sessionData = sessionStorage.getItem('ga_session_data');
-
-      if (sessionData) {
-        try {
-          const data = JSON.parse(sessionData);
-          const now = Date.now();
-
-          // Check if session is still valid
-          if (now - data.lastActivity < SESSION_DURATION) {
-            data.lastActivity = now;
-            sessionStorage.setItem('ga_session_data', JSON.stringify(data));
-            return data.sessionId;
-          }
-        } catch (e) {
-          // Create new session on error
-        }
-      }
-
-      // Create new session
-      const newSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-      const newSessionData = {
-        sessionId: newSessionId,
-        startTime: Date.now(),
-        lastActivity: Date.now()
-      };
-      sessionStorage.setItem('ga_session_data', JSON.stringify(newSessionData));
-
-      return newSessionId;
-    }
-
-    // Get or create user ID for tracking across sessions
-    function getUserId() {
-      let userId = localStorage.getItem('ga_user_id');
-      if (!userId) {
-        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        localStorage.setItem('ga_user_id', userId);
-      }
-      return userId;
-    }
-
-    // Initialize session tracking (lightweight)
-    window.analyticsSession = {
-      sessionId: getSessionId(),
-      userId: getUserId()
-    };
-
-    // Track page view - SINGLE EVENT ONLY (no duplicates)
     function trackEnhancedPageView(pageType, pageName, additionalParams) {
       if (typeof gtag !== 'undefined') {
         gtag('event', 'page_view', {
           page_type: pageType,
           page_name: pageName,
-          session_id: window.analyticsSession.sessionId,
           ...additionalParams
         });
       }
     }
 
-    // Expose tracking function globally
     window.trackEnhancedPageView = trackEnhancedPageView;
   })();
 </script>
-  
+
 
   <!-- Google Fonts (async, non-blocking) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1590,14 +1543,41 @@ footer {
     </div>
   </header>
 
-  <div class="header-banner-ad">
+  <div class="header-banner-ad" role="complementary" aria-label="Advertisement">
     <div id="mmt-d56921e6-6064-44b4-85de-214e86cc24f8"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
       var slot="d56921e6-6064-44b4-85de-214e86cc24f8";
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
-      (window.__adsReady||function(c){c();})(push);
+      var row=document.currentScript&&document.currentScript.parentElement;
+      var requested=false;
+      function push(){
+        if (requested) return;
+        requested=true;
+        $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); });
+      }
+      function ready(){ (window.__adsReady||function(c){c();})(push); }
+      function load(){
+
+
+        ready();
+      }
+      var media="";
+      if (media && window.matchMedia) {
+        var query=window.matchMedia(media);
+        if (!query.matches) {
+          var onChange=function(event){
+            if (!event.matches) return;
+            if (query.removeEventListener) query.removeEventListener('change', onChange);
+            else if (query.removeListener) query.removeListener(onChange);
+            load();
+          };
+          if (query.addEventListener) query.addEventListener('change', onChange);
+          else if (query.addListener) query.addListener(onChange);
+          return;
+        }
+      }
+      load();
     })();
     </script>
   </div>
@@ -1611,14 +1591,41 @@ footer {
 
     <!-- Game Viewer -->
     <div class="game-container">
-      <div class="vertical-ad vertical-ad-left">
+      <div class="vertical-ad vertical-ad-left" role="complementary" aria-label="Advertisement">
       <div id="mmt-0f94f1df-dac8-4d55-b24e-3051d266c344"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
       var slot="0f94f1df-dac8-4d55-b24e-3051d266c344";
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
-      (window.__adsReady||function(c){c();})(push);
+      var row=document.currentScript&&document.currentScript.parentElement;
+      var requested=false;
+      function push(){
+        if (requested) return;
+        requested=true;
+        $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); });
+      }
+      function ready(){ (window.__adsReady||function(c){c();})(push); }
+      function load(){
+
+
+        ready();
+      }
+      var media="(min-width: 1280px)";
+      if (media && window.matchMedia) {
+        var query=window.matchMedia(media);
+        if (!query.matches) {
+          var onChange=function(event){
+            if (!event.matches) return;
+            if (query.removeEventListener) query.removeEventListener('change', onChange);
+            else if (query.removeListener) query.removeListener(onChange);
+            load();
+          };
+          if (query.addEventListener) query.addEventListener('change', onChange);
+          else if (query.addListener) query.addListener(onChange);
+          return;
+        }
+      }
+      load();
     })();
     </script>
     </div>
@@ -1685,54 +1692,82 @@ footer {
         <img class="thumb" src="games/Gold Digger FRVR/thumbnail.webp" alt="Play Gold Digger FRVR Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Gold Digger FRVR</div>
-    </a><a href="/Fireboy and Watergirl 1.html" class="game-card" title="Play Fireboy and Watergirl 1 Unblocked Free Online" onclick="trackRecentGame('Fireboy and Watergirl 1')">
-      <div class="thumb-container" style="--thumb-url: url('games/Fireboy and Watergirl 1/thumbnail.webp')">
-        <img class="thumb" src="games/Fireboy and Watergirl 1/thumbnail.webp" alt="Play Fireboy and Watergirl 1 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/FNAF 3.html" class="game-card" title="Play FNAF 3 Unblocked Free Online" onclick="trackRecentGame('FNAF 3')">
+      <div class="thumb-container" style="--thumb-url: url('games/FNAF 3/thumbnail.webp')">
+        <img class="thumb" src="games/FNAF 3/thumbnail.webp" alt="Play FNAF 3 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Fireboy and Watergirl 1</div>
+      <div class="card-title">FNAF 3</div>
     </a><a href="/Plants vs Zombies 2.html" class="game-card" title="Play Plants vs Zombies 2 Unblocked Free Online" onclick="trackRecentGame('Plants vs Zombies 2')">
       <div class="thumb-container" style="--thumb-url: url('games/Plants vs Zombies 2/thumbnail.webp')">
         <img class="thumb" src="games/Plants vs Zombies 2/thumbnail.webp" alt="Play Plants vs Zombies 2 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Plants vs Zombies 2</div>
-    </a><a href="/FNAF Pizzeria Simulator.html" class="game-card" title="Play FNAF Pizzeria Simulator Unblocked Free Online" onclick="trackRecentGame('FNAF Pizzeria Simulator')">
-      <div class="thumb-container" style="--thumb-url: url('games/FNAF Pizzeria Simulator/thumbnail.webp')">
-        <img class="thumb" src="games/FNAF Pizzeria Simulator/thumbnail.webp" alt="Play FNAF Pizzeria Simulator Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/FNAF 2.html" class="game-card" title="Play FNAF 2 Unblocked Free Online" onclick="trackRecentGame('FNAF 2')">
+      <div class="thumb-container" style="--thumb-url: url('games/FNAF 2/thumbnail.webp')">
+        <img class="thumb" src="games/FNAF 2/thumbnail.webp" alt="Play FNAF 2 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">FNAF Pizzeria Simulator</div>
+      <div class="card-title">FNAF 2</div>
     </a><a href="/Exit Path.html" class="game-card" title="Play Exit Path Unblocked Free Online" onclick="trackRecentGame('Exit Path')">
       <div class="thumb-container" style="--thumb-url: url('games/Exit Path/thumbnail.webp')">
         <img class="thumb" src="games/Exit Path/thumbnail.webp" alt="Play Exit Path Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Exit Path</div>
-    </a><a href="/Bounty of One.html" class="game-card" title="Play Bounty of One Unblocked Free Online" onclick="trackRecentGame('Bounty of One')">
-      <div class="thumb-container" style="--thumb-url: url('games/Bounty of One/thumbnail.webp')">
-        <img class="thumb" src="games/Bounty of One/thumbnail.webp" alt="Play Bounty of One Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Bowmasters.html" class="game-card" title="Play Bowmasters Unblocked Free Online" onclick="trackRecentGame('Bowmasters')">
+      <div class="thumb-container" style="--thumb-url: url('games/Bowmasters/thumbnail.webp')">
+        <img class="thumb" src="games/Bowmasters/thumbnail.webp" alt="Play Bowmasters Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Bounty of One</div>
+      <div class="card-title">Bowmasters</div>
     </a><a href="/The Deadset.html" class="game-card" title="Play The Deadset Unblocked Free Online" onclick="trackRecentGame('The Deadset')">
       <div class="thumb-container" style="--thumb-url: url('games/The Deadset/thumbnail.webp')">
         <img class="thumb" src="games/The Deadset/thumbnail.webp" alt="Play The Deadset Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">The Deadset</div>
-    </a><a href="/FNAF 4.html" class="game-card" title="Play FNAF 4 Unblocked Free Online" onclick="trackRecentGame('FNAF 4')">
-      <div class="thumb-container" style="--thumb-url: url('games/FNAF 4/thumbnail.webp')">
-        <img class="thumb" src="games/FNAF 4/thumbnail.webp" alt="Play FNAF 4 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/FNAF 1.html" class="game-card" title="Play FNAF 1 Unblocked Free Online" onclick="trackRecentGame('FNAF 1')">
+      <div class="thumb-container" style="--thumb-url: url('games/FNAF 1/thumbnail.webp')">
+        <img class="thumb" src="games/FNAF 1/thumbnail.webp" alt="Play FNAF 1 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">FNAF 4</div>
-    </a><div class="horizontal-ad-row" data-ad-index="0">
+      <div class="card-title">FNAF 1</div>
+    </a><div class="horizontal-ad-row" data-ad-index="0" role="complementary" aria-label="Advertisement">
     <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
       var slot="152f0341-dbcb-4430-ab30-d9860e3bccfa";
       var row=document.currentScript&&document.currentScript.parentElement;
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      var requested=false;
+      function push(){
+        if (requested) return;
+        requested=true;
+        $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); });
+      }
       function ready(){ (window.__adsReady||function(c){c();})(push); }
-      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
-      new IntersectionObserver(function(entries, obs){
-        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
-      }, { rootMargin: '800px 0px' }).observe(row);
+      function load(){
+        if (row && 'IntersectionObserver' in window) {
+          var observer=new IntersectionObserver(function(entries){
+            if (!entries[0].isIntersecting) return;
+            observer.disconnect(); ready();
+          }, { rootMargin: '600px 0px' });
+          observer.observe(row); return;
+        }
+
+        ready();
+      }
+      var media="";
+      if (media && window.matchMedia) {
+        var query=window.matchMedia(media);
+        if (!query.matches) {
+          var onChange=function(event){
+            if (!event.matches) return;
+            if (query.removeEventListener) query.removeEventListener('change', onChange);
+            else if (query.removeListener) query.removeListener(onChange);
+            load();
+          };
+          if (query.addEventListener) query.addEventListener('change', onChange);
+          else if (query.addListener) query.addListener(onChange);
+          return;
+        }
+      }
+      load();
     })();
     </script>
   </div><a href="/Age Of War.html" class="game-card" title="Play Age Of War Unblocked Free Online" onclick="trackRecentGame('Age Of War')">
@@ -1760,21 +1795,21 @@ footer {
         <img class="thumb" src="games/Roulette Hero/thumbnail.webp" alt="Play Roulette Hero Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Roulette Hero</div>
-    </a><a href="/Cluster Rush.html" class="game-card" title="Play Cluster Rush Unblocked Free Online" onclick="trackRecentGame('Cluster Rush')">
-      <div class="thumb-container" style="--thumb-url: url('games/Cluster Rush/thumbnail.webp')">
-        <img class="thumb" src="games/Cluster Rush/thumbnail.webp" alt="Play Cluster Rush Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Cookie Clicker.html" class="game-card" title="Play Cookie Clicker Unblocked Free Online" onclick="trackRecentGame('Cookie Clicker')">
+      <div class="thumb-container" style="--thumb-url: url('games/Cookie Clicker/thumbnail.webp')">
+        <img class="thumb" src="games/Cookie Clicker/thumbnail.webp" alt="Play Cookie Clicker Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Cluster Rush</div>
+      <div class="card-title">Cookie Clicker</div>
     </a><a href="/Extreme Run 3D.html" class="game-card" title="Play Extreme Run 3D Unblocked Free Online" onclick="trackRecentGame('Extreme Run 3D')">
       <div class="thumb-container" style="--thumb-url: url('games/Extreme Run 3D/thumbnail.webp')">
         <img class="thumb" src="games/Extreme Run 3D/thumbnail.webp" alt="Play Extreme Run 3D Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Extreme Run 3D</div>
-    </a><a href="/Crank It!.html" class="game-card" title="Play Crank It! Unblocked Free Online" onclick="trackRecentGame('Crank It!')">
-      <div class="thumb-container" style="--thumb-url: url('games/Crank It!/thumbnail.webp')">
-        <img class="thumb" src="games/Crank It!/thumbnail.webp" alt="Play Crank It! Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Crazy Cars.html" class="game-card" title="Play Crazy Cars Unblocked Free Online" onclick="trackRecentGame('Crazy Cars')">
+      <div class="thumb-container" style="--thumb-url: url('games/Crazy Cars/thumbnail.webp')">
+        <img class="thumb" src="games/Crazy Cars/thumbnail.webp" alt="Play Crazy Cars Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Crank It!</div>
+      <div class="card-title">Crazy Cars</div>
     </a><a href="/Tiny Fishing.html" class="game-card" title="Play Tiny Fishing Unblocked Free Online" onclick="trackRecentGame('Tiny Fishing')">
       <div class="thumb-container" style="--thumb-url: url('games/Tiny Fishing/thumbnail.webp')">
         <img class="thumb" src="games/Tiny Fishing/thumbnail.webp" alt="Play Tiny Fishing Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -1790,24 +1825,52 @@ footer {
         <img class="thumb" src="games/Zombie Rush/thumbnail.webp" alt="Play Zombie Rush Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Zombie Rush</div>
-    </a><a href="/Clear Vision 2.html" class="game-card" title="Play Clear Vision 2 Unblocked Free Online" onclick="trackRecentGame('Clear Vision 2')">
-      <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 2/thumbnail.webp')">
-        <img class="thumb" src="games/Clear Vision 2/thumbnail.webp" alt="Play Clear Vision 2 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Clear Vision 3.html" class="game-card" title="Play Clear Vision 3 Unblocked Free Online" onclick="trackRecentGame('Clear Vision 3')">
+      <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 3/thumbnail.webp')">
+        <img class="thumb" src="games/Clear Vision 3/thumbnail.webp" alt="Play Clear Vision 3 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Clear Vision 2</div>
-    </a><div class="horizontal-ad-row" data-ad-index="1">
+      <div class="card-title">Clear Vision 3</div>
+    </a><div class="horizontal-ad-row" data-ad-index="1" role="complementary" aria-label="Advertisement">
     <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
       var slot="152f0341-dbcb-4430-ab30-d9860e3bccfa";
       var row=document.currentScript&&document.currentScript.parentElement;
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      var requested=false;
+      function push(){
+        if (requested) return;
+        requested=true;
+        $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); });
+      }
       function ready(){ (window.__adsReady||function(c){c();})(push); }
-      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
-      new IntersectionObserver(function(entries, obs){
-        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
-      }, { rootMargin: '800px 0px' }).observe(row);
+      function load(){
+        if (row && 'IntersectionObserver' in window) {
+          var observer=new IntersectionObserver(function(entries){
+            if (!entries[0].isIntersecting) return;
+            observer.disconnect(); ready();
+          }, { rootMargin: '600px 0px' });
+          observer.observe(row); return;
+        }
+
+        ready();
+      }
+      var media="";
+      if (media && window.matchMedia) {
+        var query=window.matchMedia(media);
+        if (!query.matches) {
+          var onChange=function(event){
+            if (!event.matches) return;
+            if (query.removeEventListener) query.removeEventListener('change', onChange);
+            else if (query.removeListener) query.removeListener(onChange);
+            load();
+          };
+          if (query.addEventListener) query.addEventListener('change', onChange);
+          else if (query.addListener) query.addListener(onChange);
+          return;
+        }
+      }
+      load();
     })();
     </script>
   </div><a href="/Meme Soundboard.html" class="game-card" title="Play Meme Soundboard Unblocked Free Online" onclick="trackRecentGame('Meme Soundboard')">
@@ -1835,21 +1898,21 @@ footer {
         <img class="thumb" src="games/Burger and Frights/thumbnail.webp" alt="Play Burger and Frights Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Burger and Frights</div>
-    </a><a href="/CS Go Clicker.html" class="game-card" title="Play CS Go Clicker Unblocked Free Online" onclick="trackRecentGame('CS Go Clicker')">
-      <div class="thumb-container" style="--thumb-url: url('games/CS Go Clicker/thumbnail.webp')">
-        <img class="thumb" src="games/CS Go Clicker/thumbnail.webp" alt="Play CS Go Clicker Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Capybara Clicker.html" class="game-card" title="Play Capybara Clicker Unblocked Free Online" onclick="trackRecentGame('Capybara Clicker')">
+      <div class="thumb-container" style="--thumb-url: url('games/Capybara Clicker/thumbnail.webp')">
+        <img class="thumb" src="games/Capybara Clicker/thumbnail.webp" alt="Play Capybara Clicker Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">CS Go Clicker</div>
-    </a><a href="/Five Nights at Wilsons.html" class="game-card" title="Play Five Nights at Wilsons Unblocked Free Online" onclick="trackRecentGame('Five Nights at Wilsons')">
-      <div class="thumb-container" style="--thumb-url: url('games/Five Nights at Wilsons/thumbnail.webp')">
-        <img class="thumb" src="games/Five Nights at Wilsons/thumbnail.webp" alt="Play Five Nights at Wilsons Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+      <div class="card-title">Capybara Clicker</div>
+    </a><a href="/FNAF Pizzeria Simulator.html" class="game-card" title="Play FNAF Pizzeria Simulator Unblocked Free Online" onclick="trackRecentGame('FNAF Pizzeria Simulator')">
+      <div class="thumb-container" style="--thumb-url: url('games/FNAF Pizzeria Simulator/thumbnail.webp')">
+        <img class="thumb" src="games/FNAF Pizzeria Simulator/thumbnail.webp" alt="Play FNAF Pizzeria Simulator Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Five Nights at Wilsons</div>
-    </a><a href="/FNAF 1.html" class="game-card" title="Play FNAF 1 Unblocked Free Online" onclick="trackRecentGame('FNAF 1')">
-      <div class="thumb-container" style="--thumb-url: url('games/FNAF 1/thumbnail.webp')">
-        <img class="thumb" src="games/FNAF 1/thumbnail.webp" alt="Play FNAF 1 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+      <div class="card-title">FNAF Pizzeria Simulator</div>
+    </a><a href="/Fireboy and Watergirl 1.html" class="game-card" title="Play Fireboy and Watergirl 1 Unblocked Free Online" onclick="trackRecentGame('Fireboy and Watergirl 1')">
+      <div class="thumb-container" style="--thumb-url: url('games/Fireboy and Watergirl 1/thumbnail.webp')">
+        <img class="thumb" src="games/Fireboy and Watergirl 1/thumbnail.webp" alt="Play Fireboy and Watergirl 1 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">FNAF 1</div>
+      <div class="card-title">Fireboy and Watergirl 1</div>
     </a><a href="/Dreader.html" class="game-card" title="Play Dreader Unblocked Free Online" onclick="trackRecentGame('Dreader')">
       <div class="thumb-container" style="--thumb-url: url('games/Dreader/thumbnail.webp')">
         <img class="thumb" src="games/Dreader/thumbnail.webp" alt="Play Dreader Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -1870,19 +1933,47 @@ footer {
         <img class="thumb" src="games/Lone Wolf/thumbnail.webp" alt="Play Lone Wolf Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Lone Wolf</div>
-    </a><div class="horizontal-ad-row" data-ad-index="2">
+    </a><div class="horizontal-ad-row" data-ad-index="2" role="complementary" aria-label="Advertisement">
     <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
       var slot="152f0341-dbcb-4430-ab30-d9860e3bccfa";
       var row=document.currentScript&&document.currentScript.parentElement;
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      var requested=false;
+      function push(){
+        if (requested) return;
+        requested=true;
+        $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); });
+      }
       function ready(){ (window.__adsReady||function(c){c();})(push); }
-      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
-      new IntersectionObserver(function(entries, obs){
-        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
-      }, { rootMargin: '800px 0px' }).observe(row);
+      function load(){
+        if (row && 'IntersectionObserver' in window) {
+          var observer=new IntersectionObserver(function(entries){
+            if (!entries[0].isIntersecting) return;
+            observer.disconnect(); ready();
+          }, { rootMargin: '600px 0px' });
+          observer.observe(row); return;
+        }
+
+        ready();
+      }
+      var media="";
+      if (media && window.matchMedia) {
+        var query=window.matchMedia(media);
+        if (!query.matches) {
+          var onChange=function(event){
+            if (!event.matches) return;
+            if (query.removeEventListener) query.removeEventListener('change', onChange);
+            else if (query.removeListener) query.removeListener(onChange);
+            load();
+          };
+          if (query.addEventListener) query.addEventListener('change', onChange);
+          else if (query.addListener) query.addListener(onChange);
+          return;
+        }
+      }
+      load();
     })();
     </script>
   </div><a href="/Punch the Trump.html" class="game-card" title="Play Punch the Trump Unblocked Free Online" onclick="trackRecentGame('Punch the Trump')">
@@ -1895,21 +1986,21 @@ footer {
         <img class="thumb" src="games/Little Alchemy 2/thumbnail.webp" alt="Play Little Alchemy 2 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Little Alchemy 2</div>
-    </a><a href="/Blockcraft Parkour.html" class="game-card" title="Play Blockcraft Parkour Unblocked Free Online" onclick="trackRecentGame('Blockcraft Parkour')">
-      <div class="thumb-container" style="--thumb-url: url('games/Blockcraft Parkour/thumbnail.webp')">
-        <img class="thumb" src="games/Blockcraft Parkour/thumbnail.webp" alt="Play Blockcraft Parkour Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Bloodmoney 2.html" class="game-card" title="Play Bloodmoney 2 Unblocked Free Online" onclick="trackRecentGame('Bloodmoney 2')">
+      <div class="thumb-container" style="--thumb-url: url('games/Bloodmoney 2/thumbnail.webp')">
+        <img class="thumb" src="games/Bloodmoney 2/thumbnail.webp" alt="Play Bloodmoney 2 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Blockcraft Parkour</div>
-    </a><a href="/Cookie Clicker.html" class="game-card" title="Play Cookie Clicker Unblocked Free Online" onclick="trackRecentGame('Cookie Clicker')">
-      <div class="thumb-container" style="--thumb-url: url('games/Cookie Clicker/thumbnail.webp')">
-        <img class="thumb" src="games/Cookie Clicker/thumbnail.webp" alt="Play Cookie Clicker Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+      <div class="card-title">Bloodmoney 2</div>
+    </a><a href="/Crank It!.html" class="game-card" title="Play Crank It! Unblocked Free Online" onclick="trackRecentGame('Crank It!')">
+      <div class="thumb-container" style="--thumb-url: url('games/Crank It!/thumbnail.webp')">
+        <img class="thumb" src="games/Crank It!/thumbnail.webp" alt="Play Crank It! Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Cookie Clicker</div>
-    </a><a href="/Bob The Robber.html" class="game-card" title="Play Bob The Robber Unblocked Free Online" onclick="trackRecentGame('Bob The Robber')">
-      <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber/thumbnail.webp')">
-        <img class="thumb" src="games/Bob The Robber/thumbnail.webp" alt="Play Bob The Robber Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+      <div class="card-title">Crank It!</div>
+    </a><a href="/Bouncy Basketball.html" class="game-card" title="Play Bouncy Basketball Unblocked Free Online" onclick="trackRecentGame('Bouncy Basketball')">
+      <div class="thumb-container" style="--thumb-url: url('games/Bouncy Basketball/thumbnail.webp')">
+        <img class="thumb" src="games/Bouncy Basketball/thumbnail.webp" alt="Play Bouncy Basketball Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Bob The Robber</div>
+      <div class="card-title">Bouncy Basketball</div>
     </a><a href="/Henry Stickmin Infiltrating The Airship.html" class="game-card" title="Play Henry Stickmin Infiltrating The Airship Unblocked Free Online" onclick="trackRecentGame('Henry Stickmin Infiltrating The Airship')">
       <div class="thumb-container" style="--thumb-url: url('games/Henry Stickmin Infiltrating The Airship/thumbnail.webp')">
         <img class="thumb" src="games/Henry Stickmin Infiltrating The Airship/thumbnail.webp" alt="Play Henry Stickmin Infiltrating The Airship Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -1970,19 +2061,47 @@ footer {
     </div>
   </section>
 
-  <div class="bottom-leaderboard-ad">
+  <div class="bottom-leaderboard-ad" role="complementary" aria-label="Advertisement">
     <div id="mmt-74d3975a-b756-41a9-94fe-689c862500d6"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
       var slot="74d3975a-b756-41a9-94fe-689c862500d6";
       var row=document.currentScript&&document.currentScript.parentElement;
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      var requested=false;
+      function push(){
+        if (requested) return;
+        requested=true;
+        $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); });
+      }
       function ready(){ (window.__adsReady||function(c){c();})(push); }
-      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
-      new IntersectionObserver(function(entries, obs){
-        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
-      }, { rootMargin: '800px 0px' }).observe(row);
+      function load(){
+        if (row && 'IntersectionObserver' in window) {
+          var observer=new IntersectionObserver(function(entries){
+            if (!entries[0].isIntersecting) return;
+            observer.disconnect(); ready();
+          }, { rootMargin: '600px 0px' });
+          observer.observe(row); return;
+        }
+
+        ready();
+      }
+      var media="";
+      if (media && window.matchMedia) {
+        var query=window.matchMedia(media);
+        if (!query.matches) {
+          var onChange=function(event){
+            if (!event.matches) return;
+            if (query.removeEventListener) query.removeEventListener('change', onChange);
+            else if (query.removeListener) query.removeListener(onChange);
+            load();
+          };
+          if (query.addEventListener) query.addEventListener('change', onChange);
+          else if (query.addListener) query.addListener(onChange);
+          return;
+        }
+      }
+      load();
     })();
     </script>
   </div>
@@ -2164,8 +2283,7 @@ footer {
       if (typeof gtag !== 'undefined') {
         gtag('event', 'game_started', {
           game_name: 'Hanger 2',
-          game_folder: 'Hanger 2',
-          session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          game_folder: 'Hanger 2'
         });
       }
 
@@ -2429,13 +2547,13 @@ footer {
 
   </script>
 
-  
+
 
   <!-- Cookie Consent Banner -->
   <link rel="stylesheet" href="assets/cookie-consent.css">
   <script src="assets/cookie-consent.js"></script>
 
-  <div class="footer-inscreen-ad" id="footerInScreenAd" hidden>
+  <div class="footer-inscreen-ad" id="footerInScreenAd" role="complementary" aria-label="Advertisement" hidden>
     <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="window.__closeFooterAd()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
@@ -2459,12 +2577,28 @@ footer {
     try { dismissed = sessionStorage.getItem(DISMISS_KEY) === '1'; } catch (e) {}
     if (dismissed) { el.remove(); return; }
 
-    function push(){
-      $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
-      $MMT.cmd.push(function(){ $MMT.display.slots.push(["bd025b48-54d2-4cff-88c7-33f195987398"]); });
+    function reveal(){
+      if (!el.hidden) return;
       el.hidden = false;
       document.body.classList.add('has-footer-ad');
       requestAnimationFrame(function(){ el.classList.add('footer-inscreen-ad--visible'); });
+    }
+    function watchForFill(){
+      var slot = el.querySelector('.footer-inscreen-ad__slot');
+      function filled(){ return !!slot.querySelector('iframe, img, video, object, embed'); }
+      if (filled()) { reveal(); return; }
+      if (!('MutationObserver' in window)) { reveal(); return; }
+      var observer = new MutationObserver(function(){
+        if (!filled()) return;
+        observer.disconnect(); reveal();
+      });
+      observer.observe(slot, { childList: true, subtree: true });
+      setTimeout(function(){ observer.disconnect(); }, 15000);
+    }
+    function push(){
+      $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+      $MMT.cmd.push(function(){ $MMT.display.slots.push(["bd025b48-54d2-4cff-88c7-33f195987398"]); });
+      watchForFill();
     }
     function ready(){ (window.__adsReady||function(c){c();})(push); }
     if ('requestIdleCallback' in window) { requestIdleCallback(ready, { timeout: 3000 }); }

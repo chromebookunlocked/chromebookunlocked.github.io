@@ -54,13 +54,10 @@ function generateAdNetworkHeadHints(adsEnabled, adProvider) {
 }
 
 /**
- * <head> script that (1) starts loading the ad network's main library
- * immediately — in parallel with the Turnstile challenge — so the framework
- * is initialized and connected to exchanges by the time verification clears,
- * and (2) exposes window.__adsReady(cb): a gate that runs cb only once the
- * visitor is verified (or right away if there's no bot detector). Ad slot
- * requests go through __adsReady so the library warms up early but no ads are
- * actually requested for unverified/bot traffic.
+ * <head> script that starts loading the active network asynchronously and
+ * exposes a single verification-aware request path for every ad slot. Keeping
+ * all requests behind this runtime prevents accidental double initialization
+ * and lets below-the-fold or desktop-only units wait until they can be viewed.
  */
 function generateAdNetworkHeadScript(adsEnabled, adProvider) {
   if (!adsEnabled) return '';
@@ -69,19 +66,67 @@ function generateAdNetworkHeadScript(adsEnabled, adProvider) {
   const extra = provider === 'monumetric'
     ? `s.async=true;s.setAttribute('data-cfasync','false');`
     : `s.async=true;s.crossOrigin='anonymous';`;
+  const adsenseRuntime = provider === 'adsense' ? `
+      window.__requestAdSenseSlot = function(ad){
+        if (!ad || ad.getAttribute('data-ad-requested') === '1' || ad.getAttribute('data-ad-pending') === '1') return;
+        ad.setAttribute('data-ad-pending', '1');
+        window.__adsReady(function(){
+          ad.removeAttribute('data-ad-pending');
+          if (!ad.isConnected || ad.getAttribute('data-ad-requested') === '1') return;
+          ad.setAttribute('data-ad-requested', '1');
+          try { (window.adsbygoogle = window.adsbygoogle || []).push({}); }
+          catch (e) { ad.removeAttribute('data-ad-requested'); }
+        });
+      };
 
-  return `<!-- Ad network main script: starts loading early, in parallel with Turnstile -->
+      window.__initAdSenseSlots = function(root){
+        var scope = root || document;
+        var ads = [];
+        if (scope.matches && scope.matches('ins.adsbygoogle')) ads.push(scope);
+        if (scope.querySelectorAll) {
+          ads = ads.concat(Array.prototype.slice.call(scope.querySelectorAll('ins.adsbygoogle')));
+        }
+
+        ads.forEach(function(ad){
+          if (ad.getAttribute('data-ad-watched') === '1') return;
+          ad.setAttribute('data-ad-watched', '1');
+
+          function schedule(){
+            var media = ad.getAttribute('data-ad-media');
+            if (media && window.matchMedia) {
+              var query = window.matchMedia(media);
+              if (!query.matches) {
+                var onChange = function(event){
+                  if (!event.matches) return;
+                  if (query.removeEventListener) query.removeEventListener('change', onChange);
+                  else if (query.removeListener) query.removeListener(onChange);
+                  schedule();
+                };
+                if (query.addEventListener) query.addEventListener('change', onChange);
+                else if (query.addListener) query.addListener(onChange);
+                return;
+              }
+            }
+
+            if (ad.getAttribute('data-ad-lazy') === 'true' && 'IntersectionObserver' in window) {
+              var observer = new IntersectionObserver(function(entries){
+                if (!entries[0].isIntersecting) return;
+                observer.disconnect();
+                window.__requestAdSenseSlot(ad);
+              }, { rootMargin: '600px 0px' });
+              observer.observe(ad);
+              return;
+            }
+            window.__requestAdSenseSlot(ad);
+          }
+
+          schedule();
+        });
+      };` : '';
+
+  return `<!-- Ad network runtime: verified library load + deduplicated slot requests -->
   <script>
     (function(){
-      if (!window.__adNetworkLoaded) {
-        window.__adNetworkLoaded = true;
-        var s = document.createElement('script');
-        s.src = ${JSON.stringify(src)};
-        ${extra}
-        document.head.appendChild(s);
-      }
-      // Gate actual ad requests on verification so the warmed-up library
-      // doesn't serve ads to unverified/bot traffic.
       window.__adsReady = function(cb){
         var bd = window.botDetector;
         if (!bd) return cb();
@@ -89,6 +134,19 @@ function generateAdNetworkHeadScript(adsEnabled, adProvider) {
         if (typeof bd.onVerified === 'function') return bd.onVerified(cb);
         cb();
       };
+      function loadAdNetwork(){
+        if (window.__adNetworkLoaded) return;
+        window.__adNetworkLoaded = true;
+        var s = document.createElement('script');
+        s.src = ${JSON.stringify(src)};
+        ${extra}
+        document.head.appendChild(s);
+      }
+      // The preload hint fetches the library early, but execution waits for
+      // verification because some networks discover and request slots as soon
+      // as their main script runs.
+      window.__adsReady(loadAdNetwork);
+      ${adsenseRuntime}
     })();
   </script>`;
 }
@@ -102,14 +160,9 @@ function generateAdNetworkInitScript(adsEnabled, adProvider) {
   const provider = normalizeProvider(adProvider);
   if (provider !== 'adsense') return '';
 
-  return `<!-- Initialize AdSense Ads -->
+  return `<!-- Initialize server-rendered AdSense slots once -->
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var ads = document.querySelectorAll('.horizontal-ad-row ins.adsbygoogle');
-      ads.forEach(function(ad) {
-        try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) {}
-      });
-    });
+    if (window.__initAdSenseSlots) window.__initAdSenseSlots(document);
   </script>`;
 }
 
@@ -128,46 +181,49 @@ function generateAdNetworkInitScript(adsEnabled, adProvider) {
 function monumetricSlot(slotId, opts) {
   const lazy = opts && opts.lazy === true;
   const idle = opts && opts.idle === true;
+  const media = opts && opts.media ? opts.media : '';
   const slotJson = JSON.stringify(slotId);
-
-  if (!lazy && !idle) {
-    return `<div id="mmt-${slotId}"></div>
-    <script type="text/javascript" data-cfasync="false">
-    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
-    (function(){
-      var slot=${slotJson};
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
-      (window.__adsReady||function(c){c();})(push);
-    })();
-    </script>`;
-  }
-
-  if (idle) {
-    return `<div id="mmt-${slotId}"></div>
-    <script type="text/javascript" data-cfasync="false">
-    $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
-    (function(){
-      var slot=${slotJson};
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
-      function ready(){ (window.__adsReady||function(c){c();})(push); }
-      if ('requestIdleCallback' in window) { requestIdleCallback(ready, { timeout: 3000 }); }
-      else { setTimeout(ready, 1200); }
-    })();
-    </script>`;
-  }
-
   return `<div id="mmt-${slotId}"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
       var slot=${slotJson};
       var row=document.currentScript&&document.currentScript.parentElement;
-      function push(){ $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); }); }
+      var requested=false;
+      function push(){
+        if (requested) return;
+        requested=true;
+        $MMT.cmd.push(function(){ $MMT.display.slots.push([slot]); });
+      }
       function ready(){ (window.__adsReady||function(c){c();})(push); }
-      if (!row || !('IntersectionObserver' in window)) { ready(); return; }
-      new IntersectionObserver(function(entries, obs){
-        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
-      }, { rootMargin: '800px 0px' }).observe(row);
+      function load(){
+        ${lazy ? `if (row && 'IntersectionObserver' in window) {
+          var observer=new IntersectionObserver(function(entries){
+            if (!entries[0].isIntersecting) return;
+            observer.disconnect(); ready();
+          }, { rootMargin: '600px 0px' });
+          observer.observe(row); return;
+        }` : ''}
+        ${idle ? `if ('requestIdleCallback' in window) { requestIdleCallback(ready, { timeout: 3000 }); return; }
+        setTimeout(ready, 1200); return;` : ''}
+        ready();
+      }
+      var media=${JSON.stringify(media)};
+      if (media && window.matchMedia) {
+        var query=window.matchMedia(media);
+        if (!query.matches) {
+          var onChange=function(event){
+            if (!event.matches) return;
+            if (query.removeEventListener) query.removeEventListener('change', onChange);
+            else if (query.removeListener) query.removeListener(onChange);
+            load();
+          };
+          if (query.addEventListener) query.addEventListener('change', onChange);
+          else if (query.addListener) query.addListener(onChange);
+          return;
+        }
+      }
+      load();
     })();
     </script>`;
 }
@@ -181,19 +237,19 @@ function generateHorizontalAd(adIndex, adsEnabled, adProvider) {
   const provider = normalizeProvider(adProvider);
 
   if (provider === 'monumetric') {
-    return `<div class="horizontal-ad-row" data-ad-index="${adIndex}">
+    return `<div class="horizontal-ad-row" data-ad-index="${adIndex}" role="complementary" aria-label="Advertisement">
     ${monumetricSlot(MONU_SLOTS.inContentRepeatable, { lazy: true })}
   </div>`;
   }
 
-  return `<div class="horizontal-ad-row" data-ad-index="${adIndex}">
+  return `<div class="horizontal-ad-row" data-ad-index="${adIndex}" role="complementary" aria-label="Advertisement">
     <ins class="adsbygoogle"
       style="display:block"
       data-ad-client="${ADSENSE_CLIENT}"
       data-ad-slot="${ADSENSE_HORIZONTAL_SLOT}"
       data-ad-format="auto"
+      data-ad-lazy="true"
       data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>`;
 }
 
@@ -213,19 +269,19 @@ function generateVerticalAd(adsEnabled, adProvider, side = 'left') {
       // Balancing spacer keeps the game viewer centered.
       return `<div class="vertical-ad vertical-ad-spacer" aria-hidden="true"></div>`;
     }
-    return `<div class="vertical-ad vertical-ad-${side}">
-      ${monumetricSlot(MONU_SLOTS.pillarLeft)}
+    return `<div class="vertical-ad vertical-ad-${side}" role="complementary" aria-label="Advertisement">
+      ${monumetricSlot(MONU_SLOTS.pillarLeft, { media: '(min-width: 1280px)' })}
     </div>`;
   }
 
-  return `<div class="vertical-ad vertical-ad-${side}">
+  return `<div class="vertical-ad vertical-ad-${side}" role="complementary" aria-label="Advertisement">
       <ins class="adsbygoogle"
         style="display:block"
         data-ad-client="${ADSENSE_CLIENT}"
         data-ad-slot="${ADSENSE_VERTICAL_SLOT}"
         data-ad-format="auto"
+        data-ad-media="(min-width: 1280px)"
         data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>`;
 }
 
@@ -236,7 +292,7 @@ function generateVerticalAd(adsEnabled, adProvider, side = 'left') {
 function generateHeaderBannerAd(adsEnabled, adProvider) {
   if (!adsEnabled) return '';
   if (normalizeProvider(adProvider) !== 'monumetric') return '';
-  return `<div class="header-banner-ad">
+  return `<div class="header-banner-ad" role="complementary" aria-label="Advertisement">
     ${monumetricSlot(MONU_SLOTS.headerInScreen)}
   </div>
   <script>document.body.classList.add('has-header-ad');</script>`;
@@ -249,7 +305,7 @@ function generateHeaderBannerAd(adsEnabled, adProvider) {
 function generateBottomLeaderboardAd(adsEnabled, adProvider) {
   if (!adsEnabled) return '';
   if (normalizeProvider(adProvider) !== 'monumetric') return '';
-  return `<div class="bottom-leaderboard-ad">
+  return `<div class="bottom-leaderboard-ad" role="complementary" aria-label="Advertisement">
     ${monumetricSlot(MONU_SLOTS.bottomLeaderboard, { lazy: true })}
   </div>`;
 }
@@ -262,7 +318,7 @@ function generateFooterInScreenAd(adsEnabled, adProvider) {
   if (!adsEnabled) return '';
   if (normalizeProvider(adProvider) !== 'monumetric') return '';
   const slotId = MONU_SLOTS.footerInScreen;
-  return `<div class="footer-inscreen-ad" id="footerInScreenAd" hidden>
+  return `<div class="footer-inscreen-ad" id="footerInScreenAd" role="complementary" aria-label="Advertisement" hidden>
     <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="window.__closeFooterAd()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
@@ -286,12 +342,28 @@ function generateFooterInScreenAd(adsEnabled, adProvider) {
     try { dismissed = sessionStorage.getItem(DISMISS_KEY) === '1'; } catch (e) {}
     if (dismissed) { el.remove(); return; }
 
-    function push(){
-      $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
-      $MMT.cmd.push(function(){ $MMT.display.slots.push([${JSON.stringify(slotId)}]); });
+    function reveal(){
+      if (!el.hidden) return;
       el.hidden = false;
       document.body.classList.add('has-footer-ad');
       requestAnimationFrame(function(){ el.classList.add('footer-inscreen-ad--visible'); });
+    }
+    function watchForFill(){
+      var slot = el.querySelector('.footer-inscreen-ad__slot');
+      function filled(){ return !!slot.querySelector('iframe, img, video, object, embed'); }
+      if (filled()) { reveal(); return; }
+      if (!('MutationObserver' in window)) { reveal(); return; }
+      var observer = new MutationObserver(function(){
+        if (!filled()) return;
+        observer.disconnect(); reveal();
+      });
+      observer.observe(slot, { childList: true, subtree: true });
+      setTimeout(function(){ observer.disconnect(); }, 15000);
+    }
+    function push(){
+      $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
+      $MMT.cmd.push(function(){ $MMT.display.slots.push([${JSON.stringify(slotId)}]); });
+      watchForFill();
     }
     function ready(){ (window.__adsReady||function(c){c();})(push); }
     if ('requestIdleCallback' in window) { requestIdleCallback(ready, { timeout: 3000 }); }

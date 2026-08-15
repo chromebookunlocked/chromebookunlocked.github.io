@@ -27,6 +27,12 @@ const gamesDir = path.join(__dirname, "games");
 const outputDir = __dirname; // Output directly to root directory
 const templatesDir = path.join(__dirname, "templates");
 
+// Template interpolation can leave indentation on otherwise blank lines.
+// Keep generated files deterministic and friendly to Git/CI checks.
+function cleanGeneratedHTML(html) {
+  return html.replace(/[ \t]+$/gm, "").replace(/\r\n?/g, "\n");
+}
+
 // Load ads configuration
 const adsConfigPath = path.join(__dirname, "ads-config.json");
 const adsConfig = JSON.parse(fs.readFileSync(adsConfigPath, "utf8"));
@@ -45,10 +51,15 @@ const botVerificationEnabled = adsConfig.botVerificationEnabled !== false;
 // config so subsequent builds remain consistent.
 const adsTxtPath = path.join(__dirname, "ads.txt");
 if (adsEnabled) {
-  const configContent = (adsConfig.adsTxtContent || "").replace(/\s+$/, "");
+  // Compare canonical LF content so a build on Windows does not rewrite the
+  // entire JSON config merely because ads.txt uses CRLF line endings.
+  const normalizeAdsTxt = (content) => String(content || "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/\s+$/, "");
+  const configContent = normalizeAdsTxt(adsConfig.adsTxtContent);
   let diskContent = null;
   if (fs.existsSync(adsTxtPath)) {
-    diskContent = fs.readFileSync(adsTxtPath, "utf8").replace(/\s+$/, "");
+    diskContent = normalizeAdsTxt(fs.readFileSync(adsTxtPath, "utf8"));
   }
 
   if (diskContent !== null && diskContent !== configContent) {
@@ -94,7 +105,7 @@ console.log("✅ Templates loaded\n");
 console.log("🏠 Generating main index page...");
 const indexHTML = generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir, adsEnabled, adProvider, botVerificationEnabled);
 const indexPath = path.join(outputDir, "index.html");
-fs.writeFileSync(indexPath, indexHTML);
+fs.writeFileSync(indexPath, cleanGeneratedHTML(indexHTML));
 console.log(`✅ Created ${indexPath}\n`);
 
 // Step 5: Generate individual game pages
@@ -104,7 +115,7 @@ let generatedCount = 0;
 games.forEach(game => {
   const gameHTML = generateGamePage(game, games, categories, gamePageStyles, gamesDir, adsEnabled, adProvider, botVerificationEnabled);
   const gamePagePath = path.join(outputDir, `${game.folder}.html`);
-  fs.writeFileSync(gamePagePath, gameHTML);
+  fs.writeFileSync(gamePagePath, cleanGeneratedHTML(gameHTML));
   generatedCount++;
 
   // Progress indicator

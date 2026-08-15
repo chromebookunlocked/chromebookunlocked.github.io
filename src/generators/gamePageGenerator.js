@@ -6,6 +6,7 @@ const { RECOMMENDED_GAMES_COUNT, MAX_RELATED_GAMES, GAME_DURATION_TRACKING_INTER
 const {
   generateAdNetworkHeadHints,
   generateAdNetworkHeadScript,
+  generateAdNetworkInitScript,
   generateHorizontalAd: providerHorizontalAd,
   generateVerticalAd: providerVerticalAd,
   generateHeaderBannerAd,
@@ -13,7 +14,7 @@ const {
   generateFooterInScreenAd
 } = require("../utils/adProviders");
 
-// Horizontal ad configuration: insert every 3 rows (3 × 6 = 18 games)
+// Horizontal ad configuration: insert every 2 desktop rows (2 × 6 = 12 games)
 const AD_INTERVAL = 12; // ad every 2 rows of 6
 
 function generateHorizontalAd(adIndex, adsEnabled = true, adProvider = 'adsense') {
@@ -110,7 +111,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
     recommendations.push(...moreRelated);
   }
 
-  // Generate recommended games HTML with horizontal ads every 3 rows
+  // Generate recommended games HTML with horizontal ads every 2 desktop rows
   let adCount = 0;
   let recommendedGamesHTML = '';
   recommendations.forEach((g, idx) => {
@@ -129,7 +130,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
       <div class="card-title">${escapedNameText}</div>
     </a>`;
 
-    // Insert a full-width horizontal ad every 3 rows (every 18 games)
+    // Insert a full-width horizontal ad every 2 desktop rows (every 12 games)
     if ((idx + 1) % AD_INTERVAL === 0) {
       recommendedGamesHTML += generateHorizontalAd(adCount, adsEnabled, adProvider);
       adCount++;
@@ -153,7 +154,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   ${generateAdNetworkHeadHints(adsEnabled, adProvider)}
 
   ${botVerificationEnabled ? `<!-- Cloudflare Turnstile verification gate (must load before ads) -->
-  <script src="../assets/bot-detector.js"></script>` : ''}
+  <script src="assets/bot-detector.js"></script>` : ''}
 
   ${generateConsentModeScript()}
 
@@ -161,7 +162,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
   <script>
     gtag('js', new Date());
-    gtag('config', 'G-4QZLTDX504');
+    gtag('config', 'G-4QZLTDX504', { send_page_view: false });
   </script>
 
   ${generateAdNetworkHeadScript(adsEnabled, adProvider)}
@@ -377,8 +378,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
       if (typeof gtag !== 'undefined') {
         gtag('event', 'game_started', {
           game_name: '${escapeJs(game.name)}',
-          game_folder: '${escapeJs(game.folder)}',
-          session_id: window.analyticsSession ? window.analyticsSession.sessionId : 'unknown'
+          game_folder: '${escapeJs(game.folder)}'
         });
       }
 
@@ -642,19 +642,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
   </script>
 
-  ${adsEnabled && adProvider === 'adsense' ? `<!-- Initialize AdSense Ads -->
-  <script>
-    (function() {
-      if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
-        var ads = document.querySelectorAll('.horizontal-ad-row ins.adsbygoogle');
-        for (var i = 0; i < ads.length; i++) {
-          try {
-            (adsbygoogle = window.adsbygoogle || []).push({});
-          } catch (e) {}
-        }
-      }
-    })();
-  </script>` : ''}
+  ${generateAdNetworkInitScript(adsEnabled, adProvider)}
 
   <!-- Cookie Consent Banner -->
   <link rel="stylesheet" href="assets/cookie-consent.css">

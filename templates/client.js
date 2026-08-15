@@ -59,7 +59,7 @@ function updateRecentlyPlayedNav() {
   }
 }
 
-// Horizontal ad configuration: every 3 rows (18 games at 6 columns)
+// Horizontal ad configuration: every 2 desktop rows (12 games at 6 columns)
 const AD_INTERVAL = window.__adInterval || 12;
 let adCount = window.__adCount || 0;
 
@@ -82,6 +82,8 @@ function createHorizontalAd(adIndex) {
   const div = document.createElement('div');
   div.className = 'horizontal-ad-row';
   div.setAttribute('data-ad-index', adIndex);
+  div.setAttribute('role', 'complementary');
+  div.setAttribute('aria-label', 'Advertisement');
 
   if (window.__adProvider === 'monumetric') {
     // In-Content Repeatable unit. Same id pattern as server-rendered slots
@@ -112,6 +114,7 @@ function createHorizontalAd(adIndex) {
       data-ad-client="ca-pub-1033412505744705"
       data-ad-slot="2719401053"
       data-ad-format="auto"
+      data-ad-lazy="true"
       data-full-width-responsive="true"></ins>`;
   }
   return div;
@@ -122,17 +125,9 @@ function createHorizontalAd(adIndex) {
  * @param {HTMLElement} adEl - The horizontal ad element
  */
 function initializeHorizontalAd(adEl) {
-  // Don't initialize ads if disabled or visitor hasn't passed Turnstile yet
   if (window.__adsEnabled === false) return;
-  if (window.botDetector && window.botDetector.shouldBlockAds()) {
-    return;
-  }
-
   if (window.__adProvider === 'monumetric') return;
-
-  try {
-    (adsbygoogle = window.adsbygoogle || []).push({});
-  } catch (e) {}
+  if (window.__initAdSenseSlots) window.__initAdSenseSlots(adEl);
 }
 
 // Cached DOM elements for performance
@@ -304,7 +299,7 @@ function loadMoreGames(count) {
         imageObserver.observe(img);
       }
 
-      // Insert a horizontal ad every 3 rows (every 18 games)
+      // Insert a horizontal ad every 2 desktop rows (every 12 games)
       if (shouldInsertAdAfter(i)) {
         const adEl = createHorizontalAd(adCount);
         fragment.appendChild(adEl);

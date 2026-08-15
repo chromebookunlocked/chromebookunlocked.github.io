@@ -1,7 +1,7 @@
 const { generateGameCard, generateHorizontalAd } = require('./cardGenerator');
 
 // Horizontal ad configuration
-// Insert a full-width horizontal ad every 3 rows (every 18 games at 6 columns)
+// Insert a full-width horizontal ad every 2 desktop rows (12 games at 6 columns)
 const COLS_PER_ROW = 6;
 const ROWS_PER_AD = 2;
 const AD_INTERVAL = COLS_PER_ROW * ROWS_PER_AD; // 18
@@ -30,7 +30,7 @@ const categoryIcons = {
   'Action': '⚔️',
   'Puzzle': '🧩',
   'Shooter': '🔫',
-  'Clickers': '👆',
+  'Clicker': '👆',
   'Horror': '👻',
   'Racing': '🏎️',
   'Adventure': '🗺️',
@@ -163,7 +163,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     .slice(0, 30)
     .map(g => g.folder);
 
-  // Generate initial game cards HTML with horizontal ads every 3 rows
+  // Generate initial game cards HTML with horizontal ads every 2 desktop rows
   let adCount = 0;
   let initialCardsHTML = '';
   initialGames.forEach((game, idx) => {
@@ -214,7 +214,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-4QZLTDX504"></script>
   <script>
     gtag('js', new Date());
-    gtag('config', 'G-4QZLTDX504');
+    gtag('config', 'G-4QZLTDX504', { send_page_view: false });
   </script>
 
   ${generateAdNetworkHeadScript(adsEnabled, adProvider)}
@@ -319,7 +319,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     window.__renderedCount = ${initialGameCount};
     window.__rowsPerLoad = ${ROWS_PER_LOAD};
     window.__scrollThreshold = ${SCROLL_THRESHOLD};
-    // Horizontal ad configuration (every 3 rows = 18 games at 6 columns)
+    // Horizontal ad configuration (every 2 desktop rows = 12 games)
     window.__adInterval = ${AD_INTERVAL};
     window.__adCount = ${adCount};
     // Newly Added games (folders list)
@@ -329,20 +329,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     window.__adProvider = ${JSON.stringify(adProvider)};
   </script>
 
-  ${adsEnabled && adProvider === 'adsense' ? `<!-- Initialize AdSense Ads -->
-  <script>
-    (function() {
-      if (!window.botDetector || !window.botDetector.shouldBlockAds()) {
-        // Initialize all server-rendered horizontal ad units
-        var ads = document.querySelectorAll('.horizontal-ad-row ins.adsbygoogle');
-        for (var i = 0; i < ads.length; i++) {
-          try {
-            (adsbygoogle = window.adsbygoogle || []).push({});
-          } catch (e) {}
-        }
-      }
-    })();
-  </script>` : ''}
+  ${generateAdNetworkInitScript(adsEnabled, adProvider)}
 
   <script>
     ${clientJS}
