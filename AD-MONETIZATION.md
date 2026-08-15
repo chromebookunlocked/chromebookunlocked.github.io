@@ -1,6 +1,6 @@
 # Ad monetization operations
 
-The site currently uses Monumetric, with AdSense retained as a generator-level fallback. Shared placement and loading behavior lives in `src/utils/adProviders.js`; generated HTML should not contain its own ad-request logic.
+The site uses Monumetric as its primary provider and AdSense as a script-failure fallback. Shared placement and loading behavior lives in `src/utils/adProviders.js`; generated HTML should not contain its own ad-request logic.
 
 ## Implementation invariants
 
@@ -9,6 +9,8 @@ The site currently uses Monumetric, with AdSense retained as a generator-level f
 - Do not auction desktop pillars below the 1280 px layout breakpoint.
 - Do not reveal the sticky footer container until a creative element exists, and respect dismissal for the tab session.
 - Keep ads separated from game controls and clearly exposed as advertisement landmarks.
+- Activate direct AdSense fallback inventory only when the Monumetric library fails to load. Ordinary no-fill should be handled by Monumetric demand or a network-configured passback, not by page code guessing whether a late creative will arrive.
+- Direct AdSense fallback is limited to in-content and bottom inventory. Do not put it in the game pillars or sticky unit, where touch-heavy gameplay raises accidental-click risk.
 - Run `npm run build`; the post-build validator checks every generated game page plus both provider paths.
 
 ## Required account-side setup

@@ -38,6 +38,9 @@ const adsConfigPath = path.join(__dirname, "ads-config.json");
 const adsConfig = JSON.parse(fs.readFileSync(adsConfigPath, "utf8"));
 const adsEnabled = adsConfig.adsEnabled !== false;
 const adProvider = adsConfig.adProvider === 'monumetric' ? 'monumetric' : 'adsense';
+const fallbackAdProvider = adProvider === 'monumetric' && adsConfig.fallbackAdProvider === 'adsense'
+  ? 'adsense'
+  : null;
 // Bot verification (Cloudflare Turnstile) gate. Defaults to on; set
 // "botVerificationEnabled": false in ads-config.json to load ads without
 // waiting for verification.
@@ -82,6 +85,7 @@ if (adsEnabled) {
 console.log("🚀 Starting build process...\n");
 console.log(`📢 Ads: ${adsEnabled ? "ENABLED" : "DISABLED"}`);
 console.log(`📊 Provider: ${adsEnabled ? adProvider.toUpperCase() : "n/a"}`);
+console.log(`🛟 Fallback: ${adsEnabled && fallbackAdProvider ? fallbackAdProvider.toUpperCase() : "none"}`);
 console.log(`🛡️  Bot verification: ${botVerificationEnabled ? "ENABLED" : "DISABLED"}\n`);
 
 // Step 1: Load game data
@@ -103,7 +107,7 @@ console.log("✅ Templates loaded\n");
 
 // Step 4: Generate main index page
 console.log("🏠 Generating main index page...");
-const indexHTML = generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir, adsEnabled, adProvider, botVerificationEnabled);
+const indexHTML = generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir, adsEnabled, adProvider, botVerificationEnabled, fallbackAdProvider);
 const indexPath = path.join(outputDir, "index.html");
 fs.writeFileSync(indexPath, cleanGeneratedHTML(indexHTML));
 console.log(`✅ Created ${indexPath}\n`);
@@ -113,7 +117,7 @@ console.log("🎮 Generating game pages...");
 let generatedCount = 0;
 
 games.forEach(game => {
-  const gameHTML = generateGamePage(game, games, categories, gamePageStyles, gamesDir, adsEnabled, adProvider, botVerificationEnabled);
+  const gameHTML = generateGamePage(game, games, categories, gamePageStyles, gamesDir, adsEnabled, adProvider, botVerificationEnabled, fallbackAdProvider);
   const gamePagePath = path.join(outputDir, `${game.folder}.html`);
   fs.writeFileSync(gamePagePath, cleanGeneratedHTML(gameHTML));
   generatedCount++;

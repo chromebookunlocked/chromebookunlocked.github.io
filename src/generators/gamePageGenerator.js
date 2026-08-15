@@ -17,12 +17,12 @@ const {
 // Horizontal ad configuration: insert every 2 desktop rows (2 × 6 = 12 games)
 const AD_INTERVAL = 12; // ad every 2 rows of 6
 
-function generateHorizontalAd(adIndex, adsEnabled = true, adProvider = 'adsense') {
-  return providerHorizontalAd(adIndex, adsEnabled, adProvider);
+function generateHorizontalAd(adIndex, adsEnabled = true, adProvider = 'adsense', fallbackAdProvider = null) {
+  return providerHorizontalAd(adIndex, adsEnabled, adProvider, fallbackAdProvider);
 }
 
-function generateVerticalAd(adsEnabled = true, adProvider = 'adsense', side = 'left') {
-  return providerVerticalAd(adsEnabled, adProvider, side);
+function generateVerticalAd(adsEnabled = true, adProvider = 'adsense', side = 'left', fallbackAdProvider = null) {
+  return providerVerticalAd(adsEnabled, adProvider, side, fallbackAdProvider);
 }
 
 // Helper to escape JavaScript string for use in HTML script tags
@@ -47,7 +47,7 @@ function escapeJs(str) {
  * @param {string} gamesDir - Path to games directory
  * @returns {string} Complete HTML document for game page
  */
-function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, adsEnabled = true, adProvider = 'adsense', botVerificationEnabled = true) {
+function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, adsEnabled = true, adProvider = 'adsense', botVerificationEnabled = true, fallbackAdProvider = null) {
   const thumbInfo = getThumbPath(game, gamesDir);
   const thumbPath = thumbInfo.path;
   const gameUrl = `games/${game.folder}/index.html`;
@@ -132,7 +132,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
     // Insert a full-width horizontal ad every 2 desktop rows (every 12 games)
     if ((idx + 1) % AD_INTERVAL === 0) {
-      recommendedGamesHTML += generateHorizontalAd(adCount, adsEnabled, adProvider);
+      recommendedGamesHTML += generateHorizontalAd(adCount, adsEnabled, adProvider, fallbackAdProvider);
       adCount++;
     }
   });
@@ -151,7 +151,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   ${metaTags}
 
   <!-- Resource Hints for Performance -->
-  ${generateAdNetworkHeadHints(adsEnabled, adProvider)}
+  ${generateAdNetworkHeadHints(adsEnabled, adProvider, fallbackAdProvider)}
 
   ${botVerificationEnabled ? `<!-- Cloudflare Turnstile verification gate (must load before ads) -->
   <script src="assets/bot-detector.js"></script>` : ''}
@@ -165,7 +165,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
     gtag('config', 'G-4QZLTDX504', { send_page_view: false });
   </script>
 
-  ${generateAdNetworkHeadScript(adsEnabled, adProvider)}
+  ${generateAdNetworkHeadScript(adsEnabled, adProvider, fallbackAdProvider)}
 
   ${generateAnalyticsScript()}
 
@@ -189,7 +189,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
     </div>
   </header>
 
-  ${generateHeaderBannerAd(adsEnabled, adProvider)}
+  ${generateHeaderBannerAd(adsEnabled, adProvider, fallbackAdProvider)}
 
   <!-- Main Game Content -->
   <main itemscope itemtype="https://schema.org/VideoGame">
@@ -199,30 +199,37 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
     <!-- Game Viewer -->
     <div class="game-container">
-      ${generateVerticalAd(adsEnabled, adProvider, 'left')}
+      ${generateVerticalAd(adsEnabled, adProvider, 'left', fallbackAdProvider)}
       <div class="game-frame-wrapper" id="gameWrapper">
-        <!-- Controls Bar (sticky to top of game) -->
-        <div class="controls">
-          <button id="fullscreenBtn" class="icon-btn" onclick="toggleFullscreen()" title="Play ${escapedGameNameAttr} Fullscreen" aria-label="Toggle Fullscreen Mode">
-            <svg id="fullscreenIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
-          </button>
+        <div class="game-stage" id="gameStage">
+          <div class="play-overlay" id="playOverlay">
+            <img src="${escapeHtmlAttr(thumbPath)}" alt="Play ${escapedGameNameAttr} Unblocked - Free Online ${escapeHtmlAttr(categoryText)} Game" itemprop="image" width="300" height="300" loading="eager" fetchpriority="high">
+            <h2 itemprop="headline">${escapedGameName}</h2>
+            <button class="play-btn" onclick="startGame();" aria-label="Play ${escapedGameNameAttr} Free Online">▶ Play</button>
+          </div>
+          <iframe
+            id="gameFrame"
+            src=""
+            title="${escapedGameNameAttr} Unblocked - Play Free Online Game at School"
+            allow="fullscreen; autoplay; encrypted-media"
+            allowfullscreen
+            tabindex="0">
+          </iframe>
         </div>
 
-        <div class="play-overlay" id="playOverlay">
-          <img src="${escapeHtmlAttr(thumbPath)}" alt="Play ${escapedGameNameAttr} Unblocked - Free Online ${escapeHtmlAttr(categoryText)} Game" itemprop="image" width="300" height="300" loading="eager" fetchpriority="high">
-          <h2 itemprop="headline">${escapedGameName}</h2>
-          <button class="play-btn" onclick="startGame();" aria-label="Play ${escapedGameNameAttr} Free Online">▶ Play</button>
+        <!-- Separate controls avoid covering touch targets inside the game. -->
+        <div class="controls" role="toolbar" aria-label="Game controls">
+          <button id="reloadGameBtn" class="icon-btn" onclick="reloadGame()" title="Restart ${escapedGameNameAttr}" aria-label="Restart game">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 1 0 2 5.3"></path><polyline points="20 4 20 11 13 11"></polyline></svg>
+            <span class="control-label">Restart</span>
+          </button>
+          <button id="fullscreenBtn" class="icon-btn" onclick="toggleFullscreen()" title="Play ${escapedGameNameAttr} Fullscreen" aria-label="Enter fullscreen">
+            <svg id="fullscreenIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+            <span class="control-label" id="fullscreenLabel">Fullscreen</span>
+          </button>
         </div>
-        <iframe
-          id="gameFrame"
-          src=""
-          title="${escapedGameNameAttr} Unblocked - Play Free Online Game at School"
-          allow="fullscreen; autoplay; encrypted-media"
-          allowfullscreen
-          tabindex="0">
-        </iframe>
       </div>
-      ${generateVerticalAd(adsEnabled, adProvider, 'right')}
+      ${generateVerticalAd(adsEnabled, adProvider, 'right', fallbackAdProvider)}
     </div>
   </main>
 
@@ -301,7 +308,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
     </div>
   </section>
 
-  ${generateBottomLeaderboardAd(adsEnabled, adProvider)}
+  ${generateBottomLeaderboardAd(adsEnabled, adProvider, fallbackAdProvider)}
 
   <footer>
     <div class="footer-content">
@@ -411,18 +418,59 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
       localStorage.setItem('recentlyPlayed', JSON.stringify(recentlyPlayed));
     }
 
+    function reloadGame() {
+      const frame = document.getElementById('gameFrame');
+      if (!gameIsActive || !frame.getAttribute('src')) {
+        startGame();
+        return;
+      }
+
+      // Reassigning the game URL works for both same-origin and cross-origin
+      // games without reaching into their document.
+      frame.classList.remove('active');
+      frame.src = '${gameUrl}';
+      requestAnimationFrame(() => frame.classList.add('active'));
+      setTimeout(focusGameFrame, 150);
+    }
+
+    function enterFullscreenFallback(wrapper) {
+      wrapper.classList.add('is-expanded');
+      document.body.classList.add('game-is-expanded');
+      updateFullscreenIcon();
+    }
+
+    function exitFullscreenFallback() {
+      const wrapper = document.getElementById('gameWrapper');
+      wrapper.classList.remove('is-expanded');
+      document.body.classList.remove('game-is-expanded');
+      updateFullscreenIcon();
+    }
+
     function toggleFullscreen() {
       const wrapper = document.getElementById('gameWrapper');
-      const isEnteringFullscreen = !document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement;
+      const nativeFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
 
-      if (isEnteringFullscreen) {
+      if (wrapper.classList.contains('is-expanded')) {
+        exitFullscreenFallback();
+        return;
+      }
+
+      if (!nativeFullscreen) {
         // Enter fullscreen
         if (wrapper.requestFullscreen) {
-          wrapper.requestFullscreen();
+          const request = wrapper.requestFullscreen();
+          if (request && typeof request.catch === 'function') {
+            request.catch(() => enterFullscreenFallback(wrapper));
+          }
         } else if (wrapper.webkitRequestFullscreen) {
           wrapper.webkitRequestFullscreen();
         } else if (wrapper.mozRequestFullScreen) {
           wrapper.mozRequestFullScreen();
+        } else {
+          // iOS Safari and embedded mobile browsers may not expose the
+          // element Fullscreen API. The fixed player provides the same usable
+          // viewport while keeping an obvious exit control.
+          enterFullscreenFallback(wrapper);
         }
       } else {
         // Exit fullscreen
@@ -439,17 +487,21 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
     function updateFullscreenIcon() {
       const icon = document.getElementById('fullscreenIcon');
       const btn = document.getElementById('fullscreenBtn');
+      const label = document.getElementById('fullscreenLabel');
+      const expanded = document.getElementById('gameWrapper').classList.contains('is-expanded');
 
-      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || expanded) {
         // In fullscreen - show X icon
         icon.innerHTML = '<path d="M18 6L6 18M6 6l12 12"/>';
         btn.title = 'Exit Fullscreen';
         btn.setAttribute('aria-label', 'Exit Fullscreen');
+        if (label) label.textContent = 'Exit';
       } else {
         // Not in fullscreen - show expand icon
         icon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>';
         btn.title = 'Fullscreen';
-        btn.setAttribute('aria-label', 'Toggle Fullscreen');
+        btn.setAttribute('aria-label', 'Enter Fullscreen');
+        if (label) label.textContent = 'Fullscreen';
       }
     }
 
@@ -549,6 +601,12 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && document.getElementById('gameWrapper').classList.contains('is-expanded')) {
+        exitFullscreenFallback();
+      }
+    });
+
     // Re-focus game after clicking fullscreen button
     document.getElementById('fullscreenBtn').addEventListener('click', () => {
       if (gameIsActive) {
@@ -642,13 +700,13 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
   </script>
 
-  ${generateAdNetworkInitScript(adsEnabled, adProvider)}
+  ${generateAdNetworkInitScript(adsEnabled, adProvider, fallbackAdProvider)}
 
   <!-- Cookie Consent Banner -->
   <link rel="stylesheet" href="assets/cookie-consent.css">
   <script src="assets/cookie-consent.js"></script>
 
-  ${generateFooterInScreenAd(adsEnabled, adProvider)}
+  ${generateFooterInScreenAd(adsEnabled, adProvider, fallbackAdProvider)}
 </body>
 </html>`;
 }

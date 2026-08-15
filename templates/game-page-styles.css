@@ -388,15 +388,12 @@ h1 {
   transition: transform 0.3s ease;
 }
 
-/* FULLSCREEN — no transitions, no lag */
-.game-frame-wrapper:fullscreen {
-  width: 100vw;
-  height: 100vh;
-  max-width: none;
-  max-height: none;
-  aspect-ratio: auto;
-  border-radius: 0;
-  transition: none !important;
+.game-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--bg-darker);
 }
 
 /* ============================================================================
@@ -413,6 +410,7 @@ h1 {
   align-items: center;
   z-index: 10;
   pointer-events: none;
+  gap: 0.5rem;
 }
 
 .controls > * {
@@ -434,6 +432,8 @@ h1 {
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .icon-btn:hover {
@@ -450,6 +450,10 @@ h1 {
 .icon-btn svg {
   width: var(--btn-icon-svg);
   height: var(--btn-icon-svg);
+}
+
+.control-label {
+  display: none;
 }
 
 /* ============================================================================
@@ -548,7 +552,7 @@ h1 {
    IFRAME - Scoped to game frame only (not ad iframes)
 ============================================================================ */
 
-.game-frame-wrapper iframe {
+.game-stage iframe {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -568,11 +572,12 @@ h1 {
   transition: opacity 0.35s ease;
 }
 
-.game-frame-wrapper:fullscreen iframe {
+.game-frame-wrapper:fullscreen .game-stage iframe,
+.game-frame-wrapper.is-expanded .game-stage iframe {
   transition: none;
 }
 
-.game-frame-wrapper iframe.active {
+.game-stage iframe.active {
   opacity: 1;
 }
 
@@ -1100,43 +1105,72 @@ footer {
 
 .game-frame-wrapper:-webkit-full-screen,
 .game-frame-wrapper:-moz-full-screen,
-.game-frame-wrapper:fullscreen {
-  /* Maintain 16:9 aspect ratio in fullscreen, scale to fit screen */
-  aspect-ratio: 16 / 9;
+.game-frame-wrapper:fullscreen,
+.game-frame-wrapper.is-expanded {
+  /* Let the iframe receive the real device viewport. Games that use
+     responsive canvas/layout code now resize instead of being letterboxed
+     inside a second forced 16:9 box. */
+  position: fixed;
+  inset: 0;
   width: 100vw;
   height: 100vh;
-  max-width: calc(100vh * 16 / 9); /* Limit width to maintain aspect ratio */
-  max-height: calc(100vw * 9 / 16); /* Limit height to maintain aspect ratio */
-  margin: auto; /* Center the game window */
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+  margin: 0;
   border-radius: 0;
   border: none;
-  /* Optimize fullscreen performance */
   background: #000;
   box-shadow: none;
-  /* Force GPU acceleration in fullscreen */
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* Disable animations in fullscreen for better performance */
   animation: none;
+  transition: none !important;
+  contain: layout paint size;
+  z-index: 10000;
 }
 
-.game-frame-wrapper:-webkit-full-screen::before,
-.game-frame-wrapper:-moz-full-screen::before,
-.game-frame-wrapper:fullscreen::before {
-  display: none;
+[data-ad-provider-stack],
+[data-ad-primary],
+[data-ad-fallback] {
+  width: 100%;
+}
+
+.game-frame-wrapper:-webkit-full-screen .game-stage,
+.game-frame-wrapper:-moz-full-screen .game-stage,
+.game-frame-wrapper:fullscreen .game-stage,
+.game-frame-wrapper.is-expanded .game-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
 }
 
 .game-frame-wrapper:-webkit-full-screen .controls,
 .game-frame-wrapper:-moz-full-screen .controls,
-.game-frame-wrapper:fullscreen .controls {
+.game-frame-wrapper:fullscreen .controls,
+.game-frame-wrapper.is-expanded .controls {
+  position: absolute;
+  top: max(8px, env(safe-area-inset-top));
+  right: max(8px, env(safe-area-inset-right));
+  bottom: auto;
+  left: auto;
+  width: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
   opacity: 1;
 }
 
 /* Optimize iframe in fullscreen mode */
-.game-frame-wrapper:-webkit-full-screen iframe,
-.game-frame-wrapper:-moz-full-screen iframe,
-.game-frame-wrapper:fullscreen iframe {
+.game-frame-wrapper:-webkit-full-screen .game-stage iframe,
+.game-frame-wrapper:-moz-full-screen .game-stage iframe,
+.game-frame-wrapper:fullscreen .game-stage iframe,
+.game-frame-wrapper.is-expanded .game-stage iframe {
   /* Force hardware acceleration and optimize rendering */
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
@@ -1144,6 +1178,11 @@ footer {
   /* Use native scaling for best performance */
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
+}
+
+body.game-is-expanded {
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 /* ============================================================================
@@ -1173,15 +1212,58 @@ footer {
   }
 
   .game-container {
-    padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) var(--spacing-md) var(--spacing-xs);
+    padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) max(8px, env(safe-area-inset-right)) var(--spacing-xs) max(8px, env(safe-area-inset-left));
+    align-items: flex-start;
   }
 
   .game-frame-wrapper {
-    /* Maintain 16:9 aspect ratio on tablets with improved sizing */
-    width: 92vw;
-    max-width: 92vw;
-    max-height: 65vh;
+    width: min(100%, 760px);
+    max-width: calc(100vw - 16px);
+    max-height: none;
     height: auto;
+    aspect-ratio: auto;
+    display: flex;
+    flex-direction: column;
+    contain: layout paint;
+    container-type: inline-size;
+    border-radius: var(--radius-lg);
+  }
+
+  .game-stage {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    flex: 0 0 auto;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .controls {
+    position: relative;
+    inset: auto;
+    order: 2;
+    width: 100%;
+    min-height: 60px;
+    padding: 7px max(8px, env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    justify-content: center;
+    gap: 0.75rem;
+    pointer-events: auto;
+    background: rgba(13, 0, 26, 0.98);
+    border-top: 1px solid var(--border-color);
+  }
+
+  .controls .icon-btn {
+    width: auto;
+    min-width: 116px;
+    height: 46px;
+    padding: 0 1rem;
+    gap: 0.55rem;
+    border-radius: 12px;
+    font: 600 0.78rem/1 'Orbitron', sans-serif;
+  }
+
+  .control-label {
+    display: inline;
   }
 
   .play-overlay {
@@ -1250,11 +1332,8 @@ footer {
   }
 
   .game-frame-wrapper {
-    /* Maintain 16:9 aspect ratio on mobile with better sizing */
-    width: 95vw;
-    max-width: 95vw;
-    max-height: 60vh;
-    height: auto;
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
   }
 
   .play-overlay {
@@ -1281,7 +1360,15 @@ footer {
   /* Play button uses clamp() for consistent scaling */
 
   .controls {
-    opacity: 1; /* Always show on mobile */
+    opacity: 1;
+    gap: 0.5rem;
+  }
+
+  .controls .icon-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 160px;
+    padding-inline: 0.75rem;
   }
 
   .footer-links {
@@ -1290,6 +1377,71 @@ footer {
 
   .footer-links a {
     font-size: 0.8rem;
+  }
+}
+
+/* A phone held sideways should devote almost the entire short viewport to
+   the game while preserving a familiar widescreen game surface. */
+@media (max-height: 520px) and (orientation: landscape) and (max-width: 950px) {
+  /* The header unit is not auctioned at this breakpoint (see adProviders.js),
+     so the short viewport can prioritize the game without hiding a served ad. */
+  .header-banner-ad {
+    display: none;
+  }
+
+  body:has(.header-banner-ad) .game-container,
+  body.has-header-ad .game-container,
+  .game-container {
+    padding-top: calc(clamp(48px, 6vw, 64px) + 4px);
+  }
+
+  .game-frame-wrapper {
+    width: min(calc(100vw - 16px), calc((100dvh - 116px) * 16 / 9));
+    max-width: calc(100vw - 16px);
+    max-height: none;
+    height: auto;
+    aspect-ratio: auto;
+    display: flex;
+    flex-direction: column;
+    contain: layout paint;
+    container-type: inline-size;
+    border-radius: var(--radius-lg);
+  }
+
+  .game-stage {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    flex: 0 0 auto;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .controls {
+    position: relative;
+    inset: auto;
+    order: 2;
+    width: 100%;
+    min-height: 52px;
+    padding: 4px max(8px, env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    justify-content: center;
+    gap: 0.75rem;
+    pointer-events: auto;
+    background: rgba(13, 0, 26, 0.98);
+    border-top: 1px solid var(--border-color);
+  }
+
+  .controls .icon-btn {
+    width: auto;
+    min-width: 116px;
+    height: 42px;
+    padding: 0 1rem;
+    gap: 0.55rem;
+    font: 600 0.78rem/1 'Orbitron', sans-serif;
+  }
+
+  .control-label {
+    display: inline;
   }
 }
 

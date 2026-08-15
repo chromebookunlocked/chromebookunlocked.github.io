@@ -91,7 +91,32 @@ function createHorizontalAd(adIndex) {
     // Lazy: defer the slot push via IntersectionObserver so off-screen ads
     // don't trigger an auction until they're about to scroll into view.
     const slotId = '152f0341-dbcb-4430-ab30-d9860e3bccfa';
-    div.innerHTML = `<div id="mmt-${slotId}"></div>`;
+    const primaryMarkup = `<div id="mmt-${slotId}"></div>`;
+    if (window.__fallbackAdProvider === 'adsense') {
+      div.innerHTML = `<div data-ad-provider-stack>
+        <div data-ad-primary>${primaryMarkup}</div>
+        <div data-ad-fallback hidden><ins class="adsbygoogle"
+          style="display:block"
+          data-ad-client="ca-pub-1033412505744705"
+          data-ad-slot="2719401053"
+          data-ad-format="auto"
+          data-ad-lazy="true"
+          data-full-width-responsive="true"></ins></div>
+      </div>`;
+    } else {
+      div.innerHTML = primaryMarkup;
+    }
+
+    // If the primary library failed before this row was created, prepare the
+    // fallback markup now and let initializeHorizontalAd request it after the
+    // row is attached to the document.
+    if (window.__activeAdProvider === 'adsense') {
+      const primary = div.querySelector('[data-ad-primary]');
+      const fallback = div.querySelector('[data-ad-fallback]');
+      if (primary) primary.hidden = true;
+      if (fallback) fallback.hidden = false;
+      return div;
+    }
     const push = function() {
       try {
         window.$MMT = window.$MMT || {};
@@ -126,8 +151,9 @@ function createHorizontalAd(adIndex) {
  */
 function initializeHorizontalAd(adEl) {
   if (window.__adsEnabled === false) return;
-  if (window.__adProvider === 'monumetric') return;
-  if (window.__initAdSenseSlots) window.__initAdSenseSlots(adEl);
+  if (window.__activeAdProvider !== 'adsense') return;
+  if (window.__prepareAdProviderFallbacks) window.__prepareAdProviderFallbacks(adEl);
+  else if (window.__initAdSenseSlots) window.__initAdSenseSlots(adEl);
 }
 
 // Cached DOM elements for performance

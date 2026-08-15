@@ -57,6 +57,8 @@
   <link rel="preload" as="script" href="https://monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js">
   <link rel="dns-prefetch" href="https://securepubads.g.doubleclick.net">
   <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net">
+  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>
 
   <!-- Cloudflare Turnstile verification gate (must load before ads) -->
   <script src="assets/bot-detector.js"></script>
@@ -95,6 +97,8 @@
   <!-- Ad network runtime: verified library load + deduplicated slot requests -->
   <script>
     (function(){
+      window.__activeAdProvider = "monumetric";
+      document.documentElement.setAttribute('data-ad-provider-active', window.__activeAdProvider);
       window.__adsReady = function(cb){
         var bd = window.botDetector;
         if (!bd) return cb();
@@ -105,9 +109,18 @@
       function loadAdNetwork(){
         if (window.__adNetworkLoaded) return;
         window.__adNetworkLoaded = true;
+        if ("monumetric" === 'adsense') {
+          window.__loadAdSenseNetwork(function(){ window.__initAdSenseSlots(document); });
+          return;
+        }
         var s = document.createElement('script');
         s.src = "https://monu.delivery/site/0/c/07d613-c796-4eac-978c-7029566ea884.js";
         s.async=true;s.setAttribute('data-cfasync','false');
+        s.onload = function(){ window.__primaryAdNetworkReady = true; };
+        s.onerror = function(){
+          window.__primaryAdNetworkFailed = true;
+          if (window.__activateAdSenseFallback) window.__activateAdSenseFallback('script-error');
+        };
         document.head.appendChild(s);
       }
       // The preload hint fetches the library early, but execution waits for
@@ -115,6 +128,118 @@
       // as their main script runs.
       window.__adsReady(loadAdNetwork);
 
+      window.__requestAdSenseSlot = function(ad){
+        if (!ad || ad.getAttribute('data-ad-requested') === '1' || ad.getAttribute('data-ad-pending') === '1') return;
+        ad.setAttribute('data-ad-pending', '1');
+        window.__adsReady(function(){
+          ad.removeAttribute('data-ad-pending');
+          if (!ad.isConnected || ad.getAttribute('data-ad-requested') === '1') return;
+          ad.setAttribute('data-ad-requested', '1');
+          try { (window.adsbygoogle = window.adsbygoogle || []).push({}); }
+          catch (e) { ad.removeAttribute('data-ad-requested'); }
+        });
+      };
+
+      window.__initAdSenseSlots = function(root){
+        var scope = root || document;
+        var ads = [];
+        if (scope.matches && scope.matches('ins.adsbygoogle')) ads.push(scope);
+        if (scope.querySelectorAll) {
+          ads = ads.concat(Array.prototype.slice.call(scope.querySelectorAll('ins.adsbygoogle')));
+        }
+
+        ads.forEach(function(ad){
+          if (ad.getAttribute('data-ad-watched') === '1') return;
+          ad.setAttribute('data-ad-watched', '1');
+
+          function schedule(){
+            var media = ad.getAttribute('data-ad-media');
+            if (media && window.matchMedia) {
+              var query = window.matchMedia(media);
+              if (!query.matches) {
+                var onChange = function(event){
+                  if (!event.matches) return;
+                  if (query.removeEventListener) query.removeEventListener('change', onChange);
+                  else if (query.removeListener) query.removeListener(onChange);
+                  schedule();
+                };
+                if (query.addEventListener) query.addEventListener('change', onChange);
+                else if (query.addListener) query.addListener(onChange);
+                return;
+              }
+            }
+
+            if (ad.getAttribute('data-ad-lazy') === 'true' && 'IntersectionObserver' in window) {
+              var observer = new IntersectionObserver(function(entries){
+                if (!entries[0].isIntersecting) return;
+                observer.disconnect();
+                window.__requestAdSenseSlot(ad);
+              }, { rootMargin: '600px 0px' });
+              observer.observe(ad);
+              return;
+            }
+            window.__requestAdSenseSlot(ad);
+          }
+
+          schedule();
+        });
+      };
+
+      window.__prepareAdProviderFallbacks = function(root){
+        var scope = root || document;
+        if (window.__activeAdProvider !== 'adsense') return;
+        var stacks = [];
+        if (scope.matches && scope.matches('[data-ad-provider-stack]')) stacks.push(scope);
+        if (scope.querySelectorAll) {
+          stacks = stacks.concat(Array.prototype.slice.call(scope.querySelectorAll('[data-ad-provider-stack]')));
+          Array.prototype.forEach.call(scope.querySelectorAll('[data-ad-primary-only]'), function(primaryOnly){
+            primaryOnly.hidden = true;
+          });
+        }
+        stacks.forEach(function(stack){
+          var primary = stack.querySelector('[data-ad-primary]');
+          var fallbackSlot = stack.querySelector('[data-ad-fallback]');
+          if (primary) primary.hidden = true;
+          if (fallbackSlot) fallbackSlot.hidden = false;
+        });
+        window.__initAdSenseSlots(scope);
+      };
+
+      window.__loadAdSenseNetwork = function(onReady){
+        if (window.__adsenseNetworkReady) {
+          if (onReady) onReady();
+          return;
+        }
+        if (onReady) {
+          window.__adsenseReadyCallbacks = window.__adsenseReadyCallbacks || [];
+          window.__adsenseReadyCallbacks.push(onReady);
+        }
+        if (window.__adsenseNetworkLoading) return;
+        window.__adsenseNetworkLoading = true;
+        var adsenseScript = document.createElement('script');
+        adsenseScript.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1033412505744705";
+        adsenseScript.async = true;
+        adsenseScript.crossOrigin = 'anonymous';
+        adsenseScript.onload = function(){
+          window.__adsenseNetworkReady = true;
+          var callbacks = window.__adsenseReadyCallbacks || [];
+          window.__adsenseReadyCallbacks = [];
+          callbacks.forEach(function(callback){ callback(); });
+        };
+        adsenseScript.onerror = function(){ window.__adsenseNetworkLoading = false; };
+        document.head.appendChild(adsenseScript);
+      };
+
+      window.__activateAdSenseFallback = function(reason){
+        if ("adsense" !== 'adsense' || window.__activeAdProvider === 'adsense') return;
+        window.__activeAdProvider = 'adsense';
+        document.documentElement.setAttribute('data-ad-provider-active', 'adsense');
+        window.__prepareAdProviderFallbacks(document);
+        window.__loadAdSenseNetwork(function(){ window.__initAdSenseSlots(document); });
+        try {
+          window.dispatchEvent(new CustomEvent('adproviderchange', { detail: { provider: 'adsense', reason: reason || 'primary-error' } }));
+        } catch (e) {}
+      };
     })();
   </script>
 
@@ -536,15 +661,12 @@ h1 {
   transition: transform 0.3s ease;
 }
 
-/* FULLSCREEN — no transitions, no lag */
-.game-frame-wrapper:fullscreen {
-  width: 100vw;
-  height: 100vh;
-  max-width: none;
-  max-height: none;
-  aspect-ratio: auto;
-  border-radius: 0;
-  transition: none !important;
+.game-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--bg-darker);
 }
 
 /* ============================================================================
@@ -561,6 +683,7 @@ h1 {
   align-items: center;
   z-index: 10;
   pointer-events: none;
+  gap: 0.5rem;
 }
 
 .controls > * {
@@ -582,6 +705,8 @@ h1 {
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .icon-btn:hover {
@@ -598,6 +723,10 @@ h1 {
 .icon-btn svg {
   width: var(--btn-icon-svg);
   height: var(--btn-icon-svg);
+}
+
+.control-label {
+  display: none;
 }
 
 /* ============================================================================
@@ -696,7 +825,7 @@ h1 {
    IFRAME - Scoped to game frame only (not ad iframes)
 ============================================================================ */
 
-.game-frame-wrapper iframe {
+.game-stage iframe {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -716,11 +845,12 @@ h1 {
   transition: opacity 0.35s ease;
 }
 
-.game-frame-wrapper:fullscreen iframe {
+.game-frame-wrapper:fullscreen .game-stage iframe,
+.game-frame-wrapper.is-expanded .game-stage iframe {
   transition: none;
 }
 
-.game-frame-wrapper iframe.active {
+.game-stage iframe.active {
   opacity: 1;
 }
 
@@ -1248,43 +1378,72 @@ footer {
 
 .game-frame-wrapper:-webkit-full-screen,
 .game-frame-wrapper:-moz-full-screen,
-.game-frame-wrapper:fullscreen {
-  /* Maintain 16:9 aspect ratio in fullscreen, scale to fit screen */
-  aspect-ratio: 16 / 9;
+.game-frame-wrapper:fullscreen,
+.game-frame-wrapper.is-expanded {
+  /* Let the iframe receive the real device viewport. Games that use
+     responsive canvas/layout code now resize instead of being letterboxed
+     inside a second forced 16:9 box. */
+  position: fixed;
+  inset: 0;
   width: 100vw;
   height: 100vh;
-  max-width: calc(100vh * 16 / 9); /* Limit width to maintain aspect ratio */
-  max-height: calc(100vw * 9 / 16); /* Limit height to maintain aspect ratio */
-  margin: auto; /* Center the game window */
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+  margin: 0;
   border-radius: 0;
   border: none;
-  /* Optimize fullscreen performance */
   background: #000;
   box-shadow: none;
-  /* Force GPU acceleration in fullscreen */
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  /* Disable animations in fullscreen for better performance */
   animation: none;
+  transition: none !important;
+  contain: layout paint size;
+  z-index: 10000;
 }
 
-.game-frame-wrapper:-webkit-full-screen::before,
-.game-frame-wrapper:-moz-full-screen::before,
-.game-frame-wrapper:fullscreen::before {
-  display: none;
+[data-ad-provider-stack],
+[data-ad-primary],
+[data-ad-fallback] {
+  width: 100%;
+}
+
+.game-frame-wrapper:-webkit-full-screen .game-stage,
+.game-frame-wrapper:-moz-full-screen .game-stage,
+.game-frame-wrapper:fullscreen .game-stage,
+.game-frame-wrapper.is-expanded .game-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
 }
 
 .game-frame-wrapper:-webkit-full-screen .controls,
 .game-frame-wrapper:-moz-full-screen .controls,
-.game-frame-wrapper:fullscreen .controls {
+.game-frame-wrapper:fullscreen .controls,
+.game-frame-wrapper.is-expanded .controls {
+  position: absolute;
+  top: max(8px, env(safe-area-inset-top));
+  right: max(8px, env(safe-area-inset-right));
+  bottom: auto;
+  left: auto;
+  width: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
   opacity: 1;
 }
 
 /* Optimize iframe in fullscreen mode */
-.game-frame-wrapper:-webkit-full-screen iframe,
-.game-frame-wrapper:-moz-full-screen iframe,
-.game-frame-wrapper:fullscreen iframe {
+.game-frame-wrapper:-webkit-full-screen .game-stage iframe,
+.game-frame-wrapper:-moz-full-screen .game-stage iframe,
+.game-frame-wrapper:fullscreen .game-stage iframe,
+.game-frame-wrapper.is-expanded .game-stage iframe {
   /* Force hardware acceleration and optimize rendering */
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
@@ -1292,6 +1451,11 @@ footer {
   /* Use native scaling for best performance */
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
+}
+
+body.game-is-expanded {
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 /* ============================================================================
@@ -1321,15 +1485,58 @@ footer {
   }
 
   .game-container {
-    padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) var(--spacing-md) var(--spacing-xs);
+    padding: calc(clamp(48px, 6vw, 64px) + 0.5rem) max(8px, env(safe-area-inset-right)) var(--spacing-xs) max(8px, env(safe-area-inset-left));
+    align-items: flex-start;
   }
 
   .game-frame-wrapper {
-    /* Maintain 16:9 aspect ratio on tablets with improved sizing */
-    width: 92vw;
-    max-width: 92vw;
-    max-height: 65vh;
+    width: min(100%, 760px);
+    max-width: calc(100vw - 16px);
+    max-height: none;
     height: auto;
+    aspect-ratio: auto;
+    display: flex;
+    flex-direction: column;
+    contain: layout paint;
+    container-type: inline-size;
+    border-radius: var(--radius-lg);
+  }
+
+  .game-stage {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    flex: 0 0 auto;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .controls {
+    position: relative;
+    inset: auto;
+    order: 2;
+    width: 100%;
+    min-height: 60px;
+    padding: 7px max(8px, env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    justify-content: center;
+    gap: 0.75rem;
+    pointer-events: auto;
+    background: rgba(13, 0, 26, 0.98);
+    border-top: 1px solid var(--border-color);
+  }
+
+  .controls .icon-btn {
+    width: auto;
+    min-width: 116px;
+    height: 46px;
+    padding: 0 1rem;
+    gap: 0.55rem;
+    border-radius: 12px;
+    font: 600 0.78rem/1 'Orbitron', sans-serif;
+  }
+
+  .control-label {
+    display: inline;
   }
 
   .play-overlay {
@@ -1398,11 +1605,8 @@ footer {
   }
 
   .game-frame-wrapper {
-    /* Maintain 16:9 aspect ratio on mobile with better sizing */
-    width: 95vw;
-    max-width: 95vw;
-    max-height: 60vh;
-    height: auto;
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
   }
 
   .play-overlay {
@@ -1429,7 +1633,15 @@ footer {
   /* Play button uses clamp() for consistent scaling */
 
   .controls {
-    opacity: 1; /* Always show on mobile */
+    opacity: 1;
+    gap: 0.5rem;
+  }
+
+  .controls .icon-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 160px;
+    padding-inline: 0.75rem;
   }
 
   .footer-links {
@@ -1438,6 +1650,71 @@ footer {
 
   .footer-links a {
     font-size: 0.8rem;
+  }
+}
+
+/* A phone held sideways should devote almost the entire short viewport to
+   the game while preserving a familiar widescreen game surface. */
+@media (max-height: 520px) and (orientation: landscape) and (max-width: 950px) {
+  /* The header unit is not auctioned at this breakpoint (see adProviders.js),
+     so the short viewport can prioritize the game without hiding a served ad. */
+  .header-banner-ad {
+    display: none;
+  }
+
+  body:has(.header-banner-ad) .game-container,
+  body.has-header-ad .game-container,
+  .game-container {
+    padding-top: calc(clamp(48px, 6vw, 64px) + 4px);
+  }
+
+  .game-frame-wrapper {
+    width: min(calc(100vw - 16px), calc((100dvh - 116px) * 16 / 9));
+    max-width: calc(100vw - 16px);
+    max-height: none;
+    height: auto;
+    aspect-ratio: auto;
+    display: flex;
+    flex-direction: column;
+    contain: layout paint;
+    container-type: inline-size;
+    border-radius: var(--radius-lg);
+  }
+
+  .game-stage {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    flex: 0 0 auto;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+
+  .controls {
+    position: relative;
+    inset: auto;
+    order: 2;
+    width: 100%;
+    min-height: 52px;
+    padding: 4px max(8px, env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    justify-content: center;
+    gap: 0.75rem;
+    pointer-events: auto;
+    background: rgba(13, 0, 26, 0.98);
+    border-top: 1px solid var(--border-color);
+  }
+
+  .controls .icon-btn {
+    width: auto;
+    min-width: 116px;
+    height: 42px;
+    padding: 0 1rem;
+    gap: 0.55rem;
+    font: 600 0.78rem/1 'Orbitron', sans-serif;
+  }
+
+  .control-label {
+    display: inline;
   }
 }
 
@@ -1543,7 +1820,7 @@ footer {
     </div>
   </header>
 
-  <div class="header-banner-ad" role="complementary" aria-label="Advertisement">
+  <div class="header-banner-ad" data-ad-primary-only role="complementary" aria-label="Advertisement">
     <div id="mmt-d56921e6-6064-44b4-85de-214e86cc24f8"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
@@ -1562,7 +1839,7 @@ footer {
 
         ready();
       }
-      var media="";
+      var media="(min-height: 521px), (min-width: 951px)";
       if (media && window.matchMedia) {
         var query=window.matchMedia(media);
         if (!query.matches) {
@@ -1591,7 +1868,7 @@ footer {
 
     <!-- Game Viewer -->
     <div class="game-container">
-      <div class="vertical-ad vertical-ad-left" role="complementary" aria-label="Advertisement">
+      <div class="vertical-ad vertical-ad-left" data-ad-primary-only role="complementary" aria-label="Advertisement">
       <div id="mmt-0f94f1df-dac8-4d55-b24e-3051d266c344"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
@@ -1630,28 +1907,35 @@ footer {
     </script>
     </div>
       <div class="game-frame-wrapper" id="gameWrapper">
-        <!-- Controls Bar (sticky to top of game) -->
-        <div class="controls">
-          <button id="fullscreenBtn" class="icon-btn" onclick="toggleFullscreen()" title="Play One Bit Adventure Fullscreen" aria-label="Toggle Fullscreen Mode">
-            <svg id="fullscreenIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
-          </button>
+        <div class="game-stage" id="gameStage">
+          <div class="play-overlay" id="playOverlay">
+            <img src="games/One Bit Adventure/thumbnail.webp" alt="Play One Bit Adventure Unblocked - Free Online adventure Game" itemprop="image" width="300" height="300" loading="eager" fetchpriority="high">
+            <h2 itemprop="headline">One Bit Adventure</h2>
+            <button class="play-btn" onclick="startGame();" aria-label="Play One Bit Adventure Free Online">▶ Play</button>
+          </div>
+          <iframe
+            id="gameFrame"
+            src=""
+            title="One Bit Adventure Unblocked - Play Free Online Game at School"
+            allow="fullscreen; autoplay; encrypted-media"
+            allowfullscreen
+            tabindex="0">
+          </iframe>
         </div>
 
-        <div class="play-overlay" id="playOverlay">
-          <img src="games/One Bit Adventure/thumbnail.webp" alt="Play One Bit Adventure Unblocked - Free Online adventure Game" itemprop="image" width="300" height="300" loading="eager" fetchpriority="high">
-          <h2 itemprop="headline">One Bit Adventure</h2>
-          <button class="play-btn" onclick="startGame();" aria-label="Play One Bit Adventure Free Online">▶ Play</button>
+        <!-- Separate controls avoid covering touch targets inside the game. -->
+        <div class="controls" role="toolbar" aria-label="Game controls">
+          <button id="reloadGameBtn" class="icon-btn" onclick="reloadGame()" title="Restart One Bit Adventure" aria-label="Restart game">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 1 0 2 5.3"></path><polyline points="20 4 20 11 13 11"></polyline></svg>
+            <span class="control-label">Restart</span>
+          </button>
+          <button id="fullscreenBtn" class="icon-btn" onclick="toggleFullscreen()" title="Play One Bit Adventure Fullscreen" aria-label="Enter fullscreen">
+            <svg id="fullscreenIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+            <span class="control-label" id="fullscreenLabel">Fullscreen</span>
+          </button>
         </div>
-        <iframe
-          id="gameFrame"
-          src=""
-          title="One Bit Adventure Unblocked - Play Free Online Game at School"
-          allow="fullscreen; autoplay; encrypted-media"
-          allowfullscreen
-          tabindex="0">
-        </iframe>
       </div>
-      <div class="vertical-ad vertical-ad-spacer" aria-hidden="true"></div>
+      <div class="vertical-ad vertical-ad-spacer" data-ad-primary-only aria-hidden="true"></div>
     </div>
   </main>
 
@@ -1728,7 +2012,8 @@ footer {
       </div>
       <div class="card-title">Bouncy Motors</div>
     </a><div class="horizontal-ad-row" data-ad-index="0" role="complementary" aria-label="Advertisement">
-    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
+    <div data-ad-provider-stack>
+      <div data-ad-primary><div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
@@ -1769,10 +2054,18 @@ footer {
       }
       load();
     })();
-    </script>
-  </div><a href="/Bitlife.html" class="game-card" title="Play Bitlife Unblocked Free Online" onclick="trackRecentGame('Bitlife')">
-      <div class="thumb-container" style="--thumb-url: url('games/Bitlife/thumbnail.webp')">
-        <img class="thumb" src="games/Bitlife/thumbnail.webp" alt="Play Bitlife Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </script></div>
+      <div data-ad-fallback hidden><ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="2719401053"
+      data-ad-format="auto"
+      data-ad-lazy="true"
+      data-full-width-responsive="true"></ins></div>
+    </div>
+  </div><a href="/Blackjack.html" class="game-card" title="Play Blackjack Unblocked Free Online" onclick="trackRecentGame('Blackjack')">
+      <div class="thumb-container" style="--thumb-url: url('games/Blackjack/thumbnail.webp')">
+        <img class="thumb" src="games/Blackjack/thumbnail.webp" alt="Play Blackjack Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Bitlife</div>
     </a><a href="/1v1.lol.html" class="game-card" title="Play 1v1.lol Unblocked Free Online" onclick="trackRecentGame('1v1.lol')">
@@ -1831,7 +2124,8 @@ footer {
       </div>
       <div class="card-title">Yellow</div>
     </a><div class="horizontal-ad-row" data-ad-index="1" role="complementary" aria-label="Advertisement">
-    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
+    <div data-ad-provider-stack>
+      <div data-ad-primary><div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
@@ -1872,10 +2166,18 @@ footer {
       }
       load();
     })();
-    </script>
-  </div><a href="/Bowmasters.html" class="game-card" title="Play Bowmasters Unblocked Free Online" onclick="trackRecentGame('Bowmasters')">
-      <div class="thumb-container" style="--thumb-url: url('games/Bowmasters/thumbnail.webp')">
-        <img class="thumb" src="games/Bowmasters/thumbnail.webp" alt="Play Bowmasters Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </script></div>
+      <div data-ad-fallback hidden><ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="2719401053"
+      data-ad-format="auto"
+      data-ad-lazy="true"
+      data-full-width-responsive="true"></ins></div>
+    </div>
+  </div><a href="/Brawl Simulator 3D.html" class="game-card" title="Play Brawl Simulator 3D Unblocked Free Online" onclick="trackRecentGame('Brawl Simulator 3D')">
+      <div class="thumb-container" style="--thumb-url: url('games/Brawl Simulator 3D/thumbnail.webp')">
+        <img class="thumb" src="games/Brawl Simulator 3D/thumbnail.webp" alt="Play Brawl Simulator 3D Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Bowmasters</div>
     </a><a href="/Smash Carts.html" class="game-card" title="Play Smash Carts Unblocked Free Online" onclick="trackRecentGame('Smash Carts')">
@@ -1934,7 +2236,8 @@ footer {
       </div>
       <div class="card-title">1on1 Soccer</div>
     </a><div class="horizontal-ad-row" data-ad-index="2" role="complementary" aria-label="Advertisement">
-    <div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
+    <div data-ad-provider-stack>
+      <div data-ad-primary><div id="mmt-152f0341-dbcb-4430-ab30-d9860e3bccfa"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
@@ -1975,7 +2278,15 @@ footer {
       }
       load();
     })();
-    </script>
+    </script></div>
+      <div data-ad-fallback hidden><ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="2719401053"
+      data-ad-format="auto"
+      data-ad-lazy="true"
+      data-full-width-responsive="true"></ins></div>
+    </div>
   </div><a href="/Escape Road 3.html" class="game-card" title="Play Escape Road 3 Unblocked Free Online" onclick="trackRecentGame('Escape Road 3')">
       <div class="thumb-container" style="--thumb-url: url('games/Escape Road 3/thumbnail.webp')">
         <img class="thumb" src="games/Escape Road 3/thumbnail.webp" alt="Play Escape Road 3 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -2062,7 +2373,8 @@ footer {
   </section>
 
   <div class="bottom-leaderboard-ad" role="complementary" aria-label="Advertisement">
-    <div id="mmt-74d3975a-b756-41a9-94fe-689c862500d6"></div>
+    <div data-ad-provider-stack>
+      <div data-ad-primary><div id="mmt-74d3975a-b756-41a9-94fe-689c862500d6"></div>
     <script type="text/javascript" data-cfasync="false">
     $MMT = window.$MMT || {}; $MMT.cmd = $MMT.cmd || [];
     (function(){
@@ -2103,7 +2415,15 @@ footer {
       }
       load();
     })();
-    </script>
+    </script></div>
+      <div data-ad-fallback hidden><ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="ca-pub-1033412505744705"
+      data-ad-slot="2719401053"
+      data-ad-format="auto"
+      data-ad-lazy="true"
+      data-full-width-responsive="true"></ins></div>
+    </div>
   </div>
 
   <footer>
@@ -2316,18 +2636,59 @@ footer {
       localStorage.setItem('recentlyPlayed', JSON.stringify(recentlyPlayed));
     }
 
+    function reloadGame() {
+      const frame = document.getElementById('gameFrame');
+      if (!gameIsActive || !frame.getAttribute('src')) {
+        startGame();
+        return;
+      }
+
+      // Reassigning the game URL works for both same-origin and cross-origin
+      // games without reaching into their document.
+      frame.classList.remove('active');
+      frame.src = 'games/One Bit Adventure/index.html';
+      requestAnimationFrame(() => frame.classList.add('active'));
+      setTimeout(focusGameFrame, 150);
+    }
+
+    function enterFullscreenFallback(wrapper) {
+      wrapper.classList.add('is-expanded');
+      document.body.classList.add('game-is-expanded');
+      updateFullscreenIcon();
+    }
+
+    function exitFullscreenFallback() {
+      const wrapper = document.getElementById('gameWrapper');
+      wrapper.classList.remove('is-expanded');
+      document.body.classList.remove('game-is-expanded');
+      updateFullscreenIcon();
+    }
+
     function toggleFullscreen() {
       const wrapper = document.getElementById('gameWrapper');
-      const isEnteringFullscreen = !document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement;
+      const nativeFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
 
-      if (isEnteringFullscreen) {
+      if (wrapper.classList.contains('is-expanded')) {
+        exitFullscreenFallback();
+        return;
+      }
+
+      if (!nativeFullscreen) {
         // Enter fullscreen
         if (wrapper.requestFullscreen) {
-          wrapper.requestFullscreen();
+          const request = wrapper.requestFullscreen();
+          if (request && typeof request.catch === 'function') {
+            request.catch(() => enterFullscreenFallback(wrapper));
+          }
         } else if (wrapper.webkitRequestFullscreen) {
           wrapper.webkitRequestFullscreen();
         } else if (wrapper.mozRequestFullScreen) {
           wrapper.mozRequestFullScreen();
+        } else {
+          // iOS Safari and embedded mobile browsers may not expose the
+          // element Fullscreen API. The fixed player provides the same usable
+          // viewport while keeping an obvious exit control.
+          enterFullscreenFallback(wrapper);
         }
       } else {
         // Exit fullscreen
@@ -2344,17 +2705,21 @@ footer {
     function updateFullscreenIcon() {
       const icon = document.getElementById('fullscreenIcon');
       const btn = document.getElementById('fullscreenBtn');
+      const label = document.getElementById('fullscreenLabel');
+      const expanded = document.getElementById('gameWrapper').classList.contains('is-expanded');
 
-      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || expanded) {
         // In fullscreen - show X icon
         icon.innerHTML = '<path d="M18 6L6 18M6 6l12 12"/>';
         btn.title = 'Exit Fullscreen';
         btn.setAttribute('aria-label', 'Exit Fullscreen');
+        if (label) label.textContent = 'Exit';
       } else {
         // Not in fullscreen - show expand icon
         icon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>';
         btn.title = 'Fullscreen';
-        btn.setAttribute('aria-label', 'Toggle Fullscreen');
+        btn.setAttribute('aria-label', 'Enter Fullscreen');
+        if (label) label.textContent = 'Fullscreen';
       }
     }
 
@@ -2454,6 +2819,12 @@ footer {
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && document.getElementById('gameWrapper').classList.contains('is-expanded')) {
+        exitFullscreenFallback();
+      }
+    });
+
     // Re-focus game after clicking fullscreen button
     document.getElementById('fullscreenBtn').addEventListener('click', () => {
       if (gameIsActive) {
@@ -2547,13 +2918,19 @@ footer {
 
   </script>
 
-
+  <!-- Initialize AdSense only when it is the active provider -->
+  <script>
+    if (window.__activeAdProvider === 'adsense') {
+      if (window.__prepareAdProviderFallbacks) window.__prepareAdProviderFallbacks(document);
+      else if (window.__initAdSenseSlots) window.__initAdSenseSlots(document);
+    }
+  </script>
 
   <!-- Cookie Consent Banner -->
   <link rel="stylesheet" href="assets/cookie-consent.css">
   <script src="assets/cookie-consent.js"></script>
 
-  <div class="footer-inscreen-ad" id="footerInScreenAd" role="complementary" aria-label="Advertisement" hidden>
+  <div class="footer-inscreen-ad" id="footerInScreenAd" data-ad-primary-only role="complementary" aria-label="Advertisement" hidden>
     <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="window.__closeFooterAd()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>

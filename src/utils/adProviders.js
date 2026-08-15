@@ -1,8 +1,9 @@
 /**
  * Ad provider abstraction.
  *
- * The site supports two ad networks: AdSense and Monumetric. The active
- * provider is set via `ads-config.json` -> `adProvider` ("adsense" | "monumetric").
+ * The site supports two ad networks: AdSense and Monumetric. The primary
+ * provider and optional script-failure fallback are configured in
+ * `ads-config.json`.
  *
  * Each helper returns the exact HTML to inject for a given slot. When ads
  * are disabled (or the provider is unrecognized), an empty string is returned.
@@ -28,14 +29,21 @@ function normalizeProvider(adProvider) {
   return adProvider === 'monumetric' ? 'monumetric' : 'adsense';
 }
 
+function normalizeFallbackProvider(adProvider, fallbackAdProvider) {
+  return normalizeProvider(adProvider) === 'monumetric' && fallbackAdProvider === 'adsense'
+    ? 'adsense'
+    : null;
+}
+
 /**
  * Resource hints for the active ad network: dns-prefetch + preconnect for
  * the provider's origin, preload for the main script, and preconnect for
  * the most common ad-exchange endpoints. Saves ~200-500ms on first ad fill.
  */
-function generateAdNetworkHeadHints(adsEnabled, adProvider) {
+function generateAdNetworkHeadHints(adsEnabled, adProvider, fallbackAdProvider) {
   if (!adsEnabled) return '';
   const provider = normalizeProvider(adProvider);
+  const fallback = normalizeFallbackProvider(adProvider, fallbackAdProvider);
 
   if (provider === 'monumetric') {
     // Monumetric's own snippet loads the script without crossorigin, so the
@@ -45,7 +53,9 @@ function generateAdNetworkHeadHints(adsEnabled, adProvider) {
   <link rel="preconnect" href="https://monu.delivery">
   <link rel="preload" as="script" href="${MONU_SCRIPT_SRC}">
   <link rel="dns-prefetch" href="https://securepubads.g.doubleclick.net">
-  <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net">`;
+  <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net">${fallback ? `
+  <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
+  <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin>` : ''}`;
   }
 
   return `<link rel="dns-prefetch" href="https://pagead2.googlesyndication.com">
@@ -59,14 +69,11 @@ function generateAdNetworkHeadHints(adsEnabled, adProvider) {
  * all requests behind this runtime prevents accidental double initialization
  * and lets below-the-fold or desktop-only units wait until they can be viewed.
  */
-function generateAdNetworkHeadScript(adsEnabled, adProvider) {
+function generateAdNetworkHeadScript(adsEnabled, adProvider, fallbackAdProvider) {
   if (!adsEnabled) return '';
   const provider = normalizeProvider(adProvider);
-  const src = provider === 'monumetric' ? MONU_SCRIPT_SRC : ADSENSE_SCRIPT_SRC;
-  const extra = provider === 'monumetric'
-    ? `s.async=true;s.setAttribute('data-cfasync','false');`
-    : `s.async=true;s.crossOrigin='anonymous';`;
-  const adsenseRuntime = provider === 'adsense' ? `
+  const fallback = normalizeFallbackProvider(adProvider, fallbackAdProvider);
+  const adsenseRuntime = provider === 'adsense' || fallback === 'adsense' ? `
       window.__requestAdSenseSlot = function(ad){
         if (!ad || ad.getAttribute('data-ad-requested') === '1' || ad.getAttribute('data-ad-pending') === '1') return;
         ad.setAttribute('data-ad-pending', '1');
@@ -122,11 +129,69 @@ function generateAdNetworkHeadScript(adsEnabled, adProvider) {
 
           schedule();
         });
+      };
+
+      window.__prepareAdProviderFallbacks = function(root){
+        var scope = root || document;
+        if (window.__activeAdProvider !== 'adsense') return;
+        var stacks = [];
+        if (scope.matches && scope.matches('[data-ad-provider-stack]')) stacks.push(scope);
+        if (scope.querySelectorAll) {
+          stacks = stacks.concat(Array.prototype.slice.call(scope.querySelectorAll('[data-ad-provider-stack]')));
+          Array.prototype.forEach.call(scope.querySelectorAll('[data-ad-primary-only]'), function(primaryOnly){
+            primaryOnly.hidden = true;
+          });
+        }
+        stacks.forEach(function(stack){
+          var primary = stack.querySelector('[data-ad-primary]');
+          var fallbackSlot = stack.querySelector('[data-ad-fallback]');
+          if (primary) primary.hidden = true;
+          if (fallbackSlot) fallbackSlot.hidden = false;
+        });
+        window.__initAdSenseSlots(scope);
+      };
+
+      window.__loadAdSenseNetwork = function(onReady){
+        if (window.__adsenseNetworkReady) {
+          if (onReady) onReady();
+          return;
+        }
+        if (onReady) {
+          window.__adsenseReadyCallbacks = window.__adsenseReadyCallbacks || [];
+          window.__adsenseReadyCallbacks.push(onReady);
+        }
+        if (window.__adsenseNetworkLoading) return;
+        window.__adsenseNetworkLoading = true;
+        var adsenseScript = document.createElement('script');
+        adsenseScript.src = ${JSON.stringify(ADSENSE_SCRIPT_SRC)};
+        adsenseScript.async = true;
+        adsenseScript.crossOrigin = 'anonymous';
+        adsenseScript.onload = function(){
+          window.__adsenseNetworkReady = true;
+          var callbacks = window.__adsenseReadyCallbacks || [];
+          window.__adsenseReadyCallbacks = [];
+          callbacks.forEach(function(callback){ callback(); });
+        };
+        adsenseScript.onerror = function(){ window.__adsenseNetworkLoading = false; };
+        document.head.appendChild(adsenseScript);
+      };
+
+      window.__activateAdSenseFallback = function(reason){
+        if (${JSON.stringify(fallback)} !== 'adsense' || window.__activeAdProvider === 'adsense') return;
+        window.__activeAdProvider = 'adsense';
+        document.documentElement.setAttribute('data-ad-provider-active', 'adsense');
+        window.__prepareAdProviderFallbacks(document);
+        window.__loadAdSenseNetwork(function(){ window.__initAdSenseSlots(document); });
+        try {
+          window.dispatchEvent(new CustomEvent('adproviderchange', { detail: { provider: 'adsense', reason: reason || 'primary-error' } }));
+        } catch (e) {}
       };` : '';
 
   return `<!-- Ad network runtime: verified library load + deduplicated slot requests -->
   <script>
     (function(){
+      window.__activeAdProvider = ${JSON.stringify(provider)};
+      document.documentElement.setAttribute('data-ad-provider-active', window.__activeAdProvider);
       window.__adsReady = function(cb){
         var bd = window.botDetector;
         if (!bd) return cb();
@@ -137,9 +202,18 @@ function generateAdNetworkHeadScript(adsEnabled, adProvider) {
       function loadAdNetwork(){
         if (window.__adNetworkLoaded) return;
         window.__adNetworkLoaded = true;
+        if (${JSON.stringify(provider)} === 'adsense') {
+          window.__loadAdSenseNetwork(function(){ window.__initAdSenseSlots(document); });
+          return;
+        }
         var s = document.createElement('script');
-        s.src = ${JSON.stringify(src)};
-        ${extra}
+        s.src = ${JSON.stringify(MONU_SCRIPT_SRC)};
+        s.async=true;s.setAttribute('data-cfasync','false');
+        s.onload = function(){ window.__primaryAdNetworkReady = true; };
+        s.onerror = function(){
+          window.__primaryAdNetworkFailed = true;
+          if (window.__activateAdSenseFallback) window.__activateAdSenseFallback('script-error');
+        };
         document.head.appendChild(s);
       }
       // The preload hint fetches the library early, but execution waits for
@@ -155,24 +229,28 @@ function generateAdNetworkHeadScript(adsEnabled, adProvider) {
  * Late-init script for ads that were server-rendered. Only AdSense needs
  * this — Monumetric uses its own `$MMT.cmd` queue per slot.
  */
-function generateAdNetworkInitScript(adsEnabled, adProvider) {
+function generateAdNetworkInitScript(adsEnabled, adProvider, fallbackAdProvider) {
   if (!adsEnabled) return '';
   const provider = normalizeProvider(adProvider);
-  if (provider !== 'adsense') return '';
+  const fallback = normalizeFallbackProvider(adProvider, fallbackAdProvider);
+  if (provider !== 'adsense' && fallback !== 'adsense') return '';
 
-  return `<!-- Initialize server-rendered AdSense slots once -->
+  return `<!-- Initialize AdSense only when it is the active provider -->
   <script>
-    if (window.__initAdSenseSlots) window.__initAdSenseSlots(document);
+    if (window.__activeAdProvider === 'adsense') {
+      if (window.__prepareAdProviderFallbacks) window.__prepareAdProviderFallbacks(document);
+      else if (window.__initAdSenseSlots) window.__initAdSenseSlots(document);
+    }
   </script>`;
 }
 
 /**
  * Inline Monumetric slot markup with three load strategies. In every case the
  * actual slot request runs through window.__adsReady(), so it only fires once
- * the visitor is Turnstile-verified (the library itself loads earlier).
+ * the visitor is Turnstile-verified.
  *   - default (immediate): request the slot as soon as it's verified. Use
  *     above the fold.
- *   - { lazy: true }: also wait until the wrapping element is within 800px of
+ *   - { lazy: true }: also wait until the wrapping element is within 600px of
  *     the viewport (IntersectionObserver). Use below the fold.
  *   - { idle: true }: also wait for requestIdleCallback (fallback setTimeout)
  *     so it doesn't compete with above-the-fold ad calls. Use for
@@ -228,28 +306,49 @@ function monumetricSlot(slotId, opts) {
     </script>`;
 }
 
+function adsenseSlot(slotId, opts) {
+  const lazy = opts && opts.lazy === true;
+  const media = opts && opts.media ? opts.media : '';
+  return `<ins class="adsbygoogle"
+      style="display:block"
+      data-ad-client="${ADSENSE_CLIENT}"
+      data-ad-slot="${slotId}"
+      data-ad-format="auto"${lazy ? '\n      data-ad-lazy="true"' : ''}${media ? `\n      data-ad-media="${media}"` : ''}
+      data-full-width-responsive="true"></ins>`;
+}
+
+function withAdSenseFallback(primaryMarkup, fallbackMarkup, adProvider, fallbackAdProvider) {
+  if (normalizeProvider(adProvider) !== 'monumetric' ||
+      normalizeFallbackProvider(adProvider, fallbackAdProvider) !== 'adsense') {
+    return primaryMarkup;
+  }
+  return `<div data-ad-provider-stack>
+      <div data-ad-primary>${primaryMarkup}</div>
+      <div data-ad-fallback hidden>${fallbackMarkup}</div>
+    </div>`;
+}
+
 /**
  * Horizontal ad row that sits between rows of game cards. Lazy-loaded on
  * Monumetric since these are below the fold on initial paint.
  */
-function generateHorizontalAd(adIndex, adsEnabled, adProvider) {
+function generateHorizontalAd(adIndex, adsEnabled, adProvider, fallbackAdProvider) {
   if (!adsEnabled) return '';
   const provider = normalizeProvider(adProvider);
 
   if (provider === 'monumetric') {
     return `<div class="horizontal-ad-row" data-ad-index="${adIndex}" role="complementary" aria-label="Advertisement">
-    ${monumetricSlot(MONU_SLOTS.inContentRepeatable, { lazy: true })}
+    ${withAdSenseFallback(
+      monumetricSlot(MONU_SLOTS.inContentRepeatable, { lazy: true }),
+      adsenseSlot(ADSENSE_HORIZONTAL_SLOT, { lazy: true }),
+      adProvider,
+      fallbackAdProvider
+    )}
   </div>`;
   }
 
   return `<div class="horizontal-ad-row" data-ad-index="${adIndex}" role="complementary" aria-label="Advertisement">
-    <ins class="adsbygoogle"
-      style="display:block"
-      data-ad-client="${ADSENSE_CLIENT}"
-      data-ad-slot="${ADSENSE_HORIZONTAL_SLOT}"
-      data-ad-format="auto"
-      data-ad-lazy="true"
-      data-full-width-responsive="true"></ins>
+    ${adsenseSlot(ADSENSE_HORIZONTAL_SLOT, { lazy: true })}
   </div>`;
 }
 
@@ -267,9 +366,9 @@ function generateVerticalAd(adsEnabled, adProvider, side = 'left') {
   if (provider === 'monumetric') {
     if (side !== 'left') {
       // Balancing spacer keeps the game viewer centered.
-      return `<div class="vertical-ad vertical-ad-spacer" aria-hidden="true"></div>`;
+      return `<div class="vertical-ad vertical-ad-spacer" data-ad-primary-only aria-hidden="true"></div>`;
     }
-    return `<div class="vertical-ad vertical-ad-${side}" role="complementary" aria-label="Advertisement">
+    return `<div class="vertical-ad vertical-ad-${side}" data-ad-primary-only role="complementary" aria-label="Advertisement">
       ${monumetricSlot(MONU_SLOTS.pillarLeft, { media: '(min-width: 1280px)' })}
     </div>`;
   }
@@ -292,8 +391,8 @@ function generateVerticalAd(adsEnabled, adProvider, side = 'left') {
 function generateHeaderBannerAd(adsEnabled, adProvider) {
   if (!adsEnabled) return '';
   if (normalizeProvider(adProvider) !== 'monumetric') return '';
-  return `<div class="header-banner-ad" role="complementary" aria-label="Advertisement">
-    ${monumetricSlot(MONU_SLOTS.headerInScreen)}
+  return `<div class="header-banner-ad" data-ad-primary-only role="complementary" aria-label="Advertisement">
+    ${monumetricSlot(MONU_SLOTS.headerInScreen, { media: '(min-height: 521px), (min-width: 951px)' })}
   </div>
   <script>document.body.classList.add('has-header-ad');</script>`;
 }
@@ -302,11 +401,16 @@ function generateHeaderBannerAd(adsEnabled, adProvider) {
  * Bottom leaderboard inline above the footer. Lazy-loaded since it's deep
  * below the fold. Monumetric-only.
  */
-function generateBottomLeaderboardAd(adsEnabled, adProvider) {
+function generateBottomLeaderboardAd(adsEnabled, adProvider, fallbackAdProvider) {
   if (!adsEnabled) return '';
   if (normalizeProvider(adProvider) !== 'monumetric') return '';
   return `<div class="bottom-leaderboard-ad" role="complementary" aria-label="Advertisement">
-    ${monumetricSlot(MONU_SLOTS.bottomLeaderboard, { lazy: true })}
+    ${withAdSenseFallback(
+      monumetricSlot(MONU_SLOTS.bottomLeaderboard, { lazy: true }),
+      adsenseSlot(ADSENSE_HORIZONTAL_SLOT, { lazy: true }),
+      adProvider,
+      fallbackAdProvider
+    )}
   </div>`;
 }
 
@@ -318,7 +422,7 @@ function generateFooterInScreenAd(adsEnabled, adProvider) {
   if (!adsEnabled) return '';
   if (normalizeProvider(adProvider) !== 'monumetric') return '';
   const slotId = MONU_SLOTS.footerInScreen;
-  return `<div class="footer-inscreen-ad" id="footerInScreenAd" role="complementary" aria-label="Advertisement" hidden>
+  return `<div class="footer-inscreen-ad" id="footerInScreenAd" data-ad-primary-only role="complementary" aria-label="Advertisement" hidden>
     <button type="button" class="footer-inscreen-ad__close" aria-label="Close ad" onclick="window.__closeFooterAd()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
@@ -381,5 +485,6 @@ module.exports = {
   generateHeaderBannerAd,
   generateBottomLeaderboardAd,
   generateFooterInScreenAd,
-  normalizeProvider
+  normalizeProvider,
+  normalizeFallbackProvider
 };
