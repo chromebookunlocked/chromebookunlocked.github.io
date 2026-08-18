@@ -1,4 +1,4 @@
-/* Header banner ad (Monumetric Header In-screen).
+/* Header AdSense banner.
    The site <header> is position:fixed, so this banner (the first in-flow
    element) must be pushed down by the header's height or it renders behind
    it. The game-container normally reserves that space via top padding, so
@@ -18,7 +18,7 @@ body:has(.header-banner-ad) .game-container {
 body.has-header-ad .game-container {
   padding-top: var(--spacing-xs);
 }
-.header-banner-ad > div {
+.header-banner-ad > ins.adsbygoogle {
   width: 100%;
   max-width: 970px;
   margin: 0 auto;
@@ -38,7 +38,7 @@ body.has-header-ad .game-container {
   min-height: 90px;
   padding: 16px 0;
 }
-.bottom-leaderboard-ad > div {
+.bottom-leaderboard-ad > ins.adsbygoogle {
   width: 100%;
   max-width: 970px;
   margin: 0 auto;
@@ -47,86 +47,6 @@ body.has-header-ad .game-container {
   .bottom-leaderboard-ad {
     min-height: 50px;
   }
-}
-
-/* Footer In-screen ad — sticks to the bottom of the viewport. */
-/* Floating bottom ad card: sized to its content (not a full-width bar),
-   close button anchored OUTSIDE the ad surface so it can't be mis-clicked
-   or covered by the creative, fixed slot height so the card never resizes
-   after fill. Slides up once the slot is requested. */
-.footer-inscreen-ad {
-  position: fixed;
-  left: 50%;
-  bottom: 8px;
-  transform: translateX(-50%) translateY(calc(100% + 16px));
-  z-index: 9998;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  max-width: calc(100vw - 16px);
-  padding: 4px;
-  background: rgba(20, 14, 38, 0.95);
-  border: 1px solid rgba(255, 102, 255, 0.25);
-  border-radius: 12px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
-  opacity: 0;
-  transition: transform 0.25s ease, opacity 0.25s ease;
-}
-.footer-inscreen-ad--visible {
-  transform: translateX(-50%) translateY(0);
-  opacity: 1;
-}
-.footer-inscreen-ad__slot {
-  width: 728px;
-  max-width: calc(100vw - 24px);
-  height: 90px;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 8px;
-}
-.footer-inscreen-ad__close {
-  position: absolute;
-  top: -14px;
-  right: -6px;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: 1px solid rgba(255, 102, 255, 0.4);
-  border-radius: 50%;
-  background: #1c0033;
-  color: rgba(255, 255, 255, 0.85);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
-  z-index: 1;
-}
-.footer-inscreen-ad__close:hover {
-  color: #fff;
-  background: #2d0052;
-  transform: scale(1.1);
-}
-@media (max-width: 768px) {
-  .footer-inscreen-ad__slot {
-    width: 320px;
-    height: 50px;
-  }
-  .footer-inscreen-ad__close {
-    top: -16px;
-    right: 0;
-  }
-}
-/* Managed by the footer-ad script: class is added only when the ad card
-   actually appears and removed when it's closed. */
-body.has-footer-ad {
-  padding-bottom: 100px;
-}
-body.has-footer-ad .cookie-consent-banner {
-  bottom: 120px !important;
 }
 
 /* ============================================================================
@@ -317,6 +237,7 @@ h1 {
 .vertical-ad {
   flex: 0 0 160px;
   width: 160px;
+  min-height: 600px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1130,12 +1051,6 @@ footer {
   transition: none !important;
   contain: layout paint size;
   z-index: 10000;
-}
-
-[data-ad-provider-stack],
-[data-ad-primary],
-[data-ad-fallback] {
-  width: 100%;
 }
 
 .game-frame-wrapper:-webkit-full-screen .game-stage,

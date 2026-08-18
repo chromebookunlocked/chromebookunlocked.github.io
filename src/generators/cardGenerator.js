@@ -60,11 +60,10 @@ function generateSidebar(categories) {
 }
 
 /**
- * Generate HTML for a full-width horizontal ad row, delegating to the
- * configured ad provider (AdSense or Monumetric).
+ * Generate HTML for a full-width AdSense horizontal ad row.
  */
-function generateHorizontalAd(adIndex, adsEnabled = true, adProvider = 'adsense', fallbackAdProvider = null) {
-  return providerHorizontalAd(adIndex, adsEnabled, adProvider, fallbackAdProvider);
+function generateHorizontalAd(adIndex, adsEnabled = true) {
+  return providerHorizontalAd(adIndex, adsEnabled);
 }
 
 module.exports = {

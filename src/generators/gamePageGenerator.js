@@ -6,23 +6,21 @@ const { RECOMMENDED_GAMES_COUNT, MAX_RELATED_GAMES, GAME_DURATION_TRACKING_INTER
 const {
   generateAdNetworkHeadHints,
   generateAdNetworkHeadScript,
-  generateAdNetworkInitScript,
   generateHorizontalAd: providerHorizontalAd,
   generateVerticalAd: providerVerticalAd,
   generateHeaderBannerAd,
-  generateBottomLeaderboardAd,
-  generateFooterInScreenAd
+  generateBottomLeaderboardAd
 } = require("../utils/adProviders");
 
 // Horizontal ad configuration: insert every 2 desktop rows (2 × 6 = 12 games)
 const AD_INTERVAL = 12; // ad every 2 rows of 6
 
-function generateHorizontalAd(adIndex, adsEnabled = true, adProvider = 'adsense', fallbackAdProvider = null) {
-  return providerHorizontalAd(adIndex, adsEnabled, adProvider, fallbackAdProvider);
+function generateHorizontalAd(adIndex, adsEnabled = true) {
+  return providerHorizontalAd(adIndex, adsEnabled);
 }
 
-function generateVerticalAd(adsEnabled = true, adProvider = 'adsense', side = 'left', fallbackAdProvider = null) {
-  return providerVerticalAd(adsEnabled, adProvider, side, fallbackAdProvider);
+function generateVerticalAd(adsEnabled = true, side = 'left') {
+  return providerVerticalAd(adsEnabled, side);
 }
 
 // Helper to escape JavaScript string for use in HTML script tags
@@ -47,7 +45,7 @@ function escapeJs(str) {
  * @param {string} gamesDir - Path to games directory
  * @returns {string} Complete HTML document for game page
  */
-function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, adsEnabled = true, adProvider = 'adsense', botVerificationEnabled = true, fallbackAdProvider = null) {
+function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, adsEnabled = true, botVerificationEnabled = true) {
   const thumbInfo = getThumbPath(game, gamesDir);
   const thumbPath = thumbInfo.path;
   const gameUrl = `games/${game.folder}/index.html`;
@@ -132,7 +130,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
     // Insert a full-width horizontal ad every 2 desktop rows (every 12 games)
     if ((idx + 1) % AD_INTERVAL === 0) {
-      recommendedGamesHTML += generateHorizontalAd(adCount, adsEnabled, adProvider, fallbackAdProvider);
+      recommendedGamesHTML += generateHorizontalAd(adCount, adsEnabled);
       adCount++;
     }
   });
@@ -151,7 +149,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   ${metaTags}
 
   <!-- Resource Hints for Performance -->
-  ${generateAdNetworkHeadHints(adsEnabled, adProvider, fallbackAdProvider)}
+  ${generateAdNetworkHeadHints(adsEnabled)}
 
   ${botVerificationEnabled ? `<!-- Cloudflare Turnstile verification gate (must load before ads) -->
   <script src="assets/bot-detector.js"></script>` : ''}
@@ -165,7 +163,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
     gtag('config', 'G-4QZLTDX504', { send_page_view: false });
   </script>
 
-  ${generateAdNetworkHeadScript(adsEnabled, adProvider, fallbackAdProvider)}
+  ${generateAdNetworkHeadScript(adsEnabled)}
 
   ${generateAnalyticsScript()}
 
@@ -189,7 +187,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
     </div>
   </header>
 
-  ${generateHeaderBannerAd(adsEnabled, adProvider, fallbackAdProvider)}
+  ${generateHeaderBannerAd(adsEnabled)}
 
   <!-- Main Game Content -->
   <main itemscope itemtype="https://schema.org/VideoGame">
@@ -199,7 +197,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
     <!-- Game Viewer -->
     <div class="game-container">
-      ${generateVerticalAd(adsEnabled, adProvider, 'left', fallbackAdProvider)}
+      ${generateVerticalAd(adsEnabled, 'left')}
       <div class="game-frame-wrapper" id="gameWrapper">
         <div class="game-stage" id="gameStage">
           <div class="play-overlay" id="playOverlay">
@@ -229,7 +227,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
           </button>
         </div>
       </div>
-      ${generateVerticalAd(adsEnabled, adProvider, 'right', fallbackAdProvider)}
+      ${generateVerticalAd(adsEnabled, 'right')}
     </div>
   </main>
 
@@ -308,7 +306,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
     </div>
   </section>
 
-  ${generateBottomLeaderboardAd(adsEnabled, adProvider, fallbackAdProvider)}
+  ${generateBottomLeaderboardAd(adsEnabled)}
 
   <footer>
     <div class="footer-content">
@@ -700,13 +698,10 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
   </script>
 
-  ${generateAdNetworkInitScript(adsEnabled, adProvider, fallbackAdProvider)}
-
   <!-- Cookie Consent Banner -->
   <link rel="stylesheet" href="assets/cookie-consent.css">
   <script src="assets/cookie-consent.js"></script>
 
-  ${generateFooterInScreenAd(adsEnabled, adProvider, fallbackAdProvider)}
 </body>
 </html>`;
 }

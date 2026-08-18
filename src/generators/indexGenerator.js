@@ -19,7 +19,7 @@ const { generateAnalyticsScript, generateConsentModeScript } = require('../utils
 const { escapeHtml, escapeHtmlAttr } = require('../utils/htmlEscape');
 const { getThumbPath } = require('../utils/assetManager');
 const { INITIAL_ROWS, ROWS_PER_LOAD, SCROLL_THRESHOLD, EAGER_LOAD_CARDS } = require('../utils/constants');
-const { generateAdNetworkHeadHints, generateAdNetworkHeadScript, generateAdNetworkInitScript, generateHeaderBannerAd, generateBottomLeaderboardAd, generateFooterInScreenAd } = require('../utils/adProviders');
+const { generateAdNetworkHeadHints, generateAdNetworkHeadScript, generateHeaderBannerAd, generateBottomLeaderboardAd } = require('../utils/adProviders');
 
 // Category to icon mapping (kept for sidebar)
 const categoryIcons = {
@@ -99,11 +99,9 @@ function shuffleArray(array, seed) {
  * @param {string} clientJS - JavaScript content string to embed in <script> tag
  * @param {string} gamesDir - Optional path to games directory (for asset resolution)
  * @param {boolean} adsEnabled - Whether ads are enabled
- * @param {string} adProvider - "adsense" | "monumetric"
- * @param {string|null} fallbackAdProvider - Optional script-failure fallback
  * @returns {string} Complete HTML document
  */
-function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.', adsEnabled = true, adProvider = 'adsense', botVerificationEnabled = true, fallbackAdProvider = null) {
+function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.', adsEnabled = true, botVerificationEnabled = true) {
   // Generate sidebar categories - sorted by game count (largest first)
   // Filter out categories with less than 2 games, and exclude special categories
   const sidebarCategories = Object.keys(categories)
@@ -171,7 +169,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     initialCardsHTML += generateGameCard(game, idx, gamesDir, true);
     // Check if we should insert a horizontal ad after this game
     if (shouldInsertAdAfter(idx)) {
-      initialCardsHTML += generateHorizontalAd(adCount, adsEnabled, adProvider, fallbackAdProvider);
+      initialCardsHTML += generateHorizontalAd(adCount, adsEnabled);
       adCount++;
     }
   });
@@ -189,7 +187,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <!-- Resource Hints for Performance -->
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
-  ${generateAdNetworkHeadHints(adsEnabled, adProvider, fallbackAdProvider)}
+  ${generateAdNetworkHeadHints(adsEnabled)}
 
   <!-- Optimize Google Fonts loading -->
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap">
@@ -218,7 +216,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     gtag('config', 'G-4QZLTDX504', { send_page_view: false });
   </script>
 
-  ${generateAdNetworkHeadScript(adsEnabled, adProvider, fallbackAdProvider)}
+  ${generateAdNetworkHeadScript(adsEnabled)}
 
   ${generateAnalyticsScript()}
 
@@ -258,7 +256,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       </div>
     </header>
 
-    ${generateHeaderBannerAd(adsEnabled, adProvider, fallbackAdProvider)}
+    ${generateHeaderBannerAd(adsEnabled)}
 
     <div class="content-wrapper" id="main-content">
       <div id="controls">
@@ -291,7 +289,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         <div id="scrollSentinel" style="height:1px;"></div>
       </div>
 
-      ${generateBottomLeaderboardAd(adsEnabled, adProvider, fallbackAdProvider)}
+      ${generateBottomLeaderboardAd(adsEnabled)}
 
       <footer id="siteFooter">
         <div class="footer-content">
@@ -327,11 +325,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     window.__newlyAddedFolders = ${JSON.stringify(newlyAddedFolders)};
     // Ads toggle flag
     window.__adsEnabled = ${adsEnabled};
-    window.__adProvider = ${JSON.stringify(adProvider)};
-    window.__fallbackAdProvider = ${JSON.stringify(fallbackAdProvider)};
   </script>
-
-  ${generateAdNetworkInitScript(adsEnabled, adProvider, fallbackAdProvider)}
 
   <script>
     ${clientJS}
@@ -354,7 +348,6 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   <noscript><link rel="stylesheet" href="assets/cookie-consent.css"></noscript>
   <script src="assets/cookie-consent.js" defer></script>
 
-  ${generateFooterInScreenAd(adsEnabled, adProvider, fallbackAdProvider)}
 </body>
 </html>`;
 

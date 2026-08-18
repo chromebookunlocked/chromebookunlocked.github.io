@@ -85,75 +85,15 @@ function createHorizontalAd(adIndex) {
   div.setAttribute('role', 'complementary');
   div.setAttribute('aria-label', 'Advertisement');
 
-  if (window.__adProvider === 'monumetric') {
-    // In-Content Repeatable unit. Same id pattern as server-rendered slots
-    // (duplicate ids are intentional and handled by Monumetric's renderer).
-    // Lazy: defer the slot push via IntersectionObserver so off-screen ads
-    // don't trigger an auction until they're about to scroll into view.
-    const slotId = '152f0341-dbcb-4430-ab30-d9860e3bccfa';
-    const primaryMarkup = `<div id="mmt-${slotId}"></div>`;
-    if (window.__fallbackAdProvider === 'adsense') {
-      div.innerHTML = `<div data-ad-provider-stack>
-        <div data-ad-primary>${primaryMarkup}</div>
-        <div data-ad-fallback hidden><ins class="adsbygoogle"
-          style="display:block"
-          data-ad-client="ca-pub-1033412505744705"
-          data-ad-slot="2719401053"
-          data-ad-format="auto"
-          data-ad-lazy="true"
-          data-full-width-responsive="true"></ins></div>
-      </div>`;
-    } else {
-      div.innerHTML = primaryMarkup;
-    }
-
-    // If the primary library failed before this row was created, prepare the
-    // fallback markup now and let initializeHorizontalAd request it after the
-    // row is attached to the document.
-    if (window.__activeAdProvider === 'adsense') {
-      const primary = div.querySelector('[data-ad-primary]');
-      const fallback = div.querySelector('[data-ad-fallback]');
-      if (primary) primary.hidden = true;
-      if (fallback) fallback.hidden = false;
-      return div;
-    }
-    const push = function() {
-      try {
-        window.$MMT = window.$MMT || {};
-        window.$MMT.cmd = window.$MMT.cmd || [];
-        window.$MMT.cmd.push(function() { window.$MMT.display.slots.push([slotId]); });
-      } catch (e) {}
-    };
-    // Gate the request on verification (library is already warming up).
-    const ready = function() { (window.__adsReady || function(c) { c(); })(push); };
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function(entries, obs) {
-        if (entries[0].isIntersecting) { ready(); obs.disconnect(); }
-      }, { rootMargin: '800px 0px' }).observe(div);
-    } else {
-      ready();
-    }
-  } else {
-    div.innerHTML = `<ins class="adsbygoogle"
-      style="display:block"
-      data-ad-client="ca-pub-1033412505744705"
-      data-ad-slot="2719401053"
-      data-ad-format="auto"
-      data-ad-lazy="true"
-      data-full-width-responsive="true"></ins>`;
-  }
+  div.innerHTML = `<ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-1033412505744705"
+       data-ad-slot="2719401053"
+       data-ad-format="auto"
+       data-full-width-responsive="true"
+       data-ad-placement="in_content"
+       data-ad-lazy="true"></ins>`;
   return div;
-}
-
-/**
- * Initialize a horizontal ad unit (AdSense only — Monumetric queues itself).
- * @param {HTMLElement} adEl - The horizontal ad element
- */
-function initializeHorizontalAd(adEl) {
-  if (window.__adsEnabled === false) return;
-  if (window.__activeAdProvider !== 'adsense') return;
-  if (window.__prepareAdProviderFallbacks) window.__prepareAdProviderFallbacks(adEl);
-  else if (window.__initAdSenseSlots) window.__initAdSenseSlots(adEl);
 }
 
 // Cached DOM elements for performance
@@ -311,8 +251,8 @@ function loadMoreGames(count) {
   // Use requestAnimationFrame for smooth rendering
   requestAnimationFrame(() => {
     const fragment = document.createDocumentFragment();
+    const newAdRows = [];
     const endIndex = Math.min(renderedCount + count, totalGames);
-    const newAdTiles = [];
 
     for (let i = renderedCount; i < endIndex; i++) {
       const game = filteredGames[i];
@@ -329,16 +269,16 @@ function loadMoreGames(count) {
       if (shouldInsertAdAfter(i)) {
         const adEl = createHorizontalAd(adCount);
         fragment.appendChild(adEl);
-        newAdTiles.push(adEl);
+        newAdRows.push(adEl);
         adCount++;
       }
     }
 
     gamesGrid.appendChild(fragment);
+    if (window.__initAdSenseSlots) {
+      newAdRows.forEach(adRow => window.__initAdSenseSlots(adRow));
+    }
     renderedCount = endIndex;
-
-    // Initialize new horizontal ad units after they're in the DOM
-    newAdTiles.forEach(initializeHorizontalAd);
 
     if (renderedCount >= totalGames) {
       allGamesLoaded = true;

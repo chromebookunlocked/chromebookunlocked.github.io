@@ -16,6 +16,10 @@ const path = require("path");
 // Import utilities
 const { loadGames, categorizeGames } = require("./src/utils/dataLoader");
 const { generateSitemap } = require("./src/generators/sitemapGenerator");
+const {
+  ensureRequiredAdsTxtRecords,
+  normalizeAdsTxt,
+} = require("./src/utils/adsTxt");
 
 // Import generators
 const { generateIndexHTML } = require("./src/generators/indexGenerator");
@@ -37,10 +41,10 @@ function cleanGeneratedHTML(html) {
 const adsConfigPath = path.join(__dirname, "ads-config.json");
 const adsConfig = JSON.parse(fs.readFileSync(adsConfigPath, "utf8"));
 const adsEnabled = adsConfig.adsEnabled !== false;
-const adProvider = adsConfig.adProvider === 'monumetric' ? 'monumetric' : 'adsense';
-const fallbackAdProvider = adProvider === 'monumetric' && adsConfig.fallbackAdProvider === 'adsense'
-  ? 'adsense'
-  : null;
+const adProvider = adsConfig.adProvider || 'adsense';
+if (adProvider !== 'adsense') {
+  throw new Error(`Unsupported ad provider: ${adProvider}. This build is AdSense-only.`);
+}
 // Bot verification (Cloudflare Turnstile) gate. Defaults to on; set
 // "botVerificationEnabled": false in ads-config.json to load ads without
 // waiting for verification.
@@ -54,30 +58,32 @@ const botVerificationEnabled = adsConfig.botVerificationEnabled !== false;
 // config so subsequent builds remain consistent.
 const adsTxtPath = path.join(__dirname, "ads.txt");
 if (adsEnabled) {
-  // Compare canonical LF content so a build on Windows does not rewrite the
-  // entire JSON config merely because ads.txt uses CRLF line endings.
-  const normalizeAdsTxt = (content) => String(content || "")
-    .replace(/\r\n?/g, "\n")
-    .replace(/\s+$/, "");
-  const configContent = normalizeAdsTxt(adsConfig.adsTxtContent);
+  // Enforce the site-owned AdSense authorization record on every build.
+  const configContent = ensureRequiredAdsTxtRecords(adsConfig.adsTxtContent);
   let diskContent = null;
   if (fs.existsSync(adsTxtPath)) {
-    diskContent = normalizeAdsTxt(fs.readFileSync(adsTxtPath, "utf8"));
+    diskContent = ensureRequiredAdsTxtRecords(fs.readFileSync(adsTxtPath, "utf8"));
   }
 
+  let finalContent = configContent;
   if (diskContent !== null && diskContent !== configContent) {
     // ads.txt was edited by hand — keep it and update ads-config.json to match.
-    adsConfig.adsTxtContent = diskContent;
+    finalContent = diskContent;
+    console.log("📝 ads.txt was modified — updating ads-config.json to match.");
+  }
+
+  if (normalizeAdsTxt(adsConfig.adsTxtContent) !== finalContent) {
+    adsConfig.adsTxtContent = finalContent;
     fs.writeFileSync(
       adsConfigPath,
       JSON.stringify(adsConfig, null, 2) + "\n",
       "utf8",
     );
-    console.log("📝 ads.txt was modified — updated ads-config.json to match.");
-  } else {
-    // No manual edits (or file missing) — write from config.
-    fs.writeFileSync(adsTxtPath, configContent + "\n", "utf8");
   }
+
+  // Always write the canonical content so missing records and line endings are
+  // repaired even when disk and config started with the same stale content.
+  fs.writeFileSync(adsTxtPath, finalContent + "\n", "utf8");
 } else if (fs.existsSync(adsTxtPath)) {
   fs.unlinkSync(adsTxtPath);
 }
@@ -85,7 +91,6 @@ if (adsEnabled) {
 console.log("🚀 Starting build process...\n");
 console.log(`📢 Ads: ${adsEnabled ? "ENABLED" : "DISABLED"}`);
 console.log(`📊 Provider: ${adsEnabled ? adProvider.toUpperCase() : "n/a"}`);
-console.log(`🛟 Fallback: ${adsEnabled && fallbackAdProvider ? fallbackAdProvider.toUpperCase() : "none"}`);
 console.log(`🛡️  Bot verification: ${botVerificationEnabled ? "ENABLED" : "DISABLED"}\n`);
 
 // Step 1: Load game data
@@ -107,7 +112,7 @@ console.log("✅ Templates loaded\n");
 
 // Step 4: Generate main index page
 console.log("🏠 Generating main index page...");
-const indexHTML = generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir, adsEnabled, adProvider, botVerificationEnabled, fallbackAdProvider);
+const indexHTML = generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir, adsEnabled, botVerificationEnabled);
 const indexPath = path.join(outputDir, "index.html");
 fs.writeFileSync(indexPath, cleanGeneratedHTML(indexHTML));
 console.log(`✅ Created ${indexPath}\n`);
@@ -117,7 +122,7 @@ console.log("🎮 Generating game pages...");
 let generatedCount = 0;
 
 games.forEach(game => {
-  const gameHTML = generateGamePage(game, games, categories, gamePageStyles, gamesDir, adsEnabled, adProvider, botVerificationEnabled, fallbackAdProvider);
+  const gameHTML = generateGamePage(game, games, categories, gamePageStyles, gamesDir, adsEnabled, botVerificationEnabled);
   const gamePagePath = path.join(outputDir, `${game.folder}.html`);
   fs.writeFileSync(gamePagePath, cleanGeneratedHTML(gameHTML));
   generatedCount++;

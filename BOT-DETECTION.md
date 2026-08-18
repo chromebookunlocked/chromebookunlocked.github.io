@@ -35,7 +35,7 @@ There is no client-side fingerprinting, scoring, or math challenge — the entir
 - `src/generators/indexGenerator.js` — emits the `<script src="assets/bot-detector.js">` tag.
 - `src/generators/gamePageGenerator.js` — uses the same root-level asset path on individual game pages.
 - `src/utils/adProviders.js` — gates the provider library and slot requests behind `onVerified()`.
-- `templates/client.js` — routes dynamically inserted AdSense slots through the shared request helper.
+- `templates/client.js` — queues dynamically inserted AdSense in-content slots through the shared verification gate.
 
 ## Configuration
 
