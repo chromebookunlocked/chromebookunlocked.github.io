@@ -1009,6 +1009,20 @@ button:active {
   margin: 0 auto;
   text-align: center;
 }
+
+/* AdSense sets data-ad-status after its auction. Collapse the whole grid row
+   only when Google explicitly reports no fill, so an empty unit does not
+   leave the 24px strip created by this row's vertical padding. */
+ins.adsbygoogle[data-ad-status="unfilled"] {
+  display: none !important;
+}
+
+.horizontal-ad-row:has(> ins.adsbygoogle[data-ad-status="unfilled"]) {
+  display: none;
+  min-height: 0;
+  padding: 0;
+}
+
 @media (max-width: 768px) {
   .horizontal-ad-row {
     /* Mobile in-content fill is typically 300x250 — reserving less caused

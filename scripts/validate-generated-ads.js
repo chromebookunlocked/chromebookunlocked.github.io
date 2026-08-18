@@ -47,11 +47,15 @@ function validatePage(page, html, isGamePage) {
   expect(html.includes('window.__initAdSenseSlots'), `${page} does not initialize AdSense slots through the shared runtime`);
   expect(html.includes("script.setAttribute('data-overlays', 'bottom')"), `${page} does not enable Google's native bottom anchor`);
   expect(!html.includes('footer-inscreen-ad'), `${page} still contains the custom floating ad`);
+  expect(html.includes('ins.adsbygoogle[data-ad-status="unfilled"]'), `${page} does not hide explicitly unfilled AdSense units`);
+  expect(html.includes('.horizontal-ad-row:has(> ins.adsbygoogle[data-ad-status="unfilled"])'), `${page} does not collapse unfilled in-content ad rows`);
   expect(!forbiddenMonumetricPattern.test(html), `${page} still contains Monumetric code or markup`);
 
   if (isGamePage) {
     expect(html.includes('class="game-stage"'), `${page} has no responsive game stage`);
-    expect(html.includes('id="reloadGameBtn"'), `${page} has no mobile-friendly restart control`);
+    expect(!html.includes('id="reloadGameBtn"'), `${page} still contains the restart control`);
+    expect(!html.includes('function reloadGame()'), `${page} still contains restart behavior`);
+    expect(html.includes('id="fullscreenBtn"'), `${page} has no fullscreen control`);
     expect(html.includes('role="toolbar" aria-label="Game controls"'), `${page} has no accessible game toolbar`);
     expect(occurrences(html, `data-ad-slot="${ADSENSE_VERTICAL_SLOT}"`) >= 2, `${page} does not contain both vertical AdSense pillars`);
   }

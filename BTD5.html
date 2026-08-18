@@ -1199,6 +1199,19 @@ h1 {
   text-align: center;
 }
 
+/* AdSense sets data-ad-status after its auction. Collapse the whole grid row
+   only when Google explicitly reports no fill, so an empty unit does not
+   leave the 24px strip created by this row's vertical padding. */
+ins.adsbygoogle[data-ad-status="unfilled"] {
+  display: none !important;
+}
+
+.horizontal-ad-row:has(> ins.adsbygoogle[data-ad-status="unfilled"]) {
+  display: none;
+  min-height: 0;
+  padding: 0;
+}
+
 /* Ensure horizontal ad iframes are always visible */
 .horizontal-ad-row iframe,
 .horizontal-ad-row ins iframe {
@@ -1811,12 +1824,8 @@ body.game-is-expanded {
           </iframe>
         </div>
 
-        <!-- Separate controls avoid covering touch targets inside the game. -->
+        <!-- Keep fullscreen outside the game so it does not cover touch targets. -->
         <div class="controls" role="toolbar" aria-label="Game controls">
-          <button id="reloadGameBtn" class="icon-btn" onclick="reloadGame()" title="Restart BTD5" aria-label="Restart game">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8.1 8.1 0 1 0 2 5.3"></path><polyline points="20 4 20 11 13 11"></polyline></svg>
-            <span class="control-label">Restart</span>
-          </button>
           <button id="fullscreenBtn" class="icon-btn" onclick="toggleFullscreen()" title="Play BTD5 Fullscreen" aria-label="Enter fullscreen">
             <svg id="fullscreenIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
             <span class="control-label" id="fullscreenLabel">Fullscreen</span>
@@ -1854,11 +1863,11 @@ body.game-is-expanded {
         <img class="thumb" src="games/Super Cold/thumbnail.webp" alt="Play Super Cold Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Super Cold</div>
-    </a><a href="/FNAF 3.html" class="game-card" title="Play FNAF 3 Unblocked Free Online" onclick="trackRecentGame('FNAF 3')">
-      <div class="thumb-container" style="--thumb-url: url('games/FNAF 3/thumbnail.webp')">
-        <img class="thumb" src="games/FNAF 3/thumbnail.webp" alt="Play FNAF 3 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/FNAF 2.html" class="game-card" title="Play FNAF 2 Unblocked Free Online" onclick="trackRecentGame('FNAF 2')">
+      <div class="thumb-container" style="--thumb-url: url('games/FNAF 2/thumbnail.webp')">
+        <img class="thumb" src="games/FNAF 2/thumbnail.webp" alt="Play FNAF 2 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">FNAF 3</div>
+      <div class="card-title">FNAF 2</div>
     </a><a href="/Winter Falling.html" class="game-card" title="Play Winter Falling Unblocked Free Online" onclick="trackRecentGame('Winter Falling')">
       <div class="thumb-container" style="--thumb-url: url('games/Winter Falling/thumbnail.webp')">
         <img class="thumb" src="games/Winter Falling/thumbnail.webp" alt="Play Winter Falling Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -1869,11 +1878,11 @@ body.game-is-expanded {
         <img class="thumb" src="games/Block the Pig/thumbnail.webp" alt="Play Block the Pig Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Block the Pig</div>
-    </a><a href="/FNAF 1.html" class="game-card" title="Play FNAF 1 Unblocked Free Online" onclick="trackRecentGame('FNAF 1')">
-      <div class="thumb-container" style="--thumb-url: url('games/FNAF 1/thumbnail.webp')">
-        <img class="thumb" src="games/FNAF 1/thumbnail.webp" alt="Play FNAF 1 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Five Nights at Epstein Island.html" class="game-card" title="Play Five Nights at Epstein Island Unblocked Free Online" onclick="trackRecentGame('Five Nights at Epstein Island')">
+      <div class="thumb-container" style="--thumb-url: url('games/Five Nights at Epstein Island/thumbnail.webp')">
+        <img class="thumb" src="games/Five Nights at Epstein Island/thumbnail.webp" alt="Play Five Nights at Epstein Island Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">FNAF 1</div>
+      <div class="card-title">Five Nights at Epstein Island</div>
     </a><a href="/The Impossible Quiz 2.html" class="game-card" title="Play The Impossible Quiz 2 Unblocked Free Online" onclick="trackRecentGame('The Impossible Quiz 2')">
       <div class="thumb-container" style="--thumb-url: url('games/The Impossible Quiz 2/thumbnail.webp')">
         <img class="thumb" src="games/The Impossible Quiz 2/thumbnail.webp" alt="Play The Impossible Quiz 2 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -1958,11 +1967,11 @@ body.game-is-expanded {
         <img class="thumb" src="games/Ambulance Rush/thumbnail.webp" alt="Play Ambulance Rush Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Ambulance Rush</div>
-    </a><a href="/Crazy Motorcycle.html" class="game-card" title="Play Crazy Motorcycle Unblocked Free Online" onclick="trackRecentGame('Crazy Motorcycle')">
-      <div class="thumb-container" style="--thumb-url: url('games/Crazy Motorcycle/thumbnail.webp')">
-        <img class="thumb" src="games/Crazy Motorcycle/thumbnail.webp" alt="Play Crazy Motorcycle Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Crossy Road.html" class="game-card" title="Play Crossy Road Unblocked Free Online" onclick="trackRecentGame('Crossy Road')">
+      <div class="thumb-container" style="--thumb-url: url('games/Crossy Road/thumbnail.webp')">
+        <img class="thumb" src="games/Crossy Road/thumbnail.webp" alt="Play Crossy Road Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Crazy Motorcycle</div>
+      <div class="card-title">Crossy Road</div>
     </a><a href="/234 Player Games.html" class="game-card" title="Play 234 Player Games Unblocked Free Online" onclick="trackRecentGame('234 Player Games')">
       <div class="thumb-container" style="--thumb-url: url('games/234 Player Games/thumbnail.webp')">
         <img class="thumb" src="games/234 Player Games/thumbnail.webp" alt="Play 234 Player Games Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -2007,11 +2016,11 @@ body.game-is-expanded {
         <img class="thumb" src="games/Get Yoked/thumbnail.webp" alt="Play Get Yoked Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Get Yoked</div>
-    </a><a href="/Cookie Clicker.html" class="game-card" title="Play Cookie Clicker Unblocked Free Online" onclick="trackRecentGame('Cookie Clicker')">
-      <div class="thumb-container" style="--thumb-url: url('games/Cookie Clicker/thumbnail.webp')">
-        <img class="thumb" src="games/Cookie Clicker/thumbnail.webp" alt="Play Cookie Clicker Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Crank It!.html" class="game-card" title="Play Crank It! Unblocked Free Online" onclick="trackRecentGame('Crank It!')">
+      <div class="thumb-container" style="--thumb-url: url('games/Crank It!/thumbnail.webp')">
+        <img class="thumb" src="games/Crank It!/thumbnail.webp" alt="Play Crank It! Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Cookie Clicker</div>
+      <div class="card-title">Crank It!</div>
     </a><a href="/Portal Flash.html" class="game-card" title="Play Portal Flash Unblocked Free Online" onclick="trackRecentGame('Portal Flash')">
       <div class="thumb-container" style="--thumb-url: url('games/Portal Flash/thumbnail.webp')">
         <img class="thumb" src="games/Portal Flash/thumbnail.webp" alt="Play Portal Flash Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -2042,11 +2051,11 @@ body.game-is-expanded {
         <img class="thumb" src="games/Achilles 2/thumbnail.webp" alt="Play Achilles 2 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Achilles 2</div>
-    </a><a href="/CS Go Clicker.html" class="game-card" title="Play CS Go Clicker Unblocked Free Online" onclick="trackRecentGame('CS Go Clicker')">
-      <div class="thumb-container" style="--thumb-url: url('games/CS Go Clicker/thumbnail.webp')">
-        <img class="thumb" src="games/CS Go Clicker/thumbnail.webp" alt="Play CS Go Clicker Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Capybara Clicker.html" class="game-card" title="Play Capybara Clicker Unblocked Free Online" onclick="trackRecentGame('Capybara Clicker')">
+      <div class="thumb-container" style="--thumb-url: url('games/Capybara Clicker/thumbnail.webp')">
+        <img class="thumb" src="games/Capybara Clicker/thumbnail.webp" alt="Play Capybara Clicker Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">CS Go Clicker</div>
+      <div class="card-title">Capybara Clicker</div>
     </a><div class="horizontal-ad-row" data-ad-index="2" role="complementary" aria-label="Advertisement">
     <ins class="adsbygoogle"
        style="display:block"
@@ -2071,11 +2080,11 @@ body.game-is-expanded {
         <img class="thumb" src="games/Henry Stickmin Infiltrating The Airship/thumbnail.webp" alt="Play Henry Stickmin Infiltrating The Airship Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Henry Stickmin Infiltrating The Airship</div>
-    </a><a href="/Clear Vision 5.html" class="game-card" title="Play Clear Vision 5 Unblocked Free Online" onclick="trackRecentGame('Clear Vision 5')">
-      <div class="thumb-container" style="--thumb-url: url('games/Clear Vision 5/thumbnail.webp')">
-        <img class="thumb" src="games/Clear Vision 5/thumbnail.webp" alt="Play Clear Vision 5 Unblocked - Free Online Game" loading="lazy" width="300" height="300">
+    </a><a href="/Cluster Rush.html" class="game-card" title="Play Cluster Rush Unblocked Free Online" onclick="trackRecentGame('Cluster Rush')">
+      <div class="thumb-container" style="--thumb-url: url('games/Cluster Rush/thumbnail.webp')">
+        <img class="thumb" src="games/Cluster Rush/thumbnail.webp" alt="Play Cluster Rush Unblocked - Free Online Game" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Clear Vision 5</div>
+      <div class="card-title">Cluster Rush</div>
     </a><a href="/Dino Run.html" class="game-card" title="Play Dino Run Unblocked Free Online" onclick="trackRecentGame('Dino Run')">
       <div class="thumb-container" style="--thumb-url: url('games/Dino Run/thumbnail.webp')">
         <img class="thumb" src="games/Dino Run/thumbnail.webp" alt="Play Dino Run Unblocked - Free Online Game" loading="lazy" width="300" height="300">
@@ -2360,21 +2369,6 @@ body.game-is-expanded {
       }
 
       localStorage.setItem('recentlyPlayed', JSON.stringify(recentlyPlayed));
-    }
-
-    function reloadGame() {
-      const frame = document.getElementById('gameFrame');
-      if (!gameIsActive || !frame.getAttribute('src')) {
-        startGame();
-        return;
-      }
-
-      // Reassigning the game URL works for both same-origin and cross-origin
-      // games without reaching into their document.
-      frame.classList.remove('active');
-      frame.src = 'games/BTD5/index.html';
-      requestAnimationFrame(() => frame.classList.add('active'));
-      setTimeout(focusGameFrame, 150);
     }
 
     function enterFullscreenFallback(wrapper) {
