@@ -263,12 +263,6 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     ${generateHeaderBannerAd(adsEnabled)}
 
     <div class="content-wrapper" id="main-content">
-      <section class="homepage-intro" aria-labelledby="homepage-intro-title">
-        <h2 id="homepage-intro-title">Unblocked games for school Chromebooks</h2>
-        <p>Looking for games to play on a school Chromebook? Browse free online browser games, including puzzle, racing, sports and arcade games, and open each game without a download.</p>
-        <h3>Direct GitHub.io game links</h3>
-        <p>Each game card links to its own page on chromebookunlocked.github.io. Open a card or use the alphabetical directory below to find a game link.</p>
-      </section>
       <div id="controls">
         <button id="backBtn" onclick="closeGame()" aria-label="Go back to game list">← Back</button>
         <span id="gameTitle" role="heading" aria-level="2"></span>
