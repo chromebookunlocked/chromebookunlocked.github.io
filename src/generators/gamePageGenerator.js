@@ -141,6 +141,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
 
   // Generate SEO description for the game
   const seoDescription = generateGameSEODescription(game);
+  const escapedSeoDescription = escapeHtml(seoDescription);
   const categoryText = game.categories.length > 0 ? game.categories[0].toLowerCase() : 'action';
 
   return `<!DOCTYPE html>
@@ -266,18 +267,11 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
         <h3>About ${escapedGameName}</h3>
         <div class="description-content">
           <p class="description-preview" itemprop="description">
-            ${seoDescription.split('.')[0]}. This free online game is perfect for playing at school on your Chromebook or any computer.
+            ${escapedSeoDescription}
           </p>
           <div class="description-full">
             <p>
-              ${seoDescription.substring(seoDescription.indexOf('.') + 1)}
-              ${escapedGameName} is one of the best ${escapeHtml(categoryText)} games available on our unblocked games site.
-              No downloads needed - just click play and enjoy ${escapedGameName} instantly in your browser!
-            </p>
-            <p>
-              <strong>How to Play:</strong> Click the play button above to start ${escapedGameName}. The game works on all devices including Chromebooks, laptops, and desktop computers.
-              Use the fullscreen mode for the best gaming experience! All controls are explained in-game.
-              ${escapedGameName} is completely free to play with no registration required.
+              Select Play above to open ${escapedGameName} in your browser. Use the fullscreen button if you want a larger view, or browse the related games above for another title.
             </p>
             <div class="game-meta">
               <div class="meta-item">
@@ -285,9 +279,6 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
               </div>
               <div class="meta-item">
                 <strong>Platform:</strong> Web Browser (HTML5)
-              </div>
-              <div class="meta-item">
-                <strong>Status:</strong> Unblocked & Free to Play
               </div>
             </div>
           </div>
