@@ -890,6 +890,7 @@ button:active {
   color: #f2e9f6;
 }
 .homepage-intro h2 { margin: 0 0 0.5rem; font-size: clamp(1.15rem, 2vw, 1.5rem); }
+.homepage-intro h3 { margin: 1rem 0 0.35rem; font-size: clamp(1rem, 1.8vw, 1.2rem); }
 .homepage-intro p { margin: 0; line-height: 1.6; }
 .game-directory summary { cursor: pointer; font-weight: 700; }
 .game-directory-links {
