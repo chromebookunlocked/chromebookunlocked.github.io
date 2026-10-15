@@ -764,7 +764,7 @@ button:active {
   box-shadow:0 10px 40px rgba(255, 102, 255, 0.4);
   border: 2px solid rgba(255, 102, 255, 0.3);
 }
-#startOverlay h1 {
+#startOverlay h2 {
   margin:0;
   font-size:clamp(1.5rem,2.5vw,3rem);
   color:#fff;
@@ -879,6 +879,28 @@ button:active {
   border: 2px solid var(--accent);
   box-shadow: 0 8px 30px rgba(255, 102, 255, 0.5);
 }
+
+.card:link, .card:visited { text-decoration: none; }
+.card:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+.homepage-intro, .game-directory {
+  max-width: var(--content-max-width);
+  margin: 1.5rem auto;
+  padding: 1rem clamp(0.75rem, 2vw, 1.5rem);
+  color: #f2e9f6;
+}
+.homepage-intro h2 { margin: 0 0 0.5rem; font-size: clamp(1.15rem, 2vw, 1.5rem); }
+.homepage-intro h3 { margin: 1rem 0 0.35rem; font-size: clamp(1rem, 1.8vw, 1.2rem); }
+.homepage-intro p { margin: 0; line-height: 1.6; }
+.game-directory summary { cursor: pointer; font-weight: 700; }
+.game-directory-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.65rem 1.25rem;
+  margin-top: 1rem;
+}
+.game-directory-links a { color: #f6d7ff; line-height: 1.4; }
+.game-directory-links a:hover, .game-directory-links a:focus-visible { color: #fff; text-decoration: underline; }
 
 @media (hover: none) and (pointer: coarse) {
   .card:active {

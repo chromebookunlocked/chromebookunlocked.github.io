@@ -121,7 +121,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
     const escapedNameText = escapeHtml(g.name);
     // SEO-optimized alt text with keywords
     const altText = `Play ${escapedNameText} Unblocked - Free Online Game`;
-    recommendedGamesHTML += `<a href="/${escapedFolder}.html" class="game-card" title="Play ${escapedNameText} Unblocked Free Online" onclick="trackRecentGame('${escapedFolder}')">
+    recommendedGamesHTML += `<a href="/${escapeHtmlAttr(encodeURIComponent(g.folder))}.html" class="game-card" title="Play ${escapedNameText} Unblocked Free Online" onclick="trackRecentGame('${escapedFolder}')">
       <div class="thumb-container" style="--thumb-url: url('${escapedThumbPath}')">
         <img class="thumb" src="${escapedThumbPath}" alt="${altText}" loading="lazy" width="300" height="300">
       </div>
@@ -183,7 +183,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   <header>
     <div class="header-left">
       <img src="assets/logo.webp" alt="Chromebook Unlocked Games - Free Unblocked Games for School" class="header-logo" onclick="window.location.href='/'" width="40" height="40" loading="eager" fetchpriority="high">
-      <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
+      <a class="site-title" href="/">Chromebook Unlocked Games</a>
     </div>
   </header>
 
@@ -202,7 +202,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
         <div class="game-stage" id="gameStage">
           <div class="play-overlay" id="playOverlay">
             <img src="${escapeHtmlAttr(thumbPath)}" alt="Play ${escapedGameNameAttr} Unblocked - Free Online ${escapeHtmlAttr(categoryText)} Game" itemprop="image" width="300" height="300" loading="eager" fetchpriority="high">
-            <h2 itemprop="headline">${escapedGameName}</h2>
+            <h1 itemprop="headline">${escapedGameName}</h1>
             <button class="play-btn" onclick="startGame();" aria-label="Play ${escapedGameNameAttr} Free Online">▶ Play</button>
           </div>
           <iframe

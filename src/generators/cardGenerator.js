@@ -22,7 +22,7 @@ function generateGameCard(game, idx, gamesDir, loadEagerly = false) {
   const fetchPriorityAttr = shouldEagerLoad ? ' fetchpriority="high"' : '';
 
   // Escape file paths for use in HTML attributes
-  const escapedFolder = escapeHtmlAttr(game.folder);
+  const escapedFolder = escapeHtmlAttr(encodeURIComponent(game.folder));
   const escapedThumbPath = escapeHtmlAttr(thumbPath);
   const escapedGameName = escapeHtmlAttr(game.name);
   const escapedGameNameLower = escapeHtml(game.name.toLowerCase());
@@ -36,12 +36,12 @@ function generateGameCard(game, idx, gamesDir, loadEagerly = false) {
     ? ` data-aliases="${escapeHtmlAttr(game.otherNames.map(n => n.toLowerCase()).join(','))}"`
     : '';
 
-  return `<div class="card game-card" data-index="${idx}" data-folder="${escapedFolder}" data-name="${escapedGameNameLower}"${aliasesAttr} onclick="window.location.href='/${escapedFolder}.html'">
+  return `<a class="card game-card" href="/${escapedFolder}.html" data-index="${idx}" data-folder="${escapeHtmlAttr(game.folder)}" data-name="${escapedGameNameLower}"${aliasesAttr}>
     <div class="thumb-container" style="--thumb-url: url('${escapedThumbPath}')">
       <img class="thumb" ${srcAttr}${placeholderSrc} alt="${escapedGameName}" loading="${loadingAttr}" decoding="async" width="300" height="300"${fetchPriorityAttr}>
     </div>
     <div class="card-title">${escapeHtml(game.name)}</div>
-  </div>`;
+  </a>`;
 }
 
 /**

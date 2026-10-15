@@ -177,6 +177,10 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   // Get SEO meta tags and structured data
   const metaTags = generateIndexMetaTags();
   const structuredData = generateIndexStructuredData(games);
+  const gameDirectory = [...games]
+    .sort((a, b) => a.name.localeCompare(b.name, 'en'))
+    .map(game => `<a href="/${escapeHtmlAttr(encodeURIComponent(game.folder))}.html">${escapeHtml(game.name)}</a>`)
+    .join('');
 
   // Full HTML template
   const html = `<!DOCTYPE html>
@@ -259,6 +263,12 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     ${generateHeaderBannerAd(adsEnabled)}
 
     <div class="content-wrapper" id="main-content">
+      <section class="homepage-intro" aria-labelledby="homepage-intro-title">
+        <h2 id="homepage-intro-title">Unblocked games for school Chromebooks</h2>
+        <p>Looking for games to play on a school Chromebook? Browse free online browser games, including puzzle, racing, sports and arcade games, and open each game without a download.</p>
+        <h3>Direct GitHub.io game links</h3>
+        <p>Each game card links to its own page on chromebookunlocked.github.io. Open a card or use the alphabetical directory below to find a game link.</p>
+      </section>
       <div id="controls">
         <button id="backBtn" onclick="closeGame()" aria-label="Go back to game list">← Back</button>
         <span id="gameTitle" role="heading" aria-level="2"></span>
@@ -270,7 +280,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         <div class="viewer" id="viewer">
           <div id="startOverlay">
             <img id="startThumb" src="" alt="Game Thumbnail" width="300" height="300" loading="eager">
-            <h1 id="startName"></h1>
+            <h2 id="startName"></h2>
             <button id="startButton" onclick="startGame()">▶ Play</button>
           </div>
           <iframe id="gameFrame" src="" scrolling="no"></iframe>
@@ -288,6 +298,11 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         </div>
         <div id="scrollSentinel" style="height:1px;"></div>
       </div>
+
+      <details class="game-directory">
+        <summary>Browse all ${games.length} games and direct links</summary>
+        <nav class="game-directory-links" aria-label="All game pages">${gameDirectory}</nav>
+      </details>
 
       ${generateBottomLeaderboardAd(adsEnabled)}
 
