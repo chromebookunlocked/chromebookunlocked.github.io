@@ -899,6 +899,17 @@ button:active {
 .game-directory-links a { color: #f6d7ff; line-height: 1.4; }
 .game-directory-links a:hover, .game-directory-links a:focus-visible { color: #fff; text-decoration: underline; }
 
+.site-guide {
+  max-width: var(--content-max-width);
+  margin: 1.5rem auto 2rem;
+  padding: 1.25rem clamp(0.75rem, 2vw, 1.5rem);
+  border-top: 1px solid rgba(255, 102, 255, 0.25);
+  color: #d7ccdf;
+}
+.site-guide h2 { margin: 0 0 0.75rem; color: #f2e9f6; font-size: clamp(1.1rem, 1.7vw, 1.35rem); }
+.site-guide p { max-width: 75ch; margin: 0 0 0.75rem; line-height: 1.6; }
+.site-guide p:last-child { margin-bottom: 0; }
+
 @media (hover: none) and (pointer: coarse) {
   .card:active {
     transform:scale(0.98);

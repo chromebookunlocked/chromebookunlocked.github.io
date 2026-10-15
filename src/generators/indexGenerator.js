@@ -298,6 +298,12 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         <nav class="game-directory-links" aria-label="All game pages">${gameDirectory}</nav>
       </details>
 
+      <section class="site-guide" aria-labelledby="site-guide-title">
+        <h2 id="site-guide-title">Free browser games for Chromebook</h2>
+        <p>Browse puzzle, racing, sports and arcade games in the grid above. Each game card opens its own page on Chromebook Unlocked Games, with a direct GitHub.io link you can share.</p>
+        <p>Looking for games to play on a school Chromebook? Use the search box to find a title, or open the alphabetical directory above to browse all available games. Games launch in your browser without an app download.</p>
+      </section>
+
       ${generateBottomLeaderboardAd(adsEnabled)}
 
       <footer id="siteFooter">
