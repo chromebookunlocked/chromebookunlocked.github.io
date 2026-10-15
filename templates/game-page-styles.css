@@ -195,7 +195,8 @@ header {
 
 /* Logo hover animation removed for performance */
 
-h1 {
+.site-title {
+  text-decoration: none;
   font-size: clamp(0.85rem, 2vw, 1.3rem);
   font-weight: 700;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-light), var(--secondary-color));
@@ -425,7 +426,7 @@ h1 {
   transform: scale(1.06);
 }
 
-.play-overlay h2 {
+.play-overlay h1 {
   font-size: clamp(1.5rem, 3.5cqw, 2.6rem);
   font-weight: 900;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
@@ -1274,7 +1275,7 @@ body.game-is-expanded {
     min-width: 120px;
   }
 
-  .play-overlay h2 {
+  .play-overlay h1 {
     font-size: clamp(1rem, 4cqw, 1.5rem); /* Smaller title on mobile */
     margin: 0.5rem 0;
   }

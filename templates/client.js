@@ -140,8 +140,9 @@ function escapeHtmlAttr(str) {
  * @returns {HTMLElement} Card element
  */
 function createGameCard(game, idx, eagerLoad = false) {
-  const card = document.createElement('div');
+  const card = document.createElement('a');
   card.className = 'card game-card';
+  card.href = '/' + encodeURIComponent(game.f) + '.html';
   card.setAttribute('data-index', idx);
   card.setAttribute('data-folder', game.f);
   card.setAttribute('data-name', game.n.toLowerCase());
@@ -157,7 +158,6 @@ function createGameCard(game, idx, eagerLoad = false) {
   card.onclick = () => {
     // Track as recently played before navigating
     addToRecentlyPlayed(game.f);
-    window.location.href = '/' + game.f + '.html';
   };
 
   const thumbUrl = escapeHtmlAttr(game.t);
