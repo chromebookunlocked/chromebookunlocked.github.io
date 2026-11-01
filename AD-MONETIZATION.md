@@ -4,7 +4,7 @@ The site uses Google AdSense exclusively. Shared placement, loading, deduplicati
 
 ## Configuration
 
-- Publisher: `ca-pub-1033412505744705`
+- Publisher: `ca-pub-7012225982160223`
 - Responsive horizontal slot: `2719401053`
 - Responsive vertical slot: `9122283604`
 - `ads-config.json` is locked to the `adsense` provider.
