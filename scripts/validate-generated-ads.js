@@ -42,10 +42,11 @@ function validatePage(page, html, isGamePage) {
   expect(html.includes("gtag('config', 'G-4QZLTDX504', { send_page_view: false });"), `${page} can double-count its GA page view`);
   expect(!html.includes('ga_user_id'), `${page} contains the retired parallel analytics user ID`);
   expect(occurrences(html, ADSENSE_SCRIPT_SRC) === 1, `${page} must load the AdSense library exactly once`);
+  expect(html.replace(/\r\n?/g, '\n').includes(`<script async src="${ADSENSE_SCRIPT_SRC}"\n     crossorigin="anonymous"></script>`), `${page} is missing the static AdSense snippet`);
   expect(html.includes(`data-ad-client="${ADSENSE_CLIENT}"`), `${page} does not contain the AdSense publisher ID`);
   expect(html.includes(`data-ad-slot="${ADSENSE_HORIZONTAL_SLOT}"`), `${page} does not contain the horizontal AdSense slot`);
   expect(html.includes('window.__initAdSenseSlots'), `${page} does not initialize AdSense slots through the shared runtime`);
-  expect(html.includes("script.setAttribute('data-overlays', 'bottom')"), `${page} does not enable Google's native bottom anchor`);
+  expect(!html.includes('window.__loadAdSenseScript'), `${page} still has a duplicate AdSense loader`);
   expect(!html.includes('footer-inscreen-ad'), `${page} still contains the custom floating ad`);
   expect(html.includes('ins.adsbygoogle[data-ad-status="unfilled"]'), `${page} does not hide explicitly unfilled AdSense units`);
   expect(html.includes('.horizontal-ad-row:has(> ins.adsbygoogle[data-ad-status="unfilled"])'), `${page} does not collapse unfilled in-content ad rows`);
@@ -89,9 +90,8 @@ expect(headHints.includes('pagead2.googlesyndication.com'), 'AdSense connection 
 expect(headHints.includes(`name="google-adsense-account" content="${ADSENSE_CLIENT}"`), 'AdSense account verification meta tag is missing');
 expect(occurrences(headScript, ADSENSE_SCRIPT_SRC) === 1, 'The shared head markup must load AdSense exactly once');
 expect(headScript.includes("window.__activeAdProvider = 'adsense'"), 'Runtime does not lock the active provider to AdSense');
-expect(headScript.includes('window.__adsReady(window.__loadAdSenseScript)'), 'AdSense library can load before verification');
-expect(headScript.includes("script.setAttribute('data-overlays', 'bottom')"), 'Google native bottom anchor is not enabled');
-expect(!headScript.includes(`<script async src="${ADSENSE_SCRIPT_SRC}"`), 'AdSense library is still loaded before verification');
+expect(headScript.includes(`<script async src="${ADSENSE_SCRIPT_SRC}"\n     crossorigin="anonymous"></script>`), 'Static AdSense snippet is missing');
+expect(!headScript.includes('__loadAdSenseScript'), 'Duplicate AdSense loader remains in the runtime');
 expect(headScript.includes('__requestAdSenseSlot'), 'AdSense request deduplication is missing');
 expect(headScript.includes('__initAdSenseSlots'), 'AdSense slot initialization is missing');
 expect(headScript.includes('window.__adsReady'), 'AdSense requests do not use the verification gate');

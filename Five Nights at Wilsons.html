@@ -89,6 +89,8 @@
     gtag('config', 'G-4QZLTDX504', { send_page_view: false });
   </script>
 
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7012225982160223"
+     crossorigin="anonymous"></script>
   <script>
   (function () {
     'use strict';
@@ -97,8 +99,6 @@
     var FILL_TIMEOUT_MS = 18000;
     var scheduledSlots = typeof WeakSet === 'function' ? new WeakSet() : null;
     var trackedSlots = [];
-    var adsenseScriptStarted = false;
-
     window.__activeAdProvider = 'adsense';
 
     window.__adsReady = function (callback) {
@@ -110,32 +110,6 @@
       }
       callback();
     };
-
-    window.__loadAdSenseScript = function () {
-      if (adsenseScriptStarted || document.querySelector('script[data-adsense-loader]')) return;
-      adsenseScriptStarted = true;
-      var script = document.createElement('script');
-      script.async = true;
-      script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7012225982160223';
-      script.crossOrigin = 'anonymous';
-      script.setAttribute('data-adsense-loader', 'true');
-      // Use Google's policy-compliant native anchor instead of a custom
-      // floating display unit. Google owns sizing, dismissal, and frequency.
-      script.setAttribute('data-overlays', 'bottom');
-      script.addEventListener('error', function () {
-        if (typeof window.gtag === 'function') {
-          window.gtag('event', 'ad_network_error', {
-            event_category: 'ads',
-            ad_provider: 'adsense'
-          });
-        }
-      });
-      document.head.appendChild(script);
-    };
-
-    // The connection is warmed by head hints, but no Google ad code or Auto
-    // Ads request starts until Turnstile has verified the session.
-    window.__adsReady(window.__loadAdSenseScript);
 
     function emitFillResult(ad, state) {
       if (ad.getAttribute('data-ad-fill-reported') === state) return;
