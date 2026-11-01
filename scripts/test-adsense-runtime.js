@@ -58,7 +58,6 @@ function createRuntime({ gated = false } = {}) {
   const timers = [];
   const mutationObservers = [];
   const verifiedCallbacks = [];
-  const loadedScripts = [];
 
   class FakeMutationObserver {
     constructor(callback) {
@@ -74,23 +73,8 @@ function createRuntime({ gated = false } = {}) {
   const document = {
     readyState: 'complete',
     matches: undefined,
-    head: {
-      appendChild(script) { loadedScripts.push(script); },
-    },
-    querySelector(selector) {
-      if (selector === 'script[data-adsense-loader]') return loadedScripts[0] || null;
-      return null;
-    },
     querySelectorAll() { return [ad]; },
     addEventListener() {},
-    createElement(tagName) {
-      assert.strictEqual(tagName, 'script');
-      return {
-        attributes: new Map(),
-        setAttribute(name, value) { this.attributes.set(name, String(value)); },
-        addEventListener() {},
-      };
-    },
   };
   const window = {
     document,
@@ -127,9 +111,8 @@ function createRuntime({ gated = false } = {}) {
     window,
     timers,
     mutationObservers,
-    loadedScripts,
     verify() {
-      assert(verifiedCallbacks.length >= 2, 'AdSense library and ad request did not wait for verification');
+      assert(verifiedCallbacks.length >= 1, 'AdSense slot request did not wait for verification');
       window.botDetector.shouldBlockAds = () => false;
       verifiedCallbacks.splice(0).forEach((callback) => callback());
     },
@@ -140,12 +123,9 @@ function testVerificationAndDeduplication() {
   const runtime = createRuntime({ gated: true });
   assert.strictEqual(runtime.window.__activeAdProvider, 'adsense');
   assert.strictEqual(runtime.window.adsbygoogle.length, 0, 'AdSense requested an ad before verification');
-  assert.strictEqual(runtime.loadedScripts.length, 0, 'AdSense library loaded before verification');
   assert.strictEqual(runtime.ad.getAttribute('data-ad-pending'), 'true');
 
   runtime.verify();
-  assert.strictEqual(runtime.loadedScripts.length, 1, 'AdSense library was not loaded after verification');
-  assert.strictEqual(runtime.loadedScripts[0].attributes.get('data-overlays'), 'bottom');
   assert.strictEqual(runtime.window.adsbygoogle.length, 1, 'Verified AdSense slot was not requested');
   assert.strictEqual(runtime.ad.getAttribute('data-ad-requested'), 'true');
   assert.strictEqual(runtime.ad.getAttribute('data-ad-fill-state'), 'pending');
@@ -165,7 +145,6 @@ function testVerificationAndDeduplication() {
 
 function testEmptyFillTimeout() {
   const runtime = createRuntime();
-  assert.strictEqual(runtime.loadedScripts.length, 1);
   assert.strictEqual(runtime.window.adsbygoogle.length, 1);
   const fillTimer = runtime.timers.find((timer) => timer.delay === 18000);
   assert(fillTimer, 'AdSense fill timeout was not scheduled');
@@ -178,9 +157,8 @@ function testGeneratedRuntimeIsAdSenseOnly() {
   const { markup } = extractRuntime();
   assert(markup.includes('pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'));
   assert(markup.includes(ADSENSE_CLIENT));
-  assert(markup.includes("window.__adsReady(window.__loadAdSenseScript)"));
-  assert(markup.includes("script.setAttribute('data-overlays', 'bottom')"));
-  assert(!markup.includes('<script async src="https://pagead2.googlesyndication.com'));
+  assert(markup.includes(`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}"\n     crossorigin="anonymous"></script>`));
+  assert(!markup.includes('__loadAdSenseScript'));
   assert(!/monu\.delivery|monumetric|\$MMT|mmt-/i.test(markup));
 }
 
@@ -188,4 +166,4 @@ testVerificationAndDeduplication();
 testEmptyFillTimeout();
 testGeneratedRuntimeIsAdSenseOnly();
 
-console.log('AdSense runtime tests passed (verified library load, native anchor, deduplication, fill, and no-fill).');
+console.log('AdSense runtime tests passed (static library, verified requests, deduplication, fill, and no-fill).');
