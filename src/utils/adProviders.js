@@ -1,6 +1,6 @@
 const ADSENSE_CLIENT = 'ca-pub-7012225982160223';
-const ADSENSE_HORIZONTAL_SLOT = '2719401053';
-const ADSENSE_VERTICAL_SLOT = '9122283604';
+const ADSENSE_HORIZONTAL_SLOT = '1040490510';
+const ADSENSE_VERTICAL_SLOT = '6968650790';
 const ADSENSE_SCRIPT_SRC = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`;
 
 function generateAdNetworkHeadHints(adsEnabled = true) {
