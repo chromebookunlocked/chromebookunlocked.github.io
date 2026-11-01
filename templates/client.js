@@ -87,8 +87,8 @@ function createHorizontalAd(adIndex) {
 
   div.innerHTML = `<ins class="adsbygoogle"
        style="display:block"
-       data-ad-client="ca-pub-1033412505744705"
-       data-ad-slot="2719401053"
+       data-ad-client="ca-pub-7012225982160223"
+       data-ad-slot="1040490510"
        data-ad-format="auto"
        data-full-width-responsive="true"
        data-ad-placement="in_content"

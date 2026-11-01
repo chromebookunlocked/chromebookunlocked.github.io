@@ -1,4 +1,4 @@
-const ADSENSE_DIRECT_RECORD = 'google.com, pub-1033412505744705, DIRECT, f08c47fec0942fa0';
+const ADSENSE_DIRECT_RECORD = 'google.com, pub-7012225982160223, DIRECT, f08c47fec0942fa0';
 const REQUIRED_RECORDS = [ADSENSE_DIRECT_RECORD];
 
 function normalizeAdsTxt(content) {
