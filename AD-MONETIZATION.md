@@ -10,7 +10,7 @@ The site uses Google AdSense exclusively. Shared placement, loading, deduplicati
 - `ads-config.json` is locked to the `adsense` provider.
 - `ads.txt` authorizes only the site's AdSense publisher record.
 
-The AdSense library loads through the standard async script in the head of the homepage, game landing pages, and public arcade template. Manual ad requests still wait for the Turnstile verification gate. Static and dynamically inserted units share the same deduplicated runtime, and below-the-fold units use proximity loading. Legal pages and embedded game engine files do not load the site's AdSense script.
+The AdSense library loads through the standard async script on the homepage, game landing pages, public arcade template, legal pages, and embedded game HTML. Manual ad requests on the site's landing pages still wait for the Turnstile verification gate. Static and dynamically inserted units share the same deduplicated runtime, and below-the-fold units use proximity loading.
 
 Run `npm run build` after changing ad code. Post-build checks validate every generated page, confirm both supplied slot IDs, reject Monumetric remnants, exercise request deduplication and fill reporting, and verify `ads.txt` consistency.
 

@@ -75,6 +75,33 @@ for (const page of gamePages) {
   if (fs.existsSync(pagePath)) validatePage(page, fs.readFileSync(pagePath, 'utf8'), true);
 }
 
+const staticPages = [
+  'index.template.html',
+  'dmca.html',
+  'important-pages/contact.html',
+  'important-pages/cookie-policy.html',
+  'important-pages/dmca.html',
+  'important-pages/privacy-policy.html',
+  'important-pages/terms-of-service.html',
+];
+for (const page of staticPages) {
+  const html = read(page).replace(/\r\n?/g, '\n');
+  const snippet = `<script async src="${ADSENSE_SCRIPT_SRC}"\n     crossorigin="anonymous"></script>`;
+  expect(occurrences(html, snippet) === 1, `${page} must have exactly one standard AdSense snippet`);
+  expect(html.indexOf(snippet) < html.indexOf('</head>'), `${page} must load AdSense in the head`);
+}
+
+const embeddedGamePages = fs.readdirSync(path.join(root, 'games'))
+  .map((game) => `games/${game}/index.html`)
+  .filter((page) => fs.existsSync(path.join(root, page)));
+for (const page of embeddedGamePages) {
+  const html = read(page).replace(/\r\n?/g, '\n');
+  const snippet = `<script async src="${ADSENSE_SCRIPT_SRC}"\n     crossorigin="anonymous"></script>`;
+  expect(occurrences(html, snippet) === 1, `${page} must have exactly one standard AdSense snippet`);
+  expect(occurrences(html, 'pagead2.googlesyndication.com/pagead/js/adsbygoogle.js') === 1, `${page} has a duplicate AdSense library loader`);
+  expect(!/(?:ca-)?pub-(?!7012225982160223)\d+/.test(html), `${page} still references another AdSense publisher`);
+}
+
 const headHints = generateAdNetworkHeadHints(true);
 const headScript = generateAdNetworkHeadScript(true);
 const horizontal = generateHorizontalAd(0, true);
