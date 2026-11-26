@@ -54,6 +54,7 @@ jobs:
           cp *.html dist/
           cp ads.txt dist/ads.txt
           cp sitemap.xml dist/sitemap.xml
+          if [ -f llms.txt ]; then cp llms.txt dist/llms.txt; fi
           cp robots.txt dist/robots.txt
           cp google0d95473435a7c986.html dist/google0d95473435a7c986.html
           cp .nojekyll dist/.nojekyll

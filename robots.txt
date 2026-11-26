@@ -1,28 +1,8 @@
-# Robots.txt for Chromebook Unlocked Games
-# Free Unblocked Games for School
+# robots.txt for Chromebook Unlocked Games
 
 User-agent: *
 Allow: /
-
-# Sitemap location
-Sitemap: https://chromebookunlocked.github.io/sitemap.xml
-
-# Crawl delay (be polite to servers)
-Crawl-delay: 1
-
-# Allow all search engine bots
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Slurp
-Allow: /
-
-User-agent: DuckDuckBot
-Allow: /
-
-# Block game iframe content from being indexed separately (they should access game pages)
-User-agent: *
+# Raw game files are loaded inside the game pages; the game pages are what should be indexed.
 Disallow: /games/*/index.html
+
+Sitemap: https://chromebookunlocked.github.io/sitemap.xml

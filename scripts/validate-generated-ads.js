@@ -75,8 +75,11 @@ for (const page of gamePages) {
   if (fs.existsSync(pagePath)) validatePage(page, fs.readFileSync(pagePath, 'utf8'), true);
 }
 
+// Category pages share the homepage layout and ad setup.
+const categoryPages = fs.readdirSync(root).filter((name) => name.endsWith('-games-unblocked.html'));
+for (const page of categoryPages) validatePage(page, read(page), false);
+
 const staticPages = [
-  'index.template.html',
   'dmca.html',
   'important-pages/contact.html',
   'important-pages/cookie-policy.html',

@@ -24,6 +24,8 @@ const {
 // Import generators
 const { generateIndexHTML } = require("./src/generators/indexGenerator");
 const { generateGamePage } = require("./src/generators/gamePageGenerator");
+const { generateCategoryPage } = require("./src/generators/categoryPageGenerator");
+const { getCategoryPages } = require("./src/utils/seoBuilder");
 
 // Configuration
 const dataDir = path.join(__dirname, "data");
@@ -135,16 +137,30 @@ games.forEach(game => {
 
 console.log(`✅ Generated ${generatedCount} game pages\n`);
 
-// Step 6: Generate sitemap and robots.txt
-console.log("🗺️  Generating sitemap and robots.txt...");
-generateSitemap(games, outputDir, gamesDir);
+// Step 6: Generate static category pages ("<category>-games-unblocked.html")
+console.log("🗂️  Generating category pages...");
+const categoryPages = getCategoryPages(categories);
+const categoryPageFiles = new Set(categoryPages.map(page => page.file));
+// Remove pages of categories that no longer qualify (too few games, renamed).
+fs.readdirSync(outputDir)
+  .filter(file => file.endsWith("-games-unblocked.html") && !categoryPageFiles.has(file))
+  .forEach(file => fs.unlinkSync(path.join(outputDir, file)));
+categoryPages.forEach(page => {
+  const categoryHTML = generateCategoryPage(page, categoryPages, mainStyles, gamesDir, adsEnabled, botVerificationEnabled);
+  fs.writeFileSync(path.join(outputDir, page.file), cleanGeneratedHTML(categoryHTML));
+});
+console.log(`✅ Generated ${categoryPages.length} category pages\n`);
+
+// Step 7: Generate sitemap, robots.txt and llms.txt
+console.log("🗺️  Generating sitemap, robots.txt and llms.txt...");
+generateSitemap(games, outputDir, gamesDir, categoryPages);
 
 // Build complete
 console.log("\n✨ Build complete! All files generated successfully.\n");
 console.log("📊 Build summary:");
 console.log(`   - Games: ${games.length}`);
 console.log(`   - Categories: ${Object.keys(categories).length}`);
-console.log(`   - Total pages: ${games.length + 1} (index + games)`);
-console.log(`   - SEO files: sitemap.xml, robots.txt`);
+console.log(`   - Total pages: ${games.length + categoryPages.length + 1} (index + ${categoryPages.length} category pages + games)`);
+console.log(`   - SEO files: sitemap.xml, robots.txt, llms.txt`);
 console.log(`   - Ads: ${adsEnabled ? "enabled (ads.txt present)" : "disabled (ads.txt removed)"}`);
 console.log(`   - Output directory: ${outputDir}\n`);

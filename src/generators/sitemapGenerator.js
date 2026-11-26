@@ -1,129 +1,158 @@
 const fs = require("fs");
 const path = require("path");
 const { getThumbPath } = require("../utils/assetManager");
+const {
+  BASE_URL,
+  SITE_NAME,
+  gamePageUrl,
+  assetUrl,
+  joinList
+} = require("../utils/seoBuilder");
 
-/**
- * Generate XML sitemap with image sitemap support for SEO
- * @param {Array} games - Array of game objects
- * @param {string} outputDir - Output directory path
- * @param {string} gamesDir - Games directory path for thumbnail resolution
- */
-function generateSitemap(games, outputDir, gamesDir = './games') {
-  const today = new Date().toISOString().split('T')[0];
-  const baseUrl = 'https://chromebookunlocked.github.io';
-
-  // XML sitemap with image namespace for rich results
-  let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd
-        http://www.google.com/schemas/sitemap-image/1.1
-        http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd">
-
-  <!-- Homepage - Free Unblocked Games for School -->
-  <url>
-    <loc>${baseUrl}/</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-    <image:image>
-      <image:loc>${baseUrl}/assets/logo.png</image:loc>
-      <image:title>Chromebook Unlocked Games - Free Unblocked Games for School</image:title>
-      <image:caption>Play 100+ free unblocked games online at school on your Chromebook</image:caption>
-    </image:image>
-  </url>
-
-  <!-- DMCA Page -->
-  <url>
-    <loc>${baseUrl}/dmca.html</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.3</priority>
-  </url>
-
-`;
-
-  // Add all game pages with image information for rich search results
-  games.forEach(game => {
-    // Get thumbnail path for image sitemap (with fallback support)
-    const thumbInfo = getThumbPath(game, gamesDir);
-    const thumbPath = thumbInfo.path;
-
-    const gameUrl = `${baseUrl}/${encodeURIComponent(game.folder)}.html`;
-    const imageUrl = `${baseUrl}/${thumbPath}`;
-    const categories = game.categories ? game.categories.join(', ') : 'Games';
-
-    sitemap += `  <!-- ${game.name} - Free Unblocked Game -->
-  <url>
-    <loc>${gameUrl}</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-    <image:image>
-      <image:loc>${baseUrl}/assets/logo.png</image:loc>
-      <image:title>${game.name} Unblocked - Play Free Online Game</image:title>
-      <image:caption>Play ${game.name} unblocked for free at school. ${categories} game that works on Chromebook and school computers.</image:caption>
-    </image:image>
-  </url>
-
-`;
-  });
-
-  sitemap += `</urlset>`;
-
-  // Write sitemap to dist folder
-  const sitemapPath = path.join(outputDir, 'sitemap.xml');
-  fs.writeFileSync(sitemapPath, sitemap);
-  console.log(`✅ Sitemap generated with ${games.length + 1} URLs (with image metadata)`);
-
-  // Also generate robots.txt with sitemap reference
-  generateRobotsTxt(outputDir, baseUrl);
+function escapeXml(value) {
+  return String(value == null ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
 }
 
 /**
- * Generate robots.txt file with sitemap reference
+ * Generate XML sitemap (with game thumbnails) for search engines.
+ *
+ * Only the homepage carries <lastmod>: its game order is reshuffled on every
+ * build, so the build date is true for it. Game and category pages have no
+ * tracked modification date, and stamping the build date on all of them would
+ * tell crawlers every page changed when it did not.
+ *
+ * @param {Array} games - Array of game objects
  * @param {string} outputDir - Output directory path
- * @param {string} baseUrl - Base URL of the site
+ * @param {string} gamesDir - Games directory path for thumbnail resolution
+ * @param {Array} categoryPages - generated category pages
  */
-function generateRobotsTxt(outputDir, baseUrl) {
-  const robotsTxt = `# Robots.txt for Chromebook Unlocked Games
-# Free Unblocked Games for School
+function generateSitemap(games, outputDir, gamesDir = './games', categoryPages = []) {
+  const today = new Date().toISOString().split('T')[0];
 
-User-agent: *
-Allow: /
+  const urls = [];
+  urls.push(`  <url>
+    <loc>${BASE_URL}/</loc>
+    <lastmod>${today}</lastmod>
+  </url>`);
 
-# Sitemap location
-Sitemap: ${baseUrl}/sitemap.xml
+  categoryPages.forEach((page) => {
+    urls.push(`  <url>
+    <loc>${escapeXml(page.url)}</loc>
+  </url>`);
+  });
 
-# Crawl delay (be polite to servers)
-Crawl-delay: 1
+  games.forEach((game) => {
+    const thumbInfo = getThumbPath(game, gamesDir);
+    urls.push(`  <url>
+    <loc>${escapeXml(gamePageUrl(game))}</loc>
+    <image:image>
+      <image:loc>${escapeXml(assetUrl(thumbInfo.path))}</image:loc>
+    </image:image>
+  </url>`);
+  });
 
-# Allow all search engine bots
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Slurp
-Allow: /
-
-User-agent: DuckDuckBot
-Allow: /
-
-# Block game iframe content from being indexed separately (they should access game pages)
-User-agent: *
-Disallow: /games/*/index.html
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+${urls.join('\n')}
+</urlset>
 `;
 
-  const robotsPath = path.join(outputDir, 'robots.txt');
-  fs.writeFileSync(robotsPath, robotsTxt);
+  fs.writeFileSync(path.join(outputDir, 'sitemap.xml'), sitemap);
+  console.log(`✅ Sitemap generated with ${urls.length} URLs (homepage, ${categoryPages.length} categories, ${games.length} games)`);
+
+  generateRobotsTxt(outputDir, BASE_URL);
+  generateLlmsTxt(games, outputDir, categoryPages);
+}
+
+/**
+ * Generate robots.txt.
+ *
+ * One group for every crawler. A separate "User-agent: Googlebot" group would
+ * make Googlebot ignore the rules in the "*" group, including the Disallow.
+ */
+function generateRobotsTxt(outputDir, baseUrl) {
+  const robotsTxt = `# robots.txt for ${SITE_NAME}
+
+User-agent: *
+Allow: /
+# Raw game files are loaded inside the game pages; the game pages are what should be indexed.
+Disallow: /games/*/index.html
+
+Sitemap: ${baseUrl}/sitemap.xml
+`;
+
+  fs.writeFileSync(path.join(outputDir, 'robots.txt'), robotsTxt);
   console.log(`✅ robots.txt generated with sitemap reference`);
+}
+
+/**
+ * Generate llms.txt: a short, factual description of the site with links,
+ * for AI assistants that read it.
+ */
+function generateLlmsTxt(games, outputDir, categoryPages = []) {
+  const featured = [...games]
+    .filter((game) => game.priority > 0)
+    .sort((a, b) => b.priority - a.priority || a.name.localeCompare(b.name, 'en'));
+  const topCategories = categoryPages.slice(0, 6).map((page) => page.name);
+
+  const lines = [
+    `# ${SITE_NAME}`,
+    '',
+    `> ${SITE_NAME} (chromebookunlocked.github.io) is a free website with ${games.length} browser games. Each game has its own page and runs in a browser tab, so it can be played on a Chromebook, Windows PC or Mac without downloading or installing anything.`,
+    '',
+    '## Facts',
+    '',
+    `- Number of games: ${games.length}`,
+    '- Price: free, no account needed',
+    '- Platform: web browser (HTML5); no download or install',
+    `- Game page address pattern: ${BASE_URL}/<Game Name>.html`,
+    topCategories.length ? `- Largest categories: ${joinList(topCategories)}` : null,
+    '- Whether the site loads on a school network depends on that network\'s filter.',
+    '',
+    '## Main pages',
+    '',
+    `- [All unblocked games](${BASE_URL}/): homepage with search and the full game list`,
+    `- [Contact](${BASE_URL}/important-pages/contact.html)`,
+    `- [DMCA and copyright](${BASE_URL}/important-pages/dmca.html)`,
+    `- [Privacy policy](${BASE_URL}/important-pages/privacy-policy.html)`,
+    '',
+  ].filter((line) => line !== null);
+
+  if (categoryPages.length) {
+    lines.push('## Game categories', '');
+    categoryPages.forEach((page) => {
+      lines.push(`- [${page.heading}](${page.url}): ${page.games.length} games`);
+    });
+    lines.push('');
+  }
+
+  if (featured.length) {
+    lines.push('## Featured games', '');
+    featured.forEach((game) => {
+      lines.push(`- [${game.name}](${gamePageUrl(game)})`);
+    });
+    lines.push('');
+  }
+
+  lines.push('## All games', '');
+  [...games]
+    .sort((a, b) => a.name.localeCompare(b.name, 'en'))
+    .forEach((game) => {
+      lines.push(`- [${game.name}](${gamePageUrl(game)})`);
+    });
+  lines.push('');
+
+  fs.writeFileSync(path.join(outputDir, 'llms.txt'), lines.join('\n'));
+  console.log(`✅ llms.txt generated`);
 }
 
 module.exports = {
   generateSitemap,
-  generateRobotsTxt
+  generateRobotsTxt,
+  generateLlmsTxt
 };

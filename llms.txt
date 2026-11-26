@@ -1,0 +1,261 @@
+# Chromebook Unlocked Games
+
+> Chromebook Unlocked Games (chromebookunlocked.github.io) is a free website with 186 browser games. Each game has its own page and runs in a browser tab, so it can be played on a Chromebook, Windows PC or Mac without downloading or installing anything.
+
+## Facts
+
+- Number of games: 186
+- Price: free, no account needed
+- Platform: web browser (HTML5); no download or install
+- Game page address pattern: https://chromebookunlocked.github.io/<Game Name>.html
+- Largest categories: Action, Arcade, Mobile, Casual, Puzzle and Adventure
+- Whether the site loads on a school network depends on that network's filter.
+
+## Main pages
+
+- [All unblocked games](https://chromebookunlocked.github.io/): homepage with search and the full game list
+- [Contact](https://chromebookunlocked.github.io/important-pages/contact.html)
+- [DMCA and copyright](https://chromebookunlocked.github.io/important-pages/dmca.html)
+- [Privacy policy](https://chromebookunlocked.github.io/important-pages/privacy-policy.html)
+
+## Game categories
+
+- [Action Games Unblocked](https://chromebookunlocked.github.io/action-games-unblocked.html): 39 games
+- [Arcade Games Unblocked](https://chromebookunlocked.github.io/arcade-games-unblocked.html): 33 games
+- [Mobile Games Unblocked](https://chromebookunlocked.github.io/mobile-games-unblocked.html): 33 games
+- [Casual Games Unblocked](https://chromebookunlocked.github.io/casual-games-unblocked.html): 25 games
+- [Puzzle Games Unblocked](https://chromebookunlocked.github.io/puzzle-games-unblocked.html): 23 games
+- [Adventure Games Unblocked](https://chromebookunlocked.github.io/adventure-games-unblocked.html): 19 games
+- [Shooter Games Unblocked](https://chromebookunlocked.github.io/shooter-games-unblocked.html): 19 games
+- [Strategy Games Unblocked](https://chromebookunlocked.github.io/strategy-games-unblocked.html): 19 games
+- [Horror Games Unblocked](https://chromebookunlocked.github.io/horror-games-unblocked.html): 18 games
+- [Racing Games Unblocked](https://chromebookunlocked.github.io/racing-games-unblocked.html): 16 games
+- [Driving Games Unblocked](https://chromebookunlocked.github.io/driving-games-unblocked.html): 15 games
+- [Platformer Games Unblocked](https://chromebookunlocked.github.io/platformer-games-unblocked.html): 15 games
+- [Simulation Games Unblocked](https://chromebookunlocked.github.io/simulation-games-unblocked.html): 14 games
+- [Sports Games Unblocked](https://chromebookunlocked.github.io/sports-games-unblocked.html): 11 games
+- [2 Player Games Unblocked](https://chromebookunlocked.github.io/2-player-games-unblocked.html): 10 games
+- [Clicker Games Unblocked](https://chromebookunlocked.github.io/clicker-games-unblocked.html): 9 games
+- [Physics Games Unblocked](https://chromebookunlocked.github.io/physics-games-unblocked.html): 8 games
+- [Point and Click Games Unblocked](https://chromebookunlocked.github.io/point-and-click-games-unblocked.html): 8 games
+- [Psychological Games Unblocked](https://chromebookunlocked.github.io/psychological-games-unblocked.html): 8 games
+- [Idle Games Unblocked](https://chromebookunlocked.github.io/idle-games-unblocked.html): 7 games
+- [Multiplayer Games Unblocked](https://chromebookunlocked.github.io/multiplayer-games-unblocked.html): 7 games
+- [Roguelike Games Unblocked](https://chromebookunlocked.github.io/roguelike-games-unblocked.html): 7 games
+- [Rhythm Games Unblocked](https://chromebookunlocked.github.io/rhythm-games-unblocked.html): 5 games
+- [Sniper Games Unblocked](https://chromebookunlocked.github.io/sniper-games-unblocked.html): 5 games
+- [Survival Games Unblocked](https://chromebookunlocked.github.io/survival-games-unblocked.html): 5 games
+- [Tower Defence Games Unblocked](https://chromebookunlocked.github.io/tower-defence-games-unblocked.html): 5 games
+- [Zombie Games Unblocked](https://chromebookunlocked.github.io/zombie-games-unblocked.html): 5 games
+
+## Featured games
+
+- [Geometry Dash Lite](https://chromebookunlocked.github.io/Geometry%20Dash%20Lite.html)
+- [3Dash](https://chromebookunlocked.github.io/3Dash.html)
+- [Drive Mad](https://chromebookunlocked.github.io/Drive%20Mad.html)
+- [Polytrack](https://chromebookunlocked.github.io/Polytrack.html)
+- [Granny](https://chromebookunlocked.github.io/Granny.html)
+- [Smash Carts](https://chromebookunlocked.github.io/Smash%20Carts.html)
+- [Gladdihoppers](https://chromebookunlocked.github.io/Gladdihoppers.html)
+- [Adventure Capitalist](https://chromebookunlocked.github.io/Adventure%20Capitalist.html)
+- [Escape Road](https://chromebookunlocked.github.io/Escape%20Road.html)
+- [Bitlife](https://chromebookunlocked.github.io/Bitlife.html)
+- [Five Nights at Epstein Island](https://chromebookunlocked.github.io/Five%20Nights%20at%20Epstein%20Island.html)
+- [FNAF 1](https://chromebookunlocked.github.io/FNAF%201.html)
+- [FNAF 2](https://chromebookunlocked.github.io/FNAF%202.html)
+- [Bit Planes](https://chromebookunlocked.github.io/Bit%20Planes.html)
+- [Bouncemasters](https://chromebookunlocked.github.io/Bouncemasters.html)
+- [Blaze Drifter](https://chromebookunlocked.github.io/Blaze%20Drifter.html)
+- [Retro Bowl](https://chromebookunlocked.github.io/Retro%20Bowl.html)
+- [Airline Tycoon Idle](https://chromebookunlocked.github.io/Airline%20Tycoon%20Idle.html)
+- [Basketball Super Stars](https://chromebookunlocked.github.io/Basketball%20Super%20Stars.html)
+- [Basketball Legends](https://chromebookunlocked.github.io/Basketball%20Legends.html)
+
+## All games
+
+- [10 Minutes Till Dawn](https://chromebookunlocked.github.io/10%20Minutes%20Till%20Dawn.html)
+- [1on1 Soccer](https://chromebookunlocked.github.io/1on1%20Soccer.html)
+- [1on1 Tennis](https://chromebookunlocked.github.io/1on1%20Tennis.html)
+- [1v1.lol](https://chromebookunlocked.github.io/1v1.lol.html)
+- [2048](https://chromebookunlocked.github.io/2048.html)
+- [234 Player Games](https://chromebookunlocked.github.io/234%20Player%20Games.html)
+- [3Dash](https://chromebookunlocked.github.io/3Dash.html)
+- [4th and Goal](https://chromebookunlocked.github.io/4th%20and%20Goal.html)
+- [A Dance of Fire and Ice](https://chromebookunlocked.github.io/A%20Dance%20of%20Fire%20and%20Ice.html)
+- [Ace Combat 3](https://chromebookunlocked.github.io/Ace%20Combat%203.html)
+- [Achilles 2](https://chromebookunlocked.github.io/Achilles%202.html)
+- [Adventure Capitalist](https://chromebookunlocked.github.io/Adventure%20Capitalist.html)
+- [Age Of War](https://chromebookunlocked.github.io/Age%20Of%20War.html)
+- [Ages of Conflict](https://chromebookunlocked.github.io/Ages%20of%20Conflict.html)
+- [Airline Tycoon Idle](https://chromebookunlocked.github.io/Airline%20Tycoon%20Idle.html)
+- [Ambulance Rush](https://chromebookunlocked.github.io/Ambulance%20Rush.html)
+- [Bad Ice Cream](https://chromebookunlocked.github.io/Bad%20Ice%20Cream.html)
+- [Bad Ice Cream 2](https://chromebookunlocked.github.io/Bad%20Ice%20Cream%202.html)
+- [Bad Parenting](https://chromebookunlocked.github.io/Bad%20Parenting.html)
+- [Bad Piggies](https://chromebookunlocked.github.io/Bad%20Piggies.html)
+- [Bad Time Simulator](https://chromebookunlocked.github.io/Bad%20Time%20Simulator.html)
+- [Basketball FRVR](https://chromebookunlocked.github.io/Basketball%20FRVR.html)
+- [Basketball Legends](https://chromebookunlocked.github.io/Basketball%20Legends.html)
+- [Basketball Super Stars](https://chromebookunlocked.github.io/Basketball%20Super%20Stars.html)
+- [Bit Planes](https://chromebookunlocked.github.io/Bit%20Planes.html)
+- [Bitlife](https://chromebookunlocked.github.io/Bitlife.html)
+- [Blackjack](https://chromebookunlocked.github.io/Blackjack.html)
+- [Blaze Drifter](https://chromebookunlocked.github.io/Blaze%20Drifter.html)
+- [Block Blast](https://chromebookunlocked.github.io/Block%20Blast.html)
+- [Block the Pig](https://chromebookunlocked.github.io/Block%20the%20Pig.html)
+- [Blockcraft Parkour](https://chromebookunlocked.github.io/Blockcraft%20Parkour.html)
+- [Bloodmoney](https://chromebookunlocked.github.io/Bloodmoney.html)
+- [Bloodmoney 2](https://chromebookunlocked.github.io/Bloodmoney%202.html)
+- [Bloxorz](https://chromebookunlocked.github.io/Bloxorz.html)
+- [Bob The Robber](https://chromebookunlocked.github.io/Bob%20The%20Robber.html)
+- [Bob The Robber 2](https://chromebookunlocked.github.io/Bob%20The%20Robber%202.html)
+- [Bob The Robber 5](https://chromebookunlocked.github.io/Bob%20The%20Robber%205.html)
+- [Bouncemasters](https://chromebookunlocked.github.io/Bouncemasters.html)
+- [Bouncy Basketball](https://chromebookunlocked.github.io/Bouncy%20Basketball.html)
+- [Bouncy Motors](https://chromebookunlocked.github.io/Bouncy%20Motors.html)
+- [Bounty of One](https://chromebookunlocked.github.io/Bounty%20of%20One.html)
+- [Bowmasters](https://chromebookunlocked.github.io/Bowmasters.html)
+- [Brawl Simulator 3D](https://chromebookunlocked.github.io/Brawl%20Simulator%203D.html)
+- [Brotato](https://chromebookunlocked.github.io/Brotato.html)
+- [BTD5](https://chromebookunlocked.github.io/BTD5.html)
+- [Bullet Force](https://chromebookunlocked.github.io/Bullet%20Force.html)
+- [Burger and Frights](https://chromebookunlocked.github.io/Burger%20and%20Frights.html)
+- [Burrito Bison Launcha Libre](https://chromebookunlocked.github.io/Burrito%20Bison%20Launcha%20Libre.html)
+- [Buster Jam](https://chromebookunlocked.github.io/Buster%20Jam.html)
+- [Capybara Clicker](https://chromebookunlocked.github.io/Capybara%20Clicker.html)
+- [Cars Arena](https://chromebookunlocked.github.io/Cars%20Arena.html)
+- [Cave Crawler](https://chromebookunlocked.github.io/Cave%20Crawler.html)
+- [Clear Vision 1](https://chromebookunlocked.github.io/Clear%20Vision%201.html)
+- [Clear Vision 2](https://chromebookunlocked.github.io/Clear%20Vision%202.html)
+- [Clear Vision 3](https://chromebookunlocked.github.io/Clear%20Vision%203.html)
+- [Clear Vision 4](https://chromebookunlocked.github.io/Clear%20Vision%204.html)
+- [Clear Vision 5](https://chromebookunlocked.github.io/Clear%20Vision%205.html)
+- [Cluster Rush](https://chromebookunlocked.github.io/Cluster%20Rush.html)
+- [Cookie Clicker](https://chromebookunlocked.github.io/Cookie%20Clicker.html)
+- [Crank It!](https://chromebookunlocked.github.io/Crank%20It!.html)
+- [Crazy Cars](https://chromebookunlocked.github.io/Crazy%20Cars.html)
+- [Crazy Cattle 3D](https://chromebookunlocked.github.io/Crazy%20Cattle%203D.html)
+- [Crazy Motorcycle](https://chromebookunlocked.github.io/Crazy%20Motorcycle.html)
+- [Crossy Road](https://chromebookunlocked.github.io/Crossy%20Road.html)
+- [CS Go Clicker](https://chromebookunlocked.github.io/CS%20Go%20Clicker.html)
+- [Cut the Rope](https://chromebookunlocked.github.io/Cut%20the%20Rope.html)
+- [Dead Zed 2](https://chromebookunlocked.github.io/Dead%20Zed%202.html)
+- [Deadly Descent](https://chromebookunlocked.github.io/Deadly%20Descent.html)
+- [Deepest Sword](https://chromebookunlocked.github.io/Deepest%20Sword.html)
+- [Deltarune](https://chromebookunlocked.github.io/Deltarune.html)
+- [Dino Run](https://chromebookunlocked.github.io/Dino%20Run.html)
+- [Doki Doki Literature Club](https://chromebookunlocked.github.io/Doki%20Doki%20Literature%20Club.html)
+- [Douchebag Life](https://chromebookunlocked.github.io/Douchebag%20Life.html)
+- [Dreader](https://chromebookunlocked.github.io/Dreader.html)
+- [Drift Boss](https://chromebookunlocked.github.io/Drift%20Boss.html)
+- [Drift Hunters](https://chromebookunlocked.github.io/Drift%20Hunters.html)
+- [Drive in Russia](https://chromebookunlocked.github.io/Drive%20in%20Russia.html)
+- [Drive Mad](https://chromebookunlocked.github.io/Drive%20Mad.html)
+- [Dud](https://chromebookunlocked.github.io/Dud.html)
+- [Dunk Shot](https://chromebookunlocked.github.io/Dunk%20Shot.html)
+- [Earth Taken](https://chromebookunlocked.github.io/Earth%20Taken.html)
+- [Effing Worms](https://chromebookunlocked.github.io/Effing%20Worms.html)
+- [Elastic Face](https://chromebookunlocked.github.io/Elastic%20Face.html)
+- [Escape Road](https://chromebookunlocked.github.io/Escape%20Road.html)
+- [Escape Road 3](https://chromebookunlocked.github.io/Escape%20Road%203.html)
+- [Exit Path](https://chromebookunlocked.github.io/Exit%20Path.html)
+- [Exo Observation](https://chromebookunlocked.github.io/Exo%20Observation.html)
+- [Extreme Run 3D](https://chromebookunlocked.github.io/Extreme%20Run%203D.html)
+- [Fall Guys Mini](https://chromebookunlocked.github.io/Fall%20Guys.html)
+- [Fireboy and Watergirl 1](https://chromebookunlocked.github.io/Fireboy%20and%20Watergirl%201.html)
+- [Five Nights at Epstein Island](https://chromebookunlocked.github.io/Five%20Nights%20at%20Epstein%20Island.html)
+- [Five Nights at Wilsons](https://chromebookunlocked.github.io/Five%20Nights%20at%20Wilsons.html)
+- [FNAF 1](https://chromebookunlocked.github.io/FNAF%201.html)
+- [FNAF 2](https://chromebookunlocked.github.io/FNAF%202.html)
+- [FNAF 3](https://chromebookunlocked.github.io/FNAF%203.html)
+- [FNAF 4](https://chromebookunlocked.github.io/FNAF%204.html)
+- [FNAF Pizzeria Simulator](https://chromebookunlocked.github.io/FNAF%20Pizzeria%20Simulator.html)
+- [Friday Night Funkin](https://chromebookunlocked.github.io/Friday%20Night%20Funkin.html)
+- [Friday Night Funkin Undertale](https://chromebookunlocked.github.io/Friday%20Night%20Funkin%20Undertale.html)
+- [Fruit Ninja](https://chromebookunlocked.github.io/Fruit%20Ninja.html)
+- [Geometry Dash Lite](https://chromebookunlocked.github.io/Geometry%20Dash%20Lite.html)
+- [Get Yoked](https://chromebookunlocked.github.io/Get%20Yoked.html)
+- [Gladdihoppers](https://chromebookunlocked.github.io/Gladdihoppers.html)
+- [Gobble](https://chromebookunlocked.github.io/Gobble.html)
+- [Going Balls](https://chromebookunlocked.github.io/Going%20Balls.html)
+- [Gold Digger FRVR](https://chromebookunlocked.github.io/Gold%20Digger%20FRVR.html)
+- [Granny](https://chromebookunlocked.github.io/Granny.html)
+- [Grindcraft](https://chromebookunlocked.github.io/Grindcraft.html)
+- [Gun Spin](https://chromebookunlocked.github.io/Gun%20Spin.html)
+- [Hanger 2](https://chromebookunlocked.github.io/Hanger%202.html)
+- [Happy Room](https://chromebookunlocked.github.io/Happy%20Room.html)
+- [Happy Wheels](https://chromebookunlocked.github.io/Happy%20Wheels.html)
+- [Helix Jump](https://chromebookunlocked.github.io/Helix%20Jump.html)
+- [Henry Stickmin Escaping The Prison](https://chromebookunlocked.github.io/Henry%20Stickmin%20Escaping%20The%20Prison.html)
+- [Henry Stickmin Fleeing The Complex](https://chromebookunlocked.github.io/Henry%20Stickmin%20Fleeing%20The%20Complex.html)
+- [Henry Stickmin Infiltrating The Airship](https://chromebookunlocked.github.io/Henry%20Stickmin%20Infiltrating%20The%20Airship.html)
+- [Henry Stickmin Stealing The Diamond](https://chromebookunlocked.github.io/Henry%20Stickmin%20Stealing%20The%20Diamond.html)
+- [Highway Racer](https://chromebookunlocked.github.io/Highway%20Racer.html)
+- [Hover Race Drive](https://chromebookunlocked.github.io/Hover%20Race%20Drive.html)
+- [Hungry Lamu](https://chromebookunlocked.github.io/Hungry%20Lamu.html)
+- [Infinite Craft](https://chromebookunlocked.github.io/Infinite%20Craft.html)
+- [Leap and Avoid 2](https://chromebookunlocked.github.io/Leap%20and%20Avoid%202.html)
+- [Little Alchemy 2](https://chromebookunlocked.github.io/Little%20Alchemy%202.html)
+- [Lone Wolf](https://chromebookunlocked.github.io/Lone%20Wolf.html)
+- [Mana God](https://chromebookunlocked.github.io/Mana%20God.html)
+- [Meme Soundboard](https://chromebookunlocked.github.io/Meme%20Soundboard.html)
+- [Minecraft](https://chromebookunlocked.github.io/Minecraft.html)
+- [Minecraft Tower Defence](https://chromebookunlocked.github.io/Minecraft%20Tower%20Defence.html)
+- [Mr Mine](https://chromebookunlocked.github.io/Mr%20Mine.html)
+- [Ninja Obby Parkour](https://chromebookunlocked.github.io/Ninja%20Obby%20Parkour.html)
+- [Obby Bike](https://chromebookunlocked.github.io/Obby%20Bike.html)
+- [Obby Cart](https://chromebookunlocked.github.io/Obby%20Cart.html)
+- [One Bit Adventure](https://chromebookunlocked.github.io/One%20Bit%20Adventure.html)
+- [Orange Roulette](https://chromebookunlocked.github.io/Orange%20Roulette.html)
+- [OvO](https://chromebookunlocked.github.io/OvO.html)
+- [Papas Burgeria](https://chromebookunlocked.github.io/Papas%20Burgeria.html)
+- [Perfect Hotel](https://chromebookunlocked.github.io/Perfect%20Hotel.html)
+- [Plants vs Zombies 2](https://chromebookunlocked.github.io/Plants%20vs%20Zombies%202.html)
+- [Plants vs Zombies Modded](https://chromebookunlocked.github.io/Plants%20vs%20Zombies%20Modded.html)
+- [Pokemon Emerald](https://chromebookunlocked.github.io/Pokemon%20Emerald.html)
+- [Polytrack](https://chromebookunlocked.github.io/Polytrack.html)
+- [Portal Flash](https://chromebookunlocked.github.io/Portal%20Flash.html)
+- [Punch the Trump](https://chromebookunlocked.github.io/Punch%20the%20Trump.html)
+- [Red Ball](https://chromebookunlocked.github.io/Red%20Ball.html)
+- [Retro Bowl](https://chromebookunlocked.github.io/Retro%20Bowl.html)
+- [Road of the Dead](https://chromebookunlocked.github.io/Road%20of%20the%20Dead.html)
+- [Rocket Soccer Derby](https://chromebookunlocked.github.io/Rocket%20Soccer%20Derby.html)
+- [Rooftop Run](https://chromebookunlocked.github.io/Rooftop%20Run.html)
+- [Roulette Hero](https://chromebookunlocked.github.io/Roulette%20Hero.html)
+- [Sausage Flip](https://chromebookunlocked.github.io/Sausage%20Flip.html)
+- [School Escape Duel](https://chromebookunlocked.github.io/School%20Escape%20Duel.html)
+- [Schoolboy Runaway](https://chromebookunlocked.github.io/Schoolboy%20Runaway.html)
+- [Sea Mongrel](https://chromebookunlocked.github.io/Sea%20Mongrel.html)
+- [Self](https://chromebookunlocked.github.io/Self.html)
+- [Skinwalker](https://chromebookunlocked.github.io/Skinwalker.html)
+- [Slide in the Woods](https://chromebookunlocked.github.io/Slide%20in%20the%20Woods.html)
+- [Slope](https://chromebookunlocked.github.io/Slope.html)
+- [Smash Carts](https://chromebookunlocked.github.io/Smash%20Carts.html)
+- [Stick Defenders](https://chromebookunlocked.github.io/Stick%20Defenders.html)
+- [Super Cold](https://chromebookunlocked.github.io/Super%20Cold.html)
+- [Super Falling Fred](https://chromebookunlocked.github.io/Super%20Falling%20Fred.html)
+- [Superhot](https://chromebookunlocked.github.io/Superhot.html)
+- [Swordfight](https://chromebookunlocked.github.io/Swordfight.html)
+- [The Binding of Isaac - Wrath of the Lamb](https://chromebookunlocked.github.io/The%20Binding%20of%20Isaac%20-%20Wrath%20of%20the%20Lamb.html)
+- [The Deadset](https://chromebookunlocked.github.io/The%20Deadset.html)
+- [The Imposible Quiz](https://chromebookunlocked.github.io/The%20Imposible%20Quiz.html)
+- [The Impossible Quiz 2](https://chromebookunlocked.github.io/The%20Impossible%20Quiz%202.html)
+- [The Last Stand](https://chromebookunlocked.github.io/The%20Last%20Stand.html)
+- [The Visitor](https://chromebookunlocked.github.io/The%20Visitor.html)
+- [They Are Coming](https://chromebookunlocked.github.io/They%20Are%20Coming.html)
+- [Tiny Fishing](https://chromebookunlocked.github.io/Tiny%20Fishing.html)
+- [Tower Wizzard](https://chromebookunlocked.github.io/Tower%20Wizzard.html)
+- [Tung Tung Horror](https://chromebookunlocked.github.io/Tung%20Tung%20Horror.html)
+- [Ultimate Driving Simulator](https://chromebookunlocked.github.io/Ultimate%20Driving%20Simulator.html)
+- [Vapmpire Survivors](https://chromebookunlocked.github.io/Vapmpire%20Survivors.html)
+- [Whack the Thief](https://chromebookunlocked.github.io/Whack%20the%20Thief.html)
+- [Whack Your Boss](https://chromebookunlocked.github.io/Whack%20Your%20Boss.html)
+- [Whack Your Computer](https://chromebookunlocked.github.io/Whack%20Your%20Computer.html)
+- [Winter Falling](https://chromebookunlocked.github.io/Winter%20Falling.html)
+- [Wordle](https://chromebookunlocked.github.io/Wordle.html)
+- [Worlds Hardest Game](https://chromebookunlocked.github.io/Worlds%20Hardest%20Game.html)
+- [Yellow](https://chromebookunlocked.github.io/Yellow.html)
+- [Zen Word](https://chromebookunlocked.github.io/Zen%20Word.html)
+- [Zombie Exploder](https://chromebookunlocked.github.io/Zombie%20Exploder.html)
+- [Zombie Rush](https://chromebookunlocked.github.io/Zombie%20Rush.html)
+- [Zombotron Reboot](https://chromebookunlocked.github.io/Zombotron%20Reboot.html)

@@ -379,7 +379,7 @@ html,body {
   .header-nav-link { font-size: 0.7rem; padding: 0.25em 0.35em; }
 }
 
-#topHeader h1 {
+#topHeader .brand-title {
   margin: 0;
   font-size: clamp(0.85rem, 2vw, 1.3rem);
   font-weight: 700;
@@ -415,7 +415,7 @@ html,body {
     min-width: 32px;
     min-height: 32px;
   }
-  #topHeader h1 {
+  #topHeader .brand-title {
     font-size: 0.9rem;
     /* Prevent font CLS */
     min-height: 1.2rem;
@@ -764,7 +764,7 @@ button:active {
   box-shadow:0 10px 40px rgba(255, 102, 255, 0.4);
   border: 2px solid rgba(255, 102, 255, 0.3);
 }
-#startOverlay h2 {
+#startOverlay #startName {
   margin:0;
   font-size:clamp(1.5rem,2.5vw,3rem);
   color:#fff;
@@ -1111,7 +1111,7 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
   text-align: center;
 }
 
-.footer-brand h3 {
+.footer-brand-name {
   font-size: 1.2rem;
   font-weight: 700;
   background: linear-gradient(135deg, #ff66ff, #ff99ff);
@@ -1244,4 +1244,102 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
 }
 #dmcaLink:hover {
   color: rgba(255, 255, 255, 0.6);
+}
+
+/* ============================================================================
+   SEO CONTENT: page heading, category links, FAQ, category pages
+============================================================================ */
+
+#topHeader .brand-title {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Sidebar entries are real links; the link takes the row's layout. */
+#sidebar li > a {
+  display: contents;
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-intro {
+  max-width: var(--content-max-width);
+  margin: 0.6rem auto 1rem;
+  color: #d7ccdf;
+}
+
+.page-intro h1 {
+  margin: 0 0 0.4rem;
+  color: #ffccff;
+  font-family: var(--font-main);
+  font-weight: 900;
+  font-size: clamp(1.15rem, 2vw, 1.6rem);
+  line-height: 1.3;
+}
+
+.page-intro p {
+  max-width: 85ch;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: #b9a9c4;
+}
+
+.breadcrumbs a {
+  color: #f6d7ff;
+  text-decoration: none;
+}
+
+.breadcrumbs a:hover,
+.breadcrumbs a:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.site-guide h2:not(:first-child) {
+  margin-top: 1.5rem;
+}
+
+.site-guide h3 {
+  margin: 1rem 0 0.3rem;
+  color: #f2e9f6;
+  font-size: 1rem;
+}
+
+.category-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.category-links a {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid rgba(255, 102, 255, 0.3);
+  border-radius: 999px;
+  color: #f6d7ff;
+  text-decoration: none;
+  line-height: 1.4;
+}
+
+.category-links a:hover,
+.category-links a:focus-visible {
+  color: #fff;
+  border-color: var(--accent);
+  background: rgba(255, 102, 255, 0.15);
+}
+
+/* Headings on static category pages are not clickable. */
+.category-static h2 {
+  cursor: default;
 }

@@ -1,5 +1,16 @@
 const { getThumbPath, FALLBACK_THUMBNAIL } = require("../utils/assetManager");
-const { generateGameMetaTags, generateGameStructuredData, generateGameSEOTitle, generateGameSEODescription } = require("../utils/seoBuilder");
+const {
+  generateGameMetaTags,
+  generateGameStructuredData,
+  generateGameSEODescription,
+  generateGameHeading,
+  generateGameFaq,
+  getCategoryPages,
+  findCategoryPage,
+  primaryCategoryPage,
+  gameGenres,
+  SITE_NAME
+} = require("../utils/seoBuilder");
 const { generateAnalyticsScript, generateConsentModeScript } = require("../utils/analyticsEnhanced");
 const { escapeHtml, escapeHtmlAttr } = require("../utils/htmlEscape");
 const { RECOMMENDED_GAMES_COUNT, MAX_RELATED_GAMES, GAME_DURATION_TRACKING_INTERVAL } = require("../utils/constants");
@@ -55,7 +66,6 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   const escapedGameName = escapeHtml(game.name);
   const escapedGameNameAttr = escapeHtmlAttr(game.name);
   const escapedGameFolder = escapeHtmlAttr(game.folder);
-  const escapedCategoryList = escapeHtml(categoryList);
   const escapedCategoryListJs = escapeJs(categoryList);
 
   // Get similar games for "You Might Also Like" section (no duplicates).
@@ -119,9 +129,8 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
     const escapedThumbPath = escapeHtmlAttr(gThumbPath);
     const escapedName = escapeHtmlAttr(g.name);
     const escapedNameText = escapeHtml(g.name);
-    // SEO-optimized alt text with keywords
-    const altText = `Play ${escapedNameText} Unblocked - Free Online Game`;
-    recommendedGamesHTML += `<a href="/${escapeHtmlAttr(encodeURIComponent(g.folder))}.html" class="game-card" title="Play ${escapedNameText} Unblocked Free Online" onclick="trackRecentGame('${escapedFolder}')">
+    const altText = escapedName;
+    recommendedGamesHTML += `<a href="/${escapeHtmlAttr(encodeURIComponent(g.folder))}.html" class="game-card" onclick="trackRecentGame('${escapedFolder}')">
       <div class="thumb-container" style="--thumb-url: url('${escapedThumbPath}')">
         <img class="thumb" src="${escapedThumbPath}" alt="${altText}" loading="lazy" width="300" height="300">
       </div>
@@ -136,13 +145,42 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   });
 
   // Get SEO meta tags and structured data
+  const categoryPages = getCategoryPages(categories);
   const metaTags = generateGameMetaTags(game, thumbPath);
-  const structuredData = generateGameStructuredData(game, thumbPath);
+  const structuredData = generateGameStructuredData(game, thumbPath, categoryPages);
 
-  // Generate SEO description for the game
+  // Visible copy: heading, About text, category links, breadcrumb and FAQ.
+  // All of it comes from data/<game>.json or is true for every game here.
   const seoDescription = generateGameSEODescription(game);
   const escapedSeoDescription = escapeHtml(seoDescription);
-  const categoryText = game.categories.length > 0 ? game.categories[0].toLowerCase() : 'action';
+  const escapedHeading = escapeHtml(generateGameHeading(game));
+  const genres = gameGenres(game);
+  const categoryText = genres.length > 0 ? genres[0].toLowerCase() : 'browser';
+
+  // A category links to its own page when one is generated, otherwise to the
+  // homepage filter for that category.
+  const categoryLink = (cat, className) => {
+    const page = findCategoryPage(categoryPages, cat);
+    const href = page ? page.path : `/#/category/${encodeURIComponent(cat)}`;
+    const classAttr = className ? ` class="${className}"` : '';
+    return `<a href="${escapeHtmlAttr(href)}"${classAttr}>${escapeHtml(cat)}</a>`;
+  };
+  const categoryTagsHTML = game.categories.map((cat) => categoryLink(cat, 'category-tag')).join("");
+  const categoryLinksHTML = game.categories.map((cat) => categoryLink(cat)).join(", ");
+
+  const breadcrumbCategory = primaryCategoryPage(game, categoryPages);
+  const breadcrumbHTML = `<nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Unblocked Games</a>
+      ${breadcrumbCategory ? `<span aria-hidden="true">›</span> <a href="${escapeHtmlAttr(breadcrumbCategory.path)}">${escapeHtml(breadcrumbCategory.heading)}</a>` : ''}
+      <span aria-hidden="true">›</span> <span aria-current="page">${escapedGameName}</span>
+    </nav>`;
+
+  const faqHTML = generateGameFaq(game)
+    .map((item) => `<div class="faq-item">
+            <h3>${escapeHtml(item.question)}</h3>
+            <p>${escapeHtml(item.answer)}</p>
+          </div>`)
+    .join("\n          ");
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -191,10 +229,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   ${generateHeaderBannerAd(adsEnabled)}
 
   <!-- Main Game Content -->
-  <main itemscope itemtype="https://schema.org/VideoGame">
-    <meta itemprop="name" content="${escapedGameNameAttr}">
-    <meta itemprop="gamePlatform" content="Web Browser">
-    <meta itemprop="applicationCategory" content="Game">
+  <main>
 
     <!-- Game Viewer -->
     <div class="game-container">
@@ -202,14 +237,14 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
       <div class="game-frame-wrapper" id="gameWrapper">
         <div class="game-stage" id="gameStage">
           <div class="play-overlay" id="playOverlay">
-            <img src="${escapeHtmlAttr(thumbPath)}" alt="Play ${escapedGameNameAttr} Unblocked - Free Online ${escapeHtmlAttr(categoryText)} Game" itemprop="image" width="300" height="300" loading="eager" fetchpriority="high">
-            <h1 itemprop="headline">${escapedGameName}</h1>
+            <img src="${escapeHtmlAttr(thumbPath)}" alt="${escapedGameNameAttr} unblocked - free online ${escapeHtmlAttr(categoryText)} game" width="300" height="300" loading="eager" fetchpriority="high">
+            <h1>${escapedHeading}</h1>
             <button class="play-btn" onclick="startGame();" aria-label="Play ${escapedGameNameAttr} Free Online">▶ Play</button>
           </div>
           <iframe
             id="gameFrame"
             src=""
-            title="${escapedGameNameAttr} Unblocked - Play Free Online Game at School"
+            title="${escapedGameNameAttr} game"
             allow="fullscreen; autoplay; encrypted-media"
             allowfullscreen
             tabindex="0">
@@ -239,56 +274,57 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   <!-- More Games Section -->
   <section class="recommendations" id="moreGamesSection" aria-label="More Unblocked Games">
     <div class="section-divider"></div>
+    <h2 class="section-heading">More games like ${escapedGameName}</h2>
     <div class="grid">
       ${recommendedGamesHTML}
     </div>
   </section>
 
-  <!-- Category Tags (above About section) -->
+  <!-- Breadcrumb and category links -->
   <div class="category-tags-section">
-    <div class="category-tags" role="navigation" aria-label="Game Categories">
-      ${game.categories
-        .map(
-          (cat) => {
-            const escapedCat = escapeHtmlAttr(cat);
-            const escapedCatText = escapeHtml(cat);
-            return `<a href="/#/category/${encodeURIComponent(cat)}" class="category-tag" title="Play Free ${escapedCatText} Games Unblocked">${escapedCatText}</a>`;
-          }
-        )
-        .join("")}
+    ${breadcrumbHTML}
+    <div class="category-tags" role="navigation" aria-label="Game categories">
+      ${categoryTagsHTML}
     </div>
   </div>
 
-  <!-- Enhanced SEO Section -->
+  <!-- Game information: About, How to play, FAQ -->
   <section class="game-info-section" id="gameInfoSection" aria-label="About ${escapedGameNameAttr}">
     <div class="game-info-container">
       <div class="info-card full-width">
-        <div class="info-card-icon">📝</div>
-        <h3>About ${escapedGameName}</h3>
+        <h2>About ${escapedGameName}</h2>
         <div class="description-content">
-          <p class="description-preview" itemprop="description">
-            ${escapedSeoDescription}
-          </p>
-          <div class="description-full">
-            <p>
-              Select Play above to open ${escapedGameName} in your browser. Use the fullscreen button if you want a larger view, or browse the related games above for another title.
-            </p>
-            <div class="game-meta">
-              <div class="meta-item">
-                <strong>Categories:</strong> ${escapedCategoryList}
-              </div>
-              <div class="meta-item">
-                <strong>Platform:</strong> Web Browser (HTML5)
-              </div>
+          <p>${escapedSeoDescription}</p>
+          <div class="game-meta">
+            <div class="meta-item">
+              <strong>Categories:</strong> ${categoryLinksHTML}
+            </div>
+            <div class="meta-item">
+              <strong>Platform:</strong> Web browser (HTML5)
+            </div>
+            <div class="meta-item">
+              <strong>Price:</strong> Free, no download
             </div>
           </div>
         </div>
-        <button class="show-more-btn" onclick="toggleGameInfo()" aria-label="Show more information">
-          <span class="show-more-text">Show More</span>
-          <svg class="show-more-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </button>
+      </div>
+
+      <div class="info-card full-width">
+        <h2>How to play ${escapedGameName} unblocked</h2>
+        <div class="description-content">
+          <ol class="how-to-play">
+            <li>Press the Play button on the game image to load ${escapedGameName} in this page.</li>
+            <li>Use the Fullscreen button under the game for a larger view, and press Esc to leave fullscreen.</li>
+            <li>${escapedGameName} runs in your browser tab, so nothing is downloaded or installed. To switch games, pick another title from the list above.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="info-card full-width">
+        <h2>${escapedGameName} FAQ</h2>
+        <div class="description-content faq-list">
+          ${faqHTML}
+        </div>
       </div>
     </div>
   </section>
@@ -298,7 +334,7 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
   <footer>
     <div class="footer-content">
       <div class="footer-brand">
-        <h3>Chromebook Unlocked Games</h3>
+        <p class="footer-brand-name">${SITE_NAME}</p>
         <span class="footer-url">chromebookunlocked.github.io</span>
       </div>
       <div class="footer-links">
@@ -640,25 +676,6 @@ function generateGamePage(game, allGames, categories, gamePageStyles, gamesDir, 
       // Initial check
       updateHintVisibility();
     })();
-
-    // Toggle game info section
-    function toggleGameInfo() {
-      const section = document.getElementById('gameInfoSection');
-      const btn = document.querySelector('.show-more-btn');
-      const btnText = btn.querySelector('.show-more-text');
-      const btnIcon = btn.querySelector('.show-more-icon');
-
-      if (section.classList.contains('expanded')) {
-        section.classList.remove('expanded');
-        btnText.textContent = 'Show More';
-        btnIcon.style.transform = 'rotate(0deg)';
-        section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      } else {
-        section.classList.add('expanded');
-        btnText.textContent = 'Show Less';
-        btnIcon.style.transform = 'rotate(180deg)';
-      }
-    }
 
     // Cleanup on page unload
     window.addEventListener('beforeunload', () => {

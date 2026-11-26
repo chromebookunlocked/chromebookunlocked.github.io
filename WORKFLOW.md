@@ -198,3 +198,13 @@ The workflow will automatically:
 - **`.github/workflows/build.yml`** - Legacy (disabled)
 
 The old workflows are disabled by default. Only use the **Manual Update** workflow.
+
+## 🔎 SEO output (titles, descriptions, category pages)
+
+All SEO copy is produced by the build from `src/utils/seoBuilder.js`; do not hand-edit generated HTML.
+
+- **Game description**: write one or two factual sentences in the `description` field of `data/<Game>.json`. It is shown under "About <Game>", used for the meta description (cut to 155 characters at a sentence boundary) and for structured data. With an empty description the page states only the categories the data lists.
+- **Titles / H1**: `<Game> Unblocked - Play Free Online` (the brand is added only when the title still fits 60 characters); the H1 is `<Game> Unblocked`.
+- **Category pages**: every category with 5 or more games gets a static page named `<category>-games-unblocked.html` (for example `2-player-games-unblocked.html`). They are written, and removed again when a category shrinks, by `generate.js`. "Trending Games" and "Uncategorized" never get a page.
+- **sitemap.xml, robots.txt, llms.txt** are rewritten on every build. Only the homepage carries `<lastmod>`.
+- Game page URLs (`<Game Name>.html`) are never renamed: GitHub Pages cannot redirect the old address.

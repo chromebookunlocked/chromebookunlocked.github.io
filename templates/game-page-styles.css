@@ -572,7 +572,7 @@ header {
   filter: drop-shadow(0 2px 8px rgba(255, 102, 255, 0.3));
 }
 
-.info-card h3 {
+.info-card h2 {
   font-size: 1.4rem;
   font-weight: 700;
   color: var(--text-primary);
@@ -706,7 +706,7 @@ header {
     padding: var(--spacing-md);
   }
 
-  .info-card h3 {
+  .info-card h2 {
     font-size: 1.2rem;
   }
 
@@ -954,7 +954,7 @@ footer {
   text-align: center;
 }
 
-.footer-brand h3 {
+.footer-brand-name {
   font-size: 1.2rem;
   font-weight: 700;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-light));

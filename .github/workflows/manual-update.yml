@@ -79,6 +79,7 @@ jobs:
           # Only copy ads.txt if it exists (may be absent when ads are disabled)
           if [ -f ads.txt ]; then cp ads.txt dist/ads.txt; fi
           cp sitemap.xml dist/sitemap.xml
+          if [ -f llms.txt ]; then cp llms.txt dist/llms.txt; fi
           cp robots.txt dist/robots.txt
           cp google0d95473435a7c986.html dist/google0d95473435a7c986.html
           cp .nojekyll dist/.nojekyll
@@ -94,7 +95,7 @@ jobs:
           git add -A news/ 2>/dev/null || true
           git add -A "*.html" 2>/dev/null || true
           git add news.html 2>/dev/null || true
-          git add sitemap.xml robots.txt 2>/dev/null || true
+          git add sitemap.xml robots.txt llms.txt 2>/dev/null || true
           git add ads-config.json 2>/dev/null || true
           if [ -f ads.txt ]; then git add ads.txt; else git rm --cached ads.txt 2>/dev/null || true; fi
 

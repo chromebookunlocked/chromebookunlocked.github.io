@@ -2,6 +2,6 @@
   "name": "Gun Spin",
   "category": "Arcade, Physics",
   "createdAt": "1970-01-01T00:00:00.000Z",
-  "description": "",
+  "description": "Fire a gun to send it spinning through the air and see how far it can travel. Each shot pushes it along, and upgrades add ammo and power.",
   "displayName": "Gun Spin"
 }

@@ -21,13 +21,13 @@ function getGameHTMLFiles() {
   // Filter for .html files, excluding special files
   const specialFiles = [
     'index.html',
-    'index.template.html',
     'dmca.html',
     'google0d95473435a7c986.html'
   ];
 
   return files.filter(f => {
-    return f.endsWith('.html') && !specialFiles.includes(f);
+    // Category pages ("<category>-games-unblocked.html") are written and pruned by generate.js.
+    return f.endsWith('.html') && !specialFiles.includes(f) && !f.endsWith('-games-unblocked.html');
   });
 }
 

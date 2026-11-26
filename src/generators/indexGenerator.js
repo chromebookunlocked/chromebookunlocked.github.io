@@ -14,7 +14,15 @@ const AD_INTERVAL = COLS_PER_ROW * ROWS_PER_AD; // 18
 function shouldInsertAdAfter(gameIndex) {
   return (gameIndex + 1) % AD_INTERVAL === 0;
 }
-const { generateIndexMetaTags, generateIndexStructuredData } = require('../utils/seoBuilder');
+const {
+  generateIndexMetaTags,
+  generateIndexStructuredData,
+  generateIndexFaq,
+  getCategoryPages,
+  findCategoryPage,
+  INDEX_HEADING,
+  SITE_NAME
+} = require('../utils/seoBuilder');
 const { generateAnalyticsScript, generateConsentModeScript } = require('../utils/analyticsEnhanced');
 const { escapeHtml, escapeHtmlAttr } = require('../utils/htmlEscape');
 const { getThumbPath } = require('../utils/assetManager');
@@ -102,6 +110,10 @@ function shuffleArray(array, seed) {
  * @returns {string} Complete HTML document
  */
 function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '.', adsEnabled = true, botVerificationEnabled = true) {
+  // Static category pages (crawlable). The sidebar still filters in place for
+  // visitors, but each entry is a real link to the category's own page.
+  const categoryPages = getCategoryPages(categories);
+
   // Generate sidebar categories - sorted by game count (largest first)
   // Filter out categories with less than 2 games, and exclude special categories
   const sidebarCategories = Object.keys(categories)
@@ -111,9 +123,25 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     .map(cat => {
       const escapedCat = escapeHtmlAttr(cat);
       const escapedCatText = escapeHtml(cat);
-      return `<li role="menuitem" tabindex="0" onclick="filterCategory('${escapedCat}')" onkeypress="if(event.key==='Enter')filterCategory('${escapedCat}')"><span class="icon">${getCategoryIcon(cat)}</span><span class="text">${escapedCatText}</span></li>`;
+      const page = findCategoryPage(categoryPages, cat);
+      const label = `<span class="icon">${getCategoryIcon(cat)}</span><span class="text">${escapedCatText}</span>`;
+      // The row's own handler does the in-page filter; the link only navigates
+      // when it is opened in a new tab or when scripts are unavailable.
+      const content = page
+        ? `<a href="${escapeHtmlAttr(page.path)}" tabindex="-1" onclick="event.preventDefault()">${label}</a>`
+        : label;
+      return `<li role="menuitem" tabindex="0" onclick="filterCategory('${escapedCat}')" onkeypress="if(event.key==='Enter')filterCategory('${escapedCat}')">${content}</li>`;
     })
     .join("");
+
+  const categoryLinksHTML = categoryPages
+    .map(page => `<li><a href="${escapeHtmlAttr(page.path)}">${escapeHtml(page.heading)}</a></li>`)
+    .join("");
+
+  const faqHTML = generateIndexFaq(games, categoryPages)
+    .map(item => `<h3>${escapeHtml(item.question)}</h3>
+        <p>${escapeHtml(item.answer)}</p>`)
+    .join("\n        ");
 
   // Fixed sidebar items for Recently Played and Newly Added
   const recentlyPlayedItem = `<li role="menuitem" tabindex="0" id="recentlyPlayedNav" onclick="filterCategory('Recently Played')" onkeypress="if(event.key==='Enter')filterCategory('Recently Played')" style="display:none"><span class="icon">🕐</span><span class="text">Recently Played</span></li>`;
@@ -175,8 +203,8 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   });
 
   // Get SEO meta tags and structured data
-  const metaTags = generateIndexMetaTags();
-  const structuredData = generateIndexStructuredData(games);
+  const metaTags = generateIndexMetaTags(games);
+  const structuredData = generateIndexStructuredData(games, categoryPages);
   const gameDirectory = [...games]
     .sort((a, b) => a.name.localeCompare(b.name, 'en'))
     .map(game => `<a href="/${escapeHtmlAttr(encodeURIComponent(game.folder))}.html">${escapeHtml(game.name)}</a>`)
@@ -251,7 +279,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     <header id="topHeader">
       <div class="header-left">
         <img src="assets/logo.webp" alt="Chromebook Unlocked Games Logo" class="header-logo" onclick="window.location.href='/'" width="48" height="48" fetchpriority="high">
-        <h1 onclick="window.location.href='/'">Chromebook Unlocked Games</h1>
+        <a class="brand-title" href="/">${SITE_NAME}</a>
       </div>
       <div id="searchContainer" role="search">
         <span id="searchIcon" aria-hidden="true">🔍</span>
@@ -265,7 +293,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
     <div class="content-wrapper" id="main-content">
       <div id="controls">
         <button id="backBtn" onclick="closeGame()" aria-label="Go back to game list">← Back</button>
-        <span id="gameTitle" role="heading" aria-level="2"></span>
+        <span id="gameTitle"></span>
         <button id="fullscreenBtn" onclick="toggleFullscreen()" aria-label="Toggle fullscreen mode">⛶ Fullscreen</button>
       </div>
 
@@ -274,11 +302,16 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         <div class="viewer" id="viewer">
           <div id="startOverlay">
             <img id="startThumb" src="" alt="Game Thumbnail" width="300" height="300" loading="eager">
-            <h2 id="startName"></h2>
+            <div id="startName"></div>
             <button id="startButton" onclick="startGame()">▶ Play</button>
           </div>
           <iframe id="gameFrame" src="" scrolling="no"></iframe>
         </div>
+      </div>
+
+      <div class="page-intro">
+        <h1>${INDEX_HEADING}</h1>
+        <p>${SITE_NAME} has ${games.length} free unblocked games that run in your browser with no download. Pick a game below, search by name, or browse by category.</p>
       </div>
 
       <!-- All Games Grid -->
@@ -299,9 +332,15 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       </details>
 
       <section class="site-guide" aria-labelledby="site-guide-title">
-        <h2 id="site-guide-title">Free browser games for Chromebook</h2>
+        <h2 id="site-guide-title">Free unblocked games for Chromebook</h2>
         <p>Browse puzzle, racing, sports and arcade games in the grid above. Each game card opens its own page on Chromebook Unlocked Games, with a direct GitHub.io link you can share.</p>
         <p>Looking for games to play on a school Chromebook? Use the search box to find a title, or open the alphabetical directory above to browse all available games. Games launch in your browser without an app download.</p>
+
+        <h2>Unblocked games by category</h2>
+        <ul class="category-links">${categoryLinksHTML}</ul>
+
+        <h2>Questions about ${SITE_NAME}</h2>
+        ${faqHTML}
       </section>
 
       ${generateBottomLeaderboardAd(adsEnabled)}
@@ -309,7 +348,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
       <footer id="siteFooter">
         <div class="footer-content">
           <div class="footer-brand">
-            <h3>Chromebook Unlocked Games</h3>
+            <p class="footer-brand-name">${SITE_NAME}</p>
             <span class="footer-url">chromebookunlocked.github.io</span>
           </div>
           <div class="footer-links">
