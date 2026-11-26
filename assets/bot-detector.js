@@ -155,9 +155,14 @@
       // our cue to reveal the interstitial so the user can complete it.
       'before-interactive-callback': function () { showInteractive(); },
       'error-callback': function () {
-        // If the challenge errors out, surface the UI so the user can retry
-        // rather than leaving them silently blocked from ads.
-        showInteractive();
+        // A failed challenge (blocked network, unsupported browser, crawler)
+        // must not wall off the whole site behind an empty prompt. The visitor
+        // stays unverified, so ads stay off, but the games remain usable.
+        if (typeof gtag === 'function') {
+          gtag('event', 'turnstile_error', { event_category: 'security' });
+        }
+        if (!interactive) dismissOverlay();
+        return true;
       },
       'expired-callback': function () {
         if (widgetId !== null && window.turnstile) {
@@ -179,7 +184,12 @@
 
   window.__onTurnstileLoad = function () { renderWidget(); };
 
-  if (!verified) {
+  // Search and AI crawlers cannot solve a challenge. They skip it and stay
+  // unverified (so no ads are requested for them), and they see the page
+  // itself instead of a verification screen.
+  var isCrawler = /bot|crawl|spider|slurp|Googlebot|Google-InspectionTool|bingbot|DuckDuckBot|OAI-SearchBot|ChatGPT-User|PerplexityBot|Perplexity-User|Claude-SearchBot|Claude-User|facebookexternalhit|Twitterbot|Discordbot|Lighthouse/i.test(navigator.userAgent || '');
+
+  if (!verified && !isCrawler) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', function () {
         buildOverlay();

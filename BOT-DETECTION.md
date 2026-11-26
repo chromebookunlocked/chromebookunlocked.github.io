@@ -58,3 +58,5 @@ This site is hosted on GitHub Pages, so there is no server to verify the Turnsti
 ## Privacy
 
 Turnstile does not require this site to set a long-lived verification cookie. See Cloudflare's [privacy policy](https://www.cloudflare.com/privacypolicy/) for its data practices. This implementation stores `sessionStorage["cf_turnstile_verified"] = "1"` so the check does not reappear during the same tab session.
+
+- A failed challenge (`error-callback`) no longer reveals the full-screen prompt: the visitor stays unverified (no ads) and the page stays usable. Search and AI crawlers skip the challenge entirely and also stay unverified.
