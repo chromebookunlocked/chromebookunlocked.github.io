@@ -3,5 +3,5 @@
   "category": "Action, Roguelike",
   "createdAt": "2026-02-26T00:44:10.157Z",
   "displayName": "Roulette Hero",
-  "description": ""
+  "description": "A roguelike deckbuilder driven by a roulette wheel. Each turn the wheel decides whether your hero attacks, defends, heals or earns gold. Between fights, upgrade the wheel with new slots, balls and totems."
 }

@@ -13,6 +13,26 @@
     return getSavedPreferences() !== null;
   }
 
+  // Europe (EEA, United Kingdom, Switzerland) is asked first. Elsewhere
+  // analytics is on by default and the banner opens only from Cookie Settings.
+  // Pages set window.cbuConsentRegion in <head>; pages without that script
+  // (the policy pages) fall back to the same time-zone test. Unknown = Europe.
+  function inEurope() {
+    if (window.cbuConsentRegion) return window.cbuConsentRegion === 'europe';
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      const extra = ['Atlantic/Azores', 'Atlantic/Canary', 'Atlantic/Faroe', 'Atlantic/Madeira', 'Atlantic/Reykjavik', 'Asia/Nicosia', 'Asia/Famagusta', 'Africa/Ceuta', 'Arctic/Longyearbyen', 'Indian/Reunion', 'Indian/Mayotte', 'America/Cayenne', 'America/Guadeloupe', 'America/Martinique', 'America/Marigot'];
+      return !tz || tz === 'UTC' || tz.indexOf('Etc/') === 0 || tz.indexOf('Europe/') === 0 || extra.indexOf(tz) !== -1;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  // What is in force right now: the saved choice, or the regional default.
+  function effectivePreferences() {
+    return getSavedPreferences() || { essential: true, analytics: !inEurope(), marketing: false };
+  }
+
   function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -116,6 +136,11 @@
 
     document.body.appendChild(banner);
 
+    // The switches show what is in force now, not a blank form.
+    const current = effectivePreferences();
+    document.getElementById('cookieAnalytics').checked = current.analytics;
+    document.getElementById('cookieMarketing').checked = current.marketing;
+
     // Dismissing a consent prompt is not affirmative consent.
     document.getElementById('cookieClose').addEventListener('click', function () {
       saveConsent({ essential: true, analytics: false, marketing: false });
@@ -186,7 +211,7 @@
     const policyPages = ['privacy-policy', 'cookie-policy', 'dmca', 'contact', 'terms-of-service'];
     const isPolicyPage = policyPages.some(page => window.location.pathname.includes(page));
 
-    if (!hasConsent() && !isPolicyPage) {
+    if (!hasConsent() && !isPolicyPage && inEurope()) {
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', createBanner);
       } else {

@@ -53,7 +53,7 @@
   <!-- Cloudflare Turnstile verification gate (must load before ads) -->
   <script src="assets/bot-detector.js"></script>
 
-  <!-- Google Consent Mode v2: default denied, restore saved choice -->
+  <!-- Google Consent Mode v2: saved choice first; otherwise analytics on outside Europe, off in Europe until accepted -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -63,7 +63,14 @@
         var m = ('; ' + document.cookie).split('; cookieConsent=');
         if (m.length === 2) saved = JSON.parse(decodeURIComponent(m.pop().split(';').shift()));
       } catch (e) {}
-      var analytics = saved ? saved.analytics === true : false;
+      var europe = true;
+      try {
+        var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+        var extra = ['Atlantic/Azores','Atlantic/Canary','Atlantic/Faroe','Atlantic/Madeira','Atlantic/Reykjavik','Asia/Nicosia','Asia/Famagusta','Africa/Ceuta','Arctic/Longyearbyen','Indian/Reunion','Indian/Mayotte','America/Cayenne','America/Guadeloupe','America/Martinique','America/Marigot'];
+        europe = !tz || tz === 'UTC' || tz.indexOf('Etc/') === 0 || tz.indexOf('Europe/') === 0 || extra.indexOf(tz) !== -1;
+      } catch (e) {}
+      window.cbuConsentRegion = europe ? 'europe' : 'other';
+      var analytics = saved ? saved.analytics === true : !europe;
       var marketing = saved ? saved.marketing === true : false;
       gtag('consent', 'default', {
         analytics_storage: analytics ? 'granted' : 'denied',
@@ -72,8 +79,17 @@
         ad_personalization: marketing ? 'granted' : 'denied',
         functionality_storage: 'granted',
         security_storage: 'granted',
-        wait_for_update: saved ? 0 : 500
+        wait_for_update: saved || !europe ? 0 : 500
       });
+      if (!saved && !europe) {
+        gtag('consent', 'default', {
+          analytics_storage: 'denied',
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          region: ["AT","BE","BG","HR","CY","CZ","DK","EE","FI","FR","DE","GR","HU","IE","IT","LV","LT","LU","MT","NL","PL","PT","RO","SK","SI","ES","SE","IS","LI","NO","GB","CH","GF","GP","MQ","RE","YT","MF"]
+        });
+      }
     })();
   </script>
 
@@ -92,6 +108,9 @@
 
     var SLOT_SELECTOR = 'ins.adsbygoogle[data-ad-client][data-ad-slot]';
     var FILL_TIMEOUT_MS = 18000;
+    // How long a requested slot keeps its reserved room with nothing in it.
+    var COLLAPSE_AFTER_MS = 6000;
+    var scriptFailed = false;
     var scheduledSlots = typeof WeakSet === 'function' ? new WeakSet() : null;
     var trackedSlots = [];
     window.__activeAdProvider = 'adsense';
@@ -105,6 +124,14 @@
       }
       callback();
     };
+
+    // The element around a slot reserves room only while its ad is on the
+    // way or showing; the stylesheet reads this mark. Without a mark (never
+    // requested) or with "empty" the box closes, so the page has no gap.
+    function setBox(ad, state) {
+      var box = ad.parentElement;
+      if (box && box.getAttribute('data-ad-box') !== state) box.setAttribute('data-ad-box', state);
+    }
 
     function emitFillResult(ad, state) {
       if (ad.getAttribute('data-ad-fill-reported') === state) return;
@@ -137,6 +164,7 @@
         if (finished) return;
         finished = true;
         ad.setAttribute('data-ad-fill-state', state);
+        setBox(ad, state === 'filled' ? 'filled' : 'empty');
         if (observer) observer.disconnect();
         emitFillResult(ad, state);
       }
@@ -149,6 +177,11 @@
         observer = new MutationObserver(inspect);
         observer.observe(ad, { attributes: true, childList: true, subtree: true });
       }
+      // Close the gap early if nothing has arrived; a late ad still reopens
+      // it, because the observer keeps watching until the fill timeout.
+      window.setTimeout(function () {
+        if (!finished && !creativeIsPresent(ad)) setBox(ad, 'empty');
+      }, COLLAPSE_AFTER_MS);
       window.setTimeout(function () {
         if (!finished) finish(creativeIsPresent(ad) ? 'filled' : 'empty');
       }, FILL_TIMEOUT_MS);
@@ -162,15 +195,35 @@
         if (ad.getAttribute('data-ad-requested') === 'true') return;
         ad.removeAttribute('data-ad-pending');
         ad.setAttribute('data-ad-requested', 'true');
+        if (scriptFailed) {
+          ad.setAttribute('data-ad-fill-state', 'empty');
+          setBox(ad, 'empty');
+          emitFillResult(ad, 'empty');
+          return;
+        }
+        setBox(ad, 'loading');
         trackFill(ad);
         try {
           (window.adsbygoogle = window.adsbygoogle || []).push({});
         } catch (error) {
           ad.setAttribute('data-ad-fill-state', 'empty');
+          setBox(ad, 'empty');
           emitFillResult(ad, 'empty');
         }
       });
     };
+
+    // What to watch for "the reader is getting near this slot". A row in
+    // the games grid is not laid out until its ad is requested (so that it
+    // leaves no gap), which means it cannot be watched itself: the game card
+    // just before it stands in.
+    function lazyTarget(ad) {
+      var box = ad.parentElement;
+      if (box && String(box.className || '').indexOf('horizontal-ad-row') !== -1 && box.previousElementSibling) {
+        return box.previousElementSibling;
+      }
+      return ad;
+    }
 
     function scheduleSlot(ad) {
       if (!ad || (scheduledSlots && scheduledSlots.has(ad))) return;
@@ -185,7 +238,7 @@
               request();
             }
           }, { rootMargin: '600px 0px' });
-          lazyObserver.observe(ad);
+          lazyObserver.observe(lazyTarget(ad));
         } else if (ad.getAttribute('data-ad-idle') === 'true' && 'requestIdleCallback' in window) {
           window.requestIdleCallback(request, { timeout: 2000 });
         } else {
@@ -218,6 +271,17 @@
       var slots = scope.querySelectorAll(SLOT_SELECTOR);
       for (var i = 0; i < slots.length; i += 1) scheduleSlot(slots[i]);
     };
+
+    // The ad script itself did not load (blocked or offline): no slot will
+    // ever fill, so every reserved box closes at once.
+    window.__adScriptFailed = function () {
+      scriptFailed = true;
+      for (var i = 0; i < trackedSlots.length; i += 1) {
+        if (!creativeIsPresent(trackedSlots[i])) setBox(trackedSlots[i], 'empty');
+      }
+    };
+    var adScript = document.querySelector && document.querySelector('script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]');
+    if (adScript && adScript.addEventListener) adScript.addEventListener('error', window.__adScriptFailed);
 
     window.__getAdFillStatus = function () {
       return {
@@ -1334,7 +1398,9 @@ button:active {
   border-top: 1px solid rgba(255, 102, 255, 0.25);
   color: #d7ccdf;
 }
+.site-guide h1 { margin: 0 0 0.75rem; color: #ffccff; font-family: var(--font-main); font-weight: 900; font-size: clamp(1.2rem, 2vw, 1.6rem); line-height: 1.3; }
 .site-guide h2 { margin: 0 0 0.75rem; color: #f2e9f6; font-size: clamp(1.1rem, 1.7vw, 1.35rem); }
+.site-guide .game-directory-links { margin-top: 0.75rem; }
 .site-guide p { max-width: 75ch; margin: 0 0 0.75rem; line-height: 1.6; }
 .site-guide p:last-child { margin-bottom: 0; }
 
@@ -1479,6 +1545,29 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
   display: none;
   min-height: 0;
   padding: 0;
+}
+
+/* An ad's box takes room only while its ad is on the way or showing. The ad
+   runtime (src/utils/adProviders.js) marks the box: no mark = never requested
+   (ads switched off at Google, the human check not passed, the slot still far
+   below the screen), "loading" = requested, "filled" = showing, "empty" = no
+   ad came, the request failed or the ad script was blocked. Only "loading"
+   and "filled" keep the reserved height, so a page without ads has no gaps.
+   The header and bottom boxes shrink to nothing instead of being removed:
+   on game pages the header box also carries the margin that clears the fixed
+   site header, and a box that stays in the layout lets scrolling near it
+   trigger its request. A row inside the games grid is removed outright,
+   because even an empty grid row adds a second gap between the rows of
+   games; the ad runtime watches the game card before it instead. */
+.header-banner-ad:not([data-ad-box="loading"]):not([data-ad-box="filled"]),
+.bottom-leaderboard-ad:not([data-ad-box="loading"]):not([data-ad-box="filled"]) {
+  min-height: 0;
+  height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.horizontal-ad-row:not([data-ad-box="loading"]):not([data-ad-box="filled"]) {
+  display: none;
 }
 
 @media (max-width: 768px) {
@@ -1956,6 +2045,7 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
             <a href="/important-pages/terms-of-service.html">Terms of Service</a>
             <a href="/important-pages/contact.html">Contact</a>
             <a href="/important-pages/dmca.html">DMCA</a>
+            <a href="#" onclick="event.preventDefault(); if(window.cookieConsent) window.cookieConsent.reset();">Cookie Settings</a>
           </div>
         </div>
         <div class="footer-bottom">

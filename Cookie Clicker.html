@@ -6,7 +6,7 @@
 
   <!-- Primary Meta Tags -->
   <title>Cookie Clicker Unblocked - Play Free Online</title>
-  <meta name="description" content="Cookie Clicker unblocked for school Chromebooks. Click the big cookie to bake cookies, then spend them on grandmas, farms and factories that bake for you.">
+  <meta name="description" content="Play Cookie Clicker unblocked on your school Chromebook. Click the big cookie to bake, then buy grandmas, farms and factories that bake for you.">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="Chromebook Unlocked Games">
 
@@ -14,7 +14,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://chromebookunlocked.github.io/Cookie%20Clicker.html">
   <meta property="og:title" content="Cookie Clicker Unblocked - Play Free Online">
-  <meta property="og:description" content="Cookie Clicker unblocked for school Chromebooks. Click the big cookie to bake cookies, then spend them on grandmas, farms and factories that bake for you.">
+  <meta property="og:description" content="Play Cookie Clicker unblocked on your school Chromebook. Click the big cookie to bake, then buy grandmas, farms and factories that bake for you.">
   <meta property="og:image" content="https://chromebookunlocked.github.io/games/Cookie%20Clicker/thumbnail.webp">
   <meta property="og:image:alt" content="Cookie Clicker game thumbnail">
   <meta property="og:site_name" content="Chromebook Unlocked Games">
@@ -23,7 +23,7 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="Cookie Clicker Unblocked - Play Free Online">
-  <meta name="twitter:description" content="Cookie Clicker unblocked for school Chromebooks. Click the big cookie to bake cookies, then spend them on grandmas, farms and factories that bake for you.">
+  <meta name="twitter:description" content="Play Cookie Clicker unblocked on your school Chromebook. Click the big cookie to bake, then buy grandmas, farms and factories that bake for you.">
   <meta name="twitter:image" content="https://chromebookunlocked.github.io/games/Cookie%20Clicker/thumbnail.webp">
   <meta name="twitter:image:alt" content="Cookie Clicker game thumbnail">
 
@@ -46,7 +46,7 @@
   <!-- Cloudflare Turnstile verification gate (must load before ads) -->
   <script src="assets/bot-detector.js"></script>
 
-  <!-- Google Consent Mode v2: default denied, restore saved choice -->
+  <!-- Google Consent Mode v2: saved choice first; otherwise analytics on outside Europe, off in Europe until accepted -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -56,7 +56,14 @@
         var m = ('; ' + document.cookie).split('; cookieConsent=');
         if (m.length === 2) saved = JSON.parse(decodeURIComponent(m.pop().split(';').shift()));
       } catch (e) {}
-      var analytics = saved ? saved.analytics === true : false;
+      var europe = true;
+      try {
+        var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+        var extra = ['Atlantic/Azores','Atlantic/Canary','Atlantic/Faroe','Atlantic/Madeira','Atlantic/Reykjavik','Asia/Nicosia','Asia/Famagusta','Africa/Ceuta','Arctic/Longyearbyen','Indian/Reunion','Indian/Mayotte','America/Cayenne','America/Guadeloupe','America/Martinique','America/Marigot'];
+        europe = !tz || tz === 'UTC' || tz.indexOf('Etc/') === 0 || tz.indexOf('Europe/') === 0 || extra.indexOf(tz) !== -1;
+      } catch (e) {}
+      window.cbuConsentRegion = europe ? 'europe' : 'other';
+      var analytics = saved ? saved.analytics === true : !europe;
       var marketing = saved ? saved.marketing === true : false;
       gtag('consent', 'default', {
         analytics_storage: analytics ? 'granted' : 'denied',
@@ -65,8 +72,17 @@
         ad_personalization: marketing ? 'granted' : 'denied',
         functionality_storage: 'granted',
         security_storage: 'granted',
-        wait_for_update: saved ? 0 : 500
+        wait_for_update: saved || !europe ? 0 : 500
       });
+      if (!saved && !europe) {
+        gtag('consent', 'default', {
+          analytics_storage: 'denied',
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          region: ["AT","BE","BG","HR","CY","CZ","DK","EE","FI","FR","DE","GR","HU","IE","IT","LV","LT","LU","MT","NL","PL","PT","RO","SK","SI","ES","SE","IS","LI","NO","GB","CH","GF","GP","MQ","RE","YT","MF"]
+        });
+      }
     })();
   </script>
 
@@ -85,6 +101,9 @@
 
     var SLOT_SELECTOR = 'ins.adsbygoogle[data-ad-client][data-ad-slot]';
     var FILL_TIMEOUT_MS = 18000;
+    // How long a requested slot keeps its reserved room with nothing in it.
+    var COLLAPSE_AFTER_MS = 6000;
+    var scriptFailed = false;
     var scheduledSlots = typeof WeakSet === 'function' ? new WeakSet() : null;
     var trackedSlots = [];
     window.__activeAdProvider = 'adsense';
@@ -98,6 +117,14 @@
       }
       callback();
     };
+
+    // The element around a slot reserves room only while its ad is on the
+    // way or showing; the stylesheet reads this mark. Without a mark (never
+    // requested) or with "empty" the box closes, so the page has no gap.
+    function setBox(ad, state) {
+      var box = ad.parentElement;
+      if (box && box.getAttribute('data-ad-box') !== state) box.setAttribute('data-ad-box', state);
+    }
 
     function emitFillResult(ad, state) {
       if (ad.getAttribute('data-ad-fill-reported') === state) return;
@@ -130,6 +157,7 @@
         if (finished) return;
         finished = true;
         ad.setAttribute('data-ad-fill-state', state);
+        setBox(ad, state === 'filled' ? 'filled' : 'empty');
         if (observer) observer.disconnect();
         emitFillResult(ad, state);
       }
@@ -142,6 +170,11 @@
         observer = new MutationObserver(inspect);
         observer.observe(ad, { attributes: true, childList: true, subtree: true });
       }
+      // Close the gap early if nothing has arrived; a late ad still reopens
+      // it, because the observer keeps watching until the fill timeout.
+      window.setTimeout(function () {
+        if (!finished && !creativeIsPresent(ad)) setBox(ad, 'empty');
+      }, COLLAPSE_AFTER_MS);
       window.setTimeout(function () {
         if (!finished) finish(creativeIsPresent(ad) ? 'filled' : 'empty');
       }, FILL_TIMEOUT_MS);
@@ -155,15 +188,35 @@
         if (ad.getAttribute('data-ad-requested') === 'true') return;
         ad.removeAttribute('data-ad-pending');
         ad.setAttribute('data-ad-requested', 'true');
+        if (scriptFailed) {
+          ad.setAttribute('data-ad-fill-state', 'empty');
+          setBox(ad, 'empty');
+          emitFillResult(ad, 'empty');
+          return;
+        }
+        setBox(ad, 'loading');
         trackFill(ad);
         try {
           (window.adsbygoogle = window.adsbygoogle || []).push({});
         } catch (error) {
           ad.setAttribute('data-ad-fill-state', 'empty');
+          setBox(ad, 'empty');
           emitFillResult(ad, 'empty');
         }
       });
     };
+
+    // What to watch for "the reader is getting near this slot". A row in
+    // the games grid is not laid out until its ad is requested (so that it
+    // leaves no gap), which means it cannot be watched itself: the game card
+    // just before it stands in.
+    function lazyTarget(ad) {
+      var box = ad.parentElement;
+      if (box && String(box.className || '').indexOf('horizontal-ad-row') !== -1 && box.previousElementSibling) {
+        return box.previousElementSibling;
+      }
+      return ad;
+    }
 
     function scheduleSlot(ad) {
       if (!ad || (scheduledSlots && scheduledSlots.has(ad))) return;
@@ -178,7 +231,7 @@
               request();
             }
           }, { rootMargin: '600px 0px' });
-          lazyObserver.observe(ad);
+          lazyObserver.observe(lazyTarget(ad));
         } else if (ad.getAttribute('data-ad-idle') === 'true' && 'requestIdleCallback' in window) {
           window.requestIdleCallback(request, { timeout: 2000 });
         } else {
@@ -211,6 +264,17 @@
       var slots = scope.querySelectorAll(SLOT_SELECTOR);
       for (var i = 0; i < slots.length; i += 1) scheduleSlot(slots[i]);
     };
+
+    // The ad script itself did not load (blocked or offline): no slot will
+    // ever fill, so every reserved box closes at once.
+    window.__adScriptFailed = function () {
+      scriptFailed = true;
+      for (var i = 0; i < trackedSlots.length; i += 1) {
+        if (!creativeIsPresent(trackedSlots[i])) setBox(trackedSlots[i], 'empty');
+      }
+    };
+    var adScript = document.querySelector && document.querySelector('script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]');
+    if (adScript && adScript.addEventListener) adScript.addEventListener('error', window.__adScriptFailed);
 
     window.__getAdFillStatus = function () {
       return {
@@ -1174,6 +1238,29 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
   padding: 0;
 }
 
+/* An ad's box takes room only while its ad is on the way or showing. The ad
+   runtime (src/utils/adProviders.js) marks the box: no mark = never requested
+   (ads switched off at Google, the human check not passed, the slot still far
+   below the screen), "loading" = requested, "filled" = showing, "empty" = no
+   ad came, the request failed or the ad script was blocked. Only "loading"
+   and "filled" keep the reserved height, so a page without ads has no gaps.
+   The header and bottom boxes shrink to nothing instead of being removed:
+   on game pages the header box also carries the margin that clears the fixed
+   site header, and a box that stays in the layout lets scrolling near it
+   trigger its request. A row inside the games grid is removed outright,
+   because even an empty grid row adds a second gap between the rows of
+   games; the ad runtime watches the game card before it instead. */
+.header-banner-ad:not([data-ad-box="loading"]):not([data-ad-box="filled"]),
+.bottom-leaderboard-ad:not([data-ad-box="loading"]):not([data-ad-box="filled"]) {
+  min-height: 0;
+  height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.horizontal-ad-row:not([data-ad-box="loading"]):not([data-ad-box="filled"]) {
+  display: none;
+}
+
 /* Ensure horizontal ad iframes are always visible */
 .horizontal-ad-row iframe,
 .horizontal-ad-row ins iframe {
@@ -1848,11 +1935,11 @@ body.game-is-expanded {
         <img class="thumb" src="games/10 Minutes Till Dawn/thumbnail.webp" alt="10 Minutes Till Dawn" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">10 Minutes Till Dawn</div>
-    </a><a href="/Basketball%20Super%20Stars.html" class="game-card" onclick="trackRecentGame('Basketball Super Stars')">
-      <div class="thumb-container" style="--thumb-url: url('games/Basketball Super Stars/thumbnail.webp')">
-        <img class="thumb" src="games/Basketball Super Stars/thumbnail.webp" alt="Basketball Super Stars" loading="lazy" width="300" height="300">
+    </a><a href="/Bit%20Planes.html" class="game-card" onclick="trackRecentGame('Bit Planes')">
+      <div class="thumb-container" style="--thumb-url: url('games/Bit Planes/thumbnail.webp')">
+        <img class="thumb" src="games/Bit Planes/thumbnail.webp" alt="Bit Planes" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Basketball Super Stars</div>
+      <div class="card-title">Bit Planes</div>
     </a><a href="/Ninja%20Obby%20Parkour.html" class="game-card" onclick="trackRecentGame('Ninja Obby Parkour')">
       <div class="thumb-container" style="--thumb-url: url('games/Ninja Obby Parkour/thumbnail.webp')">
         <img class="thumb" src="games/Ninja Obby Parkour/thumbnail.webp" alt="Ninja Obby Parkour" loading="lazy" width="300" height="300">
@@ -1863,21 +1950,21 @@ body.game-is-expanded {
         <img class="thumb" src="games/Ultimate Driving Simulator/thumbnail.webp" alt="Ultimate Driving Simulator" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Ultimate Driving Simulator</div>
-    </a><a href="/Blackjack.html" class="game-card" onclick="trackRecentGame('Blackjack')">
-      <div class="thumb-container" style="--thumb-url: url('games/Blackjack/thumbnail.webp')">
-        <img class="thumb" src="games/Blackjack/thumbnail.webp" alt="Blackjack" loading="lazy" width="300" height="300">
+    </a><a href="/Blaze%20Drifter.html" class="game-card" onclick="trackRecentGame('Blaze Drifter')">
+      <div class="thumb-container" style="--thumb-url: url('games/Blaze Drifter/thumbnail.webp')">
+        <img class="thumb" src="games/Blaze Drifter/thumbnail.webp" alt="Blaze Drifter" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Blackjack</div>
+      <div class="card-title">Blaze Drifter</div>
     </a><a href="/Sea%20Mongrel.html" class="game-card" onclick="trackRecentGame('Sea Mongrel')">
       <div class="thumb-container" style="--thumb-url: url('games/Sea Mongrel/thumbnail.webp')">
         <img class="thumb" src="games/Sea Mongrel/thumbnail.webp" alt="Sea Mongrel" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Sea Mongrel</div>
-    </a><a href="/FNAF%202.html" class="game-card" onclick="trackRecentGame('FNAF 2')">
-      <div class="thumb-container" style="--thumb-url: url('games/FNAF 2/thumbnail.webp')">
-        <img class="thumb" src="games/FNAF 2/thumbnail.webp" alt="FNAF 2" loading="lazy" width="300" height="300">
+    </a><a href="/Fireboy%20and%20Watergirl%201.html" class="game-card" onclick="trackRecentGame('Fireboy and Watergirl 1')">
+      <div class="thumb-container" style="--thumb-url: url('games/Fireboy and Watergirl 1/thumbnail.webp')">
+        <img class="thumb" src="games/Fireboy and Watergirl 1/thumbnail.webp" alt="Fireboy and Watergirl 1" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">FNAF 2</div>
+      <div class="card-title">Fireboy and Watergirl 1</div>
     </a><div class="horizontal-ad-row" data-ad-index="0" role="complementary" aria-label="Advertisement">
     <ins class="adsbygoogle"
        style="display:block"
@@ -1887,21 +1974,21 @@ body.game-is-expanded {
        data-full-width-responsive="true"
        data-ad-lazy="true"
        data-ad-placement="in_content"></ins>
-  </div><a href="/Bad%20Parenting.html" class="game-card" onclick="trackRecentGame('Bad Parenting')">
-      <div class="thumb-container" style="--thumb-url: url('games/Bad Parenting/thumbnail.webp')">
-        <img class="thumb" src="games/Bad Parenting/thumbnail.webp" alt="Bad Parenting" loading="lazy" width="300" height="300">
+  </div><a href="/Bad%20Time%20Simulator.html" class="game-card" onclick="trackRecentGame('Bad Time Simulator')">
+      <div class="thumb-container" style="--thumb-url: url('games/Bad Time Simulator/thumbnail.webp')">
+        <img class="thumb" src="games/Bad Time Simulator/thumbnail.webp" alt="Bad Time Simulator" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Bad Parenting</div>
+      <div class="card-title">Bad Time Simulator</div>
     </a><a href="/Meme%20Soundboard.html" class="game-card" onclick="trackRecentGame('Meme Soundboard')">
       <div class="thumb-container" style="--thumb-url: url('games/Meme Soundboard/thumbnail.webp')">
         <img class="thumb" src="games/Meme Soundboard/thumbnail.webp" alt="Meme Soundboard" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Meme Soundboard</div>
-    </a><a href="/Bad%20Time%20Simulator.html" class="game-card" onclick="trackRecentGame('Bad Time Simulator')">
-      <div class="thumb-container" style="--thumb-url: url('games/Bad Time Simulator/thumbnail.webp')">
-        <img class="thumb" src="games/Bad Time Simulator/thumbnail.webp" alt="Bad Time Simulator" loading="lazy" width="300" height="300">
+    </a><a href="/Basketball%20FRVR.html" class="game-card" onclick="trackRecentGame('Basketball FRVR')">
+      <div class="thumb-container" style="--thumb-url: url('games/Basketball FRVR/thumbnail.webp')">
+        <img class="thumb" src="games/Basketball FRVR/thumbnail.webp" alt="Basketball FRVR" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Bad Time Simulator</div>
+      <div class="card-title">Basketball FRVR</div>
     </a><a href="/Buster%20Jam.html" class="game-card" onclick="trackRecentGame('Buster Jam')">
       <div class="thumb-container" style="--thumb-url: url('games/Buster Jam/thumbnail.webp')">
         <img class="thumb" src="games/Buster Jam/thumbnail.webp" alt="Buster Jam" loading="lazy" width="300" height="300">
@@ -1917,16 +2004,16 @@ body.game-is-expanded {
         <img class="thumb" src="games/Stick Defenders/thumbnail.webp" alt="Stick Defenders" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Stick Defenders</div>
-    </a><a href="/Bad%20Ice%20Cream%202.html" class="game-card" onclick="trackRecentGame('Bad Ice Cream 2')">
-      <div class="thumb-container" style="--thumb-url: url('games/Bad Ice Cream 2/thumbnail.webp')">
-        <img class="thumb" src="games/Bad Ice Cream 2/thumbnail.webp" alt="Bad Ice Cream 2" loading="lazy" width="300" height="300">
+    </a><a href="/Bad%20Ice%20Cream.html" class="game-card" onclick="trackRecentGame('Bad Ice Cream')">
+      <div class="thumb-container" style="--thumb-url: url('games/Bad Ice Cream/thumbnail.webp')">
+        <img class="thumb" src="games/Bad Ice Cream/thumbnail.webp" alt="Bad Ice Cream" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Bad Ice Cream 2</div>
-    </a><a href="/Five%20Nights%20at%20Epstein%20Island.html" class="game-card" onclick="trackRecentGame('Five Nights at Epstein Island')">
-      <div class="thumb-container" style="--thumb-url: url('games/Five Nights at Epstein Island/thumbnail.webp')">
-        <img class="thumb" src="games/Five Nights at Epstein Island/thumbnail.webp" alt="Five Nights at Epstein Island" loading="lazy" width="300" height="300">
+      <div class="card-title">Bad Ice Cream</div>
+    </a><a href="/FNAF%204.html" class="game-card" onclick="trackRecentGame('FNAF 4')">
+      <div class="thumb-container" style="--thumb-url: url('games/FNAF 4/thumbnail.webp')">
+        <img class="thumb" src="games/FNAF 4/thumbnail.webp" alt="FNAF 4" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Five Nights at Epstein Island</div>
+      <div class="card-title">FNAF 4</div>
     </a><a href="/Crank%20It!.html" class="game-card" onclick="trackRecentGame('Crank It!')">
       <div class="thumb-container" style="--thumb-url: url('games/Crank It!/thumbnail.webp')">
         <img class="thumb" src="games/Crank It!/thumbnail.webp" alt="Crank It!" loading="lazy" width="300" height="300">
@@ -1942,11 +2029,11 @@ body.game-is-expanded {
         <img class="thumb" src="games/Plants vs Zombies Modded/thumbnail.webp" alt="Plants vs Zombies Modded" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Plants vs Zombies Modded</div>
-    </a><a href="/Whack%20Your%20Boss.html" class="game-card" onclick="trackRecentGame('Whack Your Boss')">
-      <div class="thumb-container" style="--thumb-url: url('games/Whack Your Boss/thumbnail.webp')">
-        <img class="thumb" src="games/Whack Your Boss/thumbnail.webp" alt="Whack Your Boss" loading="lazy" width="300" height="300">
+    </a><a href="/Whack%20the%20Thief.html" class="game-card" onclick="trackRecentGame('Whack the Thief')">
+      <div class="thumb-container" style="--thumb-url: url('games/Whack the Thief/thumbnail.webp')">
+        <img class="thumb" src="games/Whack the Thief/thumbnail.webp" alt="Whack the Thief" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Whack Your Boss</div>
+      <div class="card-title">Whack the Thief</div>
     </a><div class="horizontal-ad-row" data-ad-index="1" role="complementary" aria-label="Advertisement">
     <ins class="adsbygoogle"
        style="display:block"
@@ -1966,16 +2053,16 @@ body.game-is-expanded {
         <img class="thumb" src="games/Super Falling Fred/thumbnail.webp" alt="Super Falling Fred" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Super Falling Fred</div>
-    </a><a href="/Bad%20Ice%20Cream.html" class="game-card" onclick="trackRecentGame('Bad Ice Cream')">
-      <div class="thumb-container" style="--thumb-url: url('games/Bad Ice Cream/thumbnail.webp')">
-        <img class="thumb" src="games/Bad Ice Cream/thumbnail.webp" alt="Bad Ice Cream" loading="lazy" width="300" height="300">
+    </a><a href="/Bad%20Parenting.html" class="game-card" onclick="trackRecentGame('Bad Parenting')">
+      <div class="thumb-container" style="--thumb-url: url('games/Bad Parenting/thumbnail.webp')">
+        <img class="thumb" src="games/Bad Parenting/thumbnail.webp" alt="Bad Parenting" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Bad Ice Cream</div>
-    </a><a href="/Bit%20Planes.html" class="game-card" onclick="trackRecentGame('Bit Planes')">
-      <div class="thumb-container" style="--thumb-url: url('games/Bit Planes/thumbnail.webp')">
-        <img class="thumb" src="games/Bit Planes/thumbnail.webp" alt="Bit Planes" loading="lazy" width="300" height="300">
+      <div class="card-title">Bad Parenting</div>
+    </a><a href="/Blackjack.html" class="game-card" onclick="trackRecentGame('Blackjack')">
+      <div class="thumb-container" style="--thumb-url: url('games/Blackjack/thumbnail.webp')">
+        <img class="thumb" src="games/Blackjack/thumbnail.webp" alt="Blackjack" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Bit Planes</div>
+      <div class="card-title">Blackjack</div>
     </a><a href="/Minecraft%20Tower%20Defence.html" class="game-card" onclick="trackRecentGame('Minecraft Tower Defence')">
       <div class="thumb-container" style="--thumb-url: url('games/Minecraft Tower Defence/thumbnail.webp')">
         <img class="thumb" src="games/Minecraft Tower Defence/thumbnail.webp" alt="Minecraft Tower Defence" loading="lazy" width="300" height="300">
@@ -2001,11 +2088,11 @@ body.game-is-expanded {
         <img class="thumb" src="games/They Are Coming/thumbnail.webp" alt="They Are Coming" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">They Are Coming</div>
-    </a><a href="/Fall%20Guys.html" class="game-card" onclick="trackRecentGame('Fall Guys')">
-      <div class="thumb-container" style="--thumb-url: url('games/Fall Guys/thumbnail.webp')">
-        <img class="thumb" src="games/Fall Guys/thumbnail.webp" alt="Fall Guys Mini" loading="lazy" width="300" height="300">
+    </a><a href="/FNAF%202.html" class="game-card" onclick="trackRecentGame('FNAF 2')">
+      <div class="thumb-container" style="--thumb-url: url('games/FNAF 2/thumbnail.webp')">
+        <img class="thumb" src="games/FNAF 2/thumbnail.webp" alt="FNAF 2" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Fall Guys Mini</div>
+      <div class="card-title">FNAF 2</div>
     </a><a href="/Dreader.html" class="game-card" onclick="trackRecentGame('Dreader')">
       <div class="thumb-container" style="--thumb-url: url('games/Dreader/thumbnail.webp')">
         <img class="thumb" src="games/Dreader/thumbnail.webp" alt="Dreader" loading="lazy" width="300" height="300">
@@ -2035,21 +2122,21 @@ body.game-is-expanded {
         <img class="thumb" src="games/The Visitor/thumbnail.webp" alt="The Visitor" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">The Visitor</div>
-    </a><a href="/Bob%20The%20Robber%205.html" class="game-card" onclick="trackRecentGame('Bob The Robber 5')">
-      <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber 5/thumbnail.webp')">
-        <img class="thumb" src="games/Bob The Robber 5/thumbnail.webp" alt="Bob The Robber 5" loading="lazy" width="300" height="300">
+    </a><a href="/Bob%20The%20Robber.html" class="game-card" onclick="trackRecentGame('Bob The Robber')">
+      <div class="thumb-container" style="--thumb-url: url('games/Bob The Robber/thumbnail.webp')">
+        <img class="thumb" src="games/Bob The Robber/thumbnail.webp" alt="Bob The Robber" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Bob The Robber 5</div>
+      <div class="card-title">Bob The Robber</div>
     </a><a href="/Obby%20Cart.html" class="game-card" onclick="trackRecentGame('Obby Cart')">
       <div class="thumb-container" style="--thumb-url: url('games/Obby Cart/thumbnail.webp')">
         <img class="thumb" src="games/Obby Cart/thumbnail.webp" alt="Obby Cart" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Obby Cart</div>
-    </a><a href="/Drive%20in%20Russia.html" class="game-card" onclick="trackRecentGame('Drive in Russia')">
-      <div class="thumb-container" style="--thumb-url: url('games/Drive in Russia/thumbnail.webp')">
-        <img class="thumb" src="games/Drive in Russia/thumbnail.webp" alt="Drive in Russia" loading="lazy" width="300" height="300">
+    </a><a href="/Drive%20Mad.html" class="game-card" onclick="trackRecentGame('Drive Mad')">
+      <div class="thumb-container" style="--thumb-url: url('games/Drive Mad/thumbnail.webp')">
+        <img class="thumb" src="games/Drive Mad/thumbnail.webp" alt="Drive Mad" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Drive in Russia</div>
+      <div class="card-title">Drive Mad</div>
     </a><a href="/Winter%20Falling.html" class="game-card" onclick="trackRecentGame('Winter Falling')">
       <div class="thumb-container" style="--thumb-url: url('games/Winter Falling/thumbnail.webp')">
         <img class="thumb" src="games/Winter Falling/thumbnail.webp" alt="Winter Falling" loading="lazy" width="300" height="300">
@@ -2077,7 +2164,7 @@ body.game-is-expanded {
       <div class="info-card full-width">
         <h2>About Cookie Clicker</h2>
         <div class="description-content">
-          <p>Click the big cookie to bake cookies, then spend them on grandmas, farms and factories that bake for you. An idle game about ever bigger numbers.</p>
+          <p>Click the big cookie to bake, then buy grandmas, farms and factories that bake for you. An idle game about ever bigger numbers.</p>
           <div class="game-meta">
             <div class="meta-item">
               <strong>Categories:</strong> <a href="/clicker-games-unblocked.html">Clicker</a>, <a href="/idle-games-unblocked.html">Idle</a>, <a href="/#/category/Trending%20Games">Trending Games</a>, <a href="/mobile-games-unblocked.html">Mobile</a>
@@ -2167,7 +2254,7 @@ body.game-is-expanded {
       "@id": "https://chromebookunlocked.github.io/Cookie%20Clicker.html#game",
       "name": "Cookie Clicker",
       "url": "https://chromebookunlocked.github.io/Cookie%20Clicker.html",
-      "description": "Click the big cookie to bake cookies, then spend them on grandmas, farms and factories that bake for you. An idle game about ever bigger numbers.",
+      "description": "Click the big cookie to bake, then buy grandmas, farms and factories that bake for you. An idle game about ever bigger numbers.",
       "image": "https://chromebookunlocked.github.io/games/Cookie%20Clicker/thumbnail.webp",
       "genre": [
         "Clicker",
@@ -2193,10 +2280,13 @@ body.game-is-expanded {
       "@id": "https://chromebookunlocked.github.io/Cookie%20Clicker.html#webpage",
       "url": "https://chromebookunlocked.github.io/Cookie%20Clicker.html",
       "name": "Cookie Clicker Unblocked - Play Free Online",
-      "description": "Cookie Clicker unblocked for school Chromebooks. Click the big cookie to bake cookies, then spend them on grandmas, farms and factories that bake for you.",
+      "description": "Play Cookie Clicker unblocked on your school Chromebook. Click the big cookie to bake, then buy grandmas, farms and factories that bake for you.",
       "primaryImageOfPage": {
         "@type": "ImageObject",
-        "url": "https://chromebookunlocked.github.io/games/Cookie%20Clicker/thumbnail.webp"
+        "url": "https://chromebookunlocked.github.io/games/Cookie%20Clicker/thumbnail.webp",
+        "contentUrl": "https://chromebookunlocked.github.io/games/Cookie%20Clicker/thumbnail.webp",
+        "name": "Cookie Clicker unblocked",
+        "caption": "Cookie Clicker, a free unblocked game on Chromebook Unlocked Games"
       },
       "inLanguage": "en",
       "isPartOf": {

@@ -87,6 +87,8 @@ jobs:
 
           cp sitemap.xml dist/sitemap.xml
           if [ -f llms.txt ]; then cp llms.txt dist/llms.txt; fi
+          # IndexNow key file: lets Bing and other IndexNow search engines verify change pings for this site
+          if [ -f 9cd8d6fc94494c91a63de66c5133d302.txt ]; then cp 9cd8d6fc94494c91a63de66c5133d302.txt dist/; fi
           cp robots.txt dist/robots.txt
           cp google0d95473435a7c986.html dist/google0d95473435a7c986.html
           cp .nojekyll dist/.nojekyll

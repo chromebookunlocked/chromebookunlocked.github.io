@@ -906,7 +906,9 @@ button:active {
   border-top: 1px solid rgba(255, 102, 255, 0.25);
   color: #d7ccdf;
 }
+.site-guide h1 { margin: 0 0 0.75rem; color: #ffccff; font-family: var(--font-main); font-weight: 900; font-size: clamp(1.2rem, 2vw, 1.6rem); line-height: 1.3; }
 .site-guide h2 { margin: 0 0 0.75rem; color: #f2e9f6; font-size: clamp(1.1rem, 1.7vw, 1.35rem); }
+.site-guide .game-directory-links { margin-top: 0.75rem; }
 .site-guide p { max-width: 75ch; margin: 0 0 0.75rem; line-height: 1.6; }
 .site-guide p:last-child { margin-bottom: 0; }
 
@@ -1051,6 +1053,29 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
   display: none;
   min-height: 0;
   padding: 0;
+}
+
+/* An ad's box takes room only while its ad is on the way or showing. The ad
+   runtime (src/utils/adProviders.js) marks the box: no mark = never requested
+   (ads switched off at Google, the human check not passed, the slot still far
+   below the screen), "loading" = requested, "filled" = showing, "empty" = no
+   ad came, the request failed or the ad script was blocked. Only "loading"
+   and "filled" keep the reserved height, so a page without ads has no gaps.
+   The header and bottom boxes shrink to nothing instead of being removed:
+   on game pages the header box also carries the margin that clears the fixed
+   site header, and a box that stays in the layout lets scrolling near it
+   trigger its request. A row inside the games grid is removed outright,
+   because even an empty grid row adds a second gap between the rows of
+   games; the ad runtime watches the game card before it instead. */
+.header-banner-ad:not([data-ad-box="loading"]):not([data-ad-box="filled"]),
+.bottom-leaderboard-ad:not([data-ad-box="loading"]):not([data-ad-box="filled"]) {
+  min-height: 0;
+  height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.horizontal-ad-row:not([data-ad-box="loading"]):not([data-ad-box="filled"]) {
+  display: none;
 }
 
 @media (max-width: 768px) {

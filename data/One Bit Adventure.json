@@ -2,6 +2,6 @@
   "name": "One Bit Adventure",
   "category": "Adventure, RPG",
   "createdAt": "1970-01-01T00:00:00.000Z",
-  "description": "",
+  "description": "A turn-based roguelike RPG in pixel art. Every step you take is a turn: choose a class, fight monsters, level up your skills and see how far you can travel before your character dies.",
   "displayName": "One Bit Adventure"
 }

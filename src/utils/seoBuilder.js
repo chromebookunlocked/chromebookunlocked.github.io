@@ -260,44 +260,101 @@ function faqSchema(faq) {
  * Homepage
  * ------------------------------------------------------------------------ */
 
-const INDEX_TITLE = `Unblocked Games for School Chromebooks | ${SHORT_BRAND}`;
-const INDEX_HEADING = 'Unblocked Games for School Chromebooks';
+// Homepage wording follows what people type (Search Console, Aug-Nov 2026):
+//  - "unblocked games for school chromebook links" is the largest search that
+//    is not the site's own name (82,000 impressions in three months, average
+//    position 2.9), and the singular "chromebook" far outnumbers the plural.
+//    The page is a list of links, so the title, heading and description say so.
+//    This title is 65 characters, over the 60 used elsewhere, on purpose: only
+//    the brand at the end can be cut off, and Google shows the site name
+//    separately. The earlier brand-first title was 66 characters.
+//  - "... links 2026" and "unblocked games 2026" are searched too, so the
+//    year of the build is named. It changes by itself with the next build.
+const INDEX_TITLE = `Unblocked Games for School Chromebook Links | ${SHORT_BRAND}`;
+const INDEX_HEADING = 'Unblocked Games for School Chromebook';
+const BUILD_YEAR = new Date().getFullYear();
 
-function indexDescription(games = []) {
-  const featured = [...games]
+// Games on the site whose "<name> unblocked" search is the most common in
+// the United States, most searched first (monthly searches, keyword data of
+// November 2026: Slope 301,000; Geometry Dash 201,000; Retro Bowl 135,000;
+// 1v1.lol and Minecraft 110,000 each; Cookie Clicker 74,000; Bitlife, FNAF
+// and Granny 60,500 each; OvO and Smash Karts 40,500 each; Polytrack and
+// Drive Mad 27,100 each; down to Escape Road at 12,100). The homepage links
+// to each of these pages with the words people search for. Names must match
+// `name` in data/*.json; a game that is removed simply drops off the list.
+const MOST_SEARCHED = [
+  'Slope', 'Geometry Dash Lite', 'Retro Bowl', '1v1.lol', 'Minecraft', 'Cookie Clicker',
+  'Bitlife', 'FNAF 1', 'Granny', 'OvO', 'Smash Carts', 'Polytrack', 'Drive Mad',
+  'Crossy Road', 'Drift Hunters', 'Basketball Legends', 'Friday Night Funkin', 'Block Blast',
+  'Wordle', '2048', 'Happy Wheels', 'Infinite Craft', 'Escape Road',
+];
+
+function mostSearchedGames(games = []) {
+  return MOST_SEARCHED.map((name) => games.find((game) => game.name === name)).filter(Boolean);
+}
+
+// The games the site puts first (priority in data/*.json), best first.
+function featuredGames(games = [], max = 3) {
+  return [...games]
     .filter((game) => game.priority > 0)
     .sort((a, b) => b.priority - a.priority)
-    .slice(0, 3)
-    .map((game) => game.name);
+    .slice(0, max);
+}
+
+function indexDescription(games = []) {
+  const featured = featuredGames(games, 3).map((game) => game.name);
   const count = games.length;
+  const lead = `Unblocked games for school Chromebook (${BUILD_YEAR}): direct links to ${count} free`;
   const candidates = [];
   if (featured.length === 3) {
-    candidates.push(`Play ${count} free unblocked games on your school Chromebook, including ${joinList(featured)}. No download: every game runs in the browser.`);
-    candidates.push(`Play ${count} free unblocked games on your school Chromebook, including ${joinList(featured)}. No download needed.`);
+    candidates.push(`${lead} games like ${joinList(featured)}. No download: every game runs in the browser.`);
+    candidates.push(`${lead} games like ${joinList(featured)}. No download needed.`);
+    candidates.push(`${lead} games like ${joinList(featured.slice(0, 2))}. No download needed.`);
   }
-  candidates.push(`Play ${count} free unblocked games on your school Chromebook. Puzzle, racing, sports and arcade games that run in the browser with no download.`);
+  candidates.push(`${lead} puzzle, racing, sports and arcade games. No download needed.`);
   return fitDescription(candidates);
 }
 
+// Questions are the ones people type into Google (Search Console): "what
+// games are not blocked on school chromebook", "github unblocked games",
+// "how to play unblocked games on school chromebook", "best unblocked games".
+// Answers state only what is true of the site; no answer promises that a
+// school filter lets the site through, because that is not ours to promise.
 function generateIndexFaq(games = [], categoryPages = []) {
-  return [
+  const featured = featuredGames(games, 8).map((game) => game.name);
+  const faq = [
     {
       question: `What is ${SITE_NAME}?`,
-      answer: `${SITE_NAME} is a free website with ${games.length} browser games. Every game has its own page and runs in a browser tab on a Chromebook, Windows PC or Mac.`,
+      answer: `${SITE_NAME} is a free website with direct links to ${games.length} unblocked browser games. Every game has its own page and runs in a browser tab on a Chromebook, Windows PC or Mac.`,
+    },
+    {
+      question: 'What games are not blocked on a school Chromebook?',
+      answer: `That depends on the filter your school network uses, so no website can promise it. The games here need no download, app or account: each one runs inside its own page in the Chrome browser.${featured.length >= 5 ? ` Games to try first: ${joinList(featured.slice(0, 5))}.` : ''}`,
+    },
+    {
+      question: 'How do I play unblocked games on a school Chromebook?',
+      answer: 'Open chromebookunlocked.github.io in Chrome, pick a game from the grid, a category page or the A-Z list of game links, and press Play. Use the Fullscreen button on the game page for a bigger view.',
+    },
+    {
+      question: 'Is this a GitHub unblocked games site?',
+      answer: `Yes. ${SITE_NAME} is hosted on GitHub Pages at chromebookunlocked.github.io, and every game page is a direct github.io link that you can bookmark or share.`,
     },
     {
       question: 'Are the games free, and do I need to download anything?',
       answer: 'Every game is free to play. Games load inside the page, so there is no app to download or install and no account to create.',
     },
     {
-      question: 'Will the games work on a school Chromebook?',
-      answer: 'The games run in the Chrome browser, which is what a Chromebook uses. Whether the site opens at school depends on the filter your school network uses.',
-    },
-    {
       question: 'What kinds of games are there?',
       answer: `Games are sorted into ${categoryPages.length} categories, including ${joinList(categoryPages.slice(0, 6).map((page) => page.name))}. Use the category pages or the search box to find a game.`,
     },
   ];
+  if (featured.length >= 5) {
+    faq.push({
+      question: `What are the best unblocked games for a school Chromebook in ${BUILD_YEAR}?`,
+      answer: `The games featured on ${SITE_NAME} in ${BUILD_YEAR} are ${joinList(featured)}. Each one has a direct link in the list of games on this page.`,
+    });
+  }
+  return faq;
 }
 
 /**
@@ -518,7 +575,13 @@ function generateGameStructuredData(game, thumbPath, categoryPages = []) {
         url: gameUrl,
         name: generateGameSEOTitle(game),
         description: generateGameMetaDescription(game),
-        primaryImageOfPage: { '@type': 'ImageObject', url: imageUrl },
+        primaryImageOfPage: {
+          '@type': 'ImageObject',
+          url: imageUrl,
+          contentUrl: imageUrl,
+          name: `${game.name} unblocked`,
+          caption: `${game.name}, a free unblocked game on ${SITE_NAME}`,
+        },
         inLanguage: 'en',
         isPartOf: { '@type': 'WebSite', '@id': WEBSITE_ID, name: SITE_NAME, url: `${BASE_URL}/` },
         mainEntity: { '@id': `${gameUrl}#game` },
@@ -674,6 +737,9 @@ module.exports = {
   SHORT_BRAND,
   LOGO_URL,
   INDEX_HEADING,
+  BUILD_YEAR,
+  featuredGames,
+  mostSearchedGames,
   META_CATEGORIES,
   CATEGORY_PAGE_MIN_GAMES,
 };

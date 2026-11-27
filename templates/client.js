@@ -323,6 +323,8 @@ function resetAndReloadGrid(category) {
     const h2 = allGamesSection.querySelector('h2');
     if (h2) {
       h2.textContent = category || 'All Games';
+      // The page opens straight on the grid; the title shows only for a filter.
+      h2.hidden = !category || category === 'All Games';
     }
   }
 }

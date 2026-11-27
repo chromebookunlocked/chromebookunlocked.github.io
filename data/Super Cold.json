@@ -2,6 +2,6 @@
   "name": "Super Cold",
   "category": "Shooter, Action, Strategy",
   "createdAt": "1970-01-01T00:00:00.000Z",
-  "description": "",
+  "description": "A 2D take on Superhot in which time only moves when you do. Move with WASD, click to fire and clear each level of bots. Higher levels unlock new guns and mutators that change the rules.",
   "displayName": "Super Cold"
 }

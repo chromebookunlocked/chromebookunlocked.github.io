@@ -50,6 +50,7 @@ function validatePage(page, html, isGamePage) {
   expect(!html.includes('footer-inscreen-ad'), `${page} still contains the custom floating ad`);
   expect(html.includes('ins.adsbygoogle[data-ad-status="unfilled"]'), `${page} does not hide explicitly unfilled AdSense units`);
   expect(html.includes('.horizontal-ad-row:has(> ins.adsbygoogle[data-ad-status="unfilled"])'), `${page} does not collapse unfilled in-content ad rows`);
+  expect(html.includes('.horizontal-ad-row:not([data-ad-box="loading"]):not([data-ad-box="filled"])'), `${page} reserves room for ads that are not loading`);
   expect(!forbiddenMonumetricPattern.test(html), `${page} still contains Monumetric code or markup`);
 
   if (isGamePage) {
@@ -127,6 +128,7 @@ expect(headScript.includes('__initAdSenseSlots'), 'AdSense slot initialization i
 expect(headScript.includes('window.__adsReady'), 'AdSense requests do not use the verification gate');
 expect(headScript.includes("rootMargin: '600px 0px'"), 'Below-the-fold AdSense units are not proximity-loaded');
 expect(headScript.includes('__getAdFillStatus'), 'AdSense fill status is not inspectable');
+expect(headScript.includes("setBox(ad, 'loading')") && headScript.includes('__adScriptFailed'), 'Ad boxes do not close when no ad arrives');
 expect(headScript.includes("'ad_fill_result'"), 'AdSense fill results are not sent to analytics');
 expect(horizontal.includes(`data-ad-slot="${ADSENSE_HORIZONTAL_SLOT}"`), 'In-content horizontal slot is missing');
 expect(horizontal.includes('data-ad-lazy="true"'), 'In-content horizontal slot is not proximity-loaded');

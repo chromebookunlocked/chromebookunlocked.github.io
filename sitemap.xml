@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://chromebookunlocked.github.io/</loc>
-    <lastmod>2026-11-26</lastmod>
+    <lastmod>2026-11-27</lastmod>
   </url>
   <url>
     <loc>https://chromebookunlocked.github.io/action-games-unblocked.html</loc>
@@ -182,12 +182,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://chromebookunlocked.github.io/BTD5.html</loc>
-    <image:image>
-      <image:loc>https://chromebookunlocked.github.io/games/BTD5/thumbnail.webp</image:loc>
-    </image:image>
-  </url>
-  <url>
     <loc>https://chromebookunlocked.github.io/Bad%20Ice%20Cream%202.html</loc>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/games/Bad%20Ice%20Cream%202/thumbnail.webp</image:loc>
@@ -356,6 +350,12 @@
     </image:image>
   </url>
   <url>
+    <loc>https://chromebookunlocked.github.io/BTD5.html</loc>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/games/BTD5/thumbnail.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
     <loc>https://chromebookunlocked.github.io/Bullet%20Force.html</loc>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/games/Bullet%20Force/thumbnail.webp</image:loc>
@@ -377,12 +377,6 @@
     <loc>https://chromebookunlocked.github.io/Buster%20Jam.html</loc>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/games/Buster%20Jam/thumbnail.webp</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://chromebookunlocked.github.io/CS%20Go%20Clicker.html</loc>
-    <image:image>
-      <image:loc>https://chromebookunlocked.github.io/games/CS%20Go%20Clicker/thumbnail.webp</image:loc>
     </image:image>
   </url>
   <url>
@@ -476,6 +470,12 @@
     </image:image>
   </url>
   <url>
+    <loc>https://chromebookunlocked.github.io/CS%20Go%20Clicker.html</loc>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/games/CS%20Go%20Clicker/thumbnail.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
     <loc>https://chromebookunlocked.github.io/Cut%20the%20Rope.html</loc>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/games/Cut%20the%20Rope/thumbnail.webp</image:loc>
@@ -542,15 +542,15 @@
     </image:image>
   </url>
   <url>
-    <loc>https://chromebookunlocked.github.io/Drive%20Mad.html</loc>
-    <image:image>
-      <image:loc>https://chromebookunlocked.github.io/games/Drive%20Mad/thumbnail.webp</image:loc>
-    </image:image>
-  </url>
-  <url>
     <loc>https://chromebookunlocked.github.io/Drive%20in%20Russia.html</loc>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/games/Drive%20in%20Russia/thumbnail.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://chromebookunlocked.github.io/Drive%20Mad.html</loc>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/games/Drive%20Mad/thumbnail.webp</image:loc>
     </image:image>
   </url>
   <url>
@@ -614,6 +614,30 @@
     </image:image>
   </url>
   <url>
+    <loc>https://chromebookunlocked.github.io/Fall%20Guys.html</loc>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/games/Fall%20Guys/thumbnail.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://chromebookunlocked.github.io/Fireboy%20and%20Watergirl%201.html</loc>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/games/Fireboy%20and%20Watergirl%201/thumbnail.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://chromebookunlocked.github.io/Five%20Nights%20at%20Epstein%20Island.html</loc>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/games/Five%20Nights%20at%20Epstein%20Island/thumbnail.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://chromebookunlocked.github.io/Five%20Nights%20at%20Wilsons.html</loc>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/games/Five%20Nights%20at%20Wilsons/thumbnail.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
     <loc>https://chromebookunlocked.github.io/FNAF%201.html</loc>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/games/FNAF%201/thumbnail.webp</image:loc>
@@ -641,30 +665,6 @@
     <loc>https://chromebookunlocked.github.io/FNAF%20Pizzeria%20Simulator.html</loc>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/games/FNAF%20Pizzeria%20Simulator/thumbnail.webp</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://chromebookunlocked.github.io/Fall%20Guys.html</loc>
-    <image:image>
-      <image:loc>https://chromebookunlocked.github.io/games/Fall%20Guys/thumbnail.webp</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://chromebookunlocked.github.io/Fireboy%20and%20Watergirl%201.html</loc>
-    <image:image>
-      <image:loc>https://chromebookunlocked.github.io/games/Fireboy%20and%20Watergirl%201/thumbnail.webp</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://chromebookunlocked.github.io/Five%20Nights%20at%20Epstein%20Island.html</loc>
-    <image:image>
-      <image:loc>https://chromebookunlocked.github.io/games/Five%20Nights%20at%20Epstein%20Island/thumbnail.webp</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://chromebookunlocked.github.io/Five%20Nights%20at%20Wilsons.html</loc>
-    <image:image>
-      <image:loc>https://chromebookunlocked.github.io/games/Five%20Nights%20at%20Wilsons/thumbnail.webp</image:loc>
     </image:image>
   </url>
   <url>
@@ -1136,6 +1136,12 @@
     </image:image>
   </url>
   <url>
+    <loc>https://chromebookunlocked.github.io/Whack%20the%20Thief.html</loc>
+    <image:image>
+      <image:loc>https://chromebookunlocked.github.io/games/Whack%20the%20Thief/thumbnail.webp</image:loc>
+    </image:image>
+  </url>
+  <url>
     <loc>https://chromebookunlocked.github.io/Whack%20Your%20Boss.html</loc>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/games/Whack%20Your%20Boss/thumbnail.webp</image:loc>
@@ -1145,12 +1151,6 @@
     <loc>https://chromebookunlocked.github.io/Whack%20Your%20Computer.html</loc>
     <image:image>
       <image:loc>https://chromebookunlocked.github.io/games/Whack%20Your%20Computer/thumbnail.webp</image:loc>
-    </image:image>
-  </url>
-  <url>
-    <loc>https://chromebookunlocked.github.io/Whack%20the%20Thief.html</loc>
-    <image:image>
-      <image:loc>https://chromebookunlocked.github.io/games/Whack%20the%20Thief/thumbnail.webp</image:loc>
     </image:image>
   </url>
   <url>

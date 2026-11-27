@@ -46,7 +46,7 @@
   <!-- Cloudflare Turnstile verification gate (must load before ads) -->
   <script src="assets/bot-detector.js"></script>
 
-  <!-- Google Consent Mode v2: default denied, restore saved choice -->
+  <!-- Google Consent Mode v2: saved choice first; otherwise analytics on outside Europe, off in Europe until accepted -->
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -56,7 +56,14 @@
         var m = ('; ' + document.cookie).split('; cookieConsent=');
         if (m.length === 2) saved = JSON.parse(decodeURIComponent(m.pop().split(';').shift()));
       } catch (e) {}
-      var analytics = saved ? saved.analytics === true : false;
+      var europe = true;
+      try {
+        var tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+        var extra = ['Atlantic/Azores','Atlantic/Canary','Atlantic/Faroe','Atlantic/Madeira','Atlantic/Reykjavik','Asia/Nicosia','Asia/Famagusta','Africa/Ceuta','Arctic/Longyearbyen','Indian/Reunion','Indian/Mayotte','America/Cayenne','America/Guadeloupe','America/Martinique','America/Marigot'];
+        europe = !tz || tz === 'UTC' || tz.indexOf('Etc/') === 0 || tz.indexOf('Europe/') === 0 || extra.indexOf(tz) !== -1;
+      } catch (e) {}
+      window.cbuConsentRegion = europe ? 'europe' : 'other';
+      var analytics = saved ? saved.analytics === true : !europe;
       var marketing = saved ? saved.marketing === true : false;
       gtag('consent', 'default', {
         analytics_storage: analytics ? 'granted' : 'denied',
@@ -65,8 +72,17 @@
         ad_personalization: marketing ? 'granted' : 'denied',
         functionality_storage: 'granted',
         security_storage: 'granted',
-        wait_for_update: saved ? 0 : 500
+        wait_for_update: saved || !europe ? 0 : 500
       });
+      if (!saved && !europe) {
+        gtag('consent', 'default', {
+          analytics_storage: 'denied',
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied',
+          region: ["AT","BE","BG","HR","CY","CZ","DK","EE","FI","FR","DE","GR","HU","IE","IT","LV","LT","LU","MT","NL","PL","PT","RO","SK","SI","ES","SE","IS","LI","NO","GB","CH","GF","GP","MQ","RE","YT","MF"]
+        });
+      }
     })();
   </script>
 
@@ -85,6 +101,9 @@
 
     var SLOT_SELECTOR = 'ins.adsbygoogle[data-ad-client][data-ad-slot]';
     var FILL_TIMEOUT_MS = 18000;
+    // How long a requested slot keeps its reserved room with nothing in it.
+    var COLLAPSE_AFTER_MS = 6000;
+    var scriptFailed = false;
     var scheduledSlots = typeof WeakSet === 'function' ? new WeakSet() : null;
     var trackedSlots = [];
     window.__activeAdProvider = 'adsense';
@@ -98,6 +117,14 @@
       }
       callback();
     };
+
+    // The element around a slot reserves room only while its ad is on the
+    // way or showing; the stylesheet reads this mark. Without a mark (never
+    // requested) or with "empty" the box closes, so the page has no gap.
+    function setBox(ad, state) {
+      var box = ad.parentElement;
+      if (box && box.getAttribute('data-ad-box') !== state) box.setAttribute('data-ad-box', state);
+    }
 
     function emitFillResult(ad, state) {
       if (ad.getAttribute('data-ad-fill-reported') === state) return;
@@ -130,6 +157,7 @@
         if (finished) return;
         finished = true;
         ad.setAttribute('data-ad-fill-state', state);
+        setBox(ad, state === 'filled' ? 'filled' : 'empty');
         if (observer) observer.disconnect();
         emitFillResult(ad, state);
       }
@@ -142,6 +170,11 @@
         observer = new MutationObserver(inspect);
         observer.observe(ad, { attributes: true, childList: true, subtree: true });
       }
+      // Close the gap early if nothing has arrived; a late ad still reopens
+      // it, because the observer keeps watching until the fill timeout.
+      window.setTimeout(function () {
+        if (!finished && !creativeIsPresent(ad)) setBox(ad, 'empty');
+      }, COLLAPSE_AFTER_MS);
       window.setTimeout(function () {
         if (!finished) finish(creativeIsPresent(ad) ? 'filled' : 'empty');
       }, FILL_TIMEOUT_MS);
@@ -155,15 +188,35 @@
         if (ad.getAttribute('data-ad-requested') === 'true') return;
         ad.removeAttribute('data-ad-pending');
         ad.setAttribute('data-ad-requested', 'true');
+        if (scriptFailed) {
+          ad.setAttribute('data-ad-fill-state', 'empty');
+          setBox(ad, 'empty');
+          emitFillResult(ad, 'empty');
+          return;
+        }
+        setBox(ad, 'loading');
         trackFill(ad);
         try {
           (window.adsbygoogle = window.adsbygoogle || []).push({});
         } catch (error) {
           ad.setAttribute('data-ad-fill-state', 'empty');
+          setBox(ad, 'empty');
           emitFillResult(ad, 'empty');
         }
       });
     };
+
+    // What to watch for "the reader is getting near this slot". A row in
+    // the games grid is not laid out until its ad is requested (so that it
+    // leaves no gap), which means it cannot be watched itself: the game card
+    // just before it stands in.
+    function lazyTarget(ad) {
+      var box = ad.parentElement;
+      if (box && String(box.className || '').indexOf('horizontal-ad-row') !== -1 && box.previousElementSibling) {
+        return box.previousElementSibling;
+      }
+      return ad;
+    }
 
     function scheduleSlot(ad) {
       if (!ad || (scheduledSlots && scheduledSlots.has(ad))) return;
@@ -178,7 +231,7 @@
               request();
             }
           }, { rootMargin: '600px 0px' });
-          lazyObserver.observe(ad);
+          lazyObserver.observe(lazyTarget(ad));
         } else if (ad.getAttribute('data-ad-idle') === 'true' && 'requestIdleCallback' in window) {
           window.requestIdleCallback(request, { timeout: 2000 });
         } else {
@@ -211,6 +264,17 @@
       var slots = scope.querySelectorAll(SLOT_SELECTOR);
       for (var i = 0; i < slots.length; i += 1) scheduleSlot(slots[i]);
     };
+
+    // The ad script itself did not load (blocked or offline): no slot will
+    // ever fill, so every reserved box closes at once.
+    window.__adScriptFailed = function () {
+      scriptFailed = true;
+      for (var i = 0; i < trackedSlots.length; i += 1) {
+        if (!creativeIsPresent(trackedSlots[i])) setBox(trackedSlots[i], 'empty');
+      }
+    };
+    var adScript = document.querySelector && document.querySelector('script[src*="pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"]');
+    if (adScript && adScript.addEventListener) adScript.addEventListener('error', window.__adScriptFailed);
 
     window.__getAdFillStatus = function () {
       return {
@@ -1174,6 +1238,29 @@ ins.adsbygoogle[data-ad-status="unfilled"] {
   padding: 0;
 }
 
+/* An ad's box takes room only while its ad is on the way or showing. The ad
+   runtime (src/utils/adProviders.js) marks the box: no mark = never requested
+   (ads switched off at Google, the human check not passed, the slot still far
+   below the screen), "loading" = requested, "filled" = showing, "empty" = no
+   ad came, the request failed or the ad script was blocked. Only "loading"
+   and "filled" keep the reserved height, so a page without ads has no gaps.
+   The header and bottom boxes shrink to nothing instead of being removed:
+   on game pages the header box also carries the margin that clears the fixed
+   site header, and a box that stays in the layout lets scrolling near it
+   trigger its request. A row inside the games grid is removed outright,
+   because even an empty grid row adds a second gap between the rows of
+   games; the ad runtime watches the game card before it instead. */
+.header-banner-ad:not([data-ad-box="loading"]):not([data-ad-box="filled"]),
+.bottom-leaderboard-ad:not([data-ad-box="loading"]):not([data-ad-box="filled"]) {
+  min-height: 0;
+  height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.horizontal-ad-row:not([data-ad-box="loading"]):not([data-ad-box="filled"]) {
+  display: none;
+}
+
 /* Ensure horizontal ad iframes are always visible */
 .horizontal-ad-row iframe,
 .horizontal-ad-row ins iframe {
@@ -1828,11 +1915,11 @@ body.game-is-expanded {
         <img class="thumb" src="games/Bloodmoney 2/thumbnail.webp" alt="Bloodmoney 2" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Bloodmoney 2</div>
-    </a><a href="/Capybara%20Clicker.html" class="game-card" onclick="trackRecentGame('Capybara Clicker')">
-      <div class="thumb-container" style="--thumb-url: url('games/Capybara Clicker/thumbnail.webp')">
-        <img class="thumb" src="games/Capybara Clicker/thumbnail.webp" alt="Capybara Clicker" loading="lazy" width="300" height="300">
+    </a><a href="/Cookie%20Clicker.html" class="game-card" onclick="trackRecentGame('Cookie Clicker')">
+      <div class="thumb-container" style="--thumb-url: url('games/Cookie Clicker/thumbnail.webp')">
+        <img class="thumb" src="games/Cookie Clicker/thumbnail.webp" alt="Cookie Clicker" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Capybara Clicker</div>
+      <div class="card-title">Cookie Clicker</div>
     </a><a href="/Mr%20Mine.html" class="game-card" onclick="trackRecentGame('Mr Mine')">
       <div class="thumb-container" style="--thumb-url: url('games/Mr Mine/thumbnail.webp')">
         <img class="thumb" src="games/Mr Mine/thumbnail.webp" alt="Mr Mine" loading="lazy" width="300" height="300">
@@ -1863,16 +1950,16 @@ body.game-is-expanded {
         <img class="thumb" src="games/Crank It!/thumbnail.webp" alt="Crank It!" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Crank It!</div>
-    </a><a href="/Whack%20Your%20Computer.html" class="game-card" onclick="trackRecentGame('Whack Your Computer')">
-      <div class="thumb-container" style="--thumb-url: url('games/Whack Your Computer/thumbnail.webp')">
-        <img class="thumb" src="games/Whack Your Computer/thumbnail.webp" alt="Whack Your Computer" loading="lazy" width="300" height="300">
+    </a><a href="/Whack%20Your%20Boss.html" class="game-card" onclick="trackRecentGame('Whack Your Boss')">
+      <div class="thumb-container" style="--thumb-url: url('games/Whack Your Boss/thumbnail.webp')">
+        <img class="thumb" src="games/Whack Your Boss/thumbnail.webp" alt="Whack Your Boss" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Whack Your Computer</div>
-    </a><a href="/FNAF%203.html" class="game-card" onclick="trackRecentGame('FNAF 3')">
-      <div class="thumb-container" style="--thumb-url: url('games/FNAF 3/thumbnail.webp')">
-        <img class="thumb" src="games/FNAF 3/thumbnail.webp" alt="FNAF 3" loading="lazy" width="300" height="300">
+      <div class="card-title">Whack Your Boss</div>
+    </a><a href="/Five%20Nights%20at%20Epstein%20Island.html" class="game-card" onclick="trackRecentGame('Five Nights at Epstein Island')">
+      <div class="thumb-container" style="--thumb-url: url('games/Five Nights at Epstein Island/thumbnail.webp')">
+        <img class="thumb" src="games/Five Nights at Epstein Island/thumbnail.webp" alt="Five Nights at Epstein Island" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">FNAF 3</div>
+      <div class="card-title">Five Nights at Epstein Island</div>
     </a><a href="/Gladdihoppers.html" class="game-card" onclick="trackRecentGame('Gladdihoppers')">
       <div class="thumb-container" style="--thumb-url: url('games/Gladdihoppers/thumbnail.webp')">
         <img class="thumb" src="games/Gladdihoppers/thumbnail.webp" alt="Gladdihoppers" loading="lazy" width="300" height="300">
@@ -1902,16 +1989,16 @@ body.game-is-expanded {
         <img class="thumb" src="games/Friday Night Funkin Undertale/thumbnail.webp" alt="Friday Night Funkin Undertale" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Friday Night Funkin Undertale</div>
+    </a><a href="/Blockcraft%20Parkour.html" class="game-card" onclick="trackRecentGame('Blockcraft Parkour')">
+      <div class="thumb-container" style="--thumb-url: url('games/Blockcraft Parkour/thumbnail.webp')">
+        <img class="thumb" src="games/Blockcraft Parkour/thumbnail.webp" alt="Blockcraft Parkour" loading="lazy" width="300" height="300">
+      </div>
+      <div class="card-title">Blockcraft Parkour</div>
     </a><a href="/Block%20the%20Pig.html" class="game-card" onclick="trackRecentGame('Block the Pig')">
       <div class="thumb-container" style="--thumb-url: url('games/Block the Pig/thumbnail.webp')">
         <img class="thumb" src="games/Block the Pig/thumbnail.webp" alt="Block the Pig" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Block the Pig</div>
-    </a><a href="/Block%20Blast.html" class="game-card" onclick="trackRecentGame('Block Blast')">
-      <div class="thumb-container" style="--thumb-url: url('games/Block Blast/thumbnail.webp')">
-        <img class="thumb" src="games/Block Blast/thumbnail.webp" alt="Block Blast" loading="lazy" width="300" height="300">
-      </div>
-      <div class="card-title">Block Blast</div>
     </a><a href="/Granny.html" class="game-card" onclick="trackRecentGame('Granny')">
       <div class="thumb-container" style="--thumb-url: url('games/Granny/thumbnail.webp')">
         <img class="thumb" src="games/Granny/thumbnail.webp" alt="Granny" loading="lazy" width="300" height="300">
@@ -1932,11 +2019,11 @@ body.game-is-expanded {
         <img class="thumb" src="games/Clear Vision 1/thumbnail.webp" alt="Clear Vision 1" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Clear Vision 1</div>
-    </a><a href="/Brawl%20Simulator%203D.html" class="game-card" onclick="trackRecentGame('Brawl Simulator 3D')">
-      <div class="thumb-container" style="--thumb-url: url('games/Brawl Simulator 3D/thumbnail.webp')">
-        <img class="thumb" src="games/Brawl Simulator 3D/thumbnail.webp" alt="Brawl Simulator 3D" loading="lazy" width="300" height="300">
+    </a><a href="/Brotato.html" class="game-card" onclick="trackRecentGame('Brotato')">
+      <div class="thumb-container" style="--thumb-url: url('games/Brotato/thumbnail.webp')">
+        <img class="thumb" src="games/Brotato/thumbnail.webp" alt="Brotato" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Brawl Simulator 3D</div>
+      <div class="card-title">Brotato</div>
     </a><a href="/Drift%20Boss.html" class="game-card" onclick="trackRecentGame('Drift Boss')">
       <div class="thumb-container" style="--thumb-url: url('games/Drift Boss/thumbnail.webp')">
         <img class="thumb" src="games/Drift Boss/thumbnail.webp" alt="Drift Boss" loading="lazy" width="300" height="300">
@@ -1961,11 +2048,11 @@ body.game-is-expanded {
         <img class="thumb" src="games/Hanger 2/thumbnail.webp" alt="Hanger 2" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Hanger 2</div>
-    </a><a href="/Basketball%20FRVR.html" class="game-card" onclick="trackRecentGame('Basketball FRVR')">
-      <div class="thumb-container" style="--thumb-url: url('games/Basketball FRVR/thumbnail.webp')">
-        <img class="thumb" src="games/Basketball FRVR/thumbnail.webp" alt="Basketball FRVR" loading="lazy" width="300" height="300">
+    </a><a href="/Basketball%20Legends.html" class="game-card" onclick="trackRecentGame('Basketball Legends')">
+      <div class="thumb-container" style="--thumb-url: url('games/Basketball Legends/thumbnail.webp')">
+        <img class="thumb" src="games/Basketball Legends/thumbnail.webp" alt="Basketball Legends" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">Basketball FRVR</div>
+      <div class="card-title">Basketball Legends</div>
     </a><a href="/Minecraft.html" class="game-card" onclick="trackRecentGame('Minecraft')">
       <div class="thumb-container" style="--thumb-url: url('games/Minecraft/thumbnail.webp')">
         <img class="thumb" src="games/Minecraft/thumbnail.webp" alt="Minecraft" loading="lazy" width="300" height="300">
@@ -2006,11 +2093,11 @@ body.game-is-expanded {
         <img class="thumb" src="games/Punch the Trump/thumbnail.webp" alt="Punch the Trump" loading="lazy" width="300" height="300">
       </div>
       <div class="card-title">Punch the Trump</div>
-    </a><a href="/BTD5.html" class="game-card" onclick="trackRecentGame('BTD5')">
-      <div class="thumb-container" style="--thumb-url: url('games/BTD5/thumbnail.webp')">
-        <img class="thumb" src="games/BTD5/thumbnail.webp" alt="BTD5" loading="lazy" width="300" height="300">
+    </a><a href="/Bad%20Ice%20Cream%202.html" class="game-card" onclick="trackRecentGame('Bad Ice Cream 2')">
+      <div class="thumb-container" style="--thumb-url: url('games/Bad Ice Cream 2/thumbnail.webp')">
+        <img class="thumb" src="games/Bad Ice Cream 2/thumbnail.webp" alt="Bad Ice Cream 2" loading="lazy" width="300" height="300">
       </div>
-      <div class="card-title">BTD5</div>
+      <div class="card-title">Bad Ice Cream 2</div>
     </a><a href="/Dead%20Zed%202.html" class="game-card" onclick="trackRecentGame('Dead Zed 2')">
       <div class="thumb-container" style="--thumb-url: url('games/Dead Zed 2/thumbnail.webp')">
         <img class="thumb" src="games/Dead Zed 2/thumbnail.webp" alt="Dead Zed 2" loading="lazy" width="300" height="300">
@@ -2197,7 +2284,10 @@ body.game-is-expanded {
       "description": "Play Adventure Capitalist unblocked on your school Chromebook. An idle clicker that starts with a single lemonade stand. Free in your browser, no download.",
       "primaryImageOfPage": {
         "@type": "ImageObject",
-        "url": "https://chromebookunlocked.github.io/games/Adventure%20Capitalist/thumbnail.webp"
+        "url": "https://chromebookunlocked.github.io/games/Adventure%20Capitalist/thumbnail.webp",
+        "contentUrl": "https://chromebookunlocked.github.io/games/Adventure%20Capitalist/thumbnail.webp",
+        "name": "Adventure Capitalist unblocked",
+        "caption": "Adventure Capitalist, a free unblocked game on Chromebook Unlocked Games"
       },
       "inLanguage": "en",
       "isPartOf": {

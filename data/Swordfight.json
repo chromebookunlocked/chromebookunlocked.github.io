@@ -2,6 +2,6 @@
   "name": "Swordfight",
   "category": "Action, Fighting, Multiplayer",
   "createdAt": "1970-01-01T00:00:00.000Z",
-  "description": "",
+  "description": "A top-down 2D fighting game in 16-bit pixel art. Take on a roster of opponents, each with their own arena and music, and try to win every fight in the fastest time.",
   "displayName": "Swordfight"
 }

@@ -2,6 +2,6 @@
   "name": "Bouncy Motors",
   "category": "Driving, Arcade",
   "createdAt": "1970-01-01T00:00:00.000Z",
-  "description": "",
+  "description": "A physics driving game where you steer a jelly car over obstacle courses. Reach the finish quickly without touching the red zones or falling off. It also has a track editor and a two-player mode.",
   "displayName": "Bouncy Motors"
 }

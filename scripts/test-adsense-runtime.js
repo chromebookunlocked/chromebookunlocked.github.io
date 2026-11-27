@@ -17,6 +17,12 @@ class FakeElement {
       ['data-ad-placement', 'test_placement'],
     ]);
     this.hasCreative = false;
+    // The box around the slot, whose data-ad-box mark the stylesheet reads.
+    this.parentElement = {
+      mark: null,
+      getAttribute(name) { return name === 'data-ad-box' ? this.mark : null; },
+      setAttribute(name, value) { if (name === 'data-ad-box') this.mark = String(value); },
+    };
   }
 
   getAttribute(name) {
@@ -124,8 +130,10 @@ function testVerificationAndDeduplication() {
   assert.strictEqual(runtime.window.__activeAdProvider, 'adsense');
   assert.strictEqual(runtime.window.adsbygoogle.length, 0, 'AdSense requested an ad before verification');
   assert.strictEqual(runtime.ad.getAttribute('data-ad-pending'), 'true');
+  assert.strictEqual(runtime.ad.parentElement.mark, null, 'An ad box took room before its ad was requested');
 
   runtime.verify();
+  assert.strictEqual(runtime.ad.parentElement.mark, 'loading');
   assert.strictEqual(runtime.window.adsbygoogle.length, 1, 'Verified AdSense slot was not requested');
   assert.strictEqual(runtime.ad.getAttribute('data-ad-requested'), 'true');
   assert.strictEqual(runtime.ad.getAttribute('data-ad-fill-state'), 'pending');
@@ -137,6 +145,7 @@ function testVerificationAndDeduplication() {
   runtime.ad.setAttribute('data-ad-status', 'filled');
   runtime.mutationObservers[0].callback();
   assert.strictEqual(runtime.ad.getAttribute('data-ad-fill-state'), 'filled');
+  assert.strictEqual(runtime.ad.parentElement.mark, 'filled');
   assert.deepStrictEqual(
     JSON.parse(JSON.stringify(runtime.window.__getAdFillStatus())),
     { activeProvider: 'adsense', adsense: [{ slot: ADSENSE_HORIZONTAL_SLOT, placement: 'test_placement', state: 'filled' }] },
@@ -146,10 +155,31 @@ function testVerificationAndDeduplication() {
 function testEmptyFillTimeout() {
   const runtime = createRuntime();
   assert.strictEqual(runtime.window.adsbygoogle.length, 1);
+  // The box closes after a few seconds with nothing in it, well before the
+  // reporting timeout, and reopens if an ad still arrives in between.
+  assert.strictEqual(runtime.ad.parentElement.mark, 'loading');
+  const collapseTimer = runtime.timers.find((timer) => timer.delay === 6000);
+  assert(collapseTimer, 'The empty ad box is never closed early');
+  collapseTimer.callback();
+  assert.strictEqual(runtime.ad.parentElement.mark, 'empty');
+  assert.strictEqual(runtime.ad.getAttribute('data-ad-fill-state'), 'pending');
+
+  const late = createRuntime();
+  late.timers.find((timer) => timer.delay === 6000).callback();
+  late.ad.hasCreative = true;
+  late.mutationObservers[0].callback();
+  assert.strictEqual(late.ad.parentElement.mark, 'filled', 'A late ad did not reopen its box');
+
+  // A blocked ad script closes every box at once.
+  const blocked = createRuntime();
+  blocked.window.__adScriptFailed();
+  assert.strictEqual(blocked.ad.parentElement.mark, 'empty');
+
   const fillTimer = runtime.timers.find((timer) => timer.delay === 18000);
   assert(fillTimer, 'AdSense fill timeout was not scheduled');
   fillTimer.callback();
   assert.strictEqual(runtime.ad.getAttribute('data-ad-fill-state'), 'empty');
+  assert.strictEqual(runtime.ad.parentElement.mark, 'empty');
   assert.strictEqual(runtime.window.__getAdFillStatus().adsense[0].state, 'empty');
 }
 

@@ -21,6 +21,9 @@ const {
   getCategoryPages,
   findCategoryPage,
   INDEX_HEADING,
+  BUILD_YEAR,
+  featuredGames,
+  mostSearchedGames,
   SITE_NAME
 } = require('../utils/seoBuilder');
 const { generateAnalyticsScript, generateConsentModeScript } = require('../utils/analyticsEnhanced');
@@ -137,6 +140,15 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
   const categoryLinksHTML = categoryPages
     .map(page => `<li><a href="${escapeHtmlAttr(page.path)}">${escapeHtml(page.heading)}</a></li>`)
     .join("");
+
+  // Text links to the featured games, for the "links" section of the guide.
+  const featuredLinksHTML = featuredGames(games, 10)
+    .map(game => `<a href="/${escapeHtmlAttr(encodeURIComponent(game.folder))}.html">${escapeHtml(game.name)}</a>`)
+    .join(', ');
+
+  const mostSearchedHTML = mostSearchedGames(games)
+    .map(game => `<li><a href="/${escapeHtmlAttr(encodeURIComponent(game.folder))}.html">${escapeHtml(game.name)} Unblocked</a></li>`)
+    .join('');
 
   const faqHTML = generateIndexFaq(games, categoryPages)
     .map(item => `<h3>${escapeHtml(item.question)}</h3>
@@ -309,14 +321,11 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         </div>
       </div>
 
-      <div class="page-intro">
-        <h1>${INDEX_HEADING}</h1>
-        <p>${SITE_NAME} has ${games.length} free unblocked games that run in your browser with no download. Pick a game below, search by name, or browse by category.</p>
-      </div>
-
-      <!-- All Games Grid -->
-      <div class="category" data-category="All Games" id="allGamesSection">
-        <h2>All Games</h2>
+      <!-- All Games Grid. The page opens straight on the games: the page
+           heading and all descriptive text sit under the grid (site-guide).
+           The grid title is shown only when a category filter is active. -->
+      <div class="category" data-category="All Games" id="allGamesSection" aria-label="All games">
+        <h2 hidden>All Games</h2>
         <div class="grid" id="gamesGrid">
           ${initialCardsHTML}
         </div>
@@ -326,21 +335,25 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
         <div id="scrollSentinel" style="height:1px;"></div>
       </div>
 
-      <details class="game-directory">
-        <summary>Browse all ${games.length} games and direct links</summary>
-        <nav class="game-directory-links" aria-label="All game pages">${gameDirectory}</nav>
-      </details>
-
       <section class="site-guide" aria-labelledby="site-guide-title">
-        <h2 id="site-guide-title">Free unblocked games for Chromebook</h2>
-        <p>Browse puzzle, racing, sports and arcade games in the grid above. Each game card opens its own page on Chromebook Unlocked Games, with a direct GitHub.io link you can share.</p>
-        <p>Looking for games to play on a school Chromebook? Use the search box to find a title, or open the alphabetical directory above to browse all available games. Games launch in your browser without an app download.</p>
+        <h1 id="site-guide-title">${INDEX_HEADING}</h1>
+        <p>${SITE_NAME} is a list of direct links to ${games.length} free unblocked games, updated for ${BUILD_YEAR}. Each link opens a game page on chromebookunlocked.github.io where the game runs in the browser, with no app and no download.${featuredLinksHTML ? ` Popular links: ${featuredLinksHTML}.` : ''}</p>
+
+${mostSearchedHTML ? `        <h2>Most searched unblocked games</h2>
+        <ul class="category-links">${mostSearchedHTML}</ul>
+
+` : ''}        <h2>Games to play on a school Chromebook</h2>
+        <p>Looking for games to play on a school Chromebook? Browse puzzle, racing, sports and arcade games in the grid above, use the search box to find a title, or go through the A-Z list of links below to see every game. These are free Chromebook games that play online in a browser tab, so they also work on a Windows PC or Mac.</p>
 
         <h2>Unblocked games by category</h2>
         <ul class="category-links">${categoryLinksHTML}</ul>
 
         <h2>Questions about ${SITE_NAME}</h2>
         ${faqHTML}
+
+        <h2 id="game-links-title">Unblocked game links A-Z: all ${games.length} games</h2>
+        <p>Every game on ${SITE_NAME}, in alphabetical order. Each name is a direct link to that game's own page.</p>
+        <nav class="game-directory-links" aria-labelledby="game-links-title">${gameDirectory}</nav>
       </section>
 
       ${generateBottomLeaderboardAd(adsEnabled)}
@@ -357,6 +370,7 @@ function generateIndexHTML(games, categories, mainStyles, clientJS, gamesDir = '
             <a href="/important-pages/terms-of-service.html">Terms of Service</a>
             <a href="/important-pages/contact.html">Contact</a>
             <a href="/important-pages/dmca.html">DMCA</a>
+            <a href="#" onclick="event.preventDefault(); if(window.cookieConsent) window.cookieConsent.reset();">Cookie Settings</a>
           </div>
         </div>
         <div class="footer-bottom">
